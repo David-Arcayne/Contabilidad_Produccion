@@ -1,0 +1,223 @@
+[{"modulo":"recursoshumanos",
+"menu":[
+  {
+    "usuario": "QWE12313ASDADADSA",
+    "titulo": "configuracion",
+    "codigo": "configurarion-QWE12313ASDADADSA",
+    "permiso": "0000",
+    "submenu": [
+      {
+        "titulo": "Areas",
+        "codigo": "configuracionesareas-QWE12313ASDADADSA",
+        "permiso": "1111"
+      },
+      {
+        "titulo": "Cargos",
+        "codigo": "configuracioncargos-QWE12313ASDADADSA",
+        "permiso": "1100"
+      },
+      {
+        "titulo": "Tipo de contrato",
+        "codigo": "configuraciontipocontrrato-QWE12313ASDADADSA",
+        "permiso": "1100"
+      },
+      {
+        "titulo": "Entes Reguladores",
+        "codigo": "configuracionenteregulador-QWE12313ASDADADSA",
+        "permiso": "1100"
+      },
+      {
+        "titulo": "Funciones y Obligaciones",
+        "codigo": "configuracionfunyoblig-QWE12313ASDADADSA",
+        "permiso": "1100"
+      },
+      {
+        "titulo": "Responsabilidades y prohibiciones",
+        "codigo": "configuracionrespyprohi-QWE12313ASDADADSA",
+        "permiso": "1100"
+      },
+      {
+        "titulo": "Metodos de Evaluacion",
+        "codigo": "configuracionmetevaluacion-QWE12313ASDADADSA",
+        "permiso": "1100"
+      },
+      {
+        "titulo": "Rangos de evaluación",
+        "codigo": "configuracionrangosevaluacion-QWE12313ASDADADSA",
+        "permiso": "1100"
+      },
+      {
+        "titulo": "Beneficios",
+        "codigo": "configuracionbeneficios-QWE12313ASDADADSA",
+        "permiso": "1100"
+      },
+      {
+        "titulo": "Tipos de sanciones",
+        "codigo": "configuraciontiposanciones-QWE12313ASDADADSA",
+        "permiso": "1100"
+      },
+      {
+        "titulo": "Motivos de bajas",
+        "codigo": "configuracionmotivobaja-QWE12313ASDADADSA",
+        "permiso": "1100"
+      },
+      {
+        "titulo": "Salario Minimo",
+        "codigo": "configuracionsalariominimo-QWE12313ASDADADSA",
+        "permiso": "1100"
+      },
+      {
+        "titulo": "Metodo de pago",
+        "codigo": "configuracionmetodopago-QWE12313ASDADADSA",
+        "permiso": "1100"
+      }
+    ]
+  },
+  {
+    "usuario": "QWE12313ASDADADSA",
+    "titulo": "Reclutamiento",
+    "codigo": "Personal-QWE12313ASDADADSA",
+    "permiso": "0000",
+    "submenu": [
+      {
+        "titulo": "Convocatorias",
+        "codigo": "Reclutamientoconvovatoria-QWE12313ASDADADSA",
+        "permiso": "1111"
+      },
+      {
+        "titulo": "Postulantes",
+        "codigo": "Reclutamientopostulante-QWE12313ASDADADSA",
+        "permiso": "1100"
+      },
+      {
+        "titulo": "Resultados de convocatorias",
+        "codigo": "Reclutamientoresultadoconvocatoria-QWE12313ASDADADSA",
+        "permiso": "1100"
+      }
+    ]
+  },
+  {
+    "usuario": "QWE12313ASDADADSA",
+    "titulo": "Empleados",
+    "codigo": "empleados-QWE12313ASDADADSA",
+    "permiso": "0000",
+    "submenu": [
+      {
+        "titulo": "Trabajadores",
+        "codigo": "empleadostrabajadore-QWE12313ASDADADSA",
+        "permiso": "1111"
+      },
+      {
+        "titulo": "Contrataciones",
+        "codigo": "empleadoscontrataciones-QWE12313ASDADADSA",
+        "permiso": "1100"
+      },
+      {
+        "titulo": "Permisos",
+        "codigo": "empleadospermisos-QWE12313ASDADADSA",
+        "permiso": "1100"
+      },
+      {
+        "titulo": "Sanciones",
+        "codigo": "empleadossanciones-QWE12313ASDADADSA",
+        "permiso": "1100"
+      },
+      {
+        "titulo": "Memorandums",
+        "codigo": "empleadosmemorandums-QWE12313ASDADADSA",
+        "permiso": "1100"
+      },
+      {
+        "titulo": "Anticipos",
+        "codigo": "empleadosanticipos-QWE12313ASDADADSA",
+        "permiso": "1100"
+      },
+      {
+        "titulo": "vacaciones",
+        "codigo": "empleadosvacaciones-QWE12313ASDADADSA",
+        "permiso": "1100"
+      },
+      {
+        "titulo": "Bajas",
+        "codigo": "empleadosbajas-QWE12313ASDADADSA",
+        "permiso": "1100"
+      }
+    ]
+  },
+  {
+    "usuario": "QWE12313ASDADADSA",
+    "titulo": "Actividades",
+    "codigo": "actividades-QWE12313ASDADADSA",
+    "permiso": "0000",
+    "submenu": [
+      {
+        "titulo": "Actividades",
+        "codigo": "actividadesavtividad-QWE12313ASDADADSA",
+        "permiso": "1111"
+      },
+      {
+        "titulo": "Evaluaciones de actividades",
+        "codigo": "registrarventas-QWE12313ASDADADSA",
+        "permiso": "1100"
+      }
+    ]
+  },
+  {
+    "usuario": "QWE12313ASDADADSA",
+    "titulo": "PLanillas",
+    "codigo": "planillas-QWE12313ASDADADSA",
+    "permiso": "0000",
+    "submenu": [
+      {
+        "titulo": "Sueldos y Salarios",
+        "codigo": "planillassueldossalarios-QWE12313ASDADADSA",
+        "permiso": "1111"
+      },
+      {
+        "titulo": "Aportes",
+        "codigo": "planillasaportes-QWE12313ASDADADSA",
+        "permiso": "1100"
+      },
+      {
+        "titulo": "Aguinaldos",
+        "codigo": "planillasaguinaldos-QWE12313ASDADADSA",
+        "permiso": "1100"
+      },
+      {
+        "titulo": "Reintegros",
+        "codigo": "planillasreitegros-QWE12313ASDADADSA",
+        "permiso": "1100"
+      }
+    ]
+  },
+  {
+    "usuario": "QWE12313ASDADADSA",
+    "titulo": "Boletas de Pago",
+    "codigo": "boletas-QWE12313ASDADADSA",
+    "permiso": "0000",
+    "submenu": [
+      {
+        "titulo": "Salarios",
+        "codigo": "boletassalario-QWE12313ASDADADSA",
+        "permiso": "1111"
+      },
+      {
+        "titulo": "Adelantos",
+        "codigo": "boletasadelantos-QWE12313ASDADADSA",
+        "permiso": "1100"
+      },
+      {
+        "titulo": "Aguinaldos",
+        "codigo": "boletasaguinaldo-QWE12313ASDADADSA",
+        "permiso": "1100"
+      },
+      {
+        "titulo": "Retroactivo",
+        "codigo": "boletasreintegros-QWE12313ASDADADSA",
+        "permiso": "1100"
+      }
+    ]
+  }
+]
+}
+]

@@ -1,0 +1,54 @@
+[{"modulo":"empresa",
+"menu":[
+    {
+      "usuario": "QWE12313ASDADADSA",
+      "titulo": "Configuracion",
+      "codigo": "configurarion-QWE12313ASDADADSA",
+      "permiso": "1111",
+      "submenu": [
+        {
+          "titulo": "Empresa",
+          "codigo": "empresa-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Recurso",
+          "codigo": "recurso-QWE12313ASDADADSA",
+          "permiso": "1111"
+        }
+      ]
+    },
+    {
+      "usuario": "QWE12313ASDADADSA",
+      "titulo": "Licencia",
+      "codigo": "mantenimiento-QWE12313ASDADADSA",
+      "permiso": "1111",
+      "submenu": [
+        {
+          "titulo": "Planes",
+          "codigo": "planes-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Pagos",
+          "codigo": "pagos-QWE12313ASDADADSA",
+          "permiso": "1111"
+        }
+      ]
+    },
+    {
+      "usuario": "QWE12313ASDADADSA",
+      "titulo": "Reportes",
+      "codigo": "compras-QWE12313ASDADADSA",
+      "permiso": "1111",
+      "submenu": [
+        {
+          "titulo": "Reporte Contable",
+          "codigo": "reportecontable-QWE12313ASDADADSA",
+          "permiso": "1111"
+        }
+      ]
+    }
+  ]
+}
+  ]

@@ -1,0 +1,308 @@
+/* Estilo para la tabla*/
+.reportaf table, .reportaf th, .reportaf td {
+    background-color: transparent;
+}
+
+.afr-table {
+    border-bottom: 1px solid #dee2e6;
+    border-collapse: collapse;
+    border-spacing: 0;
+    /* border: 1px solid #dee2e6; */
+    border-top: 1px solid #dee2e6;
+    color: #212529;
+    margin: 0;
+    width: 100%;
+}
+
+.afr-table.afr-striped tr:nth-child(2n) td {
+    background: #f5f5f5;
+}
+
+.afr-table th {
+   /* color: #5d6975; */
+   font-weight: bold;
+}
+
+.afr-table th,
+.afr-table td {
+    border-bottom: 1px solid #dee2e6;
+    padding: 0.75em 5px;
+    text-align: left;
+    vertical-align: top;
+}
+
+.afr-table thead th {
+    border-bottom: 1px solid #dee2e6;
+    vertical-align: bottom;
+}
+.afr-table .aft-vat td {
+    vertical-align: bottom;
+}
+
+.afr-table tbody+tbody {
+    border-top: 1px solid #dee2e6;
+}
+
+.afr-table-sm th,
+.afr-table-sm td {
+    padding: 0.3rem;
+}
+
+/* .afr-table-bordered {
+    border: 1px solid #dee2e6;
+} */
+
+table .afr-ts {
+    text-align: left !important;
+}
+table .afr-tsi {
+    font-style: italic;
+    text-align: left !important;
+}
+table .afr-te {
+    text-align: right !important;
+}
+table .afr-tei {
+    font-style: italic;
+    text-align: right !important;
+}
+table .afr-tc {
+    text-align: center !important;
+}
+table .afr-tci {
+    /* color: #212529;  */
+    /* color: #6c757d; */
+    font-style: italic;
+    text-align: center !important;
+}
+
+/* tabla desprecicaión */
+.afr-table-dpr {
+    margin-bottom: 20px;
+    border-collapse: collapse;
+    border-spacing: 0;
+    border-top: 1px solid #3b3b3b;
+    margin: 0;
+    width: 100%;
+}
+.afr-table-dpr th {
+    padding: 2px 2px;
+    background: #c4c3c3 !important;
+}
+.afr-table-dpr td {
+    padding: 5px 5px;
+    vertical-align: bottom;
+}
+.afr-table-dpr td,
+.afr-table-dpr th {
+    border-bottom: 1px solid #3b3b3b;
+    border-right: 1px solid #3b3b3b;
+}
+.afr-table-dpr tr td:nth-child(1),
+.afr-table-dpr tr th:nth-child(1) {
+    border-left: 1px solid #3b3b3b;
+}
+.afr-tcategory {
+    background: #c4c3c3 !important;
+}
+.afr-tcategory th {
+    padding: 5px 2px;
+    text-align: right;
+    text-transform: uppercase;
+    vertical-align: bottom;
+}
+.afr-tr-e td {
+    text-align: right;
+}
+table .afr-w-350 {
+    width: 350px;
+}
+table .afr-w-150 {
+    width: 150px;
+}
+table td.afr-void {
+    padding: 4px;
+    border: 0;
+    border-bottom: 1px solid #3b3b3b;
+}
+
+
+/* Estilo para el encabezado */
+.afr-header {
+    font-weight: bold;
+    overflow: hidden;
+}
+.afr-h-right {
+    float: right;
+    width: 35%;
+    /* background-color:red; */
+    text-align: right;
+}
+.afr-h-left {
+    float: left;
+    width: 35%;
+    /* background-color:yellow; */
+}
+.afr-h-center {
+    float: left;
+    /* background-color:lightblue; */
+    width: 30%;
+}
+.afr-h-table {
+    border-collapse: collapse;
+    /* background-color: green; */
+    width: 100%;
+    height: 100%;
+}
+.afr-h-table td {
+    width: 100%;
+    vertical-align: middle;
+    text-align: center;
+    height: 100px;
+}
+.afr-logo {
+    /* background-color: blue; */
+    max-width: 100px;
+    max-height: 100px;
+}
+
+.afr-header span {
+    color: #4b545e;
+    font-weight: normal;
+}
+
+.afr-pb div {
+    padding-bottom: 2px;
+}
+.afr-h-mb {
+    margin-bottom: 10px;
+}
+
+/* Estilo para textos */
+.reportaf h1 {
+    color: #4b545e;
+    font-weight: normal;
+    margin: 0px;
+    padding: 0px 0px;
+    text-align: center;
+}
+.afr-text-lg {
+    font-size: 1.667em;
+    font-weight: normal;
+}
+
+.afr-info {
+    overflow: hidden;
+}
+.afr-info span {
+    color: #4b545e;
+}
+.afr-info-right {
+    float: right;
+    width: 45%;
+}
+.afr-info-left {
+    float: left;
+    width: 47%;
+}
+.afr-color-gray {
+    color: #4b545e;
+}
+
+.afr-fwb{
+    font-weight: bold;
+}
+.afr-fwbi{
+    font-weight: bold;
+    font-style: italic;
+}
+
+.afr-filters {
+    border-bottom: 1px solid #cccccc;
+    margin: 5px 0 20px 0;
+    padding-bottom: 5px;
+    text-align: center;
+}
+.afr-filter-void {
+    border-bottom: 1px solid #cccccc;
+    margin: 5px 0 20px 0;
+}
+
+.afr-filters-t {
+    border-top: 1px solid #cccccc;
+    margin: 5px 0 15px 0;
+    padding-top: 5px;
+    text-align: center;
+}
+
+.afr-filters span,
+.afr-filters-t span {
+    color: gray;
+}
+
+.afr-start {
+    text-align: left;
+}
+.afr-end {
+    text-align: right;
+}
+.afr-center {
+    text-align: center;
+}
+.afr-pt {
+    padding-top: 10px;
+}
+
+/* Firmas */
+.afr-signatures {
+    margin-top: 20px;
+    text-align: center;
+    overflow: hidden;
+}
+
+.afr-sig {
+    float: left;
+    width: 25%;
+    text-align: center;
+    margin-top: 3rem;
+}
+
+/* Tabla con borde */
+.afr-table-bordered {
+    border-collapse: collapse;
+    border-spacing: 0;
+    border-top: 1px solid #dee2e6;
+    margin: 0;
+    width: 100%;
+    color: #212529;
+}
+.afr-table-bordered th {
+    font-weight: bold;
+}
+.afr-table-bordered td,
+.afr-table-bordered th {
+    border-bottom: 1px solid #dee2e6;
+    border-right: 1px solid #dee2e6;
+    padding: 0.75em 5px;
+    text-align: left;
+    vertical-align: top;
+}
+
+.afr-table-bordered tr td:nth-child(1),
+.afr-table-bordered tr th:nth-child(1) {
+    border-left: 1px solid #dee2e6;
+}
+
+.afr-table-bordered.afr-striped tr:nth-child(2n) td {
+    background: #f5f5f5;
+}
+.afr-table-bordered thead th {
+    border-bottom: 1px solid #dee2e6;
+    vertical-align: bottom;
+}
+.afr-table-bordered .aft-vat td {
+    vertical-align: bottom;
+}
+.afr-table-bordered tbody+tbody {
+    border-top: 1px solid #dee2e6;
+}

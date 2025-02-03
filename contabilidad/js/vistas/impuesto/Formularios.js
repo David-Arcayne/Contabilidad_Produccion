@@ -1,0 +1,36 @@
+export const formularioImpuesto = [
+    {
+        id: "impuesto_codigo",
+        label: "Código",
+        forma: "input",
+        tipo: "text",
+        nombre: "codigo",
+        required: true,
+        n_registro: "codigoimpuesto",
+    },
+    {
+        id: "impuesto_nombre",
+        label: "Nombre",
+        forma: "input",
+        tipo: "text",
+        nombre: "nombre",
+        required: true,
+        n_registro: "nombreimpuesto",
+    },
+    {
+        id: "impuesto_tasa",
+        label: "Tasa",
+        forma: "input",
+        tipo: "number",
+        nombre: "tasa",
+        required: true,
+    },
+    {
+        id: "impuesto_descripcion",
+        label: "Descripción",
+        forma: "input",
+        tipo: "text",
+        nombre: "descripcion",
+        required: true,
+    },
+];

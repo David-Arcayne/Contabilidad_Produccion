@@ -1,0 +1,203 @@
+[
+    {
+      "modulo":"comercial",
+      "usuario": "QWE12313ASDADADSA",
+      "titulo": "configuracion",
+      "codigo": "configurarion-QWE12313ASDADADSA",
+      "permiso": "1111",
+      "submenu": [
+        {
+          "titulo": "Asignar Usuarios",
+          "codigo": "configuracionesusuario-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Tipos de Almacénes",
+          "codigo": "configuracionventas-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Categorias de productos",
+          "codigo": "categoriaproductos-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Estado de producto",
+          "codigo": "estadoproducto-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Unidades de producto",
+          "codigo": "unidadproducto-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Caracteristicas de productos",
+          "codigo": "caracteristicaproducto-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Divisas",
+          "codigo": "divisas-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Tipos de clientes",
+          "codigo": "tiposcliente-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Canales de venta",
+          "codigo": "canalventa-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "leyendas de proformas",
+          "codigo": "leyendaproforma-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Precio Base",
+          "codigo": "preciobase-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Categoria de Precios",
+          "codigo": "categoriaprecio-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Precios Sugeridos",
+          "codigo": "preciosugerido-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Leyendas de facturas",
+          "codigo": "leyendaproforma-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Metodos de pago de facturas",
+          "codigo": "metodopagofactura-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Parametros de obsolecencia",
+          "codigo": "parametroobsolecencia-QWE12313ASDADADSA",
+          "permiso": "1111"
+        }
+      ]
+    },
+    {
+      "modulo":"comercial",
+      "usuario": "QWE12313ASDADADSA",
+      "titulo": "Mantenimiento",
+      "codigo": "mantenimiento-QWE12313ASDADADSA",
+      "permiso": "1111",
+      "submenu": [
+        {
+          "titulo": "Registrar Almacenés",
+          "codigo": "registraralmacenes-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Registrar Productos",
+          "codigo": "registrarproductos-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Asignar Productos",
+          "codigo": "asignarprodutos-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Movimientos",
+          "codigo": "movimientos-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Campañas",
+          "codigo": "campañas-QWE12313ASDADADSA",
+          "permiso": "1111"
+        }
+      ]
+    },
+    {
+      "modulo":"comercial",
+      "usuario": "QWE12313ASDADADSA",
+      "titulo": "Compras",
+      "codigo": "compras-QWE12313ASDADADSA",
+      "permiso": "1111",
+      "submenu": [
+        {
+          "titulo": "Registrar Proveedores",
+          "codigo": "registrarproveedores-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Registrar Pedidos",
+          "codigo": "registrarpedidos-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Registrar Compras",
+          "codigo": "registrarcompras-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Reportes",
+          "codigo": "reportesalmacen-QWE12313ASDADADSA",
+          "permiso": "1111"
+        }
+      ]
+    },
+    {
+      "modulo":"comercial",
+      "usuario": "QWE12313ASDADADSA",
+      "titulo": "Ventas",
+      "codigo": "ventas-QWE12313ASDADADSA",
+      "permiso": "1111",
+      "submenu": [
+        {
+          "titulo": "Registrar Clientes",
+          "codigo": "registrarclientes-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Realizar Ventas",
+          "codigo": "registrarventas-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Realizar Anulaciones",
+          "codigo": "realizaranulacion-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Realizar Cotizaciones",
+          "codigo": "realizarcotizacion-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Cuentas por Cobrar",
+          "codigo": "cuentasporcobrar-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Registrar mermas",
+          "codigo": "registrarmermas-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Registrar robos",
+          "codigo": "registrarrobos-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Reportes",
+          "codigo": "reportesventas-QWE12313ASDADADSA",
+          "permiso": "1111"
+        }
+      ]
+    }
+  ]

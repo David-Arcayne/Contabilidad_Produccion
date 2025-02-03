@@ -1,0 +1,128 @@
+.inner-div {
+    background-color: #00000050;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    
+    display: flex;
+}
+
+.floating-message {
+    background-color: #ffffff;
+    padding: 10px;
+    border-radius: 5px;
+    margin: auto; /* Los márgenes automáticos centrarán el contenido */
+}
+
+
+.shadow-af-primary {
+    border-color:#86b7fe;
+    outline:0;
+    box-shadow:0 0 0 .25rem rgba(13,110,253,.25)
+}
+.af-slz-auto {
+    width: 180px !important;
+    min-width: 20px !important;
+    max-width: 200px;
+} 
+.input-group:has(> select.af-slz-auto ) {
+    flex-wrap: nowrap;
+}
+
+
+/* Reset básico para Vista Previa*/
+.af-seccion, .af-seccion * {
+    all: revert; 
+}
+
+.reportaf * {
+    box-sizing: border-box;
+    /* font-family: Arial, sans-serif; */
+    margin: 0;
+    padding: 0;
+}
+.reportaf {
+    /* font-family: Arial, sans-serif; */
+    font-size: 11px !important;
+}
+.reportaf p {
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+}
+
+.af-seccion h1, .af-seccion h2, .af-seccion h3, .af-seccion h4, .af-seccion h5, .af-seccion h6 {
+    font-weight: normal;
+    margin-bottom: .5rem;
+}
+.af-seccion h1 {
+    font-size: 2.5rem;
+    margin: 0;
+    padding: 0;
+}
+
+.af-seccion h2 {
+    font-size: 2rem;
+}
+
+.af-seccion h3 {
+    font-size: 1.5rem;
+}
+
+.af-seccion h4 {
+    font-size: 1.17rem;
+}
+
+.af-seccion h5 {
+    font-size: 1rem;
+}
+
+.af-seccion h6 {
+    font-size: 0.83rem;
+}
+
+
+/* para pdf */
+.print-separador {
+    border: 0px solid; border-top: 1px solid #cccccc;
+    margin: 30px 0px
+}
+@media print {
+    .print-separador {
+      display: none; /* No muestra el separador en la impresión */
+    }
+}
+
+.af-seccion table {
+    page-break-inside: auto;
+}
+
+.af-seccion tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+}
+
+/* .af-seccion p {
+    page-break-inside: avoid;
+    page-break-after: auto;
+} */
+
+
+.reportaf table {
+    page-break-inside: auto;
+}
+
+.reportaf tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+}
+
+/* .reportaf p {
+    page-break-inside: avoid;
+    page-break-after: auto;
+} */

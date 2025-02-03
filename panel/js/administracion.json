@@ -1,0 +1,84 @@
+[{"modulo":"administracion",
+"menu":[
+    {
+      "usuario": "QWE12313ASDADADSA",
+      "titulo": "Configuracion",
+      "codigo": "configurarion-QWE12313ASDADADSA",
+      "permiso": "1111",
+      "submenu": [
+        {
+          "titulo": "Planes de Licencia",
+          "codigo": "planesdelicencia-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Configuracion contable",
+          "codigo": "configuracioncontable-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Configuracion RRHH",
+          "codigo": "configuracionrrhh-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Administracion",
+          "codigo": "administracion-QWE12313ASDADADSA",
+          "permiso": "1111"
+        }
+      ]
+    },
+    {
+      "usuario": "QWE12313ASDADADSA",
+      "titulo": "Administracion",
+      "codigo": "administracion-QWE12313ASDADADSA",
+      "permiso": "1111",
+      "submenu": [
+        {
+          "titulo": "Empresas",
+          "codigo": "empresas-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Licenciaadm",
+          "codigo": "licenciaadm-QWE12313ASDADADSA",
+          "permiso": "1111"
+        }
+      ]
+    },
+    {
+      "usuario": "QWE12313ASDADADSA",
+      "titulo": "Ventas",
+      "codigo": "ventas-QWE12313ASDADADSA",
+      "permiso": "1111",
+      "submenu": [
+        {
+          "titulo": "Clientes",
+          "codigo": "clientes-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Solicitudes",
+          "codigo": "solicitudes-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Licencias",
+          "codigo": "licencias-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Facturas",
+          "codigo": "facturas-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Cobros",
+          "codigo": "cobros-QWE12313ASDADADSA",
+          "permiso": "1111"
+        }
+      ]
+    }
+  ]
+}
+  ]

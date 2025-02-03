@@ -1,0 +1,84 @@
+[{"modulo":"contabilidad",
+"menu":[
+    {
+      "usuario": "QWE12313ASDADADSA",
+      "titulo": "Configuracion",
+      "codigo": "configurarion-QWE12313ASDADADSA",
+      "permiso": "1111",
+      "submenu": [
+        {
+          "titulo": "Plan de Cuentas",
+          "codigo": "plandecuentas-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Asiento Modelo",
+          "codigo": "asientomodelo-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Tipo de Cambio",
+          "codigo": "tipodecambio-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Gestion contable",
+          "codigo": "gestioncontable-QWE12313ASDADADSA",
+          "permiso": "1111"
+        }
+      ]
+    },
+    {
+      "usuario": "QWE12313ASDADADSA",
+      "titulo": "Registro",
+      "codigo": "mantenimiento-QWE12313ASDADADSA",
+      "permiso": "1111",
+      "submenu": [
+        {
+          "titulo": "Transacciones",
+          "codigo": "transacciones-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Clientes",
+          "codigo": "clientes-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Proveedores",
+          "codigo": "proveedores-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Facturas x cobrar",
+          "codigo": "facturasxcobrar-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Facturas x pagar",
+          "codigo": "facturasxpagar-QWE12313ASDADADSA",
+          "permiso": "1111"
+        }
+      ]
+    },
+    {
+      "usuario": "QWE12313ASDADADSA",
+      "titulo": "Reportes",
+      "codigo": "compras-QWE12313ASDADADSA",
+      "permiso": "1111",
+      "submenu": [
+        {
+          "titulo": "Reporte Contable",
+          "codigo": "reportecontable-QWE12313ASDADADSA",
+          "permiso": "1111"
+        },
+        {
+          "titulo": "Reporte Gestion",
+          "codigo": "reportegestion-QWE12313ASDADADSA",
+          "permiso": "1111"
+        }
+      ]
+    }
+]
+}
+  ]
