@@ -1,0 +1,16 @@
+
+.content-container {
+    overflow: hidden;
+    transition: max-height 0.5s ease-out;
+}
+.collapsed {
+    max-height: 0;
+}
+.expanded {
+    max-height: 500px; /* Ajusta según el contenido */
+}
+.scrollable-table {
+    max-height: 300px; /* Ajusta la altura según tus necesidades */
+    overflow-y: auto;
+    display: block;
+}
