@@ -154,7 +154,7 @@ $cont->cambiarestadoconsolidado($_POST['grupo'],$_POST['estado'],$_POST['fecha']
     $cont->editar_vinculacion_cuenta_xcxp($_POST['idvinculacion_cuenta_xcxp'],$_POST['cobrar_pagar']);
 }
 
-// ----------------------------------------------------------------------------
+// ---------------------------------------------------------------------------- crearfacturas
 else{
 if($data['ver'] == "cobrofacturasaasientomodelo") {
     $cont=new Transacciones_facturas();

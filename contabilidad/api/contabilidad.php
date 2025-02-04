@@ -1,6 +1,6 @@
 <?php
 session_start();
-//require_once "db.php"; lista_cobrar_cobrado_factura
+//require_once "db.php"; lista_cobrar_cobrado_factura crearfacturas
 require_once "../../db/db.php";
 class Contabilidad extends DB
 {
