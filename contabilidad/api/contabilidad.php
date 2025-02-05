@@ -1521,6 +1521,16 @@ WHERE
         } else {
             $trans = $qq['idtransacciones'];
         }
+        if(empty($archivo['name'])){
+            $registropago = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,archivo)
+            VALUES(NULL,'$nrecibo','$fecha','$idcliente','$persona','$ci','$monto','$idfactura','$trans','$idcuenta',NULL)");
+
+        if ($registropago === TRUE) {
+            $res = array("success", "Registro Realizado", "registrocobrarfactura");
+        } else {
+            $res = array("danger", "No se pudo realizar el registro");
+        }
+        }else{
          // Manejar la carga del archivo
         $archivo_nombre = "";
         if ($archivo['error'] == UPLOAD_ERR_OK) {
@@ -1548,6 +1558,7 @@ WHERE
         }else{
             $res = array("danger", "No se movio el archivo a la carpeta",$ruta_destino,$archivo_tmp,$archivo_nombre,$archivo);
         }
+    }
         // //registrar pago, preguntar guardar la anterior transaccion o la nueva
         // $registropago = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,archivo)
         // VALUES(NULL,'$nrecibo','$fecha','$idcliente','$persona','$ci','$monto','$idfactura','$trans','$idcuenta','$archivo_nombre')");
