@@ -5,7 +5,7 @@ require_once "./transacciones_facturas/transacciones_facturas.php";
 require_once "./plan_cuentas/plandecuentas.php";
 require_once "./transacciones_facturas/transFactura_pagar.php";
 $ver=$_POST['ver'];
-$json = file_get_contents('php://input'); // Decodificar el JSON en un arreglo PHP 
+$json = file_get_contents('php://input'); // Decodificar el JSON en un arreglo PHP  
 $data = json_decode($json, true);
 if($ver=="registroplanes"){
 $ad=new Admin();
@@ -151,7 +151,7 @@ $cont->cambiarestadoconsolidado($_POST['grupo'],$_POST['estado'],$_POST['fecha']
     $cont->registrar_vinculacion_cuentas_xcxp($_POST['plancuenta_id'],$_POST['tipocuenta_id'],$_POST['empresa_id']);
 }elseif($ver=="editar_vinculacion_cuenta_xcxp"){
     $cont=new Plandecuentas();
-    $cont->editar_vinculacion_cuenta_xcxp($_POST['idvinculacion_cuenta_xcxp'],$_POST['cobrar_pagar']);
+    $cont->editar_vinculacion_cuenta_xcxp($_POST['idvinculacion_cuenta_xcxp'],$_POST['idplandecuenta']);
 }
 
 // ---------------------------------------------------------------------------- crearfacturas

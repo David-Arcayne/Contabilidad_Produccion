@@ -1,6 +1,6 @@
 <?php
 session_start();
-//require_once "db.php"; lista_cobrar_cobrado_factura crearfacturas
+//require_once "db.php"; lista_cobrar_cobrado_factura crearfacturas listadesconsolidar
 require_once "../../db/db.php";
 class Contabilidad extends DB
 {
@@ -81,8 +81,7 @@ class Contabilidad extends DB
         $lista = [];
         
         // Consulta SQL
-        $sql =$this->dbc->query("
-            SELECT 
+        $sql =$this->dbc->query("SELECT 
                 d.iddesconsolidar, 
                 d.idtransaccion, 
                 MIN(t.codigotransaccion) AS desde_primero,
@@ -106,8 +105,9 @@ class Contabilidad extends DB
             GROUP BY 
                 d.codigo
             ORDER BY 
-                d.fechaproceso DESC,
-                d.horaproceso DESC;
+                d.estado = '0' DESC,
+                d.fecha DESC,
+                d.hora DESC;
         ");
     
             // Procesar los resultados
