@@ -1,6 +1,6 @@
 <?php
 session_start();
-//require_once "db.php"; lista_cobrar_cobrado_factura
+//require_once "db.php"; lista_cobrar_cobrado_factura crearfacturas
 require_once "../../db/db.php";
 class Contabilidad extends DB
 {
@@ -683,14 +683,43 @@ WHERE md5(p.organizacion_idorganizacion)='$ide'");
         echo  json_encode($lista);
     }
 
-    public function eliminarcliente($cliente)
+    public function eliminarcliente($id)
     {
         $res = "";
-        $registro = $this->dbcm->query("delete from cliente where id_cliente='$cliente'");
-        if ($registro === TRUE) {
-            $res = array("success", "Se elimino");
-        } else {
-            $res = array("danger", "No se pudo eliminar");
+        // $registro = $this->dbcm->query("delete from cliente where id_cliente='$cliente'");
+        // if ($registro === TRUE) {
+        //     $res = array("success", "Se elimino");
+        // } else {
+        //     $res = array("danger", "No se pudo eliminar");
+        // }
+        $this->dbcm->begin_transaction();
+    
+        try {
+            $relacionadas = [
+                // 'detalletransaccion' => 'No se puede eliminar porque hay registros en producción',
+                ['tabla' => 'factura', 'campo' => 'proveedorcliente_idproveedorcliente', 'mensaje' => 'No se puede eliminar']
+                // ['tabla' => 'asiento', 'campo' => 'idcuenta', 'mensaje' => 'No se puede eliminar'],
+                // ['tabla' => 'vinculacion_cuenta_xcxp ', 'campo' => 'idplandecuenta', 'mensaje' => 'No se puede eliminar'],
+                // ['tabla' => 'relacionip', 'campo' => 'idplandecuenta', 'mensaje' => 'No se puede eliminar']
+            ];
+    
+            foreach ($relacionadas as $relacion) {
+                $query = "SELECT 1 FROM {$relacion['tabla']} WHERE {$relacion['campo']} = $id";
+                $result = $this->dbc->query($query);
+                if ($result->num_rows > 0) {
+                    throw new Exception($relacion['mensaje']);
+                }
+            }
+    // $registro = $this->dbcm->query("DELETE FROM plandecuenta WHERE idplandecuenta='$dato'");
+            $query = "DELETE FROM cliente WHERE id_cliente='$id'";
+            $this->dbcm->query($query);
+            
+            $this->dbcm->commit();
+            $res = array("success", "Se eliminó correctamente", "eliminarcliente");
+    
+        } catch (Exception $e) {
+            $this->dbcm->rollback();
+            $res = array("danger", $e->getMessage(), "eliminarcliente");
         }
         echo json_encode($res);
     }
@@ -734,14 +763,44 @@ WHERE md5(p.organizacion_idorganizacion)='$ide'");
         }
         echo  json_encode($lista);
     }
-    public function eliminarproveedor($dato)
+    public function eliminarproveedor($id)
     {
         $res = "";
-        $registro = $this->dbcm->query("delete from proveedor where id_proveedor='$dato'");
-        if ($registro === TRUE) {
-            $res = array("success", "Se registro correctamente");
-        } else {
-            $res = array("danger", "No s epudo realizar");
+        // $registro = $this->dbcm->query("delete from proveedor where id_proveedor='$dato'");
+        // if ($registro === TRUE) {
+        //     $res = array("success", "Se registro correctamente");
+        // } else {
+        //     $res = array("danger", "No s epudo realizar");
+        // }
+// -----------------------------------------------------------------------------------
+        $this->dbcm->begin_transaction();
+    
+        try {
+            $relacionadas = [
+                // 'detalletransaccion' => 'No se puede eliminar porque hay registros en producción',
+                ['tabla' => 'factura', 'campo' => 'proveedorcliente_idproveedorcliente', 'mensaje' => 'No se puede eliminar']
+                // ['tabla' => 'asiento', 'campo' => 'idcuenta', 'mensaje' => 'No se puede eliminar'],
+                // ['tabla' => 'vinculacion_cuenta_xcxp ', 'campo' => 'idplandecuenta', 'mensaje' => 'No se puede eliminar'],
+                // ['tabla' => 'relacionip', 'campo' => 'idplandecuenta', 'mensaje' => 'No se puede eliminar']
+            ];
+    
+            foreach ($relacionadas as $relacion) {
+                $query = "SELECT 1 FROM {$relacion['tabla']} WHERE {$relacion['campo']} = $id";
+                $result = $this->dbc->query($query);
+                if ($result->num_rows > 0) {
+                    throw new Exception($relacion['mensaje']);
+                }
+            }
+    // $registro = $this->dbcm->query("DELETE FROM plandecuenta WHERE idplandecuenta='$dato'");
+            $query = "DELETE FROM proveedor WHERE id_proveedor='$id'";
+            $this->dbcm->query($query);
+            
+            $this->dbcm->commit();
+            $res = array("success", "Se eliminó correctamente", "eliminarproveedor");
+    
+        } catch (Exception $e) {
+            $this->dbcm->rollback();
+            $res = array("danger", $e->getMessage(), "eliminarproveedor");
         }
         echo json_encode($res);
     }
@@ -1886,5 +1945,5 @@ WHERE
             $res = array("ok" => "success", "estado" => "transaccion", "dato" => $qwe);
         }
         echo json_encode($res);
-    } //listafactura eliminartransaccion  eliminardetalle listafactura_cobrado listaclientes
+    } //listafactura eliminartransaccion  eliminarcliente listafactura_cobrado eliminarproveedor
 }
