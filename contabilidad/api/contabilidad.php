@@ -1526,17 +1526,22 @@ WHERE
         if ($archivo['error'] == UPLOAD_ERR_OK) {
             $archivo_tmp = $archivo['tmp_name'];
             $archivo_nombre = basename($archivo['name']);
+            // ----------------------------------
+            $unique_name = uniqid("img_", true) . '.' . $archivo_nombre;
+            // $target_file = $target_dir . $unique_name;
+
             // $ruta_destino = __DIR__ . "/archivos/" . $archivo_nombre;
-            $ruta_destino = "../archivos/" . $archivo_nombre;
+            $ruta_destino = "../archivos/" . $unique_name;
+            // $ruta_destino = "../archivos/" . $archivo_nombre;
             // move_uploaded_file($archivo_tmp, $ruta_destino);
         }
         if(move_uploaded_file($archivo_tmp, $ruta_destino)){
              //registrar pago, preguntar guardar la anterior transaccion o la nueva
         $registropago = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,archivo)
-        VALUES(NULL,'$nrecibo','$fecha','$idcliente','$persona','$ci','$monto','$idfactura','$trans','$idcuenta','$archivo_nombre')");
+        VALUES(NULL,'$nrecibo','$fecha','$idcliente','$persona','$ci','$monto','$idfactura','$trans','$idcuenta','$unique_name')");
 
         if ($registropago === TRUE) {
-            $res = array("success", "Registro Realizado", "registrocobrarfactura", $idfactura);
+            $res = array("success", "Registro Realizado", "registrocobrarfactura", $idfactura,$ruta_destino,$unique_name);
         } else {
             $res = array("danger", "No se pudo realizar el registro");
         }
@@ -1659,9 +1664,9 @@ WHERE
     
             }else{
                 //SOLO HAY INDIVIDUALES
-                $registro = $this->dbc->query("SELECT c.idcuentaspof,c.nrecibo,c.fecha,c.monto,c.persona,c.ci FROM cuentaspof as c WHERE c.idfactura='$idfactura'");
+                $registro = $this->dbc->query("SELECT c.idcuentaspof,c.nrecibo,c.fecha,c.monto,c.persona,c.ci,c.archivo FROM cuentaspof as c WHERE c.idfactura='$idfactura'");
                 while ($qwe = $this->dbc->fetch($registro)) {
-                    $res = array("id" => $qwe[0], "recibo" => $qwe[1], "fecha" => $qwe[2], "monto" => $qwe[3], "persona" => $qwe[4], "ci" => $qwe[5]);
+                    $res = array("id" => $qwe[0], "recibo" => $qwe[1], "fecha" => $qwe[2], "monto" => $qwe[3], "persona" => $qwe[4], "ci" => $qwe[5],"nombre_archivo" => $qwe[6]);
                     array_push($lista, $res);
                 }
         }
@@ -1968,4 +1973,4 @@ WHERE
         }
         echo json_encode($res);
     } //listafactura eliminartransaccion  eliminarcliente listafactura_cobrado eliminarproveedor listafactura_pagado
-}//cobrar
+}//cobrar listapagos
