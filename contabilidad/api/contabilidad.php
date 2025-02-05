@@ -1475,13 +1475,13 @@ WHERE
         echo json_encode($reporte);
     }
 
-    public function registrocobrarfactura($idfactura, $idtransaccion, $idcuenta, $fecha, $nrecibo, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa)
+    public function registrocobrarfactura($idfactura, $idtransaccion, $idcuenta, $fecha, $nrecibo, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$archivo)
     {
         $res = "";
         $sucursal = $this->getidsucursal($sucursal);
         $ide = $this->getidempresa($empresa);
         $empresa = $this->emp;
-        $transi = $this->dbc->query("select * from transacciones where organizacion_idorganizacion='$ide' and sucursal='$sucursal' order by idtransacciones desc Limit 1");
+        $transi = $this->dbc->query("SELECT * FROM transacciones WHERE organizacion_idorganizacion='$ide' and sucursal='$sucursal' order by idtransacciones desc Limit 1");
         $qq = $this->dbc->fetch($transi);
         $codigo = $qq['codigotransaccion'] + 1;
         $glosa = "Registro cobro $nrecibo";
@@ -1491,14 +1491,14 @@ WHERE
         if ($asiento != 0) {
             $insertrans = $this->dbc->query("INSERT INTO `transacciones` (`idtransacciones`, `codigotransaccion`, `fechatransaccion`, `tipodecambio`, `ndocumento`, `glosa`, `consolidar`, `tipotransaccion_idtipotransaccion`, `organizacion_idorganizacion`, `sucursal`, `idgestion`) VALUES (NULL, '$codigo', '$fecha', '1', '0', '$glosa', '1', '$tipotransaccion', '$ide', '$sucursal', '$gestion');");
             //nuevat transaccion
-            $transis = $this->dbc->query("select * from transacciones where codigotransaccion='$codigo' and  organizacion_idorganizacion='$ide' order by idtransacciones desc Limit 1");
+            $transis = $this->dbc->query("SELECT * FROM transacciones WHERE codigotransaccion='$codigo' AND  organizacion_idorganizacion='$ide' ORDER BY idtransacciones DESC LIMIT 1");
             $ww = $this->dbc->fetch($transis);
             $trans = $ww['idtransacciones'];
             //$detallepago
 
             $debe = 0;
             $haber = 0;
-            $tasiento = $this->dbc->query("select * from asiento where idasientotipo='$asiento'");
+            $tasiento = $this->dbc->query("SELECT * FROM asiento WHERE idasientotipo='$asiento'");
             $orden = 1;
             while ($qwe = $this->dbc->fetch($tasiento)) {
                 $pcuenta = $qwe['idcuenta'];
@@ -1521,15 +1521,37 @@ WHERE
         } else {
             $trans = $qq['idtransacciones'];
         }
-
-        //registrar pago, preguntar guardar la anterior transaccion o la nueva
-        $registropago = $this->dbc->query("insert into cuentaspof(idcuentaspof,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta)values(NULL,'$nrecibo','$fecha','$idcliente','$persona','$ci','$monto','$idfactura','$trans','$idcuenta')");
+         // Manejar la carga del archivo
+        $archivo_nombre = "";
+        if ($archivo['error'] == UPLOAD_ERR_OK) {
+            $archivo_tmp = $archivo['tmp_name'];
+            $archivo_nombre = basename($archivo['name']);
+            // $ruta_destino = __DIR__ . "/archivos/" . $archivo_nombre;
+            $ruta_destino = "../archivos/" . $archivo_nombre;
+            // move_uploaded_file($archivo_tmp, $ruta_destino);
+        }
+        if(move_uploaded_file($archivo_tmp, $ruta_destino)){
+             //registrar pago, preguntar guardar la anterior transaccion o la nueva
+        $registropago = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,archivo)
+        VALUES(NULL,'$nrecibo','$fecha','$idcliente','$persona','$ci','$monto','$idfactura','$trans','$idcuenta','$archivo_nombre')");
 
         if ($registropago === TRUE) {
             $res = array("success", "Registro Realizado", "registrocobrarfactura", $idfactura);
         } else {
             $res = array("danger", "No se pudo realizar el registro");
         }
+        }else{
+            $res = array("danger", "No se movio el archivo a la carpeta",$ruta_destino,$archivo_tmp,$archivo_nombre,$archivo);
+        }
+        // //registrar pago, preguntar guardar la anterior transaccion o la nueva
+        // $registropago = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,archivo)
+        // VALUES(NULL,'$nrecibo','$fecha','$idcliente','$persona','$ci','$monto','$idfactura','$trans','$idcuenta','$archivo_nombre')");
+
+        // if ($registropago === TRUE) {
+        //     $res = array("success", "Registro Realizado", "registrocobrarfactura", $idfactura);
+        // } else {
+        //     $res = array("danger", "No se pudo realizar el registro");
+        // }
         echo json_encode($res);
     }
 
@@ -1946,4 +1968,4 @@ WHERE
         }
         echo json_encode($res);
     } //listafactura eliminartransaccion  eliminarcliente listafactura_cobrado eliminarproveedor listafactura_pagado
-}
+}//cobrar

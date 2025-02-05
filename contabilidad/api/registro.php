@@ -89,8 +89,13 @@ $cont->registrocrearasientos($_POST['cuenta'],$_POST['porciento'],$_POST['tipo']
 $cont=new Contabilidad();
 $cont->detalletransaccion($_POST['trans'],$_POST['tipoasiento'],$_POST['monto'],$_POST['empresa'],$_POST['sucursal']);
 }elseif($ver=="registrocobrarfactura"){
-$cont=new Contabilidad();
-$cont->registrocobrarfactura($_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa']);
+if(isset($_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$_FILES['archivo'])){
+    $cont=new Contabilidad();
+    $cont->registrocobrarfactura($_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$_FILES['archivo']);
+}
+else{
+    echo json_encode(array("danger", "Faltan parámetros en la solicitud", $_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$_FILES['archivo']));
+}
 //$res=array($_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente']);
 //echo json_encode($res);
 }elseif($ver=="registrocobrarfacturaf5"){
@@ -154,7 +159,7 @@ $cont->cambiarestadoconsolidado($_POST['grupo'],$_POST['estado'],$_POST['fecha']
     $cont->editar_vinculacion_cuenta_xcxp($_POST['idvinculacion_cuenta_xcxp'],$_POST['idplandecuenta']);
 }
 
-// ---------------------------------------------------------------------------- crearfacturas
+// ---------------------------------------------------------------------------- registrocobrarfactura
 else{
 if($data['ver'] == "cobrofacturasaasientomodelo") {
     $cont=new Transacciones_facturas();
