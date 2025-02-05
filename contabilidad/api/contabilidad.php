@@ -1551,23 +1551,15 @@ WHERE
         VALUES(NULL,'$nrecibo','$fecha','$idcliente','$persona','$ci','$monto','$idfactura','$trans','$idcuenta','$unique_name')");
 
         if ($registropago === TRUE) {
-            $res = array("success", "Registro Realizado", "registrocobrarfactura", $idfactura,$ruta_destino,$unique_name);
+            $res = array("success", "Registro Realizado", "registrocobrarfactura");
         } else {
             $res = array("danger", "No se pudo realizar el registro");
         }
         }else{
-            $res = array("danger", "No se movio el archivo a la carpeta",$ruta_destino,$archivo_tmp,$archivo_nombre,$archivo);
+            $res = array("danger", "No se movio el archivo a la carpeta");
         }
     }
-        // //registrar pago, preguntar guardar la anterior transaccion o la nueva
-        // $registropago = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,archivo)
-        // VALUES(NULL,'$nrecibo','$fecha','$idcliente','$persona','$ci','$monto','$idfactura','$trans','$idcuenta','$archivo_nombre')");
 
-        // if ($registropago === TRUE) {
-        //     $res = array("success", "Registro Realizado", "registrocobrarfactura", $idfactura);
-        // } else {
-        //     $res = array("danger", "No se pudo realizar el registro");
-        // }
         echo json_encode($res);
     }
 
