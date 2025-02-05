@@ -30,13 +30,27 @@ class Plandecuentas extends DB{
         error_reporting(E_ALL);
         $fecha=date("Y-m-d");
         $idempresa=$this->getidempresa($empresa);
+
+        $consult=$this->dbc->query("SELECT COUNT(*) AS total1 FROM vinculacion_cuenta_xcxp WHERE idempresa='$idempresa' AND cobrar_pagar = '$cobrar_pagar'");
+        $resultado = $consult->fetch_assoc();
+        $total_1 = $resultado['total1'];
+
+        // $consult2=$this->dbc->query("SELECT COUNT(*) AS total2 FROM vinculacion_cuenta_xcxp WHERE idempresa='$idempresa' AND cobrar_pagar = 2");
+        // $resultado2 = $consult2->fetch_assoc();
+        // $total_2 = $resultado2['total2'];
+
         $res="";
-        $registro=$this->dbc->query("INSERT INTO vinculacion_cuenta_xcxp(idplandecuenta,cobrar_pagar,fecha_registro,idempresa)VALUES('$idplandecuenta','$cobrar_pagar','$fecha','$idempresa')");
-        if($registro===TRUE){
-            $res = array("success", "Se Registro Correctamente", "registrar_vinculacion_cuentas_xcxp");
+        if($total_1 > 0){
+            //error ya hay una vinculacion con tipo 1 o 2 en esta empresa
         }else{
-            $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde");
+            $registro=$this->dbc->query("INSERT INTO vinculacion_cuenta_xcxp(idplandecuenta,cobrar_pagar,fecha_registro,idempresa)VALUES('$idplandecuenta','$cobrar_pagar','$fecha','$idempresa')");
+            if($registro===TRUE){
+                $res = array("success", "Se Registro Correctamente", "registrar_vinculacion_cuentas_xcxp");
+            }else{
+                $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde");
+            }
         }
+
         echo json_encode($res);
 
     }
