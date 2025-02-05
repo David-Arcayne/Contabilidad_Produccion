@@ -1945,5 +1945,5 @@ WHERE
             $res = array("ok" => "success", "estado" => "transaccion", "dato" => $qwe);
         }
         echo json_encode($res);
-    } //listafactura eliminartransaccion  eliminarcliente listafactura_cobrado eliminarproveedor
+    } //listafactura eliminartransaccion  eliminarcliente listafactura_cobrado eliminarproveedor listafactura_pagado
 }
