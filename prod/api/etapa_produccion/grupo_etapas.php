@@ -358,7 +358,7 @@ class Grupo_etapas extends DB{
 
                     if($operacionesEtapas){
                         $idProd_etap = $this->dbp->insert_id;
-                        $res = array("success", "Registrp Exitoso","registrar_produccion_etapa,$idProd_etap");
+                        $res = array("success", "Registrp Exitoso","registrar_produccion_etapa",$idProd_etap);
                     }else{
                         $res = array("danger", "No se pudo registrar","registrar_produccion_etapa");
                     }
