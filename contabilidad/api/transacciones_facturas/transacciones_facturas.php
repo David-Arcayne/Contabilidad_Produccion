@@ -18,7 +18,7 @@ class Transacciones_facturas extends DB{
 
     public function getgestionactualC($empresa)
     {
-        $orga = $this->getidempresa($empresa); // recibe md5 de la id
+        $orga = $this->getidempresa($empresa); // recibe md5 de la id insert
         $res = "";
         $registro = $this->dbc->query("SELECT * FROM gestion WHERE idempresa='$orga' AND estado='2' LIMIT 1");
         $qwe = $this->dbc->fetch($registro);

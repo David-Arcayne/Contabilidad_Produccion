@@ -5,7 +5,7 @@ class Grupo_etapas extends DB{
     public function registrar_grupo_etapas_ordenados($idgrupo, $nombre, $empresa,$rubro, $etapas_ordenes) {
         //  echo json_encode(array($idgrupo, $nombre, $empresa,$rubro, $etapas_ordenes));
 
-        // Obtener el ID de la empresa listar_grupo_etapas
+        // Obtener el ID de la empresa listar_grupo_etapas registrar_produccion
         // ---------------------------------------------------------
         $idempresa = $this->getidempresa($empresa);
     
@@ -357,7 +357,8 @@ class Grupo_etapas extends DB{
                             VALUES ('$fecha_pe','$hora_pe','$fecha_fin','$hora_fin','0','$idproduccion','$idetapaProduccion','$idempleado','$idgrupoEtapas')");
 
                     if($operacionesEtapas){
-                        $res = array("success", "Registrp Exitoso","registrar_produccion_etapa");
+                        $idProd_etap = $this->dbp->insert_id;
+                        $res = array("success", "Registrp Exitoso","registrar_produccion_etapa,$idProd_etap");
                     }else{
                         $res = array("danger", "No se pudo registrar","registrar_produccion_etapa");
                     }
