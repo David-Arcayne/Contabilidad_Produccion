@@ -115,7 +115,7 @@ $cont->eliminartasiento($ver[1]);
 }
 // elseif($ver[0]=="listafactura"){
 // $cont=new Contabilidad();
-// $cont->listafactura($ver[1]);
+// $cont->listafactura($ver[1]); individual
 // }
 elseif($ver[0]=="eliminarfactura"){
 $cont=new Contabilidad();

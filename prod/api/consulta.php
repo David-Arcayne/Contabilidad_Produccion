@@ -51,6 +51,7 @@ require_once "./empleado_rh/modopago.php";
 require_once "./gastos/costo_produccion.php";
 require_once "./gastos/gastos_generales.php";
 require_once "./despachar/despachar_producto.php";//listado_produccion_grupo_etapas
+require_once "./merma_fisico/alma_fisic_merma.php";
 
 $url=explode("/",$_GET['ver']); 
 if($url[0]=="listar_divisas"){
@@ -570,6 +571,18 @@ elseif($url[0] == "listar_ListaCompraEditable"){
 }elseif($url[0] == "listar_producto_almacen"){
     $prov = new Stock_productos();
     $prov->listar_producto_almacen($url[1]);
+}elseif($url[0] == "eliminar_almacen_fisico"){
+    $prov = new Alma_fisic_merma();
+    $prov->eliminar_almacen_fisico($url[1]);
+}elseif($url[0] == "listar_almacen_fisico"){
+    $prov = new Alma_fisic_merma();
+    $prov->listar_almacen_fisico($url[1]);
+}elseif($url[0] == "eliminar_merma"){
+    $prov = new Alma_fisic_merma();
+    $prov->eliminar_merma($url[1]);
+}elseif($url[0] == "listar_merma"){
+    $prov = new Alma_fisic_merma();
+    $prov->listar_merma($url[1]);
 }
 
 ?>         
