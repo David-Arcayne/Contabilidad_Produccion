@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista_orden_produccion_ordenada_por_grupos de Grupos con Bootstrap</title>
+    <!-- Incluye Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Estilos para diferentes grupos */
+        
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">Lista_orden_produccion_ordenada_por_grupos de Grupos y Productos</h1>
+        <div id="contenedor"></div>
+    </div>
+
+    <!-- Incluye Bootstrap y jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const Lista_Grupo_productos = [
+            {
+                "grupo_etapas_idgrupo_etapas": "3",
+                "nombre": "panes especiales",
+                "grupo_productos": [
+                    { "idgrupo_productos": "1", "producto_idproducto": "245", "grupo_etapas_idgrupo_etapas": "3" },
+                    { "idgrupo_productos": "2", "producto_idproducto": "246", "grupo_etapas_idgrupo_etapas": "3" },
+                    { "idgrupo_productos": "31", "producto_idproducto": "258", "grupo_etapas_idgrupo_etapas": "3" }
+                ]
+            },
+            {
+                "grupo_etapas_idgrupo_etapas": "7",
+                "nombre": "café yungas",
+                "grupo_productos": [
+                    { "idgrupo_productos": "4", "producto_idproducto": "249", "grupo_etapas_idgrupo_etapas": "7" },
+                    { "idgrupo_productos": "5", "producto_idproducto": "252", "grupo_etapas_idgrupo_etapas": "7" },
+                    { "idgrupo_productos": "6", "producto_idproducto": "253", "grupo_etapas_idgrupo_etapas": "7" }
+                ]
+            },
+            {
+                "grupo_etapas_idgrupo_etapas": "10",
+                "nombre": "panetones",
+                "grupo_productos": [
+                    { "idgrupo_productos": "7", "producto_idproducto": "50", "grupo_etapas_idgrupo_etapas": "10" },
+                    { "idgrupo_productos": "8", "producto_idproducto": "200", "grupo_etapas_idgrupo_etapas": "10" }
+                ]
+            }
+        ];
+
+        const Lista_orden_produccion_ordenada_por_grupos = {
+            "3": [
+                { "iddetalle_produccion": 101, "cantidad": 15, "observaciones": "detalle especial", "orden_produccion_idorden_produccion": 1, "producto_idproducto": 245, "grupo_etapas_idgrupo_etapas": "3" },
+                { "iddetalle_produccion": 102, "cantidad": 20, "observaciones": "detalle extra", "orden_produccion_idorden_produccion": 1, "producto_idproducto": 246, "grupo_etapas_idgrupo_etapas": "3" }
+            ],
+            "7": [
+                { "iddetalle_produccion": 27, "cantidad": 23, "observaciones": "detalle", "orden_produccion_idorden_produccion": 1, "producto_idproducto": 252, "grupo_etapas_idgrupo_etapas": "7" },
+                { "iddetalle_produccion": 28, "cantidad": 23, "observaciones": "detalle", "orden_produccion_idorden_produccion": 1, "producto_idproducto": 100, "grupo_etapas_idgrupo_etapas": "7" }
+            ],
+            "10": [
+                { "iddetalle_produccion": 45, "cantidad": 23, "observaciones": "detalle", "orden_produccion_idorden_produccion": 1, "producto_idproducto": 50, "grupo_etapas_idgrupo_etapas": "10" },
+                { "iddetalle_produccion": 46, "cantidad": 23, "observaciones": "detalle", "orden_produccion_idorden_produccion": 1, "producto_idproducto": 200, "grupo_etapas_idgrupo_etapas": "10" }
+            ],
+            "Sin grupo": [
+                { "iddetalle_produccion": 1, "cantidad": 50, "observaciones": "detalle", "orden_produccion_idorden_produccion": 1, "producto_idproducto": 16, "grupo_etapas_idgrupo_etapas": "Sin grupo" }
+            ]
+        };
+
+        const contenedor = document.getElementById('contenedor');
+
+        Object.keys(Lista_orden_produccion_ordenada_por_grupos).forEach(key => {
+            let grupoNombre;
+            let claseGrupo;
+
+            // Determina el nombre y clase CSS del grupo
+            const grupo = Lista_Grupo_productos.find(grupo => grupo.grupo_etapas_idgrupo_etapas === key);
+            if (grupo) {
+                grupoNombre = grupo.nombre;
+                claseGrupo = `grupo-${key}`;
+            } else {
+                grupoNombre = "Sin grupo";
+                claseGrupo = 'sin-grupo';
+            }
+
+            // Crea el contenedor del grupo en una fila completa
+            const divGrupo = document.createElement('div');
+            divGrupo.classList.add('p-3', 'mb-4', claseGrupo, 'rounded');
+            divGrupo.innerHTML = `<h4 class="text-center">${grupoNombre}</h4>`;
+            divGrupo.style.backgroundColor = generarColorAleatorio();
+
+            // Agrega una fila interna para cada detalle de producción del grupo
+            Lista_orden_produccion_ordenada_por_grupos[key].forEach(detalle => {
+                const divDetalle = document.createElement('div');
+                divDetalle.classList.add('row', 'border', 'border-dark', 'p-2', 'rounded', 'mb-2');
+                divDetalle.innerHTML = `
+                    <div class="col-md-3"><p><strong>ID:</strong> ${detalle.iddetalle_produccion}</p></div>
+                    <div class="col-md-3"><p><strong>Cantidad:</strong> ${detalle.cantidad}</p></div>
+                    <div class="col-md-3"><p><strong>Observaciones:</strong> ${detalle.observaciones}</p></div>
+                    <div class="col-md-3"><p><strong>Producto ID:</strong> ${detalle.producto_idproducto}</p></div>
+                `;
+                divGrupo.appendChild(divDetalle);
+            });
+
+            contenedor.appendChild(divGrupo);
+        });
+
+
+        function generarColorAleatorio() {
+            // Genera un número aleatorio entre 0 y 16777215 (hexadecimal para 'ffffff')
+            const color = Math.floor(Math.random() * 16777215).toString(16);
+            // Asegura que el color tenga siempre 6 caracteres
+            return `#${color.padStart(6, "0")}`;
+        }
+    </script>
+</body>
+</html>

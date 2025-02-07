@@ -86,6 +86,30 @@ public function registrarStockProductos($cantidad,$costo_unitario,$empresa,$idlo
          }
          echo json_encode($lista,JSON_NUMERIC_CHECK);
     }
+
+    public function listar_producto_almacen($idproducto_almacen) {
+        $lista = [];
+        // $idempresa = $this->getidempresa($empresa);
+    
+        // Preparar la consulta
+        $getPedido = $this->dbcm->query("SELECT * FROM productos_almacen WHERE id_productos_almacen = '$idproducto_almacen'");
+    
+        while ($qwe = $this->dbp->fetch($getPedido)) {
+            $res = array(
+                "id_productos_almacen" => $qwe['id_productos_almacen'],
+                "fecha_registro" => $qwe['fecha_registro'],
+                "estado" => $qwe['estado'],
+                "stock_minimo" => $qwe['stock_minimo'],
+                "stock_maximo" => $qwe['stock_maximo'],
+                "pais" => $qwe['pais'],
+                "almacen_id_almacen" => $qwe['almacen_id_almacen'],
+                "productos_id_productos" => $qwe['productos_id_productos']
+            );
+            array_push($lista, $res);
+        }
+    
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
     public function getidempresa($md5){
         $registro=$this->dbe->query("select * from organizacion where md5(idorganizacion)='$md5'");
         $qwe=$this->dbe->fetch($registro);
