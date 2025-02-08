@@ -583,6 +583,9 @@ elseif($url[0] == "listar_ListaCompraEditable"){
 }elseif($url[0] == "listar_merma"){
     $prov = new Alma_fisic_merma();
     $prov->listar_merma($url[1]);
-}
+}elseif($url[0] == "listar_salida_produccion"){
+    $prov = new Grupo_etapas();
+    $prov->listar_salida_produccion($url[1]);
+}//produccion_etapa
 
 ?>         

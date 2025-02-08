@@ -5,7 +5,7 @@ class Grupo_etapas extends DB{
     public function registrar_grupo_etapas_ordenados($idgrupo, $nombre, $empresa,$rubro, $etapas_ordenes) {
         //  echo json_encode(array($idgrupo, $nombre, $empresa,$rubro, $etapas_ordenes));
 
-        // Obtener el ID de la empresa listar_grupo_etapas registrar_produccion
+        // Obtener el ID de la empresa listar_grupo_etapas registrar_produccion salida
         // ---------------------------------------------------------
         $idempresa = $this->getidempresa($empresa);
     
@@ -541,6 +541,25 @@ public function listaSalidaProduccion($empresa) {
 
     // Preparar la consulta
     $getPedido = $this->dbp->query("SELECT * FROM salida_produccion WHERE empresa_idempresa='$idempresa' ORDER BY idsalida_produccion DESC");
+
+    while ($qwe = $this->dbp->fetch($getPedido)) {
+        $res = array(
+            "idsalida_produccion" => $qwe['idsalida_produccion'],
+            "cantidad" => $qwe['cantidad'],
+            "produccion_idproduccion" => $qwe['produccion_idproduccion'],
+            "producto_idproducto" => $qwe['producto_idproducto']
+        );
+        array_push($lista, $res);
+    }
+
+    echo json_encode($lista, JSON_NUMERIC_CHECK);
+}
+public function listar_salida_produccion($idproduccion) {
+    $lista = [];
+    // $idempresa = $this->getidempresa($empresa); listar_produccion_etapa_porProduccion
+
+    // Preparar la consulta
+    $getPedido = $this->dbp->query("SELECT * FROM salida_produccion WHERE produccion_idproduccion='$idproduccion'");
 
     while ($qwe = $this->dbp->fetch($getPedido)) {
         $res = array(

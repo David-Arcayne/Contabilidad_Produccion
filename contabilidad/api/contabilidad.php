@@ -1570,17 +1570,65 @@ WHERE
         echo json_encode($res);
     }
 
-    public function registrocobrarfacturaf5($idfactura, $idcobro, $idtransaccion, $idcuenta, $fecha, $nrecibo, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa)
+    public function registrocobrarfacturaf5($idrecibo,$fecha, $nrecibo, $persona, $ci,$archivo)
     {
         $res = "";
 
-        $registropago = $this->dbc->query("UPDATE cuentaspof SET nrecibo='$nrecibo',fecha='$fecha',persona='$persona',ci='$ci' WHERE idcuentaspof='$idcobro'");
+        if(empty($archivo['name'])){
 
-        if ($registropago === TRUE) {
-            $res = array("success", "Registro Realizado", "registrocobrarfactura", $idfactura);
+            $update = $this->dbc->query("UPDATE cuentaspof SET nrecibo='$nrecibo',fecha='$fecha',persona='$persona',ci='$ci' WHERE idcuentaspof='$idrecibo'");
+
+            if ($update === TRUE) {
+                $res = array("success", "Registro Realizado", "registrocobrarfactura",$idrecibo,$fecha, $nrecibo, $persona, $ci,$archivo);
+            } else {
+                $res = array("danger", "No se pudo realizar el registro");
+            }
+
+
+        //     $registropago = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,archivo)
+        //     VALUES(NULL,'$nrecibo','$fecha','$idcliente','$persona','$ci','$monto','$idfactura','$trans','$idcuenta',NULL)");
+
+        // if ($registropago === TRUE) {
+        //     $res = array("success", "Registro Realizado", "registrocobrarfactura");
+        // } else {
+        //     $res = array("danger", "No se pudo realizar el registro");
+        // }
+        }else{
+         // Manejar la carga del archivo
+        $archivo_nombre = "";
+        if ($archivo['error'] == UPLOAD_ERR_OK) {
+            $archivo_tmp = $archivo['tmp_name'];
+            $archivo_nombre = basename($archivo['name']);
+            // ----------------------------------
+            $unique_name = uniqid("img_", true) . '.' . $archivo_nombre;
+            // $target_file = $target_dir . $unique_name;
+
+            // $ruta_destino = __DIR__ . "/archivos/" . $archivo_nombre;
+            $ruta_destino = "../archivos/" . $unique_name;
+            // $ruta_destino = "../archivos/" . $archivo_nombre;
+            // move_uploaded_file($archivo_tmp, $ruta_destino);
+        }
+        if(move_uploaded_file($archivo_tmp, $ruta_destino)){
+             //registrar pago, preguntar guardar la anterior transaccion o la nueva
+        $updateArch = $this->dbc->query("UPDATE cuentaspof SET nrecibo='$nrecibo',fecha='$fecha',persona='$persona',ci='$ci',archivo='$unique_name' WHERE idcuentaspof='$idrecibo'");
+
+        if ($updateArch === TRUE) {
+            $res = array("success", "Edicion Realizada", "registrocobrarfactura");
         } else {
             $res = array("danger", "No se pudo realizar el registro");
         }
+        }else{
+            $res = array("danger", "No se movio el archivo a la carpeta");
+        }
+    }
+    //-------------------------------------------------------------------------------------------
+        // $registropago = $this->dbc->query("UPDATE cuentaspof SET nrecibo='$nrecibo',fecha='$fecha',persona='$persona',ci='$ci' WHERE idcuentaspof='$idcobro'");
+
+        // if ($registropago === TRUE) {
+        //     $res = array("success", "Registro Realizado", "registrocobrarfactura", $idfactura);
+        // } else {
+        //     $res = array("danger", "No se pudo realizar el registro");
+        // }
         echo json_encode($res);
     }
     public function registropagarfactura($idfactura, $idtransaccion, $idcuenta, $fecha, $nrecibo, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa)
