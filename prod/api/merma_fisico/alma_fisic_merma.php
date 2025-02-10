@@ -94,7 +94,7 @@ class Alma_fisic_merma extends DB{
             $resultado = $consulta->fetch_assoc();
             $cantidadAlmacen = $resultado['cantidad'];
             $resCant = $cantidadAlmacen - $cantidad;
-            $editarAlmacen = $this->dbp->query("UPDATE almacen_material SET cantidad = '$resCant'");
+            $editarAlmacen = $this->dbp->query("UPDATE almacen_material SET cantidad = '$resCant' WHERE idalmacen_material = '$idalmacen'");
                                                                                                                                                         
                 $res = array("success", "Registro exitoso","registrar_merma");
             } else {
@@ -173,7 +173,7 @@ class Alma_fisic_merma extends DB{
                 // Insertar el nuevo registro
                 $registroProveedor = $this->dbp->query("DELETE FROM merma WHERE idmerma = '$id'");
                 if ($registroProveedor === TRUE) {   
-                    $editarAlmacen = $this->dbp->query("UPDATE almacen_material SET cantidad = '$resCant'");                                                                                                                                                 
+                    $editarAlmacen = $this->dbp->query("UPDATE almacen_material SET cantidad = '$resCant' WHERE idalmacen_material = '$idalmacen'");                                                                                                                                                 
                     $res = array("success", "se elimino exitosamente","eliminar_merma");
                 } else {
                     $res = array("danger", "No se pudo registrar");
