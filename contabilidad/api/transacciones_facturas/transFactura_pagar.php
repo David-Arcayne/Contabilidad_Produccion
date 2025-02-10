@@ -108,6 +108,7 @@ class TransFactura_pagar extends DB{
         error_reporting(E_ALL);
     
         $facturas = json_decode($data, true);
+        // echo json_encode(array($fecha,$nrecibo,$persona,$ci,$monto,$idasientotipo,$empresa,$sucursal,$archivo,$facturas));
         $ide = $this->getidempresa($empresa);
         $idsucursal = $this->getidsucursal($sucursal); 
         $gestion = $this->getgestionactualid($ide);
@@ -206,57 +207,30 @@ if ($registropago2 === TRUE) {
 // $registropago = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta)VALUES('$nrecibo','$fecha','varios clientes','$persona','$ci','$monto','0','$idtrans','0')");
 // Obtener el ID del registro recién insertado
 
-$idcuentasPof = $this->dbc->insert_id;
+$idcuentasPor = $this->dbc->insert_id;
 foreach($facturas as $factura){
 
-    $cobras = $this->dbc->query("SELECT SUM(monto) AS montoSuma FROM cuentaspof WHERE idfactura='$factura[idfactura]'"); //173
+    $cobras = $this->dbc->query("SELECT SUM(monto) AS montoSuma FROM cuentaspor WHERE idfactura='$factura[idfactura]'"); //173
     // $asd = $this->dbc->fetch($cobras);
     $asd = $cobras->fetch_assoc();
     if($asd['montoSuma'] == NULL){
-        $registrarTabla = $this->dbc->query("INSERT INTO cuentascobrar_grupal(idcuentaspof,idfactura,monto)VALUES('$idcuentasPof','$factura[idfactura]','$factura[monto]')");
+        $registrarTabla = $this->dbc->query("INSERT INTO cuentaspagar_grupal(idcuentaspor,idfactura,monto)VALUES('$idcuentasPor','$factura[idfactura]','$factura[monto]')");
     }else{
         $montoSuma = $asd['montoSuma'];
         $montoCobrado = $factura['monto'] - $montoSuma;
-        $registrarTabla = $this->dbc->query("INSERT INTO cuentascobrar_grupal(idcuentaspof,idfactura,monto)VALUES('$idcuentasPof','$factura[idfactura]','$montoCobrado')");
+        $registrarTabla = $this->dbc->query("INSERT INTO cuentaspagar_grupal(idcuentaspor,idfactura,monto)VALUES('$idcuentasPor','$factura[idfactura]','$montoCobrado')");
     }
     // $montoFacturas += $factura['monto'];
     // $updatetranscodigo = $this->dbc->query("UPDATE factura SET transacciones_idtransacciones = '$idtrans' WHERE idfactura = '{$factura['idfactura']}'");
 }
 
 if ($registrarTabla === TRUE) {
-    $res = array("success", "Registro Realizado", "registrocobrarfacturaGrupal");
+    $res = array("success", "Registro Realizado", "registropagarfacturaGrupal");
 } else {
     $res = array("danger", "No se pudo realizar el registro");
 }
-
-        // //registrar pago, preguntar guardar la anterior transaccion o la nueva
-        // $registropago = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta)VALUES('$data[nrecibo]','$data[fecha]','varios clientes','$data[persona]','$data[ci]','$data[monto]','0','$idtrans','0')");
-        // // Obtener el ID del registro recién insertado
-
-        // $idcuentasPor = $this->dbc->insert_id;
-        // foreach($data['facturas'] as $factura){
-
-        //     $cobras = $this->dbc->query("SELECT SUM(monto) AS montoSuma FROM cuentaspor WHERE idfactura='$factura[idfactura]'"); //173
-        //     // $asd = $this->dbc->fetch($cobras);
-        //     $asd = $cobras->fetch_assoc();
-        //     if($asd['montoSuma'] == NULL){
-        //         $registrarTabla = $this->dbc->query("INSERT INTO cuentaspagar_grupal(idcuentaspor,idfactura,monto)VALUES('$idcuentasPor','$factura[idfactura]','$factura[monto]')");
-        //     }else{
-        //         $montoSuma = $asd['montoSuma'];
-        //         $montoCobrado = $factura['monto'] - $montoSuma;
-        //         $registrarTabla = $this->dbc->query("INSERT INTO cuentaspagar_grupal(idcuentaspor,idfactura,monto)VALUES('$idcuentasPor','$factura[idfactura]','$montoCobrado')");
-        //     }
-        //     // $montoFacturas += $factura['monto'];
-        //     // $updatetranscodigo = $this->dbc->query("UPDATE factura SET transacciones_idtransacciones = '$idtrans' WHERE idfactura = '{$factura['idfactura']}'");
-        // }
-       
-        // if ($registropago === TRUE) {
-        //     $res = array("success", "Registro Realizado", "registropagarfacturaGrupal");
-        // } else {
-        //     $res = array("danger", "No se pudo realizar el registro");
-        // }
         echo json_encode($res);
-    }
+}
 
     public function lista_pagar_pagado_factura($sucursal)
     {
@@ -403,10 +377,10 @@ public function listapagos_individuales($idfactura)
                 $listaGrup2 = $this->dbc->query("SELECT * FROM cuentaspagar_grupal WHERE idfactura='$idfactura'");
                 $resultado33 = $listaGrup2->fetch_assoc();
                 $idrecibo2 = $resultado33['idcuentaspor'];
-                $datosRecibo2 = $this->dbc->query("SELECT nrecibo,fecha,persona,ci,monto,idcuentaspor FROM cuentaspor WHERE idcuentaspor='$idrecibo2'");
+                $datosRecibo2 = $this->dbc->query("SELECT nrecibo,fecha,persona,ci,monto,idcuentaspor,archivo FROM cuentaspor WHERE idcuentaspor='$idrecibo2'");
                 
                 while ($www = $this->dbc->fetch($datosRecibo2)) {
-                    $res2 = array("recibo" => $www[0], "fecha" => $www[1], "persona" => $www[2], "ci" => $www[3], "monto" => $resultado33['monto'], "id" => $www[5]);
+                    $res2 = array("recibo" => $www[0], "fecha" => $www[1], "persona" => $www[2], "ci" => $www[3], "monto" => $resultado33['monto'], "id" => $www[5],"nombre_archivo" => $www[6]);
                     array_push($lista, $res2);
                 }
     

@@ -2,6 +2,9 @@
 require_once "../../db/db.php";
 class Alma_fisic_merma extends DB{
     public function registrar_almacen_fisico($idmaterial,$idtipo_envase,$cantidad,$empresa){
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
         $idempresa = $this->getidempresa($empresa);
         if (0 > 0) {
             $res = array("Error", "El registro ya existe","Error");
@@ -72,18 +75,27 @@ class Alma_fisic_merma extends DB{
             echo json_encode($res);
     }
     //----------------------------------------------------------------------------------------------------------
-    public function registrar_merma($cantidad_envase,$peso_neto,$tipo_envase_idtipo_envase,$cantidad,$costo_unitario,$costo_envase,$material_idmaterial,$empresa,$idproveedor,$idcompra){
+    public function registrar_merma($cantidad_envase,$peso_neto,$tipo_envase_idtipo_envase,$cantidad,$costo_unitario,$costo_envase,$material_idmaterial,$empresa,$idproveedor,$idcompra,$idalmacen){
+        
         $idempresa = $this->getidempresa($empresa);
         // $consulta = $this->dbp->query("SELECT COUNT(*) AS total FROM caracteristicas WHERE caracteristica = '$nombre' AND empresa_idempresa = '$idempresa'");
         // $resultado = $consulta->fetch_assoc();
         // $totalRegistros = $resultado['total'];
         // idmerma,cantidad_envase,peso_neto,tipo_envase_idtipo_envase,cantidad,costo_unitario,costo_envase,material_idmaterial,empresa_idempresa,proveedor_idproveedor,compra_idcompra
+        // echo json_encode(array($cantidad_envase,$peso_neto,$tipo_envase_idtipo_envase,$cantidad,$costo_unitario,$costo_envase,$material_idmaterial,$empresa,$idproveedor,$idcompra,$idalmacen));
+        
         if (0 > 0) {
             $res = array("Error", "El registro ya existe","Error");
         } else {
             // Insertar el nuevo registro
-            $registroProveedor = $this->dbp->query("INSERT INTO merma(cantidad_envase,peso_neto,tipo_envase_idtipo_envase,cantidad,costo_unitario,costo_envase,material_idmaterial,empresa_idempresa,proveedor_idproveedor,compra_idcompra) VALUES ('$cantidad_envase','$peso_neto','$tipo_envase_idtipo_envase','$cantidad','$costo_unitario','$costo_envase','$material_idmaterial','$idempresa','$idproveedor','$idcompra')");
-            if ($registroProveedor === TRUE) {                                                                                                                                                                
+            $registroProveedor = $this->dbp->query("INSERT INTO merma(cantidad_envase,peso_neto,tipo_envase_idtipo_envase,cantidad,costo_unitario,costo_envase,material_idmaterial,empresa_idempresa,proveedor_idproveedor,compra_idcompra,almacen_material_idalmacen_material) VALUES ('$cantidad_envase','$peso_neto','$tipo_envase_idtipo_envase','$cantidad','$costo_unitario','$costo_envase','$material_idmaterial','$idempresa','$idproveedor','$idcompra','$idalmacen')");
+            if ($registroProveedor === TRUE) { 
+            $consulta = $this->dbp->query("SELECT cantidad FROM almacen_material WHERE idalmacen_material = '$idalmacen'");
+            $resultado = $consulta->fetch_assoc();
+            $cantidadAlmacen = $resultado['cantidad'];
+            $resCant = $cantidadAlmacen - $cantidad;
+            $editarAlmacen = $this->dbp->query("UPDATE almacen_material SET cantidad = '$resCant'");
+                                                                                                                                                        
                 $res = array("success", "Registro exitoso","registrar_merma");
             } else {
                 $res = array("danger", "No se pudo registrar");
@@ -145,12 +157,23 @@ class Alma_fisic_merma extends DB{
     }
     public function eliminar_merma($id){
 
+        $consulta = $this->dbp->query("SELECT cantidad, almacen_material_idalmacen_material FROM merma WHERE idmerma = '$id'");
+        $resultado = $consulta->fetch_assoc();
+        $cantidadMerma = $resultado['cantidad'];
+        $idalmacen = $resultado['almacen_material_idalmacen_material'];
+
+        $consulta2 = $this->dbp->query("SELECT cantidad FROM almacen_material WHERE idalmacen_material = '$idalmacen'");
+        $resultado2 = $consulta2->fetch_assoc();
+        $cantidadAlmacen = $resultado2['cantidad'];
+
+        $resCant = $cantidadAlmacen + $cantidadMerma;
             if (0 > 0) {
                 $res = array("danger", "No se puede eliminar porque hay registros en proveedor_has_material","eliminar_proveedor");
             } else {
                 // Insertar el nuevo registro
                 $registroProveedor = $this->dbp->query("DELETE FROM merma WHERE idmerma = '$id'");
-                if ($registroProveedor === TRUE) {                                                                                                                                                    
+                if ($registroProveedor === TRUE) {   
+                    $editarAlmacen = $this->dbp->query("UPDATE almacen_material SET cantidad = '$resCant'");                                                                                                                                                 
                     $res = array("success", "se elimino exitosamente","eliminar_merma");
                 } else {
                     $res = array("danger", "No se pudo registrar");

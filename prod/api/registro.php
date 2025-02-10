@@ -1286,11 +1286,11 @@ elseif($ver=="registroUnidadTiempoControl") {// esto sale del hidden del input q
         echo json_encode(array("Error", "Faltan parámetros en la solicitud",$_POST['idetapa_producccion_has_empleado'],$_POST['fecha_fin']));
     }
 }elseif($ver=="registrar_almacen_fisico") {// esto sale del hidden del input que esta en el formulario
-    if (isset($_POST['material_idmaterial'],$_POST['$tipo_envase_idtipo_envase'],$_POST['cantidad'],$_POST['empresa_idempresa'])) {
+    if (isset($_POST['material_idmaterial'],$_POST['tipo_envase_idtipo_envase'],$_POST['cantidad'],$_POST['empresa_idempresa'])) {
         $envase = new Alma_fisic_merma();
-    $envase->registrar_almacen_fisico($_POST['material_idmaterial'],$_POST['$tipo_envase_idtipo_envase'],$_POST['cantidad'],$_POST['empresa_idempresa']);
+    $envase->registrar_almacen_fisico($_POST['material_idmaterial'],$_POST['tipo_envase_idtipo_envase'],$_POST['cantidad'],$_POST['empresa_idempresa']);
     }else{
-        echo json_encode(array("Error", "Faltan parámetros en la solicitud",$_POST['material_idmaterial'],$_POST['$tipo_envase_idtipo_envase'],$_POST['cantidad'],$_POST['empresa_idempresa']));
+        echo json_encode(array("Error", "Faltan parámetros en la solicitud",$_POST['material_idmaterial'],$_POST['tipo_envase_idtipo_envase'],$_POST['cantidad'],$_POST['empresa_idempresa']));
     }
 }elseif($ver=="editar_almacen_fisico") {// esto sale del hidden del input que esta en el formulario
     if (isset($_POST['idalmacen_fisico'],$_POST['cantidad'])) {
@@ -1300,11 +1300,11 @@ elseif($ver=="registroUnidadTiempoControl") {// esto sale del hidden del input q
         echo json_encode(array("Error", "Faltan parámetros en la solicitud",$_POST['idalmacen_fisico'],$_POST['cantidad']));
     }
 }elseif($ver=="registrar_merma") {// esto sale del hidden del input que esta en el formulario
-    if (isset($_POST['cantidad_envase'],$_POST['peso_neto'],$_POST['$tipo_envase_idtipo_envase'],$_POST['cantidad'],$_POST['costo_unitario'],$_POST['costo_envase'],$_POST['$material_idmaterial'],$_POST['empresa_idempresa'],$_POST['$proveedor_idproveedor'],$_POST['compra_idcompra'])) {
+    if (isset($_POST['cantidad_envase'],$_POST['peso_neto'],$_POST['tipo_envase_idtipo_envase'],$_POST['cantidad'],$_POST['costo_unitario'],$_POST['costo_envase'],$_POST['material_idmaterial'],$_POST['empresa_idempresa'],$_POST['proveedor_idproveedor'],$_POST['compra_idcompra'],$_POST['almacen_material_idalmacen_material'])) {
         $envase = new Alma_fisic_merma();
-    $envase->registrar_merma($_POST['cantidad_envase'],$_POST['peso_neto'],$_POST['$tipo_envase_idtipo_envase'],$_POST['cantidad'],$_POST['costo_unitario'],$_POST['costo_envase'],$_POST['$material_idmaterial'],$_POST['empresa_idempresa'],$_POST['$proveedor_idproveedor'],$_POST['compra_idcompra']);
+    $envase->registrar_merma($_POST['cantidad_envase'],$_POST['peso_neto'],$_POST['tipo_envase_idtipo_envase'],$_POST['cantidad'],$_POST['costo_unitario'],$_POST['costo_envase'],$_POST['material_idmaterial'],$_POST['empresa_idempresa'],$_POST['proveedor_idproveedor'],$_POST['compra_idcompra'],$_POST['almacen_material_idalmacen_material']);
     }else{
-        echo json_encode(array("Error", "Faltan parámetros en la solicitud",$_POST['cantidad_envase'],$_POST['peso_neto'],$_POST['$tipo_envase_idtipo_envase'],$_POST['cantidad'],$_POST['costo_unitario'],$_POST['costo_envase'],$_POST['$material_idmaterial'],$_POST['empresa_idempresa'],$_POST['$proveedor_idproveedor'],$_POST['compra_idcompra']));
+        echo json_encode(array("Error", "Faltan parámetros en la solicitud",$_POST['cantidad_envase'],$_POST['peso_neto'],$_POST['tipo_envase_idtipo_envase'],$_POST['cantidad'],$_POST['costo_unitario'],$_POST['costo_envase'],$_POST['material_idmaterial'],$_POST['empresa_idempresa'],$_POST['proveedor_idproveedor'],$_POST['compra_idcompra'],$_POST['almacen_material_idalmacen_material']));
     }
 }elseif($ver=="editar_merma") {// esto sale del hidden del input que esta en el formulario
     if (isset($_POST['idmerma'],$_POST['cantidad_envase'],$_POST['peso_neto'],$_POST['cantidad'],$_POST['costo_unitario'],$_POST['costo_envase'])) {
