@@ -125,7 +125,7 @@ INNER JOIN seccion s ON s.idseccion = tl.seccion_idseccion WHERE s.empresa_idemp
         
         // ------------------------------------------------------------------------------------
 
-        public function registrar_tarea_limpieza($limpieza, $descripcion, $frecuencia, $costo,$idseccion,$idcontrol_unidad_tiempo){
+        public function registrar_tarea_limpieza($limpieza, $descripcion, $frecuencia, $costo,$fecha_final,$idseccion,$idcontrol_unidad_tiempo,$idempleado){
             // $res = array("$cantEnvase", "$material",$tipoEnvase,"$contenidoEnvase","$medida","$empresa");
             // echo json_encode($res);
             //  $idempresa = $this->getidempresa($empresa);
@@ -139,7 +139,7 @@ INNER JOIN seccion s ON s.idseccion = tl.seccion_idseccion WHERE s.empresa_idemp
                     $res = array("danger", "El registro ya existe");
                 } else {
                     // Insertar el nuevo registro
-                    $registroEstandar = $this->dbp->query("INSERT INTO tarea_limpieza(limpieza, descripcion, frecuencia, costo,seccion_idseccion,idcontrol_unidad_tiempo) VALUES ('$limpieza', '$descripcion', '$frecuencia', '$costo','$idseccion','$idcontrol_unidad_tiempo')");
+                    $registroEstandar = $this->dbp->query("INSERT INTO tarea_limpieza(limpieza, descripcion, frecuencia, costo,fecha_final,seccion_idseccion,idcontrol_unidad_tiempo,empleado_idempleado) VALUES ('$limpieza', '$descripcion', '$frecuencia', '$costo','$fecha_final','$idseccion','$idcontrol_unidad_tiempo','$idempleado')");
                     if ($registroEstandar === TRUE) {                                                                                                                                                                
                         $res = array("success", "Registro exitoso","registrar_tarea_limpieza");
                     } else {
@@ -154,7 +154,7 @@ INNER JOIN seccion s ON s.idseccion = tl.seccion_idseccion WHERE s.empresa_idemp
                 error_reporting(E_ALL);
                 $lista = [];
                 $idempresa = $this->getidempresa($empresa);
-                $getPedido = $this->dbp->query("SELECT * FROM tarea_limpieza tl 
+                $getPedido = $this->dbp->query("SELECT tl.* FROM tarea_limpieza tl 
                             INNER JOIN seccion s ON s.idseccion = tl.seccion_idseccion
                             WHERE s.empresa_idempresa='$idempresa';");
                 // $nombre, $codigo, $nit, $detalle, $direccion, $telefono,$mobil, $email, $web, $pais, $ciudad, $zona, $contacto,$empresa
@@ -164,14 +164,16 @@ INNER JOIN seccion s ON s.idseccion = tl.seccion_idseccion WHERE s.empresa_idemp
                      "descripcion"=>$qwe['descripcion'],
                      "frecuencia"=>$qwe['frecuencia'],
                      "costo"=>$qwe['costo'],
+                     "fecha_final"=>$qwe['fecha_final'],
                      "seccion_idseccion"=>$qwe['seccion_idseccion'],
-                     "idcontrol_unidad_tiempo"=>$qwe['idcontrol_unidad_tiempo']
+                     "idcontrol_unidad_tiempo"=>$qwe['idcontrol_unidad_tiempo'],
+                     "empleado_idempleado"=>$qwe['empleado_idempleado']
                     ); //'nombre' sale del formulario de input hidden
                     array_push($lista,$res);
                  }
                   echo json_encode($lista);
             }
-            public function editar_tarea_limpieza($idtarea_limpieza,$limpieza,$descripcion,$frecuencia,$costo,$seccion_idseccion,$idcontrol_unidad_tiempo) {
+            public function editar_tarea_limpieza($idtarea_limpieza,$limpieza,$descripcion,$frecuencia,$costo,$fecha_final,$seccion_idseccion,$idcontrol_unidad_tiempo) {
                 // echo json_encode(array($id,$nombre,$codigo,$nit,$detalle,$direccion,$telefono,$mobil,$email,$web,$pais,$ciudad,$zona,$contacto,$empresa));
                 // $idempresa = $this->getidempresa($empresa);
                 ini_set('display_errors', 1);
@@ -186,6 +188,7 @@ INNER JOIN seccion s ON s.idseccion = tl.seccion_idseccion WHERE s.empresa_idemp
                                                 descripcion = '$descripcion',
                                                 frecuencia = '$frecuencia',
                                                 costo = '$costo',
+                                                fecha_final = '$fecha_final',
                                                 seccion_idseccion = '$seccion_idseccion',
                                                 idcontrol_unidad_tiempo = '$idcontrol_unidad_tiempo'
                                             WHERE idtarea_limpieza = '$idtarea_limpieza';");

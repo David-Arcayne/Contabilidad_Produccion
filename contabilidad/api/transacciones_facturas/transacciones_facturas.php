@@ -238,4 +238,25 @@ $nroTransaccion = $resultado12['codigotransaccion'] + 1;
         }
         echo json_encode($res);
     }
+    public function anular_factura($idfactura,$estado) {
+        // $idempresa = $this->getidempresa($empresa);
+        // $consulta = $this->dbp->query("SELECT COUNT(*) AS total FROM caracteristicas WHERE caracteristica = '$nombre'");
+        // $resultado = $consulta->fetch_assoc();
+        // $totalRegistros = $resultado['total'];
+
+        if (0 > 0) {
+            $res = array("Error", "El registro ya existe","anular_factura");
+        }else {
+            // Insertar el nuevo registro
+            $registroListaCompra = $this->dbp->query("UPDATE factura
+                                    SET estado = '$estado'
+                                    WHERE idfactura = '$idfactura';");
+            if ($registroListaCompra === TRUE) {                                                                                                                                                                
+                $res = array("success", "Anulacion exitosa","anular_factura");
+            } else {
+                $res = array("danger", "No se pudo editar");
+            }
+        }
+        echo json_encode($res);
+    }
 }

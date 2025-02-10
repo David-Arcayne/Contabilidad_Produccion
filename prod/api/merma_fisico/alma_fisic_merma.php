@@ -1,13 +1,13 @@
 <?php
 require_once "../../db/db.php";
 class Alma_fisic_merma extends DB{
-    public function registrar_almacen_fisico($idmaterial,$idtipo_envase,$cantidad){
-
+    public function registrar_almacen_fisico($idmaterial,$idtipo_envase,$cantidad,$empresa){
+        $idempresa = $this->getidempresa($empresa);
         if (0 > 0) {
             $res = array("Error", "El registro ya existe","Error");
         } else {
             // Insertar el nuevo registro
-            $registroProveedor = $this->dbp->query("INSERT INTO almacen_fisico(material_idmaterial,tipo_envase_idtipo_envase,cantidad) VALUES ('$idmaterial','$idtipo_envase','$cantidad')");
+            $registroProveedor = $this->dbp->query("INSERT INTO almacen_fisico(material_idmaterial,tipo_envase_idtipo_envase,cantidad,empresa_idempresa) VALUES ('$idmaterial','$idtipo_envase','$cantidad','$idempresa')");
             if ($registroProveedor === TRUE) {                                                                                                                                                                
                 $res = array("success", "Registro exitoso","registrar_almacen_fisico");
             } else {
@@ -22,16 +22,16 @@ class Alma_fisic_merma extends DB{
         $idempresa = $this->getidempresa($empresa);
     
         // Preparar la consulta
-        $getPedido = $this->dbp->query("SELECT * FROM almacen_fisico AS af
-        INNER JOIN material m ON m.idmaterial = af.material_idmaterial
-         WHERE m.empresa_idempresa = '$idempresa' ORDER BY af.idalmacen_fisico DESC");
+        $getPedido = $this->dbp->query("SELECT * FROM almacen_fisico 
+         WHERE empresa_idempresa = '$idempresa' ORDER BY idalmacen_fisico DESC");
     
         while ($qwe = $this->dbp->fetch($getPedido)) {
             $res = array(
                 "idalmacen_fisico" => $qwe['idalmacen_fisico'],
                 "material_idmaterial" => $qwe['material_idmaterial'],
                 "tipo_envase_idtipo_envase" => $qwe['tipo_envase_idtipo_envase'],
-                "cantidad" => $qwe['cantidad']
+                "cantidad" => $qwe['cantidad'],
+                "empresa_idempresa" => $qwe['empresa_idempresa']
             );
             array_push($lista, $res);
         }

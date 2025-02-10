@@ -100,7 +100,7 @@ WHERE s.empresa_idempresa='$idempresa';");
 
         // ------------------------------------------------------------------------------------
 
-        public function registrar_tareas_mantenimiento($mantenimiento, $descripcion, $frecuencia, $costo,$maquina_idmaquina,$idcontrol_unidad_tiempo){
+        public function registrar_tareas_mantenimiento($mantenimiento, $descripcion, $frecuencia, $costo,$fecha_final,$maquina_idmaquina,$idcontrol_unidad_tiempo,$idempleado){
             // $res = array("$cantEnvase", "$material",$tipoEnvase,"$contenidoEnvase","$medida","$empresa");
             // echo json_encode($r
             //  $idempresa = $this->getidempresa($empresa);
@@ -114,7 +114,7 @@ WHERE s.empresa_idempresa='$idempresa';");
                     $res = array("danger", "El registro ya existe");
                 } else {
                     // Insertar el nuevo registro
-                    $registroEstandar = $this->dbp->query("INSERT INTO tareas_mantenimiento(mantenimiento, descripcion, frecuencia, costo,maquina_idmaquina,idcontrol_unidad_tiempo) VALUES ('$mantenimiento', '$descripcion', '$frecuencia', '$costo','$maquina_idmaquina','$idcontrol_unidad_tiempo')");
+                    $registroEstandar = $this->dbp->query("INSERT INTO tareas_mantenimiento(mantenimiento, descripcion, frecuencia, costo,fecha_final,maquina_idmaquina,idcontrol_unidad_tiempo,empleado_idempleado) VALUES ('$mantenimiento', '$descripcion', '$frecuencia', '$costo','$fecha_final','$maquina_idmaquina','$idcontrol_unidad_tiempo','$idempleado')");
                     if ($registroEstandar === TRUE) {                                                                                                                                                                
                         $res = array("success", "Registro exitoso","registrar_tareas_mantenimiento");
                     } else {
@@ -140,14 +140,16 @@ WHERE s.empresa_idempresa='$idempresa';");
                      "descripcion"=>$qwe['descripcion'],
                      "frecuencia"=>$qwe['frecuencia'],
                      "costo"=>$qwe['costo'],
+                     "fecha_final"=>$qwe['fecha_final'],
                      "maquina_idmaquina"=>$qwe['maquina_idmaquina'],
-                     "idcontrol_unidad_tiempo"=>$qwe['idcontrol_unidad_tiempo']
+                     "idcontrol_unidad_tiempo"=>$qwe['idcontrol_unidad_tiempo'],
+                     "empleado_idempleado"=>$qwe['empleado_idempleado']
                     ); //'nombre' sale del formulario de input hidden
                     array_push($lista,$res);
                  }
                   echo json_encode($lista);
             }
-            public function editar_tareas_mantenimiento($idtareas_mantenimiento,$mantenimiento,$descripcion,$frecuencia,$costo,$maquina_idmaquina,$idcontrol_unidad_tiempo) {
+            public function editar_tareas_mantenimiento($idtareas_mantenimiento,$mantenimiento,$descripcion,$frecuencia,$costo,$fecha_final,$maquina_idmaquina,$idcontrol_unidad_tiempo) {
                 // echo json_encode(array($id,$nombre,$codigo,$nit,$detalle,$direccion,$telefono,$mobil,$email,$web,$pais,$ciudad,$zona,$contacto,$empresa));
                 // $idempresa = $this->getidempresa($empresa);
                 ini_set('display_errors', 1);
@@ -162,6 +164,7 @@ WHERE s.empresa_idempresa='$idempresa';");
                                                 descripcion = '$descripcion',
                                                 frecuencia = '$frecuencia',
                                                 costo = '$costo',
+                                                fecha_final = '$fecha_final',
                                                 maquina_idmaquina = '$maquina_idmaquina',
                                                 idcontrol_unidad_tiempo = '$idcontrol_unidad_tiempo'
                                             WHERE idtareas_mantenimiento = '$idtareas_mantenimiento';");

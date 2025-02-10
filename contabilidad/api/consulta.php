@@ -297,5 +297,5 @@ $cont->lista_cobrar_cobrado_factura($ver[1]);
     $cont=new Contabilidad();
     $cont->listafactura_cobrado_trans($ver[1]);
 }
-//listafactura eliminartransaccion eliminardetalletransaccion
+//listafactura eliminartransaccion eliminardetalletransaccion listapagos_individuales
 ?>

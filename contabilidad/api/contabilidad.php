@@ -1364,9 +1364,9 @@ WHERE
                             }
                     $res = array("id" => $qwe[0], "fecha" => $qwe[1], "numero" => $qwe[2], "codigo" => $qwe[3], "idproveedor" => $qwe[5], "nombrep" => $pro['nombre'], "monto" => $qwe[4], "pagado" => $asd[0], "saldo" => $saldo, "transaccion" => $qwe[6], "cuenta" => $qwe[7], "detalle" => $pagados);
                     array_push($lista, $res);
-                }
+                }//listapagos
             }elseif($hayGrupales > 0){
-                //hay solo grupales
+                //hay solo grupales 
                 $listaGrup = $this->dbc->query("SELECT * FROM cuentascobrar_grupal WHERE idfactura='$qwe[0]'");
                 $resultado3 = $listaGrup->fetch_assoc();
                 $idrecibo = $resultado3['idcuentaspof'];
@@ -1484,7 +1484,7 @@ WHERE
         $res = "";
         $sucursal = $this->getidsucursal($sucursal);
         $ide = $this->getidempresa($empresa);
-        // $empresa = $this->emp;
+        // $empresa = $this->emp; registropagarfactura
         $transi = $this->dbc->query("SELECT * FROM transacciones WHERE organizacion_idorganizacion='$ide' and sucursal='$sucursal' order by idtransacciones desc Limit 1");
         $qq = $this->dbc->fetch($transi);
         $codigo = $qq['codigotransaccion'] + 1;
@@ -1550,7 +1550,7 @@ WHERE
             // $ruta_destino = __DIR__ . "/archivos/" . $archivo_nombre;
             $ruta_destino = "../archivos/" . $unique_name;
             // $ruta_destino = "../archivos/" . $archivo_nombre;
-            // move_uploaded_file($archivo_tmp, $ruta_destino);
+            // move_uploaded_file($archivo_tmp, $ruta_destino); grupal
         }
         if(move_uploaded_file($archivo_tmp, $ruta_destino)){
              //registrar pago, preguntar guardar la anterior transaccion o la nueva
@@ -1631,7 +1631,7 @@ WHERE
         // }
         echo json_encode($res);
     }
-    public function registropagarfactura($idfactura, $idtransaccion, $idcuenta, $fecha, $nrecibo, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa)
+    public function registropagarfactura($idfactura, $idtransaccion, $idcuenta, $fecha, $nrecibo, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$archivo)
     {
         $res = "";
         $sucursal = $this->getidsucursal($sucursal);
@@ -1640,10 +1640,11 @@ WHERE
         $transi = $this->dbc->query("select * from transacciones where organizacion_idorganizacion='$ide' and sucursal='$sucursal' order by idtransacciones desc Limit 1");
         $qq = $this->dbc->fetch($transi);
         $codigo = $qq['codigotransaccion'] + 1;
-        $glosa = "Registro de Pago ";
+        $glosa = "Registro de Pago $nrecibo";
         $gestion = $this->getgestionactualid($ide);
         $tipotransaccion = 2; //ingreso
 
+        if ($asiento != 0) {
         $insertrans = $this->dbc->query("INSERT INTO `transacciones` (`idtransacciones`, `codigotransaccion`, `fechatransaccion`, `tipodecambio`, `ndocumento`, `glosa`, `consolidar`, `tipotransaccion_idtipotransaccion`, `organizacion_idorganizacion`, `sucursal`, `idgestion`) VALUES (NULL, '$codigo', '$fecha', '1', '0', '$glosa', '1', '$tipotransaccion', '$ide', '$sucursal', '$gestion');");
         //nuevat transaccion
         $transis = $this->dbc->query("select * from transacciones where codigotransaccion='$codigo' and  organizacion_idorganizacion='$ide' order by idtransacciones desc Limit 1");
@@ -1673,16 +1674,57 @@ WHERE
 
             $orden = $orden + 1;
         }
+    }else{
+        $trans = $qq['idtransacciones'];
+    }
+// -------------------------------------------------------------------------------------------
 
+    if(empty($archivo['name'])){
+        $registropago = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,archivo)
+        VALUES(NULL,'$nrecibo','$fecha','$idcliente','$persona','$ci','$monto','$idfactura','$trans','$idcuenta',NULL)");
 
+    if ($registropago === TRUE) {
+        $res = array("success", "Registro Realizado", "registropagarfactura");
+    } else {
+        $res = array("danger", "No se pudo realizar el registro");
+    }
+    }else{
+     // Manejar la carga del archivo
+    $archivo_nombre = "";
+    if ($archivo['error'] == UPLOAD_ERR_OK) {
+        $archivo_tmp = $archivo['tmp_name'];
+        $archivo_nombre = basename($archivo['name']);
+        // ----------------------------------
+        $unique_name = uniqid("img_", true) . '.' . $archivo_nombre;
+        // $target_file = $target_dir . $unique_name;
+
+        // $ruta_destino = __DIR__ . "/archivos/" . $archivo_nombre;
+        $ruta_destino = "../archivos/" . $unique_name;
+        // $ruta_destino = "../archivos/" . $archivo_nombre;
+        // move_uploaded_file($archivo_tmp, $ruta_destino); grupal
+    }
+    if(move_uploaded_file($archivo_tmp, $ruta_destino)){
+         //registrar pago, preguntar guardar la anterior transaccion o la nueva
+    $registropago2 = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,archivo)
+    VALUES(NULL,'$nrecibo','$fecha','$idcliente','$persona','$ci','$monto','$idfactura','$trans','$idcuenta','$unique_name')");
+
+    if ($registropago2 === TRUE) {
+        $res = array("success", "Registro Realizado", "registropagarfactura");
+    } else {
+        $res = array("danger", "No se pudo realizar el registro");
+    }
+    }else{
+        $res = array("danger", "No se movio el archivo a la carpeta");
+    }
+}
         //registrar pago, preguntar guardar la anterior transaccion o la nueva
-        $registropago = $this->dbc->query("insert into cuentaspor(idcuentaspor,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta)values(NULL,'$nrecibo','$fecha','$idcliente','$persona','$ci','$monto','$idfactura','$trans','$idcuenta')");
+        // $registropago = $this->dbc->query("insert into cuentaspor(idcuentaspor,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta)values(NULL,'$nrecibo','$fecha','$idcliente','$persona','$ci','$monto','$idfactura','$trans','$idcuenta')");
 
-        if ($registropago === TRUE) {
-            $res = array("success", "Registro Realizado", "registropagarfactura", $idfactura);
-        } else {
-            $res = array("danger", "No se pudo realizar el registro");
-        }
+        // if ($registropago === TRUE) {
+        //     $res = array("success", "Registro Realizado", "registropagarfactura", $idfactura);
+        // } else {
+        //     $res = array("danger", "No se pudo realizar el registro");
+        // }
         echo json_encode($res);
     }
 
@@ -1702,11 +1744,11 @@ WHERE
         if($hayIndividuales > 0){
             if($hayGrupales > 0){
                 // hay grupales e individuales
-                        $mostrarIndi = $this->dbc->query(" SELECT nrecibo,fecha,persona,ci,monto,idcuentaspof 
+                        $mostrarIndi = $this->dbc->query(" SELECT nrecibo,fecha,persona,ci,monto,idcuentaspof,archivo 
                         FROM cuentaspof WHERE idfactura = '$idfactura'");
     
                         while ($zxc = $this->dbc->fetch($mostrarIndi)) {
-                            $res = array("recibo" => $zxc[0], "fecha" => $zxc[1], "persona" => $zxc[2], "ci" => $zxc[3], "monto" => $zxc[4], "id" => $zxc[5]);
+                            $res = array("recibo" => $zxc[0], "fecha" => $zxc[1], "persona" => $zxc[2], "ci" => $zxc[3], "monto" => $zxc[4], "id" => $zxc[5],"nombre_archivo" => $zxc[6]);
                             array_push($lista, $res);
                         }
     
@@ -1733,10 +1775,10 @@ WHERE
                        $listaGrup = $this->dbc->query("SELECT * FROM cuentascobrar_grupal WHERE idfactura='$idfactura'");
                        $resultado3 = $listaGrup->fetch_assoc();
                        $idrecibo = $resultado3['idcuentaspof'];
-                       $datosRecibo = $this->dbc->query("SELECT nrecibo,fecha,persona,ci,monto,idcuentaspof FROM cuentaspof WHERE idcuentaspof='$idrecibo'");
+                       $datosRecibo = $this->dbc->query("SELECT nrecibo,fecha,persona,ci,monto,idcuentaspof,archivo FROM cuentaspof WHERE idcuentaspof='$idrecibo'");
                        
                        while ($zxc = $this->dbc->fetch($datosRecibo)) {
-                           $res = array("recibo" => $zxc[0], "fecha" => $zxc[1], "persona" => $zxc[2], "ci" => $zxc[3], "monto" => $resultado3['monto'], "id" => $zxc[5]);
+                           $res = array("recibo" => $zxc[0], "fecha" => $zxc[1], "persona" => $zxc[2], "ci" => $zxc[3], "monto" => $resultado3['monto'], "id" => $zxc[5],"nombre_archivo" => $zxc[6]);
                            array_push($lista, $res);
                        }
                     //    $res = array("id" => $qwe[0], "fecha" => $qwe[1], "numero" => $qwe[2], "codigo" => $qwe[3], "idproveedor" => $qwe[5], "nombrep" => $pro['nombre'], "monto" => $qwe[4], "pagado" => $resultado3['monto'], "saldo" => 0, "transaccion" => $qwe[6], "cuenta" => $qwe[7], "detalle" => $pagados);

@@ -943,20 +943,20 @@ elseif($ver=="registroUnidadTiempoControl") {// esto sale del hidden del input q
 }elseif($ver=="registrar_tarea_limpieza") {// esto sale del hidden del input que esta en el formulario
     // cantidad,costo_unitarioad,empresa_idempresa,lote_idlote, control_calidad_idcontrol_calidad,material_idmaterial,empresa_idempresa,control_calidad_idcontrol_calidad,producto_idproducto
     // limpieza, descripcion, frecuencia, costo,seccion_idseccion
-    if (isset($_POST['limpieza'],$_POST['descripcion'],$_POST['frecuencia'],$_POST['costo'],$_POST['seccion_idseccion'],$_POST['idcontrol_unidad_tiempo'])) {
+    if (isset($_POST['limpieza'],$_POST['descripcion'],$_POST['frecuencia'],$_POST['costo'],$_POST['fecha_final'],$_POST['seccion_idseccion'],$_POST['idcontrol_unidad_tiempo'],$_POST['empleado_idempleado'])) {
         $envase = new Limpieza();
-    $envase->registrar_tarea_limpieza($_POST['limpieza'],$_POST['descripcion'],$_POST['frecuencia'],$_POST['costo'],$_POST['seccion_idseccion'],$_POST['idcontrol_unidad_tiempo']);
+    $envase->registrar_tarea_limpieza($_POST['limpieza'],$_POST['descripcion'],$_POST['frecuencia'],$_POST['costo'],$_POST['fecha_final'],$_POST['seccion_idseccion'],$_POST['idcontrol_unidad_tiempo'],$_POST['empleado_idempleado']);
     }else{
-        echo json_encode(array("Error", "Faltan parámetros en la solicitud",$_POST['limpieza'],$_POST['descripcion'],$_POST['frecuencia'],$_POST['costo'],$_POST['seccion_idseccion'],$_POST['idcontrol_unidad_tiempo']));
+        echo json_encode(array("Error", "Faltan parámetros en la solicitud",$_POST['limpieza'],$_POST['descripcion'],$_POST['frecuencia'],$_POST['costo'],$_POST['fecha_final'],$_POST['seccion_idseccion'],$_POST['idcontrol_unidad_tiempo'],$_POST['empleado_idempleado']));
     }
 }elseif($ver=="editar_tarea_limpieza") {// esto sale del hidden del input que esta en el formulario
     // cantidad,costo_unitarioad,empresa_idempresa,lote_idlote, control_calidad_idcontrol_calidad,material_idmaterial,empresa_idempresa,control_calidad_idcontrol_calidad,producto_idproducto
     // limpieza, descripcion, frecuencia, costo,seccion_idseccion
-    if (isset($_POST['idtarea_limpieza'],$_POST['limpieza'],$_POST['descripcion'],$_POST['frecuencia'],$_POST['costo'],$_POST['seccion_idseccion'],$_POST['idcontrol_unidad_tiempo'])) {
+    if (isset($_POST['idtarea_limpieza'],$_POST['limpieza'],$_POST['descripcion'],$_POST['frecuencia'],$_POST['costo'],$_POST['fecha_final'],$_POST['seccion_idseccion'],$_POST['idcontrol_unidad_tiempo'])) {
         $envase = new Limpieza();
-    $envase->editar_tarea_limpieza($_POST['idtarea_limpieza'],$_POST['limpieza'],$_POST['descripcion'],$_POST['frecuencia'],$_POST['costo'],$_POST['seccion_idseccion'],$_POST['idcontrol_unidad_tiempo']);
+    $envase->editar_tarea_limpieza($_POST['idtarea_limpieza'],$_POST['limpieza'],$_POST['descripcion'],$_POST['frecuencia'],$_POST['costo'],$_POST['fecha_final'],$_POST['seccion_idseccion'],$_POST['idcontrol_unidad_tiempo']);
     }else{
-        echo json_encode(array("Error", "Faltan parámetros en la solicitud",$_POST['idtarea_limpieza'],$_POST['limpieza'],$_POST['descripcion'],$_POST['frecuencia'],$_POST['costo'],$_POST['seccion_idseccion'],$_POST['idcontrol_unidad_tiempo']));
+        echo json_encode(array("Error", "Faltan parámetros en la solicitud",$_POST['idtarea_limpieza'],$_POST['limpieza'],$_POST['descripcion'],$_POST['frecuencia'],$_POST['costo'],$_POST['fecha_final'],$_POST['seccion_idseccion'],$_POST['idcontrol_unidad_tiempo']));
     }
 }elseif($ver=="registrar_devolucion_compra") {// esto sale del hidden del input que esta en el formulario
     // cantidad,costo_unitarioad,empresa_idempresa,lote_idlote, control_calidad_idcontrol_calidad,material_idmaterial,empresa_idempresa,control_calidad_idcontrol_calidad,producto_idproducto
@@ -995,20 +995,20 @@ elseif($ver=="registroUnidadTiempoControl") {// esto sale del hidden del input q
 }elseif($ver=="registrar_tareas_mantenimiento") {// esto sale del hidden del input que esta en el formulario
     // cantidad,costo_unitarioad,empresa_idempresa,lote_idlote, control_calidad_idcontrol_calidad,material_idmaterial,empresa_idempresa,control_calidad_idcontrol_calidad,producto_idproducto
     // limpieza, descripcion, frecuencia, costo,seccion_idseccion
-    if (isset($_POST['mantenimiento'],$_POST['descripcion'],$_POST['frecuencia'],$_POST['costo'],$_POST['maquina_idmaquina'],$_POST['idcontrol_unidad_tiempo'])) {
+    if (isset($_POST['mantenimiento'],$_POST['descripcion'],$_POST['frecuencia'],$_POST['costo'],$_POST['fecha_final'],$_POST['maquina_idmaquina'],$_POST['idcontrol_unidad_tiempo'],$_POST['empleado_idempleado'])) {
         $envase = new Mantenimiento();
-    $envase->registrar_tareas_mantenimiento($_POST['mantenimiento'],$_POST['descripcion'],$_POST['frecuencia'],$_POST['costo'],$_POST['maquina_idmaquina'],$_POST['idcontrol_unidad_tiempo']);
+    $envase->registrar_tareas_mantenimiento($_POST['mantenimiento'],$_POST['descripcion'],$_POST['frecuencia'],$_POST['costo'],$_POST['fecha_final'],$_POST['maquina_idmaquina'],$_POST['idcontrol_unidad_tiempo'],$_POST['empleado_idempleado']);
     }else{
-        echo json_encode(array("Error", "Faltan parámetros en la solicitud",$_POST['idtareas_mantenimiento'],$_POST['mantenimiento'],$_POST['descripcion'],$_POST['frecuencia'],$_POST['costo'],$_POST['maquina_idmaquina'],$_POST['idcontrol_unidad_tiempo']));
+        echo json_encode(array("Error", "Faltan parámetros en la solicitud",$_POST['idtareas_mantenimiento'],$_POST['mantenimiento'],$_POST['descripcion'],$_POST['frecuencia'],$_POST['costo'],$_POST['fecha_final'],$_POST['maquina_idmaquina'],$_POST['idcontrol_unidad_tiempo'],$_POST['empleado_idempleado']));
     }
 }elseif($ver=="editar_tareas_mantenimiento") {// esto sale del hidden del input que esta en el formulario
     // cantidad,costo_unitarioad,empresa_idempresa,lote_idlote, control_calidad_idcontrol_calidad,material_idmaterial,empresa_idempresa,control_calidad_idcontrol_calidad,producto_idproducto
     // limpieza, descripcion, frecuencia, costo,seccion_idseccion
-    if (isset($_POST['idtareas_mantenimiento'],$_POST['mantenimiento'],$_POST['descripcion'],$_POST['frecuencia'],$_POST['costo'],$_POST['maquina_idmaquina'],$_POST['idcontrol_unidad_tiempo'])) {
+    if (isset($_POST['idtareas_mantenimiento'],$_POST['mantenimiento'],$_POST['descripcion'],$_POST['frecuencia'],$_POST['costo'],$_POST['fecha_final'],$_POST['maquina_idmaquina'],$_POST['idcontrol_unidad_tiempo'])) {
         $envase = new Mantenimiento();
-    $envase->editar_tareas_mantenimiento($_POST['idtareas_mantenimiento'],$_POST['mantenimiento'],$_POST['descripcion'],$_POST['frecuencia'],$_POST['costo'],$_POST['maquina_idmaquina'],$_POST['idcontrol_unidad_tiempo']);
+    $envase->editar_tareas_mantenimiento($_POST['idtareas_mantenimiento'],$_POST['mantenimiento'],$_POST['descripcion'],$_POST['frecuencia'],$_POST['costo'],$_POST['fecha_final'],$_POST['maquina_idmaquina'],$_POST['idcontrol_unidad_tiempo']);
     }else{
-        echo json_encode(array("Error", "Faltan parámetros en la solicitud",$_POST['idtareas_mantenimiento'],$_POST['mantenimiento'],$_POST['descripcion'],$_POST['frecuencia'],$_POST['costo'],$_POST['maquina_idmaquina'],$_POST['idcontrol_unidad_tiempo']));
+        echo json_encode(array("Error", "Faltan parámetros en la solicitud",$_POST['idtareas_mantenimiento'],$_POST['mantenimiento'],$_POST['descripcion'],$_POST['frecuencia'],$_POST['costo'],$_POST['fecha_final'],$_POST['maquina_idmaquina'],$_POST['idcontrol_unidad_tiempo']));
     }
 }elseif($ver=="editar_grupo_etapas") {// esto sale del hidden del input que esta en el formulario
     // cantidad,costo_unitarioad,empresa_idempresa,lote_idlote, control_calidad_idcontrol_calidad,material_idmaterial,empresa_idempresa,control_calidad_idcontrol_calidad,producto_idproducto
@@ -1286,11 +1286,11 @@ elseif($ver=="registroUnidadTiempoControl") {// esto sale del hidden del input q
         echo json_encode(array("Error", "Faltan parámetros en la solicitud",$_POST['idetapa_producccion_has_empleado'],$_POST['fecha_fin']));
     }
 }elseif($ver=="registrar_almacen_fisico") {// esto sale del hidden del input que esta en el formulario
-    if (isset($_POST['material_idmaterial'],$_POST['$tipo_envase_idtipo_envase'],$_POST['cantidad'])) {
+    if (isset($_POST['material_idmaterial'],$_POST['$tipo_envase_idtipo_envase'],$_POST['cantidad'],$_POST['empresa_idempresa'])) {
         $envase = new Alma_fisic_merma();
-    $envase->registrar_almacen_fisico($_POST['material_idmaterial'],$_POST['$tipo_envase_idtipo_envase'],$_POST['cantidad']);
+    $envase->registrar_almacen_fisico($_POST['material_idmaterial'],$_POST['$tipo_envase_idtipo_envase'],$_POST['cantidad'],$_POST['empresa_idempresa']);
     }else{
-        echo json_encode(array("Error", "Faltan parámetros en la solicitud",$_POST['material_idmaterial'],$_POST['$tipo_envase_idtipo_envase'],$_POST['cantidad']));
+        echo json_encode(array("Error", "Faltan parámetros en la solicitud",$_POST['material_idmaterial'],$_POST['$tipo_envase_idtipo_envase'],$_POST['cantidad'],$_POST['empresa_idempresa']));
     }
 }elseif($ver=="editar_almacen_fisico") {// esto sale del hidden del input que esta en el formulario
     if (isset($_POST['idalmacen_fisico'],$_POST['cantidad'])) {
