@@ -2073,4 +2073,4 @@ WHERE
         }
         echo json_encode($res);
     } //listafactura eliminartransaccion  eliminarcliente listafactura_cobrado eliminarproveedor listafactura_pagado
-}//cobrar listapagos registrardesconsolidar registrotransaccion
+}//cobrar listapagos registrardesconsolidar registrotransaccion cambiarestadoconsolidado
