@@ -30,7 +30,7 @@ class Limpieza extends DB{
             error_reporting(E_ALL);
             $lista = [];
             $idempresa = $this->getidempresa($empresa);
-            $getPedido = $this->dbp->query("SELECT * FROM limpieza l INNER JOIN tarea_limpieza tl ON tl.idtarea_limpieza=l.tarea_limpieza_idtarea_limpieza
+            $getPedido = $this->dbp->query("SELECT l.* FROM limpieza l INNER JOIN tarea_limpieza tl ON tl.idtarea_limpieza=l.tarea_limpieza_idtarea_limpieza
                         INNER JOIN seccion s ON s.idseccion = tl.seccion_idseccion
                         WHERE s.empresa_idempresa='$idempresa';");
             // $nombre, $codigo, $nit, $detalle, $direccion, $telefono,$mobil, $email, $web, $pais, $ciudad, $zona, $contacto,$empresa
