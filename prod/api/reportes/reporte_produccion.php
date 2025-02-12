@@ -42,7 +42,7 @@ class Reporte_produccion extends DB{
             $montoTotal = $montoPromedio / (24*30);
             // $montoTotal = $montoTotal * $sumaHorasEtapa;
         // Consulta para listar las etapas de producción asociadas a una empresa
-        $lote = $this->dbp->query("SELECT * FROM lote");
+        $lote = $this->dbp->query("SELECT * FROM lote WHERE empresa_idempresa = '$idempresa'");
     
         // Verificar que la consulta fue exitosa
         if (!$lote) {
@@ -293,6 +293,7 @@ class Reporte_produccion extends DB{
                 );
                 $dtsol= $this->dbp->query("SELECT * FROM detalle_solicitud_material 
                 WHERE solicitud_material_idsolicitud_material = '{$soliMate['idsolicitud_material']}'");  
+                 $array_detalle =[];
                  while ($dtsolimate = $this->dbp->fetch($dtsol)) {
 
                     $precioMat = $this->dbp->query("SELECT precio FROM material WHERE idmaterial = '$dtsolimate[material_idmaterial]'");
@@ -308,6 +309,8 @@ class Reporte_produccion extends DB{
                     "material_idmaterial" => $dtsolimate['material_idmaterial'],
                     "costo" => $costoDt
                     );
+                    // array_push($array_detalle,$dtsolimate['iddetalle_solicitud_material']); 
+                    array_push($res8['material_produccion'], $dtsolimate['iddetalle_solicitud_material']);
                     array_push($res8['detalle_solicitud_material'], $res44);
                 }
                 array_push($res2['solicitud_material'], $res8);
