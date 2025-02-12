@@ -184,7 +184,7 @@ class Reporte_produccion extends DB{
                         FROM etapa_producccion_has_empleado 
                         WHERE etapas_produccion_idetapas_produccion='$prodEt[etapas_produccion_idetapas_produccion]'
                         AND ('$etapa[fecha_lote]' > fecha_inicio AND fecha_fin IS NULL) 
-                        OR (fecha_lote BETWEEN fecha_inicio AND fecha_fin)");
+                        OR ('$etapa[fecha_lote]' BETWEEN fecha_inicio AND fecha_fin)");
 
                 $listaEmpleados=[];
                 while($ayuda = $this->dbp->fetch($empleados)){
@@ -309,8 +309,25 @@ class Reporte_produccion extends DB{
                     "material_idmaterial" => $dtsolimate['material_idmaterial'],
                     "costo" => $costoDt
                     );
+
+                    $mat_prod = $this->dbp->query("SELECT * FROM material_produccion 
+                    WHERE detalle_solicitud_material_iddetalle_solicitud_material = '$dtsolimate[iddetalle_solicitud_material]'");
+                    // if ($mat_prod->num_rows == 0) 
+                    if($mat_prod->num_rows == 0){
+
+                    }else{
+                    $mat_prod2 = $mat_prod->fetch_assoc();
+                    // $cod = $resultado['codigotransaccion'];
+                    $res55 = array(
+                        "idmaterial_produccion" => $mat_prod2['idmaterial_produccion'],
+                        "cantidad" => $mat_prod2['cantidad'],
+                        "detalle_solicitud_material_iddetalle_solicitud_material" => $mat_prod2['detalle_solicitud_material_iddetalle_solicitud_material'],
+                        "almacen_material_idalmacen_material" => $mat_prod2['almacen_material_idalmacen_material'],
+                        "costo" => 0
+                        );
                     // array_push($array_detalle,$dtsolimate['iddetalle_solicitud_material']); 
-                    array_push($res8['material_produccion'], $dtsolimate['iddetalle_solicitud_material']);
+                    array_push($res8['material_produccion'], $res55);
+                    }
                     array_push($res8['detalle_solicitud_material'], $res44);
                 }
                 array_push($res2['solicitud_material'], $res8);
