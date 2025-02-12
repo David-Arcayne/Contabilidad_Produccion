@@ -110,6 +110,7 @@ public function registrarStockProductos($cantidad,$costo_unitario,$empresa,$idlo
     
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
+    
     public function getidempresa($md5){
         $registro=$this->dbe->query("select * from organizacion where md5(idorganizacion)='$md5'");
         $qwe=$this->dbe->fetch($registro);

@@ -5,6 +5,8 @@ require_once "reportes.php";
 require_once "funciones.php";
 require_once "./plan_cuentas/plandecuentas.php";
 require_once "./transacciones_facturas/transFactura_pagar.php";
+require_once "./solicitudes/insertar_transaccion.php";
+
 $ver=explode("/",$_GET['ver']); //dividiendo los "/"  ver[0],ver[1],ver[x] listafacturaapi_cobrado
 if($ver[0]=="verificacion"){
 $ad=new Admin();
@@ -296,6 +298,9 @@ $cont->lista_cobrar_cobrado_factura($ver[1]);
 }elseif($ver[0]=="listafactura_cobrado_trans"){
     $cont=new Contabilidad();
     $cont->listafactura_cobrado_trans($ver[1]);
+}elseif($ver[0]=="lista_transaccionEn_espera"){
+    $cont=new Insertar_transaccion();
+    $cont->lista_transaccionEn_espera($ver[1]);
 }
 //listafactura eliminartransaccion eliminardetalletransaccion listapagos_individuales
 ?>

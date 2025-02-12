@@ -4,6 +4,7 @@ require_once "contabilidad.php";
 require_once "./transacciones_facturas/transacciones_facturas.php";
 require_once "./plan_cuentas/plandecuentas.php";
 require_once "./transacciones_facturas/transFactura_pagar.php";
+require_once "./solicitudes/insertar_transaccion.php";
 $ver=$_POST['ver'];
 $json = file_get_contents('php://input'); // Decodificar el JSON en un arreglo PHP  
 $data = json_decode($json, true);
@@ -157,6 +158,13 @@ $cont->cambiarestadoconsolidado($_POST['grupo'],$_POST['estado'],$_POST['fecha']
 }elseif($ver=="editar_vinculacion_cuenta_xcxp"){
     $cont=new Plandecuentas();
     $cont->editar_vinculacion_cuenta_xcxp($_POST['idvinculacion_cuenta_xcxp'],$_POST['idplandecuenta']);
+}elseif($ver=="registrar_transaccionEn_espera"){
+    $cont=new Insertar_transaccion();
+    //$idtransaccion,$estado,$hora,$fecha,$idusuario,$codigo,$tipocambio, $tipotransaccion, $glosa,$idempresa,$sucursal
+    $cont->registrar_transaccionEn_espera($_POST['transacciones_idtransacciones'],$_POST['estado'],$_POST['hora'],$_POST['fecha'],$_POST['idusuario'],$_POST['codigotransaccion'],$_POST['tipocambio'],$_POST['tipotransaccion'],$_POST['glosa'],$_POST['idempresa'],$_POST['sucursal']);
+}elseif($ver=="cambiarestadotransaccionEn_espera"){
+    $cont=new Insertar_transaccion();
+    $cont->cambiarestadotransaccionEn_espera($_POST['idtransaccionEn_espera'],$_POST['estado'],$_POST['fecha'],$_POST['hora']);
 }
 
 // ---------------------------------------------------------------------------- registropagarfactura
