@@ -163,8 +163,12 @@ $cont->cambiarestadoconsolidado($_POST['grupo'],$_POST['estado'],$_POST['fecha']
     //$idtransaccion,$estado,$hora,$fecha,$idusuario,$codigo,$tipocambio, $tipotransaccion, $glosa,$idempresa,$sucursal
     $cont->registrar_transaccionEn_espera($_POST['transacciones_idtransacciones'],$_POST['estado'],$_POST['hora'],$_POST['fecha'],$_POST['idusuario'],$_POST['codigotransaccion'],$_POST['tipocambio'],$_POST['tipotransaccion'],$_POST['glosa'],$_POST['idempresa'],$_POST['sucursal']);
 }elseif($ver=="cambiarestadotransaccionEn_espera"){
-    $cont=new Insertar_transaccion();
-    $cont->cambiarestadotransaccionEn_espera($_POST['idtransaccionEn_espera'],$_POST['estado'],$_POST['fecha'],$_POST['hora']);
+    if (isset($_POST['idtransaccionEn_espera'],$_POST['estado'],$_POST['fecha'],$_POST['hora'],$_POST['idusuario'])) {
+        $cont=new Insertar_transaccion();
+        $cont->cambiarestadotransaccionEn_espera($_POST['idtransaccionEn_espera'],$_POST['estado'],$_POST['fecha'],$_POST['hora'],$_POST['idusuario']);
+    }else{
+        echo json_encode(array("Error", "Faltan parámetros en la solicitud",$_POST['idtransaccionEn_espera'],$_POST['estado'],$_POST['fecha'],$_POST['hora'],$_POST['idusuario']));
+    }
 }
 
 // ---------------------------------------------------------------------------- registropagarfactura

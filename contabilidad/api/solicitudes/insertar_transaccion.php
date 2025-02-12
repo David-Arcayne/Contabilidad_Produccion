@@ -9,10 +9,11 @@ public function registrar_transaccionEn_espera($idtransaccion,$estado,$hora,$fec
         $usuario=$this->getidusuario($idusuario);
         $idsucursal = $this->getidsucursal($sucursal);
         $empresa=$this->getidempresa($idempresa);
+        $gestion = $this->getgestionactualid($empresa);
         // $codigo=date("Ymd").rand(100,1000);
 // idusuario codigotransaccion tipodecambio ndocumento glosa consolidar tipotransaccion_idtipotransaccion sucursal idempresa idgestion
         $registro=$this->dbc->query("INSERT INTO transaccionEn_espera(transacciones_idtransacciones,estado,hora,fecha,idusuario,codigotransaccion, tipodecambio, ndocumento, glosa, consolidar, tipotransaccion_idtipotransaccion, sucursal,idempresa,idgestion)
-        VALUES('$idtransaccion','$estado','$hora','$fecha','$usuario','$codigo','$tipocambio','0', '$glosa','1', '$tipotransaccion','$idsucursal','$empresa','$codigo')");
+        VALUES('$idtransaccion','$estado','$hora','$fecha','$usuario','$codigo','$tipocambio','0', '$glosa','1', '$tipotransaccion','$idsucursal','$empresa','$gestion')");
         if($registro===TRUE){
             $res = array("success", "Se Registro Correctamente", "registrar_transaccionEn_espera");
         }else{
@@ -21,13 +22,17 @@ public function registrar_transaccionEn_espera($idtransaccion,$estado,$hora,$fec
         echo json_encode($res);
 
     }
-    public function cambiarestadotransaccionEn_espera($idtran_espera,$estado,$fecha,$hora){
+    public function cambiarestadotransaccionEn_espera($idtran_espera,$estado,$fecha,$hora,$idusuario_admin){
         //actualizar esto:
-        
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+        // echo json_encode(array($idtran_espera,$estado,$fecha,$hora));
+        $usuario=$this->getidusuario($idusuario_admin);
                 $res="";
                 // $reg_trans=$this->dbc->query("SELECT * FROM transaccionEn_espera WHERE idtransaccionEn_espera='$idtran_espera'");
 
-                $registro=$this->dbc->query("UPDATE transaccionEn_espera SET estado='$estado',fecha_proceso='$fecha',hora_proceso='$hora' WHERE idtransaccionEn_espera='$idtran_espera'");
+                $registro=$this->dbc->query("UPDATE transaccionEn_espera SET estado='$estado',fecha_proceso='$fecha',hora_proceso='$hora',idusuario_admin = '$usuario' WHERE idtransaccionEn_espera='$idtran_espera'");
                 //consolidar es 2 y desconsolidar es 1
                 if($estado==1){//aceptado
                     $reg_trans=$this->dbc->query("SELECT * FROM transaccionEn_espera WHERE idtransaccionEn_espera='$idtran_espera'");
@@ -42,18 +47,33 @@ public function registrar_transaccionEn_espera($idtransaccion,$estado,$hora,$fec
                         WHERE idtransacciones = '$qwe2[idtransacciones]'");
                         $cod++;
                     }
-                    while($qwe=$this->dbc->fetch($reg_trans)){
-                        $descTRan=$this->dbc->query("INSERT INTO transacciones(codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
-                        VALUES('$qwe[codigotransaccion]','$fecha','$qwe[tipodecambio]','$qwe[ndocumento]','$qwe[glosa]','1','$qwe[tipotransaccion_idtipotransaccion]','$qwe[idempresa]','$qwe[sucursal]','$qwe[idgestion]')");
-                    }
-                
-                if($descTRan===TRUE){
-                    // $reg_trans=$this->dbc->query("SELECT * FROM transacciones WHERE codigotransaccion >= '$cod'");
 
+
+                        $descTRan2=$this->dbc->query("INSERT INTO transacciones(codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
+                        VALUES('$resultado[codigotransaccion]','$resultado[fecha_proceso]','$resultado[tipodecambio]','$resultado[ndocumento]','$resultado[glosa]','1','$resultado[tipotransaccion_idtipotransaccion]','$resultado[idempresa]','$resultado[sucursal]','$resultado[idgestion]')");
+         
+                
+                
+                if($descTRan2===TRUE){
+                    // $reg_trans=$this->dbc->query("SELECT * FROM transacciones WHERE codigotransaccion >= '$cod'");
+                    // $descTRan3=$this->dbc->query("UPDATE transaccionEn_espera SET estado = '$estado' 
+                    //     WHERE idtransaccionEn_espera = '$idtran_espera'");
                     $res = array("success", "Se Registro Correctamente", "cambiarestadotransaccionEn_espera");
                 }else{
-                    $res = array("danger", "Se Registro Correctamente");
-                }
+                    $res = array("danger", "No se pudo registrar",$resultado['codigotransaccion'],$resultado['fecha_proceso'],$resultado['tipodecambio'],$resultado['ndocumento'],$resultado['glosa'],'1',$resultado['tipotransaccion_idtipotransaccion'],$resultado['idempresa'],$resultado['sucursal'],$resultado['idgestion']);
+                }   
+
+            }else{
+                //DENEGADO
+            //     $descTRan3=$this->dbc->query("UPDATE transaccionEn_espera SET estado = '$estado' 
+            //             WHERE idtransaccionEn_espera = '$idtran_espera'");
+            // if($descTRan3===TRUE){
+                $res = array("success", "Se Denego el permiso para insertar", "cambiarestadotransaccionEn_espera");
+
+            // }else{
+            //     $res = array("danger", "no se pudo registrar");
+
+            // }
             }
                 
         
@@ -69,7 +89,7 @@ public function registrar_transaccionEn_espera($idtransaccion,$estado,$hora,$fec
             
                     // Procesar los resultados
                     while ($qwe = $this->dbc->fetch($sql)) {
-                    //    $usuario = $this->getusuario($qwe['idusuario']); // Asegúrate de que esta función retorne los campos esperados
+                       $usuario = $this->getusuario($qwe['idusuario']); // Asegúrate de que esta función retorne los campos esperados
                         // $usuariob = isset($qwe['idusuariob']) ? $this->getusuario($qwe['idusuariob']) : null;
                         /*"
                             */
@@ -80,7 +100,12 @@ public function registrar_transaccionEn_espera($idtransaccion,$estado,$hora,$fec
                             "fecha" => $qwe['fecha'],
                             "horaproceso" => $qwe['horaproceso'],
                             "fechaproceso" => $qwe['fechaproceso'],
-                            "idusuario" => $qwe['idusuario']
+                            "estado" => $qwe['estado'],
+                            "codigotransaccion" => $qwe['codigotransaccion'],
+                            "glosa" => $qwe['glosa'],
+                            "idusuario" => $qwe['idusuario'],
+                            "nombre" => $usuario['nombre'] ?? null,
+                            "apellido" => $usuario['apellido'] ?? null
                         ];
                     }
             
@@ -128,4 +153,20 @@ public function registrar_transaccionEn_espera($idtransaccion,$estado,$hora,$fec
         return $qwe['idusuario'];
 
     } 
+    public function getusuario($id) {
+        $registro = $this->dbrh->query("
+            SELECT u.nombre AS usuario_nombre, t.nombre AS trabajador_nombre, t.apellido, t.ci 
+            FROM usuario AS u 
+            INNER JOIN trabajador AS t ON t.idtrabajador = u.trabajador_idtrabajador
+            WHERE u.idusuario = '$id'
+        ");
+        $qwe = $this->dbrh->fetch($registro);
+    
+        return [
+            "usuario" => $qwe['usuario_nombre'],
+            "nombre" => $qwe['trabajador_nombre'],
+            "apellido" => $qwe['apellido'],
+            "ci" => $qwe['ci']
+        ];
+    }
 }

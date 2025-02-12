@@ -128,7 +128,7 @@ $nroTransaccion = $resultado12['codigotransaccion'] + 1;
             $fecha2 = $this->dbc->real_escape_string($fecha);
             $nroTransaccion2 = $this->dbc->real_escape_string($nroTransaccion);
         // Insertar en transacciones
-        $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion, fechatransaccion, tipodecambio, ndocumento, glosa, consolidar, tipotransaccion_idtipotransaccion, organizacion_idorganizacion, sucursal, idgestion) VALUES ('$nroTransaccion2', '$fecha2', '1', '0', '$glosa2', '1', '$tipotransaccion', '$ide', '$sucursal', '$gestion')");
+        $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion, fechatransaccion, tipodecambio, ndocumento, glosa, consolidar, tipotransaccion_idtipotransaccion, organizacion_idorganizacion, sucursal, idgestion) VALUES ('$nroTransaccion2', '$fecha2', '1', '0', '$glosa2', '1', '$tipotransaccion', '$ide', '$idsucursal', '$gestion')");
     
         // Obtener el ID del registro recién insertado
         $idtrans = $this->dbc->insert_id;
