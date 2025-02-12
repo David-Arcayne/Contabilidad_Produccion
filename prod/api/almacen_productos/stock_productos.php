@@ -94,7 +94,7 @@ public function registrarStockProductos($cantidad,$costo_unitario,$empresa,$idlo
         // Preparar la consulta
         $getPedido = $this->dbcm->query("SELECT * FROM productos_almacen WHERE id_productos_almacen = '$idproducto_almacen'");
     
-        while ($qwe = $this->dbp->fetch($getPedido)) {
+        while ($qwe = $this->dbcm->fetch($getPedido)) {
             $res = array(
                 "id_productos_almacen" => $qwe['id_productos_almacen'],
                 "fecha_registro" => $qwe['fecha_registro'],

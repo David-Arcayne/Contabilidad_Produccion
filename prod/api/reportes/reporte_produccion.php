@@ -288,7 +288,8 @@ class Reporte_produccion extends DB{
                 "empresa_idempresa" => $soliMate['empresa_idempresa'],
                 "empleado_idempleado" => $soliMate['empleado_idempleado'],
                 "produccion_idproduccion" => $soliMate['produccion_idproduccion'],
-                 "detalle_solicitud_material" => []
+                 "detalle_solicitud_material" => [],
+                 "material_produccion" => []
                 );
                 $dtsol= $this->dbp->query("SELECT * FROM detalle_solicitud_material 
                 WHERE solicitud_material_idsolicitud_material = '{$soliMate['idsolicitud_material']}'");  

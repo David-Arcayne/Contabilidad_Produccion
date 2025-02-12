@@ -586,6 +586,6 @@ elseif($url[0] == "listar_ListaCompraEditable"){
 }elseif($url[0] == "listar_salida_produccion"){
     $prov = new Grupo_etapas();
     $prov->listar_salida_produccion($url[1]);
-}//produccion_etapa
+}//produccion_etapa 
 
 ?>         
