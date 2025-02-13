@@ -546,7 +546,7 @@ $totalHaber = 0;
         ORDER by p.numero ASC;");
         $totalDebe = 0;
 $totalHaber = 0;
-//and  t.consolidar='2' 
+//and  t.consolidar='2'  
         while($qwe=$this->dbc->fetch($reporte)){
             $deudor=0;
             $acreedor=0;

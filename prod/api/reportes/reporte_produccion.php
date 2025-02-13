@@ -13,6 +13,7 @@ class Reporte_produccion extends DB{
         error_reporting(E_ALL);
         $idempresa = $this->getidempresa($empresa);  
         $lista = [];
+        $lista_error =[];
         // $idempresa = $this->getidempresa($empresa); sumaHorasEtapa
 
          // Consulta para listar los gastos generales
@@ -137,22 +138,28 @@ class Reporte_produccion extends DB{
                         
                         $resultado = $aux5->fetch_assoc();
                         $cantProducto = $resultado['cantidad'];
+                        if ($cantProducto != 0) {
 
-                while ($costo = $this->dbp->fetch($aux4)) {
+                            while ($costo = $this->dbp->fetch($aux4)) {
 
-                    $aux6 = $this->dbp->query("SELECT precio FROM material 
-                    WHERE idmaterial ='$costo[material_idmaterial]';"); 
-                    $resultado2 = $aux6->fetch_assoc();
-                    $aaa = (int)$resultado2['precio'];
-                    $resRegla3= (($costo['cantidad'] * $dt_produccion['cantidad'])/$cantProducto)*$aaa;
-                    array_push($arrRegla3, $resRegla3);
+                                $aux6 = $this->dbp->query("SELECT precio FROM material 
+                                WHERE idmaterial ='$costo[material_idmaterial]';"); 
+                                $resultado2 = $aux6->fetch_assoc();
+                                $aaa = (int)$resultado2['precio'];
+                                $resRegla3= (($costo['cantidad'] * $dt_produccion['cantidad'])/$cantProducto)*$aaa;
+                                array_push($arrRegla3, $resRegla3);
 
-                    $aiu =0;
-                    foreach($arrRegla3 as $i){
-                        $aiu= $aiu+$i;
-                    }
-                    $res4['costo'] = $aiu;
-                    }
+                                $aiu =0;
+                                foreach($arrRegla3 as $i){
+                                    $aiu= $aiu+$i;
+                                }
+                                $res4['costo'] = $aiu;
+                                }
+                        }else{
+                            $lista_error = array("danger", "la cantidad del producto '{$dt_produccion['producto_idproducto']}' es cero","reprte_produccion");
+                            // echo json_encode($res222);
+                            // break;
+                        }
                                 
                     array_push($res3['detalle_produccion'], $res4);
                 }
@@ -342,7 +349,12 @@ class Reporte_produccion extends DB{
             array_push($lista, $res);
         }
     
-        echo json_encode($lista);
+        if(empty($lista_error)){
+            echo json_encode($lista);
+        }else{
+            echo json_encode($lista_error);
+        }
+
     }
     public function getidempresa($md5){
         $registro=$this->dbe->query("select * from organizacion where md5(idorganizacion)='$md5'");
