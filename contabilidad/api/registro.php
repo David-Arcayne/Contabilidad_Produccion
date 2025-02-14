@@ -28,7 +28,7 @@ $cont->registrotransaccion($_POST['codigo'],$_POST['fecha'],$_POST['tipodecambio
     $cont->insertartransaccionen($_POST['codigo'],$_POST['fecha'],$_POST['tipodecambio'],$_POST['tipotransaccion'],$_POST['descripcion'],$_POST['empresa'],$_POST['sucursal']);
 }elseif($ver=="registrotransaccionf5"){
 $cont=new Contabilidad();
-$cont->registrotransaccionf5($_POST['idt'],$_POST['codigo'],$_POST['fecha'],$_POST['tipodecambio'],$_POST['tipotransaccion'],$_POST['descripcion'],$_POST['gestion']);
+$cont->registrotransaccionf5($_POST['idt'],$_POST['fecha'],$_POST['tipodecambio'],$_POST['tipotransaccion'],$_POST['descripcion'],$_POST['gestion']);
 }elseif($ver=="detalletransaccionnormal"){
 $cont=new Contabilidad();
 $cont->detalletransaccionnormal($_POST['trans'],$_POST['plandecuenta'],$_POST['debe'],$_POST['haber'],$_POST['nota'],$_POST['empresa'],$_POST['sucursal'],$_POST['iddetalletransaccion']);
@@ -198,6 +198,6 @@ if($data['ver'] == "cobrofacturasaasientomodelo") {
         echo json_encode(array("danger", "Faltan parámetros en la solicitud", $_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['idasientotipo'],$_POST['empresa'],$_POST['sucursal'],$_FILES['archivo'],$_POST['facturas']));
     }
 }
-// registrardesconsolidar registrotransaccion
+// registrardesconsolidar registrotransaccion registrotransaccionf5
 }
 ?>

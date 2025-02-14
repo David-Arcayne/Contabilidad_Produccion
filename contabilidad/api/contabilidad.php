@@ -463,11 +463,11 @@ WHERE md5(p.organizacion_idorganizacion)='$ide'");
     }
 
 
-    public function registrotransaccionf5($idt, $codigo, $fecha, $tipocambio, $tipotransaccion, $glosa, $gestion)
+    public function registrotransaccionf5($idt, $fecha, $tipocambio, $tipotransaccion, $glosa, $gestion)
     {
 
         $res = "";
-        $writetrans = $this->dbc->query("update transacciones set codigotransaccion='$codigo',fechatransaccion='$fecha',tipodecambio='$tipocambio',glosa='$glosa',tipotransaccion_idtipotransaccion='$tipotransaccion',idgestion='$gestion' where idtransacciones='$idt'");
+        $writetrans = $this->dbc->query("UPDATE transacciones SET fechatransaccion='$fecha',tipodecambio='$tipocambio',glosa='$glosa',tipotransaccion_idtipotransaccion='$tipotransaccion',idgestion='$gestion' where idtransacciones='$idt'");
         if ($writetrans === TRUE) {
             $res = array("success", "Se Registro Correctamente", "registrotransaccionf5");
         } else {
@@ -1006,12 +1006,12 @@ WHERE md5(p.organizacion_idorganizacion)='$ide'");
     {
         $lista = [];
         $res = "";
-        // lista pagados y pagar
+        // lista pagados y pagar clientes proveedor
         $facture = $this->dbc->query("SELECT f.idfactura, f.fecha, f.nfactura, f.nautorizacion, f.codigocontrol, f.montofactura, f.tasa0, f.export, f.npoliza, f.iceiecdhotros, f.descuentobonificacion, f.clasefactura, f.cobrado, f.pagado, f.espesificacion, f.estado, f.tipocompra, f.transacciones_idtransacciones, f.proveedorcliente_idproveedorcliente, f.idorganizacion, f.cuenta, f.sucursal 
         FROM factura  AS f WHERE transacciones_idtransacciones='$idtransaccion' AND f.cobrado != '0' ORDER BY f.fecha ASC");
         while ($qwe = $this->dbc->fetch($facture)) {
             if ($qwe['clasefactura'] == 2) {
-                $cliente = $this->dbcm->query("select * from cliente where id_cliente='" . $qwe[18] . "'");
+                $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $qwe[18] . "'");
                 $asd = $this->dbcm->fetch($cliente);
                 $res = array("id" => $qwe[0], "fecha" => $qwe[1], "nfactura" => $qwe[2], "nautorizacion" => $qwe[3], "codigocontrol" => $qwe[4], "montofactura" => $qwe[5], "tasacero" => $qwe[6], "export" => $qwe[7], "npoliza" => $qwe[8], "ice" => $qwe[9], "descuentobonificacion" => $qwe[10], "clasefactura" => $qwe[11], "cobrado" => $qwe[12], "pagado" => $qwe[13], "espesificacion" => $qwe[14], "estado" => $qwe[15], "tipocompra" => $qwe[16], "idtransaccion" => $qwe[17], "idcliente" => $qwe[18], "empresa" => $qwe[19], "cuenta" => $qwe[20], "sucursal" => $qwe[21], "procli" => $asd['nombre'], "nit" => $asd['nit']);
             } else {
@@ -1485,7 +1485,7 @@ WHERE
         $sucursal = $this->getidsucursal($sucursal);
         $ide = $this->getidempresa($empresa);
         // $empresa = $this->emp; registropagarfactura
-        $transi = $this->dbc->query("SELECT * FROM transacciones WHERE organizacion_idorganizacion='$ide' and sucursal='$sucursal' order by idtransacciones desc Limit 1");
+        $transi = $this->dbc->query("SELECT * FROM transacciones WHERE organizacion_idorganizacion='$ide' and sucursal='$sucursal' order by codigotransaccion desc Limit 1");
         $qq = $this->dbc->fetch($transi);
         $codigo = $qq['codigotransaccion'] + 1;
         $glosa = "Registro cobro $nrecibo";
@@ -1637,7 +1637,7 @@ WHERE
         $sucursal = $this->getidsucursal($sucursal);
         $ide = $this->getidempresa($empresa);
         $empresa = $this->emp;
-        $transi = $this->dbc->query("select * from transacciones where organizacion_idorganizacion='$ide' and sucursal='$sucursal' order by idtransacciones desc Limit 1");
+        $transi = $this->dbc->query("SELECT * FROM transacciones WHERE organizacion_idorganizacion='$ide' AND sucursal='$sucursal' ORDER BY codigotransaccion DESC LIMIT 1");
         $qq = $this->dbc->fetch($transi);
         $codigo = $qq['codigotransaccion'] + 1;
         $glosa = "Registro de Pago $nrecibo";
@@ -1925,8 +1925,39 @@ WHERE
         if($totalRegistros > 0){
             $res = array("danger", "No se Puede Eliminar, tiene datos almacenados");
         }else{
-            $transa = $this->dbc->query("DELETE FROM transacciones WHERE idtransacciones='$idt'");
-            $res = array("success", "Se Elimino correctamente");
+
+            $eliminado=$this->dbc->query("SELECT codigotransaccion,organizacion_idorganizacion FROM transacciones 
+            WHERE idtransacciones = '$idt'");
+
+             $resElimi = $eliminado->fetch_assoc();
+             $codig = $resElimi['codigotransaccion'];
+             $idempresa = $resElimi['organizacion_idorganizacion'];
+
+             $transa = $this->dbc->query("DELETE FROM transacciones WHERE idtransacciones='$idt'");
+           
+            $transs=$this->dbc->query("SELECT * FROM transacciones 
+            WHERE codigotransaccion > '$codig' AND organizacion_idorganizacion = '$idempresa'");
+            $aux=0;
+            if ($transs->num_rows === 0){
+                $res = array("success", "Se Elimino correctamente");
+            }else{
+            while($qwe2=$this->dbc->fetch($transs)){
+           $codigo =  $qwe2['codigotransaccion'];
+           $codigo = $codigo - 1;
+            
+                $descTRan=$this->dbc->query("UPDATE transacciones SET codigotransaccion = '$codigo' 
+                WHERE idtransacciones = '$qwe2[idtransacciones]'");
+               $aux++;
+            }
+            
+            if ($descTRan ==TRUE){
+                $res = array("success", "Se Elimino correctamente");
+
+            }else{
+                $res = array("danger", "Se elimino pero no se actualiza");
+
+            }
+        }
         }
         
         echo  json_encode($res);
@@ -2072,5 +2103,5 @@ WHERE
             $res = array("ok" => "success", "estado" => "transaccion", "dato" => $qwe);
         }
         echo json_encode($res);
-    } //listafactura eliminartransaccion  eliminarcliente listafactura_cobrado eliminarproveedor listafactura_pagado
-}//cobrar listapagos registrardesconsolidar registrotransaccion cambiarestadoconsolidado listatransacciones
+    } //listafactura eliminartransaccion  eliminarcliente listafactura_cobrado eliminarproveedor listafactura_pagado registrocobrarfactura
+}//eliminarcobrados listapagos registrardesconsolidar registrotransaccion cambiarestadoconsolidado listatransacciones registrocobrarfactura

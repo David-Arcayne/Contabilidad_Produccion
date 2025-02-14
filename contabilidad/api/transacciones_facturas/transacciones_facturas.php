@@ -48,7 +48,10 @@ class Transacciones_facturas extends DB{
         $nroTrans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE organizacion_idorganizacion=$idempresa AND idgestion='$gestion' ORDER BY codigotransaccion DESC LIMIT 1;");
         $resultado12 = $nroTrans->fetch_assoc();
         $nroTransaccion = $resultado12['codigotransaccion'] + 1;
-    
+     // Obtener el número de transacción más reciente y sumar 1
+     $nroRec = $this->dbc->query("SELECT count(*) AS cantidadRec FROM cuentaspof cp INNER JOIN transacciones t ON t.idtransacciones=cp.transaccion WHERE t.organizacion_idorganizacion='$idempresa' AND idgestion = '$gestion'");
+     $resultado123 = $nroRec->fetch_assoc();
+     $nroRecibo = $resultado123['cantidadRec'] + 1;
         // Obtener el tipo de transacción
         $idAsientoTipo = $this->dbc->query("SELECT * FROM asientotipo WHERE idasientotipo='{$data['idasientotipo']}' AND idorganizacion='$idempresa';");
         $asiento = $idAsientoTipo->fetch_assoc();  // Cambiado $nroTrans->fetch_assoc() a $idAsientoTipo->fetch_assoc()
@@ -63,8 +66,32 @@ class Transacciones_facturas extends DB{
         // Editar las facturas seleccionadas
         $montoFacturas = 0;
         foreach ($data['facturas'] as $factura) {
+            $selectFact = $this->dbc->query("SELECT * FROM factura WHERE idfactura='{$factura['idfactura']}' AND idorganizacion='$idempresa';");
+            $fact = $selectFact->fetch_assoc();
+            // proveedorcliente_idproveedorcliente
+            if ($fact['clasefactura'] == 2) { //POR COBRAR
+                $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $fact['proveedorcliente_idproveedorcliente'] . "'");
+                // $asd = $this->dbcm->fetch($cliente);
+                $clientSelect = $cliente->fetch_assoc();
+                // $res = array("id" => $qwe[0], "fecha" => $qwe[1], "nfactura" => $qwe[2], "nautorizacion" => $qwe[3], "codigocontrol" => $qwe[4], "montofactura" => $qwe[5], "tasacero" => $qwe[6], "export" => $qwe[7], "npoliza" => $qwe[8], "ice" => $qwe[9], "descuentobonificacion" => $qwe[10], "clasefactura" => $qwe[11], "cobrado" => $qwe[12], "pagado" => $qwe[13], "espesificacion" => $qwe[14], "estado" => $qwe[15], "tipocompra" => $qwe[16], "idtransaccion" => $qwe[17], "idcliente" => $qwe[18], "empresa" => $qwe[19], "cuenta" => $qwe[20], "sucursal" => $qwe[21], "procli" => $asd['nombre'], "nit" => $asd['nit']);
+            } else {
+                $proveedor = $this->dbcm->query("SELECT * SELECT proveedor SELECT id_proveedor='" . $fact['proveedorcliente_idproveedorcliente'] . "'");
+                $clientSelect = $proveedor->fetch_assoc();
+
+                // $asd = $this->dbcm->fetch($proveedor);
+                // $res = array("id" => $qwe[0], "fecha" => $qwe[1], "nfactura" => $qwe[2], "nautorizacion" => $qwe[3], "codigocontrol" => $qwe[4], "montofactura" => $qwe[5], "tasacero" => $qwe[6], "export" => $qwe[7], "npoliza" => $qwe[8], "ice" => $qwe[9], "descuentobonificacion" => $qwe[10], "clasefactura" => $qwe[11], "cobrado" => $qwe[12], "pagado" => $qwe[13], "espesificacion" => $qwe[14], "estado" => $qwe[15], "tipocompra" => $qwe[16], "idtransaccion" => $qwe[17], "idproveedor" => $qwe[18], "empresa" => $qwe[19], "cuenta" => $qwe[20], "sucursal" => $qwe[21], "procli" => $asd['nombre'], "nit" => $asd['nit']);
+            }
             $montoFacturas += $factura['monto'];
             $updatetranscodigo = $this->dbc->query("UPDATE factura SET transacciones_idtransacciones = '$idtrans' WHERE idfactura = '{$factura['idfactura']}'");
+            if($fact['cobrado'] == 2){ //COBRADO
+                //CREAR RECIBO
+            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,archivo)
+            VALUES('$nroRecibo','$fact[fecha]','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$fact[montofactura]','$fact[idfactura]','$idtrans','0',NULL)");
+
+            }else{
+                //NADA
+            }
+            
         }
     
         // Obtener los asientos relacionados y calcular debe y haber
