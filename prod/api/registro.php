@@ -1300,18 +1300,18 @@ elseif($ver=="registroUnidadTiempoControl") {// esto sale del hidden del input q
         echo json_encode(array("Error", "Faltan parámetros en la solicitud",$_POST['idalmacen_fisico'],$_POST['cantidad']));
     }
 }elseif($ver=="registrar_merma") {// esto sale del hidden del input que esta en el formulario
-    if (isset($_POST['cantidad_envase'],$_POST['peso_neto'],$_POST['tipo_envase_idtipo_envase'],$_POST['cantidad'],$_POST['costo_unitario'],$_POST['costo_envase'],$_POST['material_idmaterial'],$_POST['empresa_idempresa'],$_POST['proveedor_idproveedor'],$_POST['compra_idcompra'],$_POST['almacen_material_idalmacen_material'])) {
+    if (isset($_POST['cantidad_envase'],$_POST['peso_neto'],$_POST['tipo_envase_idtipo_envase'],$_POST['cantidad'],$_POST['costo_unitario'],$_POST['costo_envase'],$_POST['justificacion'],$_POST['material_idmaterial'],$_POST['empresa_idempresa'],$_POST['proveedor_idproveedor'],$_POST['compra_idcompra'],$_POST['almacen_material_idalmacen_material'])) {
         $envase = new Alma_fisic_merma();
-    $envase->registrar_merma($_POST['cantidad_envase'],$_POST['peso_neto'],$_POST['tipo_envase_idtipo_envase'],$_POST['cantidad'],$_POST['costo_unitario'],$_POST['costo_envase'],$_POST['material_idmaterial'],$_POST['empresa_idempresa'],$_POST['proveedor_idproveedor'],$_POST['compra_idcompra'],$_POST['almacen_material_idalmacen_material']);
+    $envase->registrar_merma($_POST['cantidad_envase'],$_POST['peso_neto'],$_POST['tipo_envase_idtipo_envase'],$_POST['cantidad'],$_POST['costo_unitario'],$_POST['costo_envase'],$_POST['justificacion'],$_POST['material_idmaterial'],$_POST['empresa_idempresa'],$_POST['proveedor_idproveedor'],$_POST['compra_idcompra'],$_POST['almacen_material_idalmacen_material']);
     }else{
-        echo json_encode(array("Error", "Faltan parámetros en la solicitud",$_POST['cantidad_envase'],$_POST['peso_neto'],$_POST['tipo_envase_idtipo_envase'],$_POST['cantidad'],$_POST['costo_unitario'],$_POST['costo_envase'],$_POST['material_idmaterial'],$_POST['empresa_idempresa'],$_POST['proveedor_idproveedor'],$_POST['compra_idcompra'],$_POST['almacen_material_idalmacen_material']));
+        echo json_encode(array("Error", "Faltan parámetros en la solicitud",$_POST['cantidad_envase'],$_POST['peso_neto'],$_POST['tipo_envase_idtipo_envase'],$_POST['cantidad'],$_POST['costo_unitario'],$_POST['costo_envase'],$_POST['justificacion'],$_POST['material_idmaterial'],$_POST['empresa_idempresa'],$_POST['proveedor_idproveedor'],$_POST['compra_idcompra'],$_POST['almacen_material_idalmacen_material']));
     }
 }elseif($ver=="editar_merma") {// esto sale del hidden del input que esta en el formulario
-    if (isset($_POST['idmerma'],$_POST['cantidad_envase'],$_POST['peso_neto'],$_POST['cantidad'],$_POST['costo_unitario'],$_POST['costo_envase'])) {
+    if (isset($_POST['idmerma'],$_POST['cantidad_envase'],$_POST['peso_neto'],$_POST['cantidad'],$_POST['costo_unitario'],$_POST['costo_envase'],$_POST['justificacion'])) {
         $envase = new Alma_fisic_merma();
-    $envase->editar_merma($_POST['idmerma'],$_POST['cantidad_envase'],$_POST['peso_neto'],$_POST['cantidad'],$_POST['costo_unitario'],$_POST['costo_envase']);
+    $envase->editar_merma($_POST['idmerma'],$_POST['cantidad_envase'],$_POST['peso_neto'],$_POST['cantidad'],$_POST['costo_unitario'],$_POST['costo_envase'],$_POST['justificacion']);
     }else{
-        echo json_encode(array("Error", "Faltan parámetros en la solicitud",$_POST['idmerma'],$_POST['cantidad_envase'],$_POST['peso_neto'],$_POST['cantidad'],$_POST['costo_unitario'],$_POST['costo_envase']));
+        echo json_encode(array("Error", "Faltan parámetros en la solicitud",$_POST['idmerma'],$_POST['cantidad_envase'],$_POST['peso_neto'],$_POST['cantidad'],$_POST['costo_unitario'],$_POST['costo_envase'],$_POST['justificacion']));
     }
 }
 

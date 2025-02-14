@@ -324,13 +324,16 @@ class Reporte_produccion extends DB{
 
                     }else{
                     $mat_prod2 = $mat_prod->fetch_assoc();
-                    // $cod = $resultado['codigotransaccion'];
+
+                    // $idmate = $dtsolimate['material_idmaterial'];
+                    $total = $precioMaterial * $mat_prod2['cantidad'];
+
                     $res55 = array(
                         "idmaterial_produccion" => $mat_prod2['idmaterial_produccion'],
                         "cantidad" => $mat_prod2['cantidad'],
                         "detalle_solicitud_material_iddetalle_solicitud_material" => $mat_prod2['detalle_solicitud_material_iddetalle_solicitud_material'],
                         "almacen_material_idalmacen_material" => $mat_prod2['almacen_material_idalmacen_material'],
-                        "costo" => 0
+                        "costo" => $total
                         );
                     // array_push($array_detalle,$dtsolimate['iddetalle_solicitud_material']); 
                     array_push($res8['material_produccion'], $res55);

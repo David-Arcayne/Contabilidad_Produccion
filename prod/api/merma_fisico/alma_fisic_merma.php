@@ -75,7 +75,7 @@ class Alma_fisic_merma extends DB{
             echo json_encode($res);
     }
     //----------------------------------------------------------------------------------------------------------
-    public function registrar_merma($cantidad_envase,$peso_neto,$tipo_envase_idtipo_envase,$cantidad,$costo_unitario,$costo_envase,$material_idmaterial,$empresa,$idproveedor,$idcompra,$idalmacen){
+    public function registrar_merma($cantidad_envase,$peso_neto,$tipo_envase_idtipo_envase,$cantidad,$costo_unitario,$costo_envase,$justificacion,$material_idmaterial,$empresa,$idproveedor,$idcompra,$idalmacen){
         
         $idempresa = $this->getidempresa($empresa);
         // $consulta = $this->dbp->query("SELECT COUNT(*) AS total FROM caracteristicas WHERE caracteristica = '$nombre' AND empresa_idempresa = '$idempresa'");
@@ -88,7 +88,7 @@ class Alma_fisic_merma extends DB{
             $res = array("Error", "El registro ya existe","Error");
         } else {
             // Insertar el nuevo registro
-            $registroProveedor = $this->dbp->query("INSERT INTO merma(cantidad_envase,peso_neto,tipo_envase_idtipo_envase,cantidad,costo_unitario,costo_envase,material_idmaterial,empresa_idempresa,proveedor_idproveedor,compra_idcompra,almacen_material_idalmacen_material) VALUES ('$cantidad_envase','$peso_neto','$tipo_envase_idtipo_envase','$cantidad','$costo_unitario','$costo_envase','$material_idmaterial','$idempresa','$idproveedor','$idcompra','$idalmacen')");
+            $registroProveedor = $this->dbp->query("INSERT INTO merma(cantidad_envase,peso_neto,tipo_envase_idtipo_envase,cantidad,costo_unitario,costo_envase,justificacion,material_idmaterial,empresa_idempresa,proveedor_idproveedor,compra_idcompra,almacen_material_idalmacen_material) VALUES ('$cantidad_envase','$peso_neto','$tipo_envase_idtipo_envase','$cantidad','$costo_unitario','$costo_envase','$justificacion','$material_idmaterial','$idempresa','$idproveedor','$idcompra','$idalmacen')");
             if ($registroProveedor === TRUE) { 
             $consulta = $this->dbp->query("SELECT cantidad FROM almacen_material WHERE idalmacen_material = '$idalmacen'");
             $resultado = $consulta->fetch_assoc();
@@ -121,6 +121,7 @@ class Alma_fisic_merma extends DB{
                 "cantidad" => $qwe['cantidad'],
                 "costo_unitario" => $qwe['costo_unitario'],
                 "costo_envase" => $qwe['costo_envase'],
+                "justificacion" => $qwe['justificacion'],
                 "material_idmaterial" => $qwe['material_idmaterial'],
                 "empresa_idempresa" => $qwe['empresa_idempresa'],
                 "proveedor_idproveedor" => $qwe['proveedor_idproveedor'],
@@ -134,7 +135,7 @@ class Alma_fisic_merma extends DB{
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
     
-    public function editar_merma($id,$cantidad_envase,$peso_neto,$cantidad,$costo_unitario,$costo_envase) {    
+    public function editar_merma($id,$cantidad_envase,$peso_neto,$cantidad,$costo_unitario,$costo_envase,$justificacion) {    
 
         if (0 > 0) {
             $res = array("Error", "El registro ya existe","editarCaracteristicas");
@@ -145,7 +146,8 @@ class Alma_fisic_merma extends DB{
                                     peso_neto = '$peso_neto',
                                     cantidad = '$cantidad',
                                     costo_unitario = '$costo_unitario',
-                                    costo_envase = '$costo_envase'
+                                    costo_envase = '$costo_envase',
+                                    justificacion = '$justificacion'
                                     WHERE idmerma = '$id';");
             if ($registroListaCompra === TRUE) {                                                                                                                                                                
                 $res = array("success", "Edición exitosa","editar_merma");
