@@ -266,6 +266,83 @@ class Gastos_generales extends DB{
                         }
                         echo json_encode($res);
                 }
+
+                public function registrar_detalle_gasto_general($monto, $tipo,$id_gg){
+
+                    ini_set('display_errors', 1);
+                    ini_set('display_startup_errors', 1);
+                    error_reporting(E_ALL);
+                        if (0 > 0) {
+                            $res = array("danger", "El registro ya existe");
+                        } else {
+                            // Insertar el nuevo registro
+                            $registroEstandar = $this->dbp->query("INSERT INTO detalle_gasto_general(monto,tipo,gastos_generales_idgastos_generales) VALUES ('$monto', '$tipo','$id_gg')");
+                            if ($registroEstandar === TRUE) {                                                                                                                                                                
+                                $res = array("success", "Registro exitoso","registrar_detalle_gasto_general");
+                            } else {
+                                $res = array("danger", "No se pudo registrar");
+                            }
+                        }
+                        echo json_encode($res);
+                    }
+                    public function listar_detalle_gasto_general($id_gg){
+                        ini_set('display_errors', 1);
+                        ini_set('display_startup_errors', 1);
+                        error_reporting(E_ALL);
+                        $lista = [];
+                        $getPedido = $this->dbp->query("SELECT * FROM detalle_gasto_general 
+                                    WHERE gastos_generales_idgastos_generales='$id_gg';");
+                        // $nombre, $codigo, $nit, $detalle, $direccion, $telefono,$mobil, $email, $web, $pais, $ciudad, $zona, $contacto,$empresa
+                        while($qwe=$this->dbp->fetch($getPedido)){
+                             $res=array("iddetalle_gasto_general"=>$qwe['iddetalle_gasto_general'],
+                             "monto"=>$qwe['monto'],
+                             "tipo"=>$qwe['tipo'],
+                             "gastos_generales_idgastos_generales"=>$qwe['gastos_generales_idgastos_generales']
+                            ); //'nombre' sale del formulario de input hidden
+                            array_push($lista,$res);
+                         }
+                          echo json_encode($lista);
+                    }
+                    public function editar_detalle_gasto_general($id_dtgg,$monto, $tipo) {
+            
+                        if (0 > 0) {
+                            $res = array("danger", "El registro ya existe");
+                        } else {
+                            // Insertar el nuevo registro
+                            $registroListaCompra = $this->dbp->query("UPDATE detalle_gasto_general
+                                                    SET monto = '$monto',
+                                                        tipo = '$tipo'
+                                                    WHERE iddetalle_gasto_general = '$id_dtgg';");
+                            if ($registroListaCompra === TRUE) {                                                                                                                                                                
+                                $res = array("success", "Edición exitosa","editar_detalle_gasto_general");
+                            } else {
+                                $res = array("danger", "No se pudo registrar");
+                            }
+                        }
+                        echo json_encode($res);
+                    }
+            
+                    public function eliminar_detalle_gasto_general($id){
+                        // echo json_encode(array($idproveedor,$idempresa,"hola"));
+                
+                        // $idempresa = $this->getidempresa($empresa);
+                            // $consulta = $this->dbp->query("SELECT COUNT(*) AS total FROM proveedor_has_material WHERE proveedor_idproveedor = '$idproveedor'");
+                            // $resultado = $consulta->fetch_assoc();
+                            // $totalRegistros = $resultado['total'];
+                
+                            if (0 > 0) {
+                                $res = array("danger", "No se puede eliminar porque hay registros en proveedor_has_material","eliminar_proveedor");
+                            } else {
+                                // Insertar el nuevo registro
+                                $eliminarL = $this->dbp->query("DELETE FROM detalle_gasto_general WHERE iddetalle_gasto_general = '$id'");
+                                if ($eliminarL === TRUE) {                                                                                                                                                    
+                                    $res = array("success", "se elimino exitosamente","eliminar_detalle_gasto_general");
+                                } else {
+                                    $res = array("danger", "No se pudo registrar");
+                                }
+                            }
+                            echo json_encode($res);
+                    }
         // ------------------------------------------------------------------------------------
 
         public function getidempresa($md5){

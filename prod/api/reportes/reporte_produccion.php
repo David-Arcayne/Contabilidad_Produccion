@@ -17,28 +17,34 @@ class Reporte_produccion extends DB{
         // $idempresa = $this->getidempresa($empresa); sumaHorasEtapa
 
          // Consulta para listar los gastos generales
-         $gastosGen = $this->dbp->query("SELECT * FROM gastos_generales");
+         $gastosGen = $this->dbp->query("SELECT * FROM gastos_generales WHERE empresa_idempresa = '$idempresa'");
         $montoPromedio =0;
          while ($gastos_generales = $this->dbp->fetch($gastosGen)) {
             $monto =0;
             // $sumaHorasEtapa=0;
             $detalle_gastos = $this->dbp->query("SELECT monto FROM detalle_gastos 
             WHERE gastos_generales_idgastos_generales ='$gastos_generales[idgastos_generales]';"); 
-             while ($dtgastos = $this->dbp->fetch($detalle_gastos)) {
-                $monto = $monto + $dtgastos['monto'];
-             }
-             $montoPromedio = $montoPromedio + ($monto/12);
-            //  $montoPromedio =
-        //    $resultado2 = $detalle_gastos->fetch_assoc();
-            
-            // $resRegla3= (($costo['cantidad'] * $dt_produccion['cantidad'])/$cantProducto)*$aaa;
-            // array_push($arrRegla3, $resRegla3);
+             //si hay resultados en la tabla detalle_gastos 
+             if ($detalle_gastos->num_rows > 0) {
+                //hago el calculo de la antigua forma suma de montos
+                while ($dtgastos = $this->dbp->fetch($detalle_gastos)) {
+                    $monto = $monto + $dtgastos['monto'];
+                 }
+                 $montoPromedio = $montoPromedio + ($monto/12);
+            }else{
+                $dgg = $this->dbp->query("SELECT * FROM detalle_gasto_general
+            WHERE gastos_generales_idgastos_generales ='$gastos_generales[idgastos_generales]';");
+             $det_ggenral = $dgg->fetch_assoc();
+            // $totalRegistros = $det_ggenral['total']; 
+                if($det_ggenral['tipo'] == 1){ // mensual
+                    $aaa = $det_ggenral['monto']/()
+                }
+                else{ // anual
 
-            // $aiu =0;
-            // foreach($arrRegla3 as $i){
-            //     $aiu= $aiu+$i;
-            // }
-            // $res4['costo'] = $aiu;
+                }
+
+            }
+            
             }
             $montoTotal = $montoPromedio / (24*30);
             // $montoTotal = $montoTotal * $sumaHorasEtapa;
@@ -356,10 +362,10 @@ class Reporte_produccion extends DB{
         
         // array_push($res2['produccion_etapa'], $res7);
         }   
-        $gastoGeneral = $montoTotal * $sumaHorasEtapas + $monto_otros_gastos;
+        $gastoGeneral = ($montoTotal * $sumaHorasEtapas) + $monto_otros_gastos;
         $res['gastos_generales'] = $gastoGeneral;
             array_push($lista, $res);
-        }
+        } 
     
         if(empty($lista_error)){
             echo json_encode($lista);

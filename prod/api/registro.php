@@ -1341,6 +1341,20 @@ elseif($ver=="registroUnidadTiempoControl") {// esto sale del hidden del input q
     }else{
         echo json_encode(array("Error", "Faltan parámetros en la solicitud",$_POST['idotros_gastos'],$_POST['nombre'],$_POST['detalle'],$_POST['produccion_idproduccion']));
     }
+}elseif($ver=="registrar_detalle_gasto_general") {// esto sale del hidden del input que esta en el formulario
+    if (isset($_POST['monto'],$_POST['tipo'],$_POST['gastos_generales_idgastos_generales'])) {
+        $envase = new Gastos_generales();
+    $envase->registrar_detalle_gasto_general($_POST['monto'],$_POST['tipo'],$_POST['gastos_generales_idgastos_generales']);
+    }else{
+        echo json_encode(array("Error", "Faltan parámetros en la solicitud",$_POST['monto'],$_POST['tipo'],$_POST['gastos_generales_idgastos_generales']));
+    }
+}elseif($ver=="editar_detalle_gasto_general") {// esto sale del hidden del input que esta en el formulario
+    if (isset($_POST['iddetalle_gasto_general'],$_POST['monto'],$_POST['tipo'])) {    
+        $envase = new Gastos_generales();
+        $envase->editar_detalle_gasto_general($_POST['iddetalle_gasto_general'],$_POST['monto'],$_POST['tipo']);
+    }else{
+        echo json_encode(array("Error", "Faltan parámetros en la solicitud",$_POST['iddetalle_gasto_general'],$_POST['monto'],$_POST['tipo']));
+    }
 }
 
 else{

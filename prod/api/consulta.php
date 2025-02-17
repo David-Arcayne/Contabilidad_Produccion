@@ -598,6 +598,12 @@ elseif($url[0] == "listar_ListaCompraEditable"){
 }elseif($url[0] == "eliminar_otros_gastos"){
     $prov = new Gastos_generales();
     $prov->eliminar_otros_gastos($url[1]);
+}elseif($url[0] == "listar_detalle_gasto_general"){
+    $prov = new Gastos_generales();
+    $prov->listar_detalle_gasto_general($url[1]);
+}elseif($url[0] == "eliminar_detalle_gasto_general"){
+    $prov = new Gastos_generales();
+    $prov->eliminar_detalle_gasto_general($url[1]);
 }//produccion_etapa 
 
 ?>         
