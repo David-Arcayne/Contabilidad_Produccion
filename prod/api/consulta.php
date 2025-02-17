@@ -586,6 +586,18 @@ elseif($url[0] == "listar_ListaCompraEditable"){
 }elseif($url[0] == "listar_salida_produccion"){
     $prov = new Grupo_etapas();
     $prov->listar_salida_produccion($url[1]);
+}elseif($url[0] == "listar_detalle_uso_maquina"){
+    $prov = new Maquina_conf();
+    $prov->listar_detalle_uso_maquina($url[1]);
+}elseif($url[0] == "eliminar_detalle_uso_maquina"){
+    $prov = new Maquina_conf();
+    $prov->eliminar_detalle_uso_maquina($url[1]);
+}elseif($url[0] == "listar_otros_gastos"){
+    $prov = new Gastos_generales();
+    $prov->listar_otros_gastos($url[1]);
+}elseif($url[0] == "eliminar_otros_gastos"){
+    $prov = new Gastos_generales();
+    $prov->eliminar_otros_gastos($url[1]);
 }//produccion_etapa 
 
 ?>         

@@ -74,7 +74,7 @@ class Reporte_produccion extends DB{
             if (!$aux1) {
                 die("Error en la consulta: " . $this->dbp->error);
             }
-           
+            $monto_otros_gastos = 0;
             while ($produccion = $this->dbp->fetch($aux1)) {
                 $res2 = array(
                     "idproduccion" => $produccion['idproduccion'],
@@ -344,10 +344,19 @@ class Reporte_produccion extends DB{
                 }
                 array_push($res['produccion'], $res2);
 
-    
+                $otros_gast = $this->dbp->query("SELECT monto 
+                FROM otros_gastos                    
+                WHERE produccion_idproduccion = '{$produccion['idproduccion']}'");
+        if ($otros_gast->num_rows === 0) {
+            
+        }else{
+            $resultado_gastos = $otros_gast->fetch_assoc();
+            $monto_otros_gastos = $resultado_gastos['monto'];
+        }        
+        
         // array_push($res2['produccion_etapa'], $res7);
         }   
-        $gastoGeneral = $montoTotal * $sumaHorasEtapas;
+        $gastoGeneral = $montoTotal * $sumaHorasEtapas + $monto_otros_gastos;
         $res['gastos_generales'] = $gastoGeneral;
             array_push($lista, $res);
         }

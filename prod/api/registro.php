@@ -1313,6 +1313,34 @@ elseif($ver=="registroUnidadTiempoControl") {// esto sale del hidden del input q
     }else{
         echo json_encode(array("Error", "Faltan parámetros en la solicitud",$_POST['idmerma'],$_POST['cantidad_envase'],$_POST['peso_neto'],$_POST['cantidad'],$_POST['costo_unitario'],$_POST['costo_envase'],$_POST['justificacion']));
     }
+}elseif($ver=="registrar_detalle_uso_maquina") {// esto sale del hidden del input que esta en el formulario
+    if (isset($_POST['dato_variable'],$_POST['tiempo'],$_POST['variables_proceso_idvariables_proceso'],$_POST['control_unidad_tiempo_idcontrol_unidad_tiempo'],$_POST['uso_maquina_iduso_maquina'])) {
+        $envase = new Maquina_conf();
+    $envase->registrar_detalle_uso_maquina($_POST['dato_variable'],$_POST['tiempo'],$_POST['variables_proceso_idvariables_proceso'],$_POST['control_unidad_tiempo_idcontrol_unidad_tiempo'],$_POST['uso_maquina_iduso_maquina']);
+    }else{
+        echo json_encode(array("Error", "Faltan parámetros en la solicitud",$_POST['dato_variable'],$_POST['tiempo'],$_POST['variables_proceso_idvariables_proceso'],$_POST['control_unidad_tiempo_idcontrol_unidad_tiempo'],$_POST['uso_maquina_iduso_maquina']));
+    }
+}elseif($ver=="editar_detalle_uso_maquina") {// esto sale del hidden del input que esta en el formulario
+    if (isset($_POST['iddetalle_uso_maquina'],$_POST['dato_variable'],$_POST['tiempo'],$_POST['variables_proceso_idvariables_proceso'],$_POST['control_unidad_tiempo_idcontrol_unidad_tiempo'])) {    
+        $envase = new Maquina_conf();
+        $envase->editar_detalle_uso_maquina($_POST['iddetalle_uso_maquina'],$_POST['dato_variable'],$_POST['tiempo'],$_POST['variables_proceso_idvariables_proceso'],$_POST['control_unidad_tiempo_idcontrol_unidad_tiempo']);
+    }else{
+        echo json_encode(array("Error", "Faltan parámetros en la solicitud",$_POST['iddetalle_uso_maquina'],$_POST['dato_variable'],$_POST['tiempo'],$_POST['variables_proceso_idvariables_proceso'],$_POST['control_unidad_tiempo_idcontrol_unidad_tiempo']));
+    }
+}elseif($ver=="registrar_otros_gastos") {// esto sale del hidden del input que esta en el formulario
+    if (isset($_POST['nombre'],$_POST['detalle'],$_POST['monto'],$_POST['produccion_idproduccion'])) {
+        $envase = new Gastos_generales();
+    $envase->registrar_otros_gastos($_POST['nombre'],$_POST['detalle'],$_POST['monto'],$_POST['produccion_idproduccion']);
+    }else{
+        echo json_encode(array("Error", "Faltan parámetros en la solicitud",$_POST['nombre'],$_POST['detalle'],$_POST['monto'],$_POST['produccion_idproduccion']));
+    }
+}elseif($ver=="editar_otros_gastos") {// esto sale del hidden del input que esta en el formulario
+    if (isset($_POST['idotros_gastos'],$_POST['nombre'],$_POST['detalle'],$_POST['produccion_idproduccion'])) {    
+        $envase = new Gastos_generales();
+        $envase->editar_otros_gastos($_POST['idotros_gastos'],$_POST['nombre'],$_POST['detalle'],$_POST['produccion_idproduccion']);
+    }else{
+        echo json_encode(array("Error", "Faltan parámetros en la solicitud",$_POST['idotros_gastos'],$_POST['nombre'],$_POST['detalle'],$_POST['produccion_idproduccion']));
+    }
 }
 
 else{

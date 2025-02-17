@@ -549,8 +549,87 @@ class Maquina_conf extends DB{
 
         
     }
+    public function registrar_detalle_uso_maquina($dato_variable,$tiempo,$variables_proceso_idvariables_proceso,$control_unidad_tiempo_idcontrol_unidad_tiempo,$uso_maquina_iduso_maquina){
+        // $idempresa = $this->getidempresa($empresa);
+        // $consulta = $this->dbp->query("SELECT COUNT(*) AS total FROM caracteristicas WHERE caracteristica = '$nombre' AND empresa_idempresa = '$idempresa'");
+        // $resultado = $consulta->fetch_assoc();
+        // $totalRegistros = $resultado['total'];
+
+        if (0 > 0) {
+            $res = array("Error", "El registro ya existe","Error");
+        } else {
+            // Insertar el nuevo registro
+            $registro = $this->dbp->query("INSERT INTO detalle_uso_maquina(dato_variable,tiempo,variables_proceso_idvariables_proceso,control_unidad_tiempo_idcontrol_unidad_tiempo,uso_maquina_iduso_maquina) VALUES ('$dato_variable','$tiempo','$variables_proceso_idvariables_proceso','$control_unidad_tiempo_idcontrol_unidad_tiempo','$uso_maquina_iduso_maquina')");
+            if ($registro === TRUE) {                                                                                                                                                                
+                $res = array("success", "Registro exitoso","registrar_detalle_uso_maquina");
+            } else {
+                $res = array("danger", "No se pudo registrar");
+            }
+        }
+        echo json_encode($res);
+        
+    }
+    public function listar_detalle_uso_maquina($iduso_maq) {
+        $lista = [];
+        // $idempresa = $this->getidempresa($empresa);
     
+        // Preparar la consulta
+        $getPedido = $this->dbp->query("SELECT * FROM detalle_uso_maquina WHERE uso_maquina_iduso_maquina = '$iduso_maq' ORDER BY iddetalle_uso_maquina DESC");
     
+        while ($qwe = $this->dbp->fetch($getPedido)) {
+            $res = array(
+                "iddetalle_uso_maquina" => $qwe['iddetalle_uso_maquina'],
+                "dato_variable" => $qwe['dato_variable'],
+                "tiempo" => $qwe['tiempo'],
+                "variables_proceso_idvariables_proceso" => $qwe['variables_proceso_idvariables_proceso'],
+                "control_unidad_tiempo_idcontrol_unidad_tiempo" => $qwe['control_unidad_tiempo_idcontrol_unidad_tiempo'],
+                "uso_maquia_iduso_maquina" => $qwe['uso_maquia_iduso_maquina']
+            );
+            array_push($lista, $res);
+        }
+    
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
+    public function editar_detalle_uso_maquina($id,$variable,$tiempo,$id_var_proceso,$id_unidad_tiempo) {
+        // $idempresa = $this->getidempresa($empresa);
+        // $consulta = $this->dbp->query("SELECT COUNT(*) AS total FROM caracteristicas WHERE caracteristica = '$nombre'");
+        // $resultado = $consulta->fetch_assoc();
+        // $totalRegistros = $resultado['total'];
+
+        if (0 > 0) {
+            $res = array("Error", "El registro ya existe","editarCaracteristicas");
+        }else {
+            // Insertar el nuevo registro
+            $registroListaCompra = $this->dbp->query("UPDATE detalle_uso_maquina
+                                    SET dato_variable = '$variable',
+                                    tiempo = '$tiempo',
+                                    variables_proceso_idvariables_proceso = '$id_var_proceso',
+                                    control_unidad_tiempo_idcontrol_unidad_tiempo = '$id_unidad_tiempo'
+                                    WHERE iddetalle_uso_maquina = '$id';");
+            if ($registroListaCompra === TRUE) {                                                                                                                                                                
+                $res = array("success", "Edición exitosa","editar_detalle_uso_maquina");
+            } else {
+                $res = array("danger", "No se pudo editar");
+            }
+        }
+        echo json_encode($res);
+    }
+    public function eliminar_detalle_uso_maquina($id){
+
+            if (0 > 0) {
+                $res = array("danger", "No se puede eliminar porque hay registros en proveedor_has_material","eliminar_proveedor");
+            } else {
+                // Insertar el nuevo registro
+                $eliminar = $this->dbp->query("DELETE FROM detalle_uso_maquina WHERE iddetalle_uso_maquina = '$id'");
+                if ($eliminar === TRUE) {                                                                                                                                                    
+                    $res = array("success", "se elimino exitosamente","eliminar_detalle_uso_maquina");
+                } else {
+                    $res = array("danger", "No se pudo registrar");
+                }
+            }
+            echo json_encode($res);
+    }
+
 }
 
 ?>

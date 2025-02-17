@@ -178,6 +178,94 @@ class Gastos_generales extends DB{
                     }
                     echo json_encode($res);
             }
+          
+    public function registrar_otros_gastos($nombre, $detalle, $monto,$produccion_idproduccion){
+                // $res = array("$cantEnvase", "$material",$tipoEnvase,"$contenidoEnvase","$medida","$empresa");
+                // echo json_encode($res);
+                //  $idempresa = $this->getidempresa($empresa_idempresa);
+                //     $consulta = $this->dbp->query("SELECT COUNT(*) AS total FROM gastos_generales WHERE codigo = '$codigo' AND empresa_idempresa='$idempresa'");
+                //     $resultado = $consulta->fetch_assoc();
+                //     $totalRegistros = $resultado['total'];
+                ini_set('display_errors', 1);
+                ini_set('display_startup_errors', 1);
+                error_reporting(E_ALL);
+                    if (0 > 0) {
+                        $res = array("danger", "El registro ya existe");
+                    } else {
+                        // Insertar el nuevo registro
+                        $registroEstandar = $this->dbp->query("INSERT INTO otros_gastos(nombre, detalle, monto, produccion_idproduccion) VALUES ('$nombre', '$detalle', '$monto','$produccion_idproduccion')");
+                        if ($registroEstandar === TRUE) {                                                                                                                                                                
+                            $res = array("success", "Registro exitoso","registrar_otros_gastos");
+                        } else {
+                            $res = array("danger", "No se pudo registrar");
+                        }
+                    }
+                    echo json_encode($res);
+                }
+                public function listar_otros_gastos($id_produccion){
+                    ini_set('display_errors', 1);
+                    ini_set('display_startup_errors', 1);
+                    error_reporting(E_ALL);
+                    $lista = [];
+                    $getPedido = $this->dbp->query("SELECT * FROM otros_gastos 
+                                WHERE idotros_gastos='$id_produccion';");
+                    // $nombre, $codigo, $nit, $detalle, $direccion, $telefono,$mobil, $email, $web, $pais, $ciudad, $zona, $contacto,$empresa
+                    while($qwe=$this->dbp->fetch($getPedido)){
+                         $res=array("idotros_gastos"=>$qwe['idotros_gastos'],
+                         "nombre"=>$qwe['nombre'],
+                         "detalle"=>$qwe['detalle'],
+                         "monto"=>$qwe['monto'],
+                         "produccion_idproduccion"=>$qwe['produccion_idproduccion']
+                        ); //'nombre' sale del formulario de input hidden
+                        array_push($lista,$res);
+                     }
+                      echo json_encode($lista);
+                }
+                public function editar_otros_gastos($idotros_gastos,$nombre, $detalle,$idproduccion) {
+                    // echo json_encode(array($id,$nombre,$codigo,$nit,$detalle,$direccion,$telefono,$mobil,$email,$web,$pais,$ciudad,$zona,$contacto,$empresa));
+                    // $idempresa = $this->getidempresa($empresa);
+                    // $idempresa = $this->getidempresa($empresa_idempresa);
+                    $consulta = $this->dbp->query("SELECT COUNT(*) AS total FROM otros_gastos WHERE nombre = '$nombre' AND produccion_idproduccion = '$idproduccion' AND idotros_gastos!='$idotros_gastos'");
+                    $resultado = $consulta->fetch_assoc();
+                    $totalRegistros = $resultado['total'];
+                    if ($totalRegistros > 0) {
+                        $res = array("danger", "El registro ya existe");
+                    } else {
+                        // Insertar el nuevo registro
+                        $registroListaCompra = $this->dbp->query("UPDATE otros_gastos
+                                                SET nombre = '$nombre',
+                                                    detalle = '$detalle'
+                                                WHERE idotros_gastos = '$idotros_gastos';");
+                        if ($registroListaCompra === TRUE) {                                                                                                                                                                
+                            $res = array("success", "Edición exitosa","editar_otros_gastos");
+                        } else {
+                            $res = array("danger", "No se pudo registrar");
+                        }
+                    }
+                    echo json_encode($res);
+                }
+        
+                public function eliminar_otros_gastos($id){
+                    // echo json_encode(array($idproveedor,$idempresa,"hola"));
+            
+                    // $idempresa = $this->getidempresa($empresa);
+                        // $consulta = $this->dbp->query("SELECT COUNT(*) AS total FROM proveedor_has_material WHERE proveedor_idproveedor = '$idproveedor'");
+                        // $resultado = $consulta->fetch_assoc();
+                        // $totalRegistros = $resultado['total'];
+            
+                        if (0 > 0) {
+                            $res = array("danger", "No se puede eliminar porque hay registros en proveedor_has_material","eliminar_proveedor");
+                        } else {
+                            // Insertar el nuevo registro
+                            $eliminarL = $this->dbp->query("DELETE FROM otros_gastos WHERE idotros_gastos = '$id'");
+                            if ($eliminarL === TRUE) {                                                                                                                                                    
+                                $res = array("success", "se elimino exitosamente","eliminar_otros_gastos");
+                            } else {
+                                $res = array("danger", "No se pudo registrar");
+                            }
+                        }
+                        echo json_encode($res);
+                }
         // ------------------------------------------------------------------------------------
 
         public function getidempresa($md5){
