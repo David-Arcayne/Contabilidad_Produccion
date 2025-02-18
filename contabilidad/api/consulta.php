@@ -6,6 +6,7 @@ require_once "funciones.php";
 require_once "./plan_cuentas/plandecuentas.php";
 require_once "./transacciones_facturas/transFactura_pagar.php";
 require_once "./solicitudes/insertar_transaccion.php";
+require_once "./transacciones_facturas/transacciones.php";
 
 $ver=explode("/",$_GET['ver']); //dividiendo los "/"  ver[0],ver[1],ver[x] listafacturaapi_cobrado
 if($ver[0]=="verificacion"){
@@ -33,17 +34,17 @@ $ad->reemplazarplanes($ver[1]);
 $ad=new Admin();
 $ad->listatipodecambio($ver[1]);
 }elseif($ver[0]=="listatransacciones"){
-$cont=new Contabilidad();
-$cont->listatransaciones($ver[1]);
+$cont=new Transacciones();
+$cont->listatransacciones($ver[1]);
 }elseif($ver[0]=="tipotransaccion"){
 $cont=new Contabilidad();
 $cont->tipotransaccion();
 //echo "Hola";
 }elseif($ver[0]=="listadetalletransaccion"){
-$cont=new Contabilidad();
+$cont=new Transacciones();
 $cont->listadetalletransaccion($ver[1]);
 }elseif($ver[0]=="eliminardetalle"){
-$cont=new Contabilidad();
+$cont=new Transacciones();
 $cont->eliminardetalle($ver[1]);
 }elseif($ver[0]=="reportedetallefpt"){
 $rep=new Reportes();
@@ -163,7 +164,7 @@ $cont->estadogestion($ver[1],$ver[2],$ver[3]);
 $cont=new Contabilidad();
 $cont->getgestionactual($ver[1]);
 }elseif($ver[0]=="eliminartransaccion"){
-$cont=new Contabilidad();
+$cont=new Transacciones();
 $cont->eliminartransaccion($ver[1]);
 }elseif($ver[0]=="gestionlista"){
 $cont=new Contabilidad();
@@ -302,5 +303,5 @@ $cont->lista_cobrar_cobrado_factura($ver[1]);
     $cont=new Insertar_transaccion();
     $cont->lista_transaccionEn_espera($ver[1]);
 }
-//listafactura eliminartransaccion eliminardetalletransaccion listapagos_individuales
+//listafactura eliminartransaccion eliminardetalletransaccion listapagos_individuales listatransaciones
 ?>

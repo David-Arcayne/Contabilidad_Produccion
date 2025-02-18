@@ -5,6 +5,8 @@ require_once "./transacciones_facturas/transacciones_facturas.php";
 require_once "./plan_cuentas/plandecuentas.php";
 require_once "./transacciones_facturas/transFactura_pagar.php";
 require_once "./solicitudes/insertar_transaccion.php";
+require_once "./transacciones_facturas/transacciones.php";
+
 $ver=$_POST['ver'];
 $json = file_get_contents('php://input'); // Decodificar el JSON en un arreglo PHP  
 $data = json_decode($json, true);
@@ -21,19 +23,19 @@ $adm->registrotipodecambio($_POST['dolar'],$_POST['ufv'],$_POST['fecha'],$_POST[
 $adm=new Admin();
 $adm->registrotipodecambiof5($_POST['id'],$_POST['dolar'],$_POST['ufv'],$_POST['fecha']);
 }elseif($ver=="registrotransaccion"){
-$cont=new Contabilidad();
+$cont=new Transacciones();
 $cont->registrotransaccion($_POST['codigo'],$_POST['fecha'],$_POST['tipodecambio'],$_POST['tipotransaccion'],$_POST['descripcion'],$_POST['empresa'],$_POST['sucursal']);
 }elseif($ver=="insertartransaccionen"){
     $cont=new Contabilidad();
     $cont->insertartransaccionen($_POST['codigo'],$_POST['fecha'],$_POST['tipodecambio'],$_POST['tipotransaccion'],$_POST['descripcion'],$_POST['empresa'],$_POST['sucursal']);
 }elseif($ver=="registrotransaccionf5"){
-$cont=new Contabilidad();
+$cont=new Transacciones();
 $cont->registrotransaccionf5($_POST['idt'],$_POST['fecha'],$_POST['tipodecambio'],$_POST['tipotransaccion'],$_POST['descripcion'],$_POST['gestion']);
 }elseif($ver=="detalletransaccionnormal"){
-$cont=new Contabilidad();
+$cont=new Transacciones();
 $cont->detalletransaccionnormal($_POST['trans'],$_POST['plandecuenta'],$_POST['debe'],$_POST['haber'],$_POST['nota'],$_POST['empresa'],$_POST['sucursal'],$_POST['iddetalletransaccion']);
 }elseif($ver=="detalletransaccionnormalf5"){
-    $cont=new Contabilidad();
+    $cont=new Transacciones();
     $cont->detalletransaccionnormalf5($_POST['iddetalle'],$_POST['trans'],$_POST['plandecuenta'],$_POST['debe'],$_POST['haber'],$_POST['nota']);
     }elseif($ver=="registrocliente"){
 $cont=new Contabilidad();
@@ -198,6 +200,6 @@ if($data['ver'] == "cobrofacturasaasientomodelo") {
         echo json_encode(array("danger", "Faltan parámetros en la solicitud", $_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['idasientotipo'],$_POST['empresa'],$_POST['sucursal'],$_FILES['archivo'],$_POST['facturas']));
     }
 }
-// registrardesconsolidar registrotransaccion registrotransaccionf5
+// registrardesconsolidar registrotransaccion registrotransaccionf5 duplicartransaccion
 }
 ?>
