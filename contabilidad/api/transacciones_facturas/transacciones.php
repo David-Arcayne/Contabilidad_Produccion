@@ -15,7 +15,8 @@ class Transacciones extends DB{
         $res = "";
         // aqui la condicional si hay una nueva gestion
 
-        $writetrans = $this->dbc->query("insert into transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)value(NULL,'$codigo','$fecha','$tipocambio','$ndocumento','$glosa','1','$tipotransaccion','$ide','$idsucursal','$idgestion')");
+        $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
+        VALUE(NULL,'$codigo','$fecha','$tipocambio','$ndocumento','$glosa','1','1','$tipotransaccion','$ide','$idsucursal','$idgestion')");
         if ($writetrans === TRUE) {
             $res = array("success", "Se Registro Correctamente", "registrotransaccion");
         } else {

@@ -293,7 +293,7 @@ $nroTransaccion = $resultado12['codigotransaccion'] + 1;
         }
         echo json_encode($res);
     }
-    public function registrar_transaccion_recibo($fecha,$monto,$glosa, $asiento,$empresa,$sucursal){
+    public function registrar_transaccion_recibo($idRecibo,$fecha,$monto,$glosa, $asiento,$empresa,$sucursal){
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
@@ -307,14 +307,14 @@ $nroTransaccion = $resultado12['codigotransaccion'] + 1;
         $qq = $this->dbc->fetch($transi);
         $codigo = $qq['codigotransaccion'] + 1;
         if ($asiento != 0) {
-            $insertrans = $this->dbc->query("INSERT INTO `transacciones` (`idtransacciones`, `codigotransaccion`, `fechatransaccion`, `tipodecambio`, `ndocumento`, `glosa`, `consolidar`, `tipotransaccion_idtipotransaccion`, `organizacion_idorganizacion`, `sucursal`, `idgestion`) 
-            VALUES (NULL, '$codigo', '$fecha', '1', '0', '$glosa', '1', '$tipotransaccion', '$ide', '$sucursal', '$gestion');");
+            $insertrans = $this->dbc->query("INSERT INTO `transacciones` (`idtransacciones`, `codigotransaccion`, `fechatransaccion`, `tipodecambio`, `ndocumento`, `glosa`, `consolidar`,`estado`, `tipotransaccion_idtipotransaccion`, `organizacion_idorganizacion`, `sucursal`, `idgestion`) 
+            VALUES (NULL, '$codigo', '$fecha', '1', '0', '$glosa', '1','1', '$tipotransaccion', '$ide', '$sucursal', '$gestion');");
             //nuevat transaccion
             $transis = $this->dbc->query("SELECT * FROM transacciones WHERE codigotransaccion='$codigo' AND  organizacion_idorganizacion='$ide' ORDER BY idtransacciones DESC LIMIT 1");
             $ww = $this->dbc->fetch($transis);
             $trans = $ww['idtransacciones'];
             //$detallepago
-
+            $editar_recibo = $this->dbc->query("UPDATE cuentaspof SET transaccion = '$trans' WHERE idcuentaspof ='$idRecibo'");
             $debe = 0;
             $haber = 0;
             $tasiento = $this->dbc->query("SELECT * FROM asiento WHERE idasientotipo='$asiento'");
@@ -339,7 +339,13 @@ $nroTransaccion = $resultado12['codigotransaccion'] + 1;
             }
         } else {
             $trans = $qq['idtransacciones'];
+            $editar_recibo = $this->dbc->query("UPDATE cuentaspof SET transaccion = '$trans' WHERE idcuentaspof ='$idRecibo'");
         }
-        
+        if($insertrans == TRUE){
+            $res = array("success", "Registro exitoso","registrar_transaccion_recibo");
+        }else{
+            $res = array("danger", "No se pudo registrar","registrar_transaccion_recibo");
+        }
+        echo json_encode($res);
     }
 }

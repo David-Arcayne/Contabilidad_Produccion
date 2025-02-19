@@ -31,6 +31,15 @@ class Anulacion_transaccion extends DB{
         // $resultado = $detallet->fetch_assoc();
         // $totalRegistros = $resultado['total'];
         if($registro===TRUE){
+            if($estado_opci == 1){ //estado_opcion= 1 anular
+                // estado_trans = 2--> proceso de anulacion 
+                $editar=$this->dbc->query("UPDATE transacciones SET estado = '2' WHERE idtransacciones = '$idtransaccion'");    
+            }else{ //estado_opcion= 2 eliminar
+                // estado_trans = 3--> proceso de eliminacion 
+                $editar=$this->dbc->query("UPDATE transacciones SET estado = '3' WHERE idtransacciones = '$idtransaccion'");    
+
+            }
+            
             $res = array("success", "Anulacion exitosa","anular_transaccion");
         }else{
             $res = array("danger", "No se pudo anular");
@@ -63,7 +72,7 @@ class Anulacion_transaccion extends DB{
                 if($estado_solicitud == 2){ //ACEPTADO
                     $consulta_detalle=$this->dbc->query("SELECT * FROM detalletransaccion WHERE transacciones_idtransacciones='$idtransaccion'");
 
-                    $update_trans=$this->dbc->query("UPDATE transacciones SET estado = '2' 
+                    $update_trans=$this->dbc->query("UPDATE transacciones SET estado = '4' 
                         WHERE idtransacciones = '$idtransaccion'");  
 
                     if ($consulta_detalle->num_rows > 0) {  

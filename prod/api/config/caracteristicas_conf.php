@@ -49,7 +49,8 @@ class Caracteristica_conf extends DB{
     } 
     public function editarCaracteristicas($id,$nombre,$tipo,$minimo,$maximo,$empresa) {
         $idempresa = $this->getidempresa($empresa);
-        $consulta = $this->dbp->query("SELECT COUNT(*) AS total FROM caracteristicas WHERE caracteristica = '$nombre'");
+
+        $consulta = $this->dbp->query("SELECT COUNT(*) AS total FROM caracteristicas WHERE caracteristica = '$nombre' AND empresa_idempresa = '$idempresa' AND idcaracteristicas != '$id'");
         $resultado = $consulta->fetch_assoc();
         $totalRegistros = $resultado['total'];
 

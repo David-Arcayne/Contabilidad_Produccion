@@ -221,13 +221,13 @@ if($data['ver'] == "cobrofacturasaasientomodelo") {
     }
 }elseif($ver == "registrar_transaccion_recibo"){
 
-    if(isset($_POST['fecha'],$_POST['monto'],$_POST['glosa'],$_POST['asiento'],$_POST['empresa'],$_POST['sucursal'])){
+    if(isset($_POST['idcuentaspof'],$_POST['fecha'],$_POST['monto'],$_POST['glosa'],$_POST['asiento'],$_POST['empresa'],$_POST['sucursal'])){
         // decode echo json_encode(array("danger", "Faltan parámetros en la solicitud", $_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$facturas));
         $cont=new Transacciones_facturas();
-        $cont->registrar_transaccion_recibo($_POST['fecha'],$_POST['monto'],$_POST['glosa'],$_POST['asiento'],$_POST['empresa'],$_POST['sucursal']);
+        $cont->registrar_transaccion_recibo($_POST['idcuentaspof'],$_POST['fecha'],$_POST['monto'],$_POST['glosa'],$_POST['asiento'],$_POST['empresa'],$_POST['sucursal']);
     }
     else{
-        echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['fecha'],$_POST['monto'],$_POST['glosa'],$_POST['asiento'],$_POST['empresa'],$_POST['sucursal']));
+        echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idcuentaspof'],$_POST['fecha'],$_POST['monto'],$_POST['glosa'],$_POST['asiento'],$_POST['empresa'],$_POST['sucursal']));
     }
 }
 // registrardesconsolidar registrotransaccion registrotransaccionf5 duplicartransaccion registrocobrarfactura

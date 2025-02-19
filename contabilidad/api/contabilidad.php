@@ -1424,7 +1424,7 @@ WHERE
         $tipotransaccion = 2; //ingreso
 
         if ($asiento != 0) {
-        $insertrans = $this->dbc->query("INSERT INTO `transacciones` (`idtransacciones`, `codigotransaccion`, `fechatransaccion`, `tipodecambio`, `ndocumento`, `glosa`, `consolidar`, `tipotransaccion_idtipotransaccion`, `organizacion_idorganizacion`, `sucursal`, `idgestion`) VALUES (NULL, '$codigo', '$fecha', '1', '0', '$glosa', '1', '$tipotransaccion', '$ide', '$sucursal', '$gestion');");
+        $insertrans = $this->dbc->query("INSERT INTO `transacciones` (`idtransacciones`, `codigotransaccion`, `fechatransaccion`, `tipodecambio`, `ndocumento`, `glosa`, `consolidar`,`estado`, `tipotransaccion_idtipotransaccion`, `organizacion_idorganizacion`, `sucursal`, `idgestion`) VALUES (NULL, '$codigo', '$fecha', '1', '0', '$glosa', '1','1', '$tipotransaccion', '$ide', '$sucursal', '$gestion');");
         //nuevat transaccion
         $transis = $this->dbc->query("select * from transacciones where codigotransaccion='$codigo' and  organizacion_idorganizacion='$ide' order by idtransacciones desc Limit 1");
         $ww = $this->dbc->fetch($transis);
@@ -1523,29 +1523,29 @@ WHERE
         if($hayIndividuales > 0){
             if($hayGrupales > 0){
                 // hay grupales e individuales
-                        $mostrarIndi = $this->dbc->query(" SELECT nrecibo,fecha,persona,ci,monto,idcuentaspof,archivo 
+                        $mostrarIndi = $this->dbc->query(" SELECT nrecibo,fecha,persona,ci,monto,idcuentaspof,transaccion,archivo 
                         FROM cuentaspof WHERE idfactura = '$idfactura'");
     
                         while ($zxc = $this->dbc->fetch($mostrarIndi)) {
-                            $res = array("recibo" => $zxc[0], "fecha" => $zxc[1], "persona" => $zxc[2], "ci" => $zxc[3], "monto" => $zxc[4], "id" => $zxc[5],"nombre_archivo" => $zxc[6]);
+                            $res = array("recibo" => $zxc[0], "fecha" => $zxc[1], "persona" => $zxc[2], "ci" => $zxc[3], "monto" => $zxc[4], "id" => $zxc[5],"transaccion" => $zxc[6],"nombre_archivo" => $zxc[7]);
                             array_push($lista, $res);
                         }
     
                 $listaGrup2 = $this->dbc->query("SELECT * FROM cuentascobrar_grupal WHERE idfactura='$idfactura'");
                 $resultado33 = $listaGrup2->fetch_assoc();
                 $idrecibo2 = $resultado33['idcuentaspof'];
-                $datosRecibo2 = $this->dbc->query("SELECT nrecibo,fecha,persona,ci,monto,idcuentaspof,archivo FROM cuentaspof WHERE idcuentaspof='$idrecibo2'");
+                $datosRecibo2 = $this->dbc->query("SELECT nrecibo,fecha,persona,ci,monto,idcuentaspof,transaccion,archivo FROM cuentaspof WHERE idcuentaspof='$idrecibo2'");
                 
                 while ($www = $this->dbc->fetch($datosRecibo2)) {
-                    $res2 = array("recibo" => $www[0], "fecha" => $www[1], "persona" => $www[2], "ci" => $www[3], "monto" => $resultado33['monto'], "id" => $www[5],"nombre_archivo" => $www[6]);
+                    $res2 = array("recibo" => $www[0], "fecha" => $www[1], "persona" => $www[2], "ci" => $www[3], "monto" => $resultado33['monto'], "id" => $www[5],"transaccion" => $www[6],"nombre_archivo" => $www[7]);
                     array_push($lista, $res2);
                 }
     
             }else{
                 //SOLO HAY INDIVIDUALES
-                $registro = $this->dbc->query("SELECT c.idcuentaspof,c.nrecibo,c.fecha,c.monto,c.persona,c.ci,c.archivo FROM cuentaspof as c WHERE c.idfactura='$idfactura'");
+                $registro = $this->dbc->query("SELECT c.idcuentaspof,c.nrecibo,c.fecha,c.monto,c.persona,c.ci,c.transaccion,c.archivo FROM cuentaspof as c WHERE c.idfactura='$idfactura'");
                 while ($qwe = $this->dbc->fetch($registro)) {
-                    $res = array("id" => $qwe[0], "recibo" => $qwe[1], "fecha" => $qwe[2], "monto" => $qwe[3], "persona" => $qwe[4], "ci" => $qwe[5],"nombre_archivo" => $qwe[6]);
+                    $res = array("id" => $qwe[0], "recibo" => $qwe[1], "fecha" => $qwe[2], "monto" => $qwe[3], "persona" => $qwe[4], "ci" => $qwe[5],"transaccion" => $qwe[6],"nombre_archivo" => $qwe[7]);
                     array_push($lista, $res);
                 }
         }
@@ -1554,10 +1554,10 @@ WHERE
                        $listaGrup = $this->dbc->query("SELECT * FROM cuentascobrar_grupal WHERE idfactura='$idfactura'");
                        $resultado3 = $listaGrup->fetch_assoc();
                        $idrecibo = $resultado3['idcuentaspof'];
-                       $datosRecibo = $this->dbc->query("SELECT nrecibo,fecha,persona,ci,monto,idcuentaspof,archivo FROM cuentaspof WHERE idcuentaspof='$idrecibo'");
+                       $datosRecibo = $this->dbc->query("SELECT nrecibo,fecha,persona,ci,monto,idcuentaspof,transaccion,archivo FROM cuentaspof WHERE idcuentaspof='$idrecibo'");
                        
                        while ($zxc = $this->dbc->fetch($datosRecibo)) {
-                           $res = array("recibo" => $zxc[0], "fecha" => $zxc[1], "persona" => $zxc[2], "ci" => $zxc[3], "monto" => $resultado3['monto'], "id" => $zxc[5],"nombre_archivo" => $zxc[6]);
+                           $res = array("recibo" => $zxc[0], "fecha" => $zxc[1], "persona" => $zxc[2], "ci" => $zxc[3], "monto" => $resultado3['monto'], "id" => $zxc[5],"transaccion" => $zxc[6],"nombre_archivo" => $zxc[7]);
                            array_push($lista, $res);
                        }
                     //    $res = array("id" => $qwe[0], "fecha" => $qwe[1], "numero" => $qwe[2], "codigo" => $qwe[3], "idproveedor" => $qwe[5], "nombrep" => $pro['nombre'], "monto" => $qwe[4], "pagado" => $resultado3['monto'], "saldo" => 0, "transaccion" => $qwe[6], "cuenta" => $qwe[7], "detalle" => $pagados);
@@ -1807,8 +1807,8 @@ WHERE
          $nroTransaccion = $resultado12['codigotransaccion'] + 1;
 
         // Insertar una nueva transacción con los mismos datos
-        $this->dbc->query("INSERT INTO transacciones (codigotransaccion, fechatransaccion, tipodecambio, ndocumento, glosa, consolidar, tipotransaccion_idtipotransaccion, organizacion_idorganizacion, sucursal, idgestion) 
-                           VALUES ('$nroTransaccion', '{$transaccionData['fechatransaccion']}', '{$transaccionData['tipodecambio']}', '{$transaccionData['ndocumento']}', '{$transaccionData['glosa']}', '{$transaccionData['consolidar']}', '{$transaccionData['tipotransaccion_idtipotransaccion']}', '{$transaccionData['organizacion_idorganizacion']}', '{$transaccionData['sucursal']}', '{$transaccionData['idgestion']}')");
+        $this->dbc->query("INSERT INTO transacciones (codigotransaccion, fechatransaccion, tipodecambio, ndocumento, glosa, consolidar, estado, tipotransaccion_idtipotransaccion, organizacion_idorganizacion, sucursal, idgestion) 
+                           VALUES ('$nroTransaccion', '{$transaccionData['fechatransaccion']}', '{$transaccionData['tipodecambio']}', '{$transaccionData['ndocumento']}', '{$transaccionData['glosa']}', '{$transaccionData['consolidar']}','1', '{$transaccionData['tipotransaccion_idtipotransaccion']}', '{$transaccionData['organizacion_idorganizacion']}', '{$transaccionData['sucursal']}', '{$transaccionData['idgestion']}')");
 
         // Obtener el ID de la nueva transacción listapagos
         $newTransaccionId = $this->dbc->insert_id;
@@ -1838,4 +1838,4 @@ WHERE
         echo json_encode($res);
     } //listafactura eliminartransaccion  eliminarcliente listafactura_cobrado eliminarproveedor listafactura_pagado registrocobrarfactura
 }//eliminarcobrados listapagos registrardesconsolidar registrotransaccion cambiarestadoconsolidado  registrocobrarfactura
-//registrardesconsolidar crearfactura
+//registrardesconsolidar crearfactura listapagos
