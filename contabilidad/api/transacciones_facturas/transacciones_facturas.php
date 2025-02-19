@@ -293,4 +293,53 @@ $nroTransaccion = $resultado12['codigotransaccion'] + 1;
         }
         echo json_encode($res);
     }
+    public function registrar_transaccion_recibo($fecha,$monto,$glosa, $asiento,$empresa,$sucursal){
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+        
+        $ide = $this->getidempresa($empresa);
+        $sucursal = $this->getidsucursal($sucursal);
+        $gestion = $this->getgestionactualid($ide);
+        $tipotransaccion = 1; //ingreso
+        $trans = "";
+        $transi = $this->dbc->query("SELECT * FROM transacciones WHERE organizacion_idorganizacion='$ide' and sucursal='$sucursal' order by codigotransaccion desc Limit 1");
+        $qq = $this->dbc->fetch($transi);
+        $codigo = $qq['codigotransaccion'] + 1;
+        if ($asiento != 0) {
+            $insertrans = $this->dbc->query("INSERT INTO `transacciones` (`idtransacciones`, `codigotransaccion`, `fechatransaccion`, `tipodecambio`, `ndocumento`, `glosa`, `consolidar`, `tipotransaccion_idtipotransaccion`, `organizacion_idorganizacion`, `sucursal`, `idgestion`) 
+            VALUES (NULL, '$codigo', '$fecha', '1', '0', '$glosa', '1', '$tipotransaccion', '$ide', '$sucursal', '$gestion');");
+            //nuevat transaccion
+            $transis = $this->dbc->query("SELECT * FROM transacciones WHERE codigotransaccion='$codigo' AND  organizacion_idorganizacion='$ide' ORDER BY idtransacciones DESC LIMIT 1");
+            $ww = $this->dbc->fetch($transis);
+            $trans = $ww['idtransacciones'];
+            //$detallepago
+
+            $debe = 0;
+            $haber = 0;
+            $tasiento = $this->dbc->query("SELECT * FROM asiento WHERE idasientotipo='$asiento'");
+            $orden = 1;
+            while ($qwe = $this->dbc->fetch($tasiento)) {
+                $pcuenta = $qwe['idcuenta'];
+                if ($qwe['tipo'] == "DEBE") {
+                    $debe = $monto * ($qwe['porciento'] / 100);
+                    $haber = 0;
+                } elseif ($qwe['tipo'] == "HABER") {
+                    $debe = 0;
+                    $haber = $monto * ($qwe['porciento'] / 100);
+                }
+                //$pcuenta=$_POST['plandecuenta'];
+                $ppresupuestario = 0; //$_POST['planpresupuestario'];
+                $nota = "-";
+                $estado = 1; //$_POST['estado'];
+                $crear = $this->dbc->query("INSERT INTO detalletransaccion(debe,haber,nota,transacciones_idtransacciones,idplandecuenta,idcuentapresupuestaria,estado,cobrar,pagar,idorganizacion,idsucursal,orden)
+                VALUES ('$debe','$haber','$nota','$trans','$pcuenta','$ppresupuestario','$estado','2','2','$ide','$sucursal','$orden')");
+
+                $orden = $orden + 1;
+            }
+        } else {
+            $trans = $qq['idtransacciones'];
+        }
+        
+    }
 }

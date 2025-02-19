@@ -110,8 +110,41 @@ class Anulacion_transaccion extends DB{
 
                 $update_recibo=$this->dbc->query("UPDATE cuentaspor SET transaccion = '0' 
                         WHERE transaccion = '$idtransaccion'");  
+                
+                $eliminado=$this->dbc->query("SELECT codigotransaccion,organizacion_idorganizacion FROM transacciones 
+                WHERE idtransacciones = '$idtransaccion'");
+    
+                 $resElimi = $eliminado->fetch_assoc();
+                 $codig = $resElimi['codigotransaccion'];
+                 $idempresa = $resElimi['organizacion_idorganizacion'];
+
                 $delete_transaccion=$this->dbc->query("DELETE FROM transacciones
                     WHERE idtransacciones = '$idtransaccion'");  
+                // -----------------------------------------------------------------------------
+                $transs=$this->dbc->query("SELECT * FROM transacciones 
+                    WHERE codigotransaccion > '$codig' AND organizacion_idorganizacion = '$idempresa'");
+                    $aux=0;
+                    if ($transs->num_rows === 0){
+                        // $res = array("success", "Se Elimino correctamente");
+                    }else{
+                while($qwe2=$this->dbc->fetch($transs)){
+                    $codigo =  $qwe2['codigotransaccion'];
+                    $codigo = $codigo - 1;
+                    
+                        $descTRan=$this->dbc->query("UPDATE transacciones SET codigotransaccion = '$codigo' 
+                        WHERE idtransacciones = '$qwe2[idtransacciones]'");
+                    $aux++;
+                    }
+                    
+                    // if ($descTRan ==TRUE){
+                    //     $res = array("success", "Se Elimino correctamente");
+
+                    // }else{
+                    //     $res = array("danger", "Se elimino pero no se actualiza");
+
+                    // }
+                }
+                // -------------------------------------------------------------------------------------
 
                 $res = array("success", "Se Acepto la eliminacion de transaccion", "cambiarEstado_anular_eliminar_transaccion");
 

@@ -1272,11 +1272,11 @@ elseif($ver=="registroUnidadTiempoControl") {// esto sale del hidden del input q
         echo json_encode(array("Error", "Faltan parámetros en la solicitud",$_POST['idcontrataciones'],$_POST['fechaf'],$_POST['fechab']));
     }
 }elseif($ver=="registrar_grupo_etapa") {// esto sale del hidden del input que esta en el formulario
-    if (isset($_POST['nombre'],$_POST['$empresa_idempresa'],$_POST['rubro_idrubro'])) {
+    if (isset($_POST['nombre'],$_POST['empresa_idempresa'],$_POST['rubro_idrubro'])) {
         $envase = new Grupo_etapas();
-    $envase->registrar_grupo_etapa($_POST['nombre'],$_POST['$empresa_idempresa'],$_POST['rubro_idrubro']);
+    $envase->registrar_grupo_etapa($_POST['nombre'],$_POST['empresa_idempresa'],$_POST['rubro_idrubro']);
     }else{
-        echo json_encode(array("Error", "Faltan parámetros en la solicitud",$_POST['nombre'],$_POST['$empresa_idempresa'],$_POST['rubro_idrubro']));
+        echo json_encode(array("Error", "Faltan parámetros en la solicitud",$_POST['nombre'],$_POST['empresa_idempresa'],$_POST['rubro_idrubro']));
     }
 }elseif($ver=="editar_etapa_produccion_empleado") {// esto sale del hidden del input que esta en el formulario
     if (isset($_POST['idetapa_producccion_has_empleado'],$_POST['fecha_fin'])) {
@@ -1285,7 +1285,7 @@ elseif($ver=="registroUnidadTiempoControl") {// esto sale del hidden del input q
     }else{
         echo json_encode(array("Error", "Faltan parámetros en la solicitud",$_POST['idetapa_producccion_has_empleado'],$_POST['fecha_fin']));
     }
-}elseif($ver=="registrar_almacen_fisico") {// esto sale del hidden del input que esta en el formulario
+}elseif($ver=="registrar_almacen_fisico") {// esto sale del hidden del input que esta en el formulario 
     if (isset($_POST['material_idmaterial'],$_POST['tipo_envase_idtipo_envase'],$_POST['cantidad'],$_POST['empresa_idempresa'])) {
         $envase = new Alma_fisic_merma();
     $envase->registrar_almacen_fisico($_POST['material_idmaterial'],$_POST['tipo_envase_idtipo_envase'],$_POST['cantidad'],$_POST['empresa_idempresa']);
@@ -1497,7 +1497,7 @@ else{
         // numerodoc,fecha,hora,estado,usuario_idusuario,empresa_idempresa,rubro_idrubro
         if (isset($data['numerodoc'],$data['fecha'],$data['hora'], $data['estado'],$data['usuario_idusuario'],$data['empresa_idempresa'],$data['rubro_idrubro'],$data['detalle'])) {
             $rcompra = new Despachar_producto();
-            // Iterar sobre cada detalle y realizar la operación necesaria
+            // Iterar sobre cada detalle y realizar la operación necesaria registrar_grupo_etapa
             
             $rcompra->registrar_distribucion($data['numerodoc'],$data['fecha'],$data['hora'], $data['estado'],$data['usuario_idusuario'],$data['empresa_idempresa'],$data['rubro_idrubro'],$data['detalle']);
             // echo json_encode(array("siPasoParametros", "epa")); registro_despacho_producto

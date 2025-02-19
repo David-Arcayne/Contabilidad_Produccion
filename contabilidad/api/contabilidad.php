@@ -1260,7 +1260,7 @@ WHERE
         $sucursal = $this->getidsucursal($sucursal);
         $ide = $this->getidempresa($empresa);
         $count = $this->dbc->query("SELECT COUNT(*) AS canti_total FROM cuentaspof cp
-  INNER JOIN transacciones t ON t.idtransacciones = cp.transaccion WHERE t.organizacion_idorganizacion='$ide'");
+        INNER JOIN transacciones t ON t.idtransacciones = cp.transaccion WHERE t.organizacion_idorganizacion='$ide'");
         $hh = $this->dbc->fetch($count);
         $nrecibo = $hh['canti_total'];
         // $empresa = $this->emp; registropagarfactura nrecibo
