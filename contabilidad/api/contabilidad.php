@@ -1259,7 +1259,8 @@ WHERE
         $res = "";
         $sucursal = $this->getidsucursal($sucursal);
         $ide = $this->getidempresa($empresa);
-        $count = $this->dbc->query("SELECT COUNT(*) AS canti_total FROM cuentaspof WHERE organizacion_idorganizacion='$ide' and sucursal='$sucursal'");
+        $count = $this->dbc->query("SELECT COUNT(*) AS canti_total FROM cuentaspof cp
+  INNER JOIN transacciones t ON t.idtransacciones = cp.transaccion WHERE t.organizacion_idorganizacion='$ide'");
         $hh = $this->dbc->fetch($count);
         $nrecibo = $hh['canti_total'];
         // $empresa = $this->emp; registropagarfactura nrecibo
@@ -1837,4 +1838,4 @@ WHERE
         echo json_encode($res);
     } //listafactura eliminartransaccion  eliminarcliente listafactura_cobrado eliminarproveedor listafactura_pagado registrocobrarfactura
 }//eliminarcobrados listapagos registrardesconsolidar registrotransaccion cambiarestadoconsolidado  registrocobrarfactura
-//registrardesconsolidar
+//registrardesconsolidar crearfactura

@@ -86,8 +86,8 @@ class Transacciones_facturas extends DB{
             if($fact['cobrado'] == 2){ //COBRADO
                 //CREAR RECIBO
 
-                $consul = $this->dbcm->query("SELECT * FROM cuentaspof WHERE idfactura='$fact[idfactura]'");
-                $consul_grup = $this->dbcm->query("SELECT * FROM cuentascobrar_grupal WHERE idfactura='$fact[idfactura]'");
+                $consul = $this->dbc->query("SELECT * FROM cuentaspof WHERE idfactura='$fact[idfactura]'");
+                $consul_grup = $this->dbc->query("SELECT * FROM cuentascobrar_grupal WHERE idfactura='$fact[idfactura]'");
                 if($consul->num_rows > 0 || $consul_grup->num_rows > 0){ //YA EXISTE RECIBO EN ESTA FACTURA 
                     //SOLO SE ASIGNA TRANSACCION A ESTA FACTURA NADA MAS
                 }else{
