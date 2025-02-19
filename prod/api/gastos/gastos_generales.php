@@ -208,7 +208,7 @@ class Gastos_generales extends DB{
                     error_reporting(E_ALL);
                     $lista = [];
                     $getPedido = $this->dbp->query("SELECT * FROM otros_gastos 
-                                WHERE idotros_gastos='$id_produccion';");
+                                WHERE produccion_idproduccion='$id_produccion';");
                     // $nombre, $codigo, $nit, $detalle, $direccion, $telefono,$mobil, $email, $web, $pais, $ciudad, $zona, $contacto,$empresa
                     while($qwe=$this->dbp->fetch($getPedido)){
                          $res=array("idotros_gastos"=>$qwe['idotros_gastos'],

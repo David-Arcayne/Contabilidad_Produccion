@@ -51,6 +51,7 @@ class Transacciones extends DB{
         t.consolidar,
         t.tipotransaccion_idtipotransaccion,
         t.idgestion,
+        t.estado,
         t.tipodecambio
       FROM
         transacciones as t
@@ -70,7 +71,7 @@ class Transacciones extends DB{
                 array_push($detalle, $ress);
             }
 
-            $res = array("id" => $qwe[0], "ntransaccion" => $qwe[1], "fecha" => $qwe[2], "glosa" => $qwe[3], "consolidar" => $qwe[4], "ttransaccion" => $asd['nombre'],"idtipotransaccion"=>$qwe[5], "gestion" => $qwe[6], "detalle" => $detalle, "tipocambio" => $qwe[7]);
+            $res = array("id" => $qwe[0], "ntransaccion" => $qwe[1], "fecha" => $qwe[2], "glosa" => $qwe[3], "consolidar" => $qwe[4], "ttransaccion" => $asd['nombre'],"idtipotransaccion"=>$qwe[5], "gestion" => $qwe[6],"estado" => $qwe[7], "detalle" => $detalle, "tipocambio" => $qwe[8]);
             array_push($lista, $res);
         }
         echo json_encode($lista);

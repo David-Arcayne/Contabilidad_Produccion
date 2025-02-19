@@ -6,6 +6,7 @@ require_once "funciones.php";
 require_once "./plan_cuentas/plandecuentas.php";
 require_once "./transacciones_facturas/transFactura_pagar.php";
 require_once "./solicitudes/insertar_transaccion.php";
+require_once "./solicitudes/anulacion_transaccion.php";
 require_once "./transacciones_facturas/transacciones.php";
 
 $ver=explode("/",$_GET['ver']); //dividiendo los "/"  ver[0],ver[1],ver[x] listafacturaapi_cobrado
@@ -302,6 +303,9 @@ $cont->lista_cobrar_cobrado_factura($ver[1]);
 }elseif($ver[0]=="lista_transaccionEn_espera"){
     $cont=new Insertar_transaccion();
     $cont->lista_transaccionEn_espera($ver[1]);
+}elseif($ver[0]=="listar_anular_eliminar_transaccion"){
+    $cont=new Anulacion_transaccion();
+    $cont->listar_anular_eliminar_transaccion($ver[1]);
 }
 //listafactura eliminartransaccion eliminardetalletransaccion listapagos_individuales listatransaciones
 ?>

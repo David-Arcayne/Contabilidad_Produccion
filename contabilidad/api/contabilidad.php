@@ -1250,7 +1250,7 @@ WHERE
         echo json_encode($reporte);
     }
 
-    public function registrocobrarfactura($idfactura, $idtransaccion, $idcuenta, $fecha, $nrecibo, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$archivo)
+    public function registrocobrarfactura($idfactura, $idtransaccion, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$archivo)
     {
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
@@ -1259,7 +1259,10 @@ WHERE
         $res = "";
         $sucursal = $this->getidsucursal($sucursal);
         $ide = $this->getidempresa($empresa);
-        // $empresa = $this->emp; registropagarfactura
+        $count = $this->dbc->query("SELECT COUNT(*) AS canti_total FROM cuentaspof WHERE organizacion_idorganizacion='$ide' and sucursal='$sucursal'");
+        $hh = $this->dbc->fetch($count);
+        $nrecibo = $hh['canti_total'];
+        // $empresa = $this->emp; registropagarfactura nrecibo
         $transi = $this->dbc->query("SELECT * FROM transacciones WHERE organizacion_idorganizacion='$ide' and sucursal='$sucursal' order by codigotransaccion desc Limit 1");
         $qq = $this->dbc->fetch($transi);
         $codigo = $qq['codigotransaccion'] + 1;
@@ -1310,7 +1313,7 @@ WHERE
         if ($registropago === TRUE) {
             $res = array("success", "Registro Realizado", "registrocobrarfactura");
         } else {
-            $res = array("danger", "No se pudo realizar el registro");
+            $res = array("danger", "No se pudo realizar el registrooo",$nrecibo,$fecha,$idcliente,$persona,$ci,$monto,$idfactura,$trans,$idcuenta);
         }
         }else{
          // Manejar la carga del archivo

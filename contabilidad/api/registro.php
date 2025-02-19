@@ -5,6 +5,7 @@ require_once "./transacciones_facturas/transacciones_facturas.php";
 require_once "./plan_cuentas/plandecuentas.php";
 require_once "./transacciones_facturas/transFactura_pagar.php";
 require_once "./solicitudes/insertar_transaccion.php";
+require_once "./solicitudes/anulacion_transaccion.php";
 require_once "./transacciones_facturas/transacciones.php";
 
 $ver=$_POST['ver'];
@@ -92,12 +93,12 @@ $cont->registrocrearasientos($_POST['cuenta'],$_POST['porciento'],$_POST['tipo']
 $cont=new Contabilidad();
 $cont->detalletransaccion($_POST['trans'],$_POST['tipoasiento'],$_POST['monto'],$_POST['empresa'],$_POST['sucursal']);
 }elseif($ver=="registrocobrarfactura"){
-if(isset($_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$_FILES['archivo'])){
+if(isset($_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$_FILES['archivo'])){
     $cont=new Contabilidad();
-    $cont->registrocobrarfactura($_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$_FILES['archivo']);
+    $cont->registrocobrarfactura($_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$_FILES['archivo']);
 }
 else{
-    echo json_encode(array("danger", "Faltan parámetros en la solicitud", $_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$_FILES['archivo']));
+    echo json_encode(array("danger", "Faltan parámetros en la solicitud", $_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$_FILES['archivo']));
 }
 //$res=array($_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente']);
 //echo json_encode($res); 
@@ -199,7 +200,26 @@ if($data['ver'] == "cobrofacturasaasientomodelo") {
     else{
         echo json_encode(array("danger", "Faltan parámetros en la solicitud", $_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['idasientotipo'],$_POST['empresa'],$_POST['sucursal'],$_FILES['archivo'],$_POST['facturas']));
     }
+}elseif($ver == "registrar_anular_eliminar_transaccion"){
+    if(isset($_POST['transacciones_idtransacciones'],$_POST['motivo'],$_POST['estado_opcion'],$_POST['estado_solicitud'],$_POST['hora'],$_POST['fecha'],$_POST['idusuario'],$_POST['idempresa'])){
+        // decode echo json_encode(array("danger", "Faltan parámetros en la solicitud", $_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$facturas));
+        $cont=new Anulacion_transaccion();
+        $cont->registrar_anular_eliminar_transaccion($_POST['transacciones_idtransacciones'],$_POST['motivo'],$_POST['estado_opcion'],$_POST['estado_solicitud'],$_POST['hora'],$_POST['fecha'],$_POST['idusuario'],$_POST['idempresa']);
+    }
+    else{
+        echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['transacciones_idtransacciones'],$_POST['motivo'],$_POST['estado_opcion'],$_POST['estado_solicitud'],$_POST['hora'],$_POST['fecha'],$_POST['idusuario'],$_POST['idempresa']));
+    }
+}elseif($ver == "cambiarEstado_anular_eliminar_transaccion"){
+
+    if(isset($_POST['idsolicitud_anular_eliminar'],$_POST['estado_opcion'],$_POST['estado_solicitud'],$_POST['fecha_proceso'],$_POST['hora_proceso'],$_POST['idusuario_admin'])){
+        // decode echo json_encode(array("danger", "Faltan parámetros en la solicitud", $_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$facturas));
+        $cont=new Anulacion_transaccion();
+        $cont->cambiarEstado_anular_eliminar_transaccion($_POST['idsolicitud_anular_eliminar'],$_POST['estado_opcion'],$_POST['estado_solicitud'],$_POST['fecha_proceso'],$_POST['hora_proceso'],$_POST['idusuario_admin']);
+    }
+    else{
+        echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idsolicitud_anular_eliminar'],$_POST['estado_opcion'],$_POST['estado_solicitud'],$_POST['fecha_proceso'],$_POST['hora_proceso'],$_POST['idusuario_admin']));
+    }
 }
-// registrardesconsolidar registrotransaccion registrotransaccionf5 duplicartransaccion
+// registrardesconsolidar registrotransaccion registrotransaccionf5 duplicartransaccion registrocobrarfactura
 }
 ?>

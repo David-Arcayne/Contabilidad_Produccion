@@ -583,7 +583,7 @@ class Maquina_conf extends DB{
                 "tiempo" => $qwe['tiempo'],
                 "variables_proceso_idvariables_proceso" => $qwe['variables_proceso_idvariables_proceso'],
                 "control_unidad_tiempo_idcontrol_unidad_tiempo" => $qwe['control_unidad_tiempo_idcontrol_unidad_tiempo'],
-                "uso_maquia_iduso_maquina" => $qwe['uso_maquia_iduso_maquina']
+                "uso_maquina_iduso_maquina" => $qwe['uso_maquina_iduso_maquina']
             );
             array_push($lista, $res);
         }

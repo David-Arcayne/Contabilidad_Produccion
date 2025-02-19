@@ -58,7 +58,7 @@ class Transacciones_facturas extends DB{
         $tipotransaccion = $asiento['tipo'];
     
         // Insertar en transacciones
-        $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion, fechatransaccion, tipodecambio, ndocumento, glosa, consolidar, tipotransaccion_idtipotransaccion, organizacion_idorganizacion, sucursal, idgestion) VALUES ('$nroTransaccion', '{$data['fecha']}', '1', '0', '{$data['glosa']}', '1', '$tipotransaccion', '$idempresa', '$idsucursal', '$gestion')");
+        $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion, fechatransaccion, tipodecambio, ndocumento, glosa, consolidar,estado, tipotransaccion_idtipotransaccion, organizacion_idorganizacion, sucursal, idgestion) VALUES ('$nroTransaccion', '{$data['fecha']}', '1', '0', '{$data['glosa']}', '1','1', '$tipotransaccion', '$idempresa', '$idsucursal', '$gestion')");
     
         // Obtener el ID del registro recién insertado
         $idtrans = $this->dbc->insert_id;
@@ -75,7 +75,7 @@ class Transacciones_facturas extends DB{
                 $clientSelect = $cliente->fetch_assoc();
                 // $res = array("id" => $qwe[0], "fecha" => $qwe[1], "nfactura" => $qwe[2], "nautorizacion" => $qwe[3], "codigocontrol" => $qwe[4], "montofactura" => $qwe[5], "tasacero" => $qwe[6], "export" => $qwe[7], "npoliza" => $qwe[8], "ice" => $qwe[9], "descuentobonificacion" => $qwe[10], "clasefactura" => $qwe[11], "cobrado" => $qwe[12], "pagado" => $qwe[13], "espesificacion" => $qwe[14], "estado" => $qwe[15], "tipocompra" => $qwe[16], "idtransaccion" => $qwe[17], "idcliente" => $qwe[18], "empresa" => $qwe[19], "cuenta" => $qwe[20], "sucursal" => $qwe[21], "procli" => $asd['nombre'], "nit" => $asd['nit']);
             } else {
-                $proveedor = $this->dbcm->query("SELECT * SELECT proveedor SELECT id_proveedor='" . $fact['proveedorcliente_idproveedorcliente'] . "'");
+                $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='" . $fact['proveedorcliente_idproveedorcliente'] . "'");
                 $clientSelect = $proveedor->fetch_assoc();
 
                 // $asd = $this->dbcm->fetch($proveedor);
@@ -85,8 +85,15 @@ class Transacciones_facturas extends DB{
             $updatetranscodigo = $this->dbc->query("UPDATE factura SET transacciones_idtransacciones = '$idtrans' WHERE idfactura = '{$factura['idfactura']}'");
             if($fact['cobrado'] == 2){ //COBRADO
                 //CREAR RECIBO
-            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,archivo)
-            VALUES('$nroRecibo','$fact[fecha]','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$fact[montofactura]','$fact[idfactura]','$idtrans','0',NULL)");
+
+                $consul = $this->dbcm->query("SELECT * FROM cuentaspof WHERE idfactura='$fact[idfactura]'");
+                $consul_grup = $this->dbcm->query("SELECT * FROM cuentascobrar_grupal WHERE idfactura='$fact[idfactura]'");
+                if($consul->num_rows > 0 || $consul_grup->num_rows > 0){ //YA EXISTE RECIBO EN ESTA FACTURA 
+                    //SOLO SE ASIGNA TRANSACCION A ESTA FACTURA NADA MAS
+                }else{
+                $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,archivo)
+                VALUES('$nroRecibo','$fact[fecha]','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$fact[montofactura]','$fact[idfactura]','$idtrans','0',NULL)");
+                }
 
             }else{
                 //NADA
@@ -162,7 +169,7 @@ $nroTransaccion = $resultado12['codigotransaccion'] + 1;
             $nroTransaccion2 = $this->dbc->real_escape_string($nroTransaccion);
 
         // Insertar en transacciones
-        $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion, fechatransaccion, tipodecambio, ndocumento, glosa, consolidar, tipotransaccion_idtipotransaccion, organizacion_idorganizacion, sucursal, idgestion) VALUES ('$nroTransaccion2', '$fecha2', '1', '0', '$glosa2', '1', '$tipotransaccion', '$ide', '$sucursal', '$gestion')");
+        $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion, fechatransaccion, tipodecambio, ndocumento, glosa, consolidar,estado, tipotransaccion_idtipotransaccion, organizacion_idorganizacion, sucursal, idgestion) VALUES ('$nroTransaccion2', '$fecha2', '1', '0', '$glosa2', '1','1', '$tipotransaccion', '$ide', '$sucursal', '$gestion')");
     
         // Obtener el ID del registro recién insertado
         $idtrans = $this->dbc->insert_id;
