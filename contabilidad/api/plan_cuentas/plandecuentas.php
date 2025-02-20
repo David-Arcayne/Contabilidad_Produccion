@@ -136,4 +136,78 @@ class Plandecuentas extends DB{
             "saldonormal" => $qwe['saldonormal']
         ];
     }
+    public function registrar_caja_bancos($codigo,$tipo_cuenta,$glosa,$idplandecuenta,$empresa){
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+        
+        $fecha=date("Y-m-d");
+        $idempresa=$this->getidempresa($empresa);
+
+        $consult=$this->dbc->query("SELECT COUNT(*) AS total1 FROM vinculacion_cuenta_xcxp WHERE idempresa='$idempresa' AND cobrar_pagar = '$cobrar_pagar'");
+        $resultado = $consult->fetch_assoc();
+        $total_1 = $resultado['total1'];
+
+        $res="";
+        if(0 > 0){
+            //error ya hay una vinculacion con tipo 1 o 2 en esta empresa
+            $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde");
+        }else{
+            $registro=$this->dbc->query("INSERT INTO caja_bancos(codigo,tipo_cuenta,glosa,idplandecuenta,idempresa)VALUES('$codigo','$tipo_cuenta','$glosa','$idplandecuenta','$idempresa')");
+            if($registro===TRUE){
+                $res = array("success", "Se Registro Correctamente", "registrar_caja_bancos");
+            }else{
+                $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde");
+            }
+        }
+
+        echo json_encode($res);
+
+    }
+
+    public function editar_caja_bancos($id,$codigo,$tipo_cuenta,$glosa,$idplandecuenta){
+        $fecha=date("Y-m-d");
+        // $empresa=$this->getidempresa($idempresa);
+        $res="";
+        $registro=$this->dbc->query("UPDATE caja_bancos 
+        SET codigo = '$codigo',tipo_cuenta = '$tipo_cuenta',glosa = '$glosa',idplandecuenta='$idplandecuenta' 
+        WHERE idcaja_bancos='$id'");
+        if($registro===TRUE){
+            $res = array("success", "Se Edito Correctamente", "editar_caja_bancos");
+        }else{
+            $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde");
+
+        }
+
+        echo json_encode($res);
+
+    }
+
+    public function eliminar_caja_bancos($id){
+        $res="";
+        // restringir q no exista un registro en cuentaspof y cuentaspor
+        $registro=$this->dbc->query("DELETE FROM caja_bancos WHERE idcaja_bancos='$id'");
+        if($registro===TRUE){
+            $res = array("success", "Se Elimino Correctamente", "eliminar_caja_bancos");
+        }else{
+            $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde");
+
+        }
+        echo  json_encode($res);
+    }
+
+    public function listar_caja_bancos($empresa)
+    {
+        $lista = [];
+        $idempresa = $this->getidempresa($empresa);
+        $listado = $this->dbc->query("SELECT * FROM caja_bancos WHERE idempresa ='$idempresa'");
+        while ($qwe = $this->dbc->fetch($listado)) {
+            $listado = $this->dbc->query("SELECT numero,nombreplan,saldonormal FROM plandecuenta WHERE idplandecuenta ='$qwe[idplandecuenta]'");
+            $aaa = $listado->fetch_assoc();
+            // $idtransaccion = $aaa['transacciones_idtransacciones'];
+            $res = array("idcaja_bancos" => $qwe[0], "codigo" => $qwe[1], "tipo_cuenta" => $qwe[2], "glosa" => $qwe[3],$aaa['numero'], $aaa['nombreplan'], $aaa['saldonormal']);
+            array_push($lista, $res);
+        }
+        echo json_encode($lista);
+    }
 }

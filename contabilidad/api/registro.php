@@ -229,6 +229,24 @@ if($data['ver'] == "cobrofacturasaasientomodelo") {
     else{
         echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idcuentaspof'],$_POST['fecha'],$_POST['monto'],$_POST['glosa'],$_POST['asiento'],$_POST['empresa'],$_POST['sucursal']));
     }
+}elseif($ver == "registrar_caja_bancos"){
+    if(isset($_POST['codigo'],$_POST['tipo_cuenta'],$_POST['glosa'],$_POST['glosa'],$_POST['idplandecuenta'],$_POST['idempresa'])){
+        // decode echo json_encode(array("danger", "Faltan parámetros en la solicitud", $_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$facturas));
+        $cont=new Plandecuentas();
+        $cont->registrar_caja_bancos($_POST['codigo'],$_POST['tipo_cuenta'],$_POST['glosa'],$_POST['glosa'],$_POST['idplandecuenta'],$_POST['idempresa']);
+    }
+    else{
+        echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['codigo'],$_POST['tipo_cuenta'],$_POST['glosa'],$_POST['glosa'],$_POST['idplandecuenta'],$_POST['idempresa']));
+    }
+}elseif($ver == "editar_caja_bancos"){
+    if(isset($_POST['idcaja_bancos'],$_POST['codigo'],$_POST['tipo_cuenta'],$_POST['glosa'],$_POST['glosa'],$_POST['idplandecuenta'],$_POST['idempresa'])){
+        // decode echo json_encode(array("danger", "Faltan parámetros en la solicitud", $_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$facturas));
+        $cont=new Plandecuentas();
+        $cont->registrar_caja_bancos($_POST['idcaja_bancos'],$_POST['codigo'],$_POST['tipo_cuenta'],$_POST['glosa'],$_POST['glosa'],$_POST['idplandecuenta'],$_POST['idempresa']);
+    }
+    else{
+        echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idcaja_bancos'],$_POST['codigo'],$_POST['tipo_cuenta'],$_POST['glosa'],$_POST['glosa'],$_POST['idplandecuenta'],$_POST['idempresa']));
+    }
 }
 // registrardesconsolidar registrotransaccion registrotransaccionf5 duplicartransaccion registrocobrarfactura
 }

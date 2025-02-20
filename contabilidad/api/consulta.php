@@ -306,6 +306,12 @@ $cont->lista_cobrar_cobrado_factura($ver[1]);
 }elseif($ver[0]=="listar_anular_eliminar_transaccion"){
     $cont=new Anulacion_transaccion();
     $cont->listar_anular_eliminar_transaccion($ver[1]);
+}elseif($ver[0]=="listar_caja_bancos"){
+    $cont=new Plandecuentas();
+    $cont->listar_caja_bancos($ver[1]);
+}elseif($ver[0]=="eliminar_caja_bancos"){
+    $cont=new Plandecuentas();
+    $cont->eliminar_caja_bancos($ver[1]);
 }
 //listafactura eliminartransaccion eliminardetalletransaccion listapagos_individuales listatransaciones
 ?>
