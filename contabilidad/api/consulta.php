@@ -98,9 +98,9 @@ $rep->reportecomprobantecontable($ver[1],$ver[2],$ver[3],$ver[4]);
 }elseif($ver[0]=="reporteactivodiaponibledos"){
 $rep=new Reportes();
 $rep->reporteactivodiaponibledos($ver[1],$ver[2],$ver[3]);
-}elseif($ver[0]=="listaclientes"){
+}elseif($ver[0]=="facturas"){
 $cont=new Contabilidad();
-$cont->listaclientes($ver[1]);
+$cont->facturas($ver[1]);
 }elseif($ver[0]=="listaproveedores"){
 $cont=new Contabilidad();
 $cont->listaproveedores($ver[1]);
@@ -316,5 +316,5 @@ $cont->lista_cobrar_cobrado_factura($ver[1]);
     $cont=new Contabilidad();
     $cont->listar_recibo_por_id($ver[1]);
 }
-//listafactura eliminartransaccion eliminardetalletransaccion listapagos_individuales listatransaciones
+//listafactura eliminartransaccion eliminardetalletransaccion listapagos_individuales listatransaciones factura
 ?>

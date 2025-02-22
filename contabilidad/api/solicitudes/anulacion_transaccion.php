@@ -4,20 +4,6 @@ session_start();
 require_once "../../db/db.php";
 class Anulacion_transaccion extends DB{
 
-// public function registrardesconsolidar($idtransaccion,$motivo,$estado,$hora,$fecha,$idusuario,$idempresa){
-    //     $res="";
-    //     $usuario=$this->getidusuario($idusuario);
-    //     $empresa=$this->getidempresa($idempresa);
-    //     $codigo=date("Ymd").rand(100,1000);
-    //     $registro=$this->dbc->query("INSERT INTO desconsolidar(idtransaccion,motivo,estado,hora,fecha,idusuario,idempresa,codigo)VALUES('$idtransaccion','$motivo','$estado','$hora','$fecha','$usuario','$empresa','$codigo')");
-    //     if($registro===TRUE){
-    //         $res=array("ok"=>"success");
-    //     }else{
-    //         $res=array("ok"=>"danger $idtransaccion,$motivo,$estado,$hora,$fecha,$idusuario");
-    //     }
-    //     echo json_encode($res);
-
-    // }
     public function registrar_anular_eliminar_transaccion($idtransaccion,$motivo,$estado_opci,$estado_soli,$hora,$fecha,$usuario,$empresa)
     {
         // EN CUALQUIERA DE LOS CASOS SE PODRA SOLICITAR LA ANULACION
@@ -170,7 +156,14 @@ class Anulacion_transaccion extends DB{
         $lista = [];
         
         // Consulta SQL
-        $sql =$this->dbc->query("SELECT * FROM solicitud_anular_eliminar WHERE md5(idempresa) = '$idempresa' ORDER BY idsolicitud_anular_eliminar DESC");
+        $sql =$this->dbc->query("SELECT * FROM solicitud_anular_eliminar
+WHERE md5(idempresa) = '$idempresa'
+ORDER BY 
+    (estado_solicitud = '1') DESC,
+    fecha DESC,
+    hora DESC;
+
+");
     
             // Procesar los resultados
             while ($qwe = $this->dbc->fetch($sql)) {
@@ -194,10 +187,7 @@ class Anulacion_transaccion extends DB{
                     "apellido" => $usuario['apellido'] ?? null,
                     "motivo" => $qwe['motivo']
                 ];
-            }
-    
-            
-        
+            } 
     
         // Retornar la lista en formato JSON
         echo json_encode($lista);

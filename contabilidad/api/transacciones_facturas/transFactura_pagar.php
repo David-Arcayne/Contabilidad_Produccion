@@ -49,6 +49,11 @@ class TransFactura_pagar extends DB{
         $resultado12 = $nroTrans->fetch_assoc();
         $nroTransaccion = $resultado12['codigotransaccion'] + 1;
     
+         // Obtener el número de transacción más reciente y sumar 1
+        $nroRec = $this->dbc->query("SELECT count(*) AS cantidadRec FROM cuentaspor cp INNER JOIN transacciones t ON t.idtransacciones=cp.transaccion WHERE t.organizacion_idorganizacion='$idempresa' AND idgestion = '$gestion'");
+        $resultado123 = $nroRec->fetch_assoc();
+        $nroRecibo = $resultado123['cantidadRec'] + 1;
+
         // Obtener el tipo de transacción
         $idAsientoTipo = $this->dbc->query("SELECT * FROM asientotipo WHERE idasientotipo='{$data['idasientotipo']}' AND idorganizacion='$idempresa';");
         $asiento = $idAsientoTipo->fetch_assoc();  // Cambiado $nroTrans->fetch_assoc() a $idAsientoTipo->fetch_assoc()
@@ -63,8 +68,43 @@ class TransFactura_pagar extends DB{
         // Editar las facturas seleccionadas
         $montoFacturas = 0;
         foreach ($data['facturas'] as $factura) {
+            // $montoFacturas += $factura['monto'];
+            // $updatetranscodigo = $this->dbc->query("UPDATE factura SET transacciones_idtransacciones = '$idtrans' WHERE idfactura = '{$factura['idfactura']}'");
+            
+            $selectFact = $this->dbc->query("SELECT * FROM factura WHERE idfactura='{$factura['idfactura']}' AND idorganizacion='$idempresa';");
+            $fact = $selectFact->fetch_assoc();
+            // proveedorcliente_idproveedorcliente
+            if ($fact['clasefactura'] == 1) { //POR PAGAR
+                $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $fact['proveedorcliente_idproveedorcliente'] . "'");
+                // $asd = $this->dbcm->fetch($cliente);
+                $clientSelect = $cliente->fetch_assoc();
+                // $res = array("id" => $qwe[0], "fecha" => $qwe[1], "nfactura" => $qwe[2], "nautorizacion" => $qwe[3], "codigocontrol" => $qwe[4], "montofactura" => $qwe[5], "tasacero" => $qwe[6], "export" => $qwe[7], "npoliza" => $qwe[8], "ice" => $qwe[9], "descuentobonificacion" => $qwe[10], "clasefactura" => $qwe[11], "cobrado" => $qwe[12], "pagado" => $qwe[13], "espesificacion" => $qwe[14], "estado" => $qwe[15], "tipocompra" => $qwe[16], "idtransaccion" => $qwe[17], "idcliente" => $qwe[18], "empresa" => $qwe[19], "cuenta" => $qwe[20], "sucursal" => $qwe[21], "procli" => $asd['nombre'], "nit" => $asd['nit']);
+            } else {
+                $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='" . $fact['proveedorcliente_idproveedorcliente'] . "'");
+                $clientSelect = $proveedor->fetch_assoc();
+
+                // $asd = $this->dbcm->fetch($proveedor);
+                // $res = array("id" => $qwe[0], "fecha" => $qwe[1], "nfactura" => $qwe[2], "nautorizacion" => $qwe[3], "codigocontrol" => $qwe[4], "montofactura" => $qwe[5], "tasacero" => $qwe[6], "export" => $qwe[7], "npoliza" => $qwe[8], "ice" => $qwe[9], "descuentobonificacion" => $qwe[10], "clasefactura" => $qwe[11], "cobrado" => $qwe[12], "pagado" => $qwe[13], "espesificacion" => $qwe[14], "estado" => $qwe[15], "tipocompra" => $qwe[16], "idtransaccion" => $qwe[17], "idproveedor" => $qwe[18], "empresa" => $qwe[19], "cuenta" => $qwe[20], "sucursal" => $qwe[21], "procli" => $asd['nombre'], "nit" => $asd['nit']);
+            }
             $montoFacturas += $factura['monto'];
             $updatetranscodigo = $this->dbc->query("UPDATE factura SET transacciones_idtransacciones = '$idtrans' WHERE idfactura = '{$factura['idfactura']}'");
+            if($fact['pagado'] == 2){ //PAGADO
+                //CREAR RECIBO
+
+                $consul = $this->dbc->query("SELECT * FROM cuentaspor WHERE idfactura='$fact[idfactura]'");
+                $consul_grup = $this->dbc->query("SELECT * FROM cuentaspagar_grupal WHERE idfactura='$fact[idfactura]'");
+                if($consul->num_rows > 0 || $consul_grup->num_rows > 0){ //YA EXISTE RECIBO EN ESTA FACTURA 
+                    //SOLO SE ASIGNA TRANSACCION A ESTA FACTURA NADA MAS
+                }else{
+                $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,archivo)
+                VALUES('$nroRecibo','$fact[fecha]','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$fact[montofactura]','$fact[idfactura]','$idtrans','0',NULL)");
+                }
+
+            }else{
+                //NADA
+            }
+            
+        
         }
     
         // Obtener los asientos relacionados y calcular debe y haber
@@ -100,7 +140,7 @@ class TransFactura_pagar extends DB{
     }
 
     // public function registrocobrarfactura($idfactura, $idtransaccion, $idcuenta, $fecha, $nrecibo, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa)
-    public function registropagarfacturaGrupal($fecha,$nrecibo,$persona,$ci,$monto,$idasientotipo,$empresa,$sucursal,$archivo,$data)
+    public function registropagarfacturaGrupal($fecha,$nrecibo,$persona,$ci,$monto,$idasientotipo,$idcaja_bancos,$empresa,$sucursal,$archivo,$data)
     {
         // echo json_encode($data);
         ini_set('display_errors', 1);
@@ -162,8 +202,8 @@ $nroTransaccion = $resultado12['codigotransaccion'] + 1;
 // --------------------------------------------------------------------------------------------------------
 
 if(empty($archivo['name'])){
-    $registropago = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,archivo)
-    VALUES(NULL,'$nrecibo','$fecha','varios clientes','$persona','$ci','$monto','0','$idtrans','0',NULL)");
+    $registropago = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,idcaja_bancos,archivo)
+    VALUES(NULL,'$nrecibo','$fecha','varios clientes','$persona','$ci','$monto','0','$idtrans','0','$idcaja_bancos',NULL)");
 
 // $registropago = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta)
 // VALUES('$nrecibo','$fecha','varios clientes','$persona','$ci','$monto','0','$idtrans','0')");
@@ -190,8 +230,8 @@ if ($archivo['error'] == UPLOAD_ERR_OK) {
 }
 if(move_uploaded_file($archivo_tmp, $ruta_destino)){
      //registrar pago, preguntar guardar la anterior transaccion o la nueva
-     $registropago2 = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,archivo)
-    VALUES(NULL,'$nrecibo','$fecha','varios clientes','$persona','$ci','$monto','0','$idtrans','0','$unique_name')");
+     $registropago2 = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,idcaja_bancos,archivo)
+    VALUES(NULL,'$nrecibo','$fecha','varios clientes','$persona','$ci','$monto','0','$idtrans','0','$idcaja_bancos','$unique_name')");
 
 if ($registropago2 === TRUE) {
     $res = array("success", "Registro Realizado", "registropagarfacturaGrupal");

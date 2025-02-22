@@ -1047,35 +1047,7 @@ WHERE
         }
         echo json_encode($registro);
     }
-
-    // public function listacobrarfacturazero($sucursal)
-    // {
-    //     //cobrar listapagarfacturazero
-    //     $lista = [];
-    //     $cf = 2;
-    //     $idsucursal = $this->getidsucursal($sucursal);
-    //     $registro = $this->dbc->query("select f.idfactura,f.fecha,f.nfactura,t.codigotransaccion, f.montofactura,f.proveedorcliente_idproveedorcliente,f.transacciones_idtransacciones,f.cuenta
-    //      from factura f,transacciones t
-    //      where f.clasefactura='$cf' and f.sucursal='$idsucursal' and f.transacciones_idtransacciones=t.idtransacciones");
-    //     while ($qwe = $this->dbc->fetch($registro)) {
-    //         $pagados = [];
-    //         $cobras = $this->dbc->query("select SUM(monto) from cuentaspof where idfactura='$qwe[0]'"); //173
-    //         $asd = $this->dbc->fetch($cobras);
-    //         $saldo = $qwe[4] - $asd[0];
-    //         $proveedor = $this->dbcm->query("select * from cliente where id_cliente='" . $qwe[5] . "'");
-    //         $pro = $this->dbcm->fetch($proveedor);
-    //         $cuentacobrar = $this->dbc->query("select nrecibo,fecha,persona,ci,monto,idcuentaspof from cuentaspof where idfactura='$qwe[0]'");
-    //         while ($zxc = $this->dbc->fetch($cuentacobrar)) {
-    //             $pes = array("nrecibo" => $zxc[0], "fechar" => $zxc[1], "persona" => $zxc[2], "ci" => $zxc[3], "monto" => $zxc[4], "id" => $zxc[5]);
-    //             array_push($pagados, $pes);
-    //         }
-
-    //         $res = array("id" => $qwe[0], "fecha" => $qwe[1], "numero" => $qwe[2], "codigo" => $qwe[3], "idproveedor" => $qwe[5], "nombrep" => $pro['nombre'], "monto" => $qwe[4], "pagado" => $asd[0], "saldo" => $saldo, "transaccion" => $qwe[6], "cuenta" => $qwe[7], "detalle" => $pagados);
-    //         array_push($lista, $res);
-    //     }
-    //     echo json_encode($lista); lista_pagar_pagado_factura
-    // }
-
+  
     public function lista_cobrar_cobrado_factura($sucursal)
     {
         ini_set('display_errors', 1);
@@ -1101,7 +1073,7 @@ WHERE
             $resultado2 = $hay_grup->fetch_assoc();
             $hayGrupales = $resultado2['hay_grupal'];
             // $asd = $this->dbc->fetch($cobras);
-            $proveedor = $this->dbcm->query("select * from cliente where id_cliente='" . $qwe[5] . "'");
+            $proveedor = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $qwe[5] . "'");
             $pro = $this->dbcm->fetch($proveedor);
             if($hayIndividuales > 0){
                 if($hayGrupales > 0){
@@ -1410,7 +1382,7 @@ WHERE
         // }
         echo json_encode($res);
     }
-    public function registropagarfactura($idfactura, $idtransaccion, $idcuenta, $fecha, $nrecibo, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$archivo)
+    public function registropagarfactura($idfactura, $idtransaccion,$idcaja_bancos, $idcuenta, $fecha, $nrecibo, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$archivo)
     {
         $res = "";
         $sucursal = $this->getidsucursal($sucursal);
@@ -1459,8 +1431,8 @@ WHERE
 // -------------------------------------------------------------------------------------------
 
     if(empty($archivo['name'])){
-        $registropago = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,archivo)
-        VALUES(NULL,'$nrecibo','$fecha','$idcliente','$persona','$ci','$monto','$idfactura','$trans','$idcuenta',NULL)");
+        $registropago = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,idcaja_bancos,archivo)
+        VALUES(NULL,'$nrecibo','$fecha','$idcliente','$persona','$ci','$monto','$idfactura','$trans','$idcuenta','$idcaja_bancos',NULL)");
 
     if ($registropago === TRUE) {
         $res = array("success", "Registro Realizado", "registropagarfactura");
@@ -1484,8 +1456,8 @@ WHERE
     }
     if(move_uploaded_file($archivo_tmp, $ruta_destino)){
          //registrar pago, preguntar guardar la anterior transaccion o la nueva
-    $registropago2 = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,archivo)
-    VALUES(NULL,'$nrecibo','$fecha','$idcliente','$persona','$ci','$monto','$idfactura','$trans','$idcuenta','$unique_name')");
+    $registropago2 = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,idcaja_bancos,archivo)
+    VALUES(NULL,'$nrecibo','$fecha','$idcliente','$persona','$ci','$monto','$idfactura','$trans','$idcuenta','$idcaja_bancos','$unique_name')");
 
     if ($registropago2 === TRUE) {
         $res = array("success", "Registro Realizado", "registropagarfactura");
@@ -1496,14 +1468,6 @@ WHERE
         $res = array("danger", "No se movio el archivo a la carpeta");
     }
 }
-        //registrar pago, preguntar guardar la anterior transaccion o la nueva
-        // $registropago = $this->dbc->query("insert into cuentaspor(idcuentaspor,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta)values(NULL,'$nrecibo','$fecha','$idcliente','$persona','$ci','$monto','$idfactura','$trans','$idcuenta')");
-
-        // if ($registropago === TRUE) {
-        //     $res = array("success", "Registro Realizado", "registropagarfactura", $idfactura);
-        // } else {
-        //     $res = array("danger", "No se pudo realizar el registro");
-        // }
         echo json_encode($res);
     }
 
@@ -1852,15 +1816,6 @@ WHERE
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
         $lista = [];
-        // $empresa = $this->getidempresa($ide);
-        // "recibo": "87",
-        // "fecha": "2024-02-19",
-        // "monto": "2",
-        // "persona": "persona Monto17",
-
-        // $registro = $this->dbc->query("SELECT cp.nrecibo,cp.fecha,cp.monto,cp.persona,cb.idcaja_bancos,cb.codigo,cb.tipo_cuenta FROM cuentaspof AS cp
-        // INNER JOIN caja_bancos AS cb ON cb.idcaja_bancos = cp.idcaja_bancos
-        // where cp.idcuentaspof ='$idrecibo'");
         
         $registro = $this->dbc->query("SELECT * FROM cuentaspof WHERE idcuentaspof = '$idrecibo'");
 
@@ -1882,4 +1837,4 @@ WHERE
     
     //listafactura eliminartransaccion  eliminarcliente listafactura_cobrado eliminarproveedor listafactura_pagado registrocobrarfactura
 }//eliminarcobrados listapagos registrardesconsolidar registrotransaccion cambiarestadoconsolidado  registrocobrarfactura
-//registrardesconsolidar crearfactura listapagos crearfacturasapi lista_cobrar_cobrado_factura
+//registrardesconsolidar crearfactura listapagos crearfacturasapi lista_cobrar_cobrado_factura registropagarfactura
