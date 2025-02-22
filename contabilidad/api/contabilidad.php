@@ -1073,7 +1073,7 @@ WHERE
     //         $res = array("id" => $qwe[0], "fecha" => $qwe[1], "numero" => $qwe[2], "codigo" => $qwe[3], "idproveedor" => $qwe[5], "nombrep" => $pro['nombre'], "monto" => $qwe[4], "pagado" => $asd[0], "saldo" => $saldo, "transaccion" => $qwe[6], "cuenta" => $qwe[7], "detalle" => $pagados);
     //         array_push($lista, $res);
     //     }
-    //     echo json_encode($lista);
+    //     echo json_encode($lista); lista_pagar_pagado_factura
     // }
 
     public function lista_cobrar_cobrado_factura($sucursal)
@@ -1250,7 +1250,7 @@ WHERE
         echo json_encode($reporte);
     }
 
-    public function registrocobrarfactura($idfactura, $idtransaccion, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$archivo)
+    public function registrocobrarfactura($idfactura, $idtransaccion,$idcaja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$archivo)
     {
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
@@ -1302,14 +1302,14 @@ WHERE
                 $orden = $orden + 1;
             }
         } else {
-            $trans = $qq['idtransacciones'];
+            $trans = $idtransaccion;
         }
         
         //------------------------------------------------------------------------------------
 
         if(empty($archivo['name'])){
-            $registropago = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,archivo)
-            VALUES(NULL,'$nrecibo','$fecha','$idcliente','$persona','$ci','$monto','$idfactura','$trans','$idcuenta',NULL)");
+            $registropago = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,idcaja_bancos,archivo)
+            VALUES(NULL,'$nrecibo','$fecha','$idcliente','$persona','$ci','$monto','$idfactura','$trans','$idcuenta','$idcaja_bancos',NULL)");
 
         if ($registropago === TRUE) {
             $res = array("success", "Registro Realizado", "registrocobrarfactura");
@@ -1333,8 +1333,8 @@ WHERE
         }
         if(move_uploaded_file($archivo_tmp, $ruta_destino)){
              //registrar pago, preguntar guardar la anterior transaccion o la nueva
-        $registropago2 = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,archivo)
-        VALUES(NULL,'$nrecibo','$fecha','$idcliente','$persona','$ci','$monto','$idfactura','$trans','$idcuenta','$unique_name')");
+        $registropago2 = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,idcaja_bancos,archivo)
+        VALUES(NULL,'$nrecibo','$fecha','$idcliente','$persona','$ci','$monto','$idfactura','$trans','$idcuenta','$idcaja_bancos','$unique_name')");
 
         if ($registropago2 === TRUE) {
             $res = array("success", "Registro Realizado", "registrocobrarfactura");
@@ -1509,6 +1509,15 @@ WHERE
 
     public function listapagos($idfactura)
     {
+        $fact = $this->dbc->query("SELECT * FROM factura WHERE idfactura='$idfactura'");
+        $aaa = $fact->fetch_assoc();
+        if($aaa['cobrado'] != 0){
+            $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $aaa['proveedorcliente_idproveedorcliente'] . "'");
+            $cl = $cliente->fetch_assoc();
+        }else{
+            $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='" . $aaa['proveedorcliente_idproveedorcliente'] . "'");
+            $cl = $proveedor->fetch_assoc();
+        }
         $lista = [];
         // }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
          // CONSULTA PARA SABER SI HAY INDIVIDUALES
@@ -1527,7 +1536,7 @@ WHERE
                         FROM cuentaspof WHERE idfactura = '$idfactura'");
     
                         while ($zxc = $this->dbc->fetch($mostrarIndi)) {
-                            $res = array("recibo" => $zxc[0], "fecha" => $zxc[1], "persona" => $zxc[2], "ci" => $zxc[3], "monto" => $zxc[4], "id" => $zxc[5],"transaccion" => $zxc[6],"nombre_archivo" => $zxc[7]);
+                            $res = array("recibo" => $zxc[0], "fecha" => $zxc[1], "persona" => $zxc[2], "ci" => $zxc[3], "monto" => $zxc[4], "id" => $zxc[5],"transaccion" => $zxc[6],"nombre_archivo" => $zxc[7],"nit" => $cl['nit'],"direccion" => $cl['direccion']);
                             array_push($lista, $res);
                         }
     
@@ -1537,7 +1546,7 @@ WHERE
                 $datosRecibo2 = $this->dbc->query("SELECT nrecibo,fecha,persona,ci,monto,idcuentaspof,transaccion,archivo FROM cuentaspof WHERE idcuentaspof='$idrecibo2'");
                 
                 while ($www = $this->dbc->fetch($datosRecibo2)) {
-                    $res2 = array("recibo" => $www[0], "fecha" => $www[1], "persona" => $www[2], "ci" => $www[3], "monto" => $resultado33['monto'], "id" => $www[5],"transaccion" => $www[6],"nombre_archivo" => $www[7]);
+                    $res2 = array("recibo" => $www[0], "fecha" => $www[1], "persona" => $www[2], "ci" => $www[3], "monto" => $resultado33['monto'], "id" => $www[5],"transaccion" => $www[6],"nombre_archivo" => $www[7],"nit" => $cl['nit'],"direccion" => $cl['direccion']);
                     array_push($lista, $res2);
                 }
     
@@ -1545,7 +1554,7 @@ WHERE
                 //SOLO HAY INDIVIDUALES
                 $registro = $this->dbc->query("SELECT c.idcuentaspof,c.nrecibo,c.fecha,c.monto,c.persona,c.ci,c.transaccion,c.archivo FROM cuentaspof as c WHERE c.idfactura='$idfactura'");
                 while ($qwe = $this->dbc->fetch($registro)) {
-                    $res = array("id" => $qwe[0], "recibo" => $qwe[1], "fecha" => $qwe[2], "monto" => $qwe[3], "persona" => $qwe[4], "ci" => $qwe[5],"transaccion" => $qwe[6],"nombre_archivo" => $qwe[7]);
+                    $res = array("id" => $qwe[0], "recibo" => $qwe[1], "fecha" => $qwe[2], "monto" => $qwe[3], "persona" => $qwe[4], "ci" => $qwe[5],"transaccion" => $qwe[6],"nombre_archivo" => $qwe[7],"nit" => $cl['nit'],"direccion" => $cl['direccion']);
                     array_push($lista, $res);
                 }
         }
@@ -1557,7 +1566,7 @@ WHERE
                        $datosRecibo = $this->dbc->query("SELECT nrecibo,fecha,persona,ci,monto,idcuentaspof,transaccion,archivo FROM cuentaspof WHERE idcuentaspof='$idrecibo'");
                        
                        while ($zxc = $this->dbc->fetch($datosRecibo)) {
-                           $res = array("recibo" => $zxc[0], "fecha" => $zxc[1], "persona" => $zxc[2], "ci" => $zxc[3], "monto" => $resultado3['monto'], "id" => $zxc[5],"transaccion" => $zxc[6],"nombre_archivo" => $zxc[7]);
+                           $res = array("recibo" => $zxc[0], "fecha" => $zxc[1], "persona" => $zxc[2], "ci" => $zxc[3], "monto" => $resultado3['monto'], "id" => $zxc[5],"transaccion" => $zxc[6],"nombre_archivo" => $zxc[7],"nit" => $cl['nit'],"direccion" => $cl['direccion']);
                            array_push($lista, $res);
                        }
                     //    $res = array("id" => $qwe[0], "fecha" => $qwe[1], "numero" => $qwe[2], "codigo" => $qwe[3], "idproveedor" => $qwe[5], "nombrep" => $pro['nombre'], "monto" => $qwe[4], "pagado" => $resultado3['monto'], "saldo" => 0, "transaccion" => $qwe[6], "cuenta" => $qwe[7], "detalle" => $pagados);
@@ -1836,6 +1845,41 @@ WHERE
             $res = array("ok" => "success", "estado" => "transaccion", "dato" => $qwe);
         }
         echo json_encode($res);
-    } //listafactura eliminartransaccion  eliminarcliente listafactura_cobrado eliminarproveedor listafactura_pagado registrocobrarfactura
+    } 
+    public function listar_recibo_por_id($idrecibo)
+    {
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+        $lista = [];
+        // $empresa = $this->getidempresa($ide);
+        // "recibo": "87",
+        // "fecha": "2024-02-19",
+        // "monto": "2",
+        // "persona": "persona Monto17",
+
+        // $registro = $this->dbc->query("SELECT cp.nrecibo,cp.fecha,cp.monto,cp.persona,cb.idcaja_bancos,cb.codigo,cb.tipo_cuenta FROM cuentaspof AS cp
+        // INNER JOIN caja_bancos AS cb ON cb.idcaja_bancos = cp.idcaja_bancos
+        // where cp.idcuentaspof ='$idrecibo'");
+        
+        $registro = $this->dbc->query("SELECT * FROM cuentaspof WHERE idcuentaspof = '$idrecibo'");
+
+        while ($qwe = $this->dbc->fetch($registro)) {
+            $caja_banco = $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '$qwe[idcaja_bancos]'");
+            if($caja_banco->num_rows > 0){
+                $datos_caja = $caja_banco->fetch_assoc();
+                $res = array("nrecibo" => $qwe['nrecibo'],"fecha" => $qwe['fecha'], "monto" => $qwe['monto'], "persona" => $qwe['persona'],"idcaja_bancos" => $datos_caja['idcaja_bancos'], "codigo" => $datos_caja['codigo'], "nombre" => $datos_caja['tipo_cuenta']);
+            }else{
+                $res = array("nrecibo" => $qwe['nrecibo'],"fecha" => $qwe['fecha'], "monto" => $qwe['monto'], "persona" => $qwe['persona'],"idcaja_bancos" => $qwe['idcaja_bancos'], "codigo" => NULL, "nombre" => NULL);
+
+            }
+            
+            // $nroTransaccion = $resultado12['codigotransaccion'] + 1;
+            array_push($lista, $res);
+        }
+        echo json_encode($lista);
+    }
+    
+    //listafactura eliminartransaccion  eliminarcliente listafactura_cobrado eliminarproveedor listafactura_pagado registrocobrarfactura
 }//eliminarcobrados listapagos registrardesconsolidar registrotransaccion cambiarestadoconsolidado  registrocobrarfactura
-//registrardesconsolidar crearfactura listapagos
+//registrardesconsolidar crearfactura listapagos crearfacturasapi lista_cobrar_cobrado_factura

@@ -141,12 +141,14 @@ class Plandecuentas extends DB{
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
         
-        $fecha=date("Y-m-d");
+        // $fecha=date("Y-m-d");
+       
+        // echo json_encode(array($codigo,$tipo_cuenta,$glosa,$idplandecuenta,$empresa));
         $idempresa=$this->getidempresa($empresa);
 
-        $consult=$this->dbc->query("SELECT COUNT(*) AS total1 FROM vinculacion_cuenta_xcxp WHERE idempresa='$idempresa' AND cobrar_pagar = '$cobrar_pagar'");
-        $resultado = $consult->fetch_assoc();
-        $total_1 = $resultado['total1'];
+        // $consult=$this->dbc->query("SELECT COUNT(*) AS total1 FROM vinculacion_cuenta_xcxp WHERE idempresa='$idempresa' AND cobrar_pagar = '$cobrar_pagar'");
+        // $resultado = $consult->fetch_assoc();
+        // $total_1 = $resultado['total1'];
 
         $res="";
         if(0 > 0){
@@ -200,12 +202,12 @@ class Plandecuentas extends DB{
     {
         $lista = [];
         $idempresa = $this->getidempresa($empresa);
-        $listado = $this->dbc->query("SELECT * FROM caja_bancos WHERE idempresa ='$idempresa'");
-        while ($qwe = $this->dbc->fetch($listado)) {
-            $listado = $this->dbc->query("SELECT numero,nombreplan,saldonormal FROM plandecuenta WHERE idplandecuenta ='$qwe[idplandecuenta]'");
-            $aaa = $listado->fetch_assoc();
+        $listado1 = $this->dbc->query("SELECT * FROM caja_bancos WHERE idempresa ='$idempresa'");
+        while ($qwe = $this->dbc->fetch($listado1)) {
+            $listado2 = $this->dbc->query("SELECT idplandecuenta,numero,nombreplan,saldonormal FROM plandecuenta WHERE idplandecuenta ='$qwe[idplandecuenta]'");
+            $aaa = $listado2->fetch_assoc();
             // $idtransaccion = $aaa['transacciones_idtransacciones'];
-            $res = array("idcaja_bancos" => $qwe[0], "codigo" => $qwe[1], "tipo_cuenta" => $qwe[2], "glosa" => $qwe[3],$aaa['numero'], $aaa['nombreplan'], $aaa['saldonormal']);
+            $res = array("idcaja_bancos" => $qwe['idcaja_bancos'], "codigo" => $qwe['codigo'], "tipo_cuenta" => $qwe['tipo_cuenta'], "glosa" => $qwe['glosa'],"idplandecuenta" => $aaa['idplandecuenta'],"codigo_cuenta" => $aaa['numero'],"cuenta" => $aaa['nombreplan'],"tipo" => $aaa['saldonormal']);
             array_push($lista, $res);
         }
         echo json_encode($lista);

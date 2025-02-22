@@ -291,10 +291,10 @@ public function getidgestion($md5){
         $lista=[];
         $ide=$this->getidempresa($empresa);
         $gestion=$this->getidgestion($empresa);
-        $reporte=$this->dbc->query("select p.numero,p.nombreplan,SUM(d.debe) as debe,SUM(d.haber) as haber,SUM(debe)-SUM(haber) as deudor,SUM(haber)-SUM(debe) as acreedor from plandecuenta as p
-        INNER JOIN transacciones as t ON t.organizacion_idorganizacion='$ide'
-        INNER JOIN detalletransaccion as d ON d.idplandecuenta=p.idplandecuenta and t.idtransacciones=d.transacciones_idtransacciones
-        WHERE p.organizacion_idorganizacion='$ide' and t.fechatransaccion>='$fechai' and t.fechatransaccion<='$fechaf' and 
+        $reporte=$this->dbc->query("SELECT p.numero,p.nombreplan,SUM(d.debe) AS debe,SUM(d.haber) AS haber,SUM(debe)-SUM(haber) AS deudor,SUM(haber)-SUM(debe) AS acreedor FROM plandecuenta AS p
+        INNER JOIN transacciones AS t ON t.organizacion_idorganizacion='$ide'
+        INNER JOIN detalletransaccion AS d ON d.idplandecuenta=p.idplandecuenta AND t.idtransacciones=d.transacciones_idtransacciones
+        WHERE p.organizacion_idorganizacion='$ide' AND t.fechatransaccion>='$fechai' AND t.fechatransaccion<='$fechaf' AND 
         t.idgestion='$gestion'  
         GROUP by p.nombreplan 
         ORDER by p.numero ASC;");
@@ -780,57 +780,58 @@ $totalHaber = 0;
     $lista=[];
     $ide=$this->getidempresa($empresa);
     $gestion=$this->getidgestion($empresa);
-    $registro=$this->dbc->query("select
+    $registro=$this->dbc->query("SELECT
     t.codigotransaccion,
     t.fechatransaccion,
     t.ndocumento,
     t.glosa,
     t.tipotransaccion_idtipotransaccion,
     t.idtransacciones
-  from
-    transacciones as t
-  where
+  FROM
+    transacciones AS t
+  WHERE
     t.codigotransaccion >= '$fechai'
-    and t.codigotransaccion <= '$fechaf'
-    and t.organizacion_idorganizacion = '$ide'
-    and t.idgestion='$gestion'
-  order by
-    t.codigotransaccion asc;
+    AND t.codigotransaccion <= '$fechaf'
+    AND t.organizacion_idorganizacion = '$ide'
+    AND t.idgestion='$gestion'
+  ORDER BY
+    t.codigotransaccion ASC;
   ");
     while($qwe=$this->dbc->fetch($registro)){
 
      
-       $pcuentas=$this->dbc->query("select * from detalletransaccion where transacciones_idtransacciones='".$qwe['idtransacciones']."'");
+       $pcuentas=$this->dbc->query("SELECT * FROM detalletransaccion WHERE transacciones_idtransacciones='".$qwe['idtransacciones']."'");
        $ww=$this->dbc->fetch($pcuentas);
-   
+   //CONTROLA Q EL DETALLE_TRANSACCION PERTENEZCA A LA TRANSACCIO Q DICE PERTENECER DEBEN SER LOS IDS IGUALES
+   //TRANSACCIONES --> ID = 50,    DETALLE_TRANSACCION -->ID = 50
        if($ww['transacciones_idtransacciones']!=$qwe['idtransacciones']){}else{
 
 
-       $tipo=$this->dbc->query("select * from tipotransaccion where idtipotransaccion='$qwe[4]'"); //llamaba a dba
+       $tipo=$this->dbc->query("SELECT * FROM tipotransaccion WHERE idtipotransaccion='$qwe[4]'"); //llamaba a dba 
        $tt=$this->dbc->fetch($tipo);
        $detalle=[];
        $facturas=[];
-       $fature=$this->dbc->query("select
+       $fature=$this->dbc->query("SELECT
        f.idfactura,
        f.fecha,
        f.nfactura,
        f.montofactura,
        f.proveedorcliente_idproveedorcliente,
        f.clasefactura
-     from
-       factura as f
-     where
+     FROM
+       factura AS f
+     WHERE
        f.transacciones_idtransacciones ='$qwe[5]'
        ");
        while($zxc=$this->dbc->fetch($fature)){
            if($zxc[5]==2){
-           $cliente=$this->dbcm->query("select c.nombre,c.nit from cliente as c where c.id_cliente='$zxc[4]' ");
+           $cliente=$this->dbcm->query("SELECT c.nombre,c.nit FROM cliente AS c WHERE c.id_cliente='$zxc[4]' ");
            $cc=$this->dbcm->fetch($cliente);
            //ahi arriba and c.idempresa='".$this->emp."'
            $fat=array("fecha"=>$zxc[1],"cliente"=>$cc[0],"nfactura"=>$zxc[2],"nit"=>$cc[1],"monto"=>$zxc[3]);
            array_push($facturas,$fat);
        }else{
-           $cliente=$this->dbcm->query("select p.nombre,p.nit from proveedor as p where p.id_proveedor='$zxc[4]' ");
+           $cliente=$this->dbcm->query("SELECT p.nombre,p.nit FROM proveedor AS p WHERE p.id_proveedor='$zxc[4]' ");
            $cc=$this->dbcm->fetch($cliente);
            //ahi arriba and c.idempresa='".$this->emp."'
            $fat=array("fecha"=>$zxc[1],"cliente"=>$cc[0],"nfactura"=>$zxc[2],"nit"=>$cc[1],"monto"=>$zxc[3]);
@@ -842,7 +843,7 @@ $totalHaber = 0;
 
       $dt=$this->dbc->query("SELECT p.numero,p.nombreplan,d.nota,d.debe,d.haber FROM detalletransaccion AS d
        INNER JOIN plandecuenta AS p ON p.idplandecuenta=d.idplandecuenta
-       WHERE d.transacciones_idtransacciones='$qwe[5]' ;");
+       WHERE d.transacciones_idtransacciones='$qwe[5]';");
        while($asd=$this->dbc->fetch($dt)){
            $det=array("numero"=>$asd[0],"plan"=>$asd[1],"nota"=>$asd[2],"debe"=>$asd[3],"haber"=>$asd[4]);
            array_push($detalle,$det);
@@ -1109,7 +1110,7 @@ $totalHaber = 0;
     }
     return $result;  // Devolver el array con los valores calculados nota
   }
-
+//reportecomprobantecontable
 
 }
 
