@@ -1834,7 +1834,31 @@ WHERE
         }
         echo json_encode($lista);
     }
-    
+    public function listar_recibo_pago_por_id($idrecibo)
+    {
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+        $lista = [];
+        
+        $registro = $this->dbc->query("SELECT * FROM cuentaspor WHERE idcuentaspor = '$idrecibo'");
+
+        while ($qwe = $this->dbc->fetch($registro)) {
+            $caja_banco = $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '$qwe[idcaja_bancos]'");
+            if($caja_banco->num_rows > 0){
+                $datos_caja = $caja_banco->fetch_assoc();
+                $res = array("nrecibo" => $qwe['nrecibo'],"fecha" => $qwe['fecha'], "monto" => $qwe['monto'], "persona" => $qwe['persona'],"idcaja_bancos" => $datos_caja['idcaja_bancos'], "codigo" => $datos_caja['codigo'], "nombre" => $datos_caja['tipo_cuenta']);
+            }else{
+                $res = array("nrecibo" => $qwe['nrecibo'],"fecha" => $qwe['fecha'], "monto" => $qwe['monto'], "persona" => $qwe['persona'],"idcaja_bancos" => $qwe['idcaja_bancos'], "codigo" => NULL, "nombre" => NULL);
+
+            }
+            
+            // $nroTransaccion = $resultado12['codigotransaccion'] + 1;
+            array_push($lista, $res);
+        }
+        echo json_encode($lista);
+    }
+     
     //listafactura eliminartransaccion  eliminarcliente listafactura_cobrado eliminarproveedor listafactura_pagado registrocobrarfactura
 }//eliminarcobrados listapagos registrardesconsolidar registrotransaccion cambiarestadoconsolidado  registrocobrarfactura
 //registrardesconsolidar crearfactura listapagos crearfacturasapi lista_cobrar_cobrado_factura registropagarfactura

@@ -392,6 +392,15 @@ if ($registrarTabla === TRUE) {
 
 public function listapagos_individuales($idfactura)
     {
+        $fact = $this->dbc->query("SELECT * FROM factura WHERE idfactura='$idfactura'");
+        $aaa = $fact->fetch_assoc();
+        if($aaa['cobrado'] != 0){
+            $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $aaa['proveedorcliente_idproveedorcliente'] . "'");
+            $cl = $cliente->fetch_assoc();
+        }else{
+            $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='" . $aaa['proveedorcliente_idproveedorcliente'] . "'");
+            $cl = $proveedor->fetch_assoc();
+        }
         $lista = [];
         // }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
          // CONSULTA PARA SABER SI HAY INDIVIDUALES
@@ -406,29 +415,29 @@ public function listapagos_individuales($idfactura)
         if($hayIndividuales > 0){
             if($hayGrupales > 0){
                 // hay grupales e individuales
-                        $mostrarIndi = $this->dbc->query(" SELECT nrecibo,fecha,persona,ci,monto,idcuentaspor,archivo
+                        $mostrarIndi = $this->dbc->query(" SELECT nrecibo,fecha,persona,ci,monto,idcuentaspor,transaccion,archivo
                         FROM cuentaspor WHERE idfactura = '$idfactura'");
     
                         while ($zxc = $this->dbc->fetch($mostrarIndi)) {
-                            $res = array("recibo" => $zxc[0], "fecha" => $zxc[1], "persona" => $zxc[2], "ci" => $zxc[3], "monto" => $zxc[4], "id" => $zxc[5],"nombre_archivo" => $zxc[6]);
+                            $res = array("recibo" => $zxc[0], "fecha" => $zxc[1], "persona" => $zxc[2], "ci" => $zxc[3], "monto" => $zxc[4], "id" => $zxc[5],"transaccion" => $zxc[6],"nombre_archivo" => $zxc[7],"nit" => $cl['nit'],"direccion" => $cl['direccion']);
                             array_push($lista, $res);
                         }
     
                 $listaGrup2 = $this->dbc->query("SELECT * FROM cuentaspagar_grupal WHERE idfactura='$idfactura'");
                 $resultado33 = $listaGrup2->fetch_assoc();
                 $idrecibo2 = $resultado33['idcuentaspor'];
-                $datosRecibo2 = $this->dbc->query("SELECT nrecibo,fecha,persona,ci,monto,idcuentaspor,archivo FROM cuentaspor WHERE idcuentaspor='$idrecibo2'");
+                $datosRecibo2 = $this->dbc->query("SELECT nrecibo,fecha,persona,ci,monto,idcuentaspor,transaccion,archivo FROM cuentaspor WHERE idcuentaspor='$idrecibo2'");
                 
                 while ($www = $this->dbc->fetch($datosRecibo2)) {
-                    $res2 = array("recibo" => $www[0], "fecha" => $www[1], "persona" => $www[2], "ci" => $www[3], "monto" => $resultado33['monto'], "id" => $www[5],"nombre_archivo" => $www[6]);
+                    $res2 = array("recibo" => $www[0], "fecha" => $www[1], "persona" => $www[2], "ci" => $www[3], "monto" => $resultado33['monto'], "id" => $www[5],"transaccion" => $zxc[6],"nombre_archivo" => $www[7],"nit" => $cl['nit'],"direccion" => $cl['direccion']);
                     array_push($lista, $res2);
                 }
     
             }else{
                 //SOLO HAY INDIVIDUALES
-                $registro = $this->dbc->query("SELECT c.idcuentaspor,c.nrecibo,c.fecha,c.monto,c.persona,c.ci,c.archivo FROM cuentaspor as c WHERE c.idfactura='$idfactura'");
+                $registro = $this->dbc->query("SELECT c.idcuentaspor,c.nrecibo,c.fecha,c.monto,c.persona,c.ci,c.transaccion,c.archivo FROM cuentaspor as c WHERE c.idfactura='$idfactura'");
                 while ($qwe = $this->dbc->fetch($registro)) {
-                    $res = array("id" => $qwe[0], "recibo" => $qwe[1], "fecha" => $qwe[2], "monto" => $qwe[3], "persona" => $qwe[4], "ci" => $qwe[5],"nombre_archivo" => $qwe[6]);
+                    $res = array("id" => $qwe[0], "recibo" => $qwe[1], "fecha" => $qwe[2], "monto" => $qwe[3], "persona" => $qwe[4], "ci" => $qwe[5],"transaccion" => $qwe[6],"nombre_archivo" => $qwe[7],"nit" => $cl['nit'],"direccion" => $cl['direccion']);
                     array_push($lista, $res);
                 }
         }
@@ -437,10 +446,10 @@ public function listapagos_individuales($idfactura)
                        $listaGrup = $this->dbc->query("SELECT * FROM cuentaspagar_grupal WHERE idfactura='$idfactura'");
                        $resultado3 = $listaGrup->fetch_assoc();
                        $idrecibo = $resultado3['idcuentaspor'];
-                       $datosRecibo = $this->dbc->query("SELECT nrecibo,fecha,persona,ci,monto,idcuentaspor,archivo FROM cuentaspor WHERE idcuentaspor='$idrecibo'");
+                       $datosRecibo = $this->dbc->query("SELECT nrecibo,fecha,persona,ci,monto,idcuentaspor,transaccion,archivo FROM cuentaspor WHERE idcuentaspor='$idrecibo'");
                        
                        while ($zxc = $this->dbc->fetch($datosRecibo)) {
-                           $res = array("recibo" => $zxc[0], "fecha" => $zxc[1], "persona" => $zxc[2], "ci" => $zxc[3], "monto" => $resultado3['monto'], "id" => $zxc[5], "nombre_archivo" => $zxc[6]);
+                           $res = array("recibo" => $zxc[0], "fecha" => $zxc[1], "persona" => $zxc[2], "ci" => $zxc[3], "monto" => $resultado3['monto'], "id" => $zxc[5],"transaccion" =>$zxc[6], "nombre_archivo" => $zxc[7],"nit" => $cl['nit'],"direccion" => $cl['direccion']);
                            array_push($lista, $res);
                        }
                     //    $res = array("id" => $qwe[0], "fecha" => $qwe[1], "numero" => $qwe[2], "codigo" => $qwe[3], "idproveedor" => $qwe[5], "nombrep" => $pro['nombre'], "monto" => $qwe[4], "pagado" => $resultado3['monto'], "saldo" => 0, "transaccion" => $qwe[6], "cuenta" => $qwe[7], "detalle" => $pagados);
@@ -448,5 +457,60 @@ public function listapagos_individuales($idfactura)
         }
 
         echo json_encode($lista);
+    }
+    public function registrar_transaccion_recibo_pago($idRecibo,$fecha,$monto,$glosa, $asiento,$empresa,$sucursal){
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+        
+        $ide = $this->getidempresa($empresa);
+        $sucursal = $this->getidsucursal($sucursal);
+        $gestion = $this->getgestionactualid($ide);
+        $tipotransaccion = 1; //ingreso
+        $trans = "";
+        $transi = $this->dbc->query("SELECT * FROM transacciones WHERE organizacion_idorganizacion='$ide' and sucursal='$sucursal' order by codigotransaccion desc Limit 1");
+        $qq = $this->dbc->fetch($transi);
+        $codigo = $qq['codigotransaccion'] + 1;
+        if ($asiento != 0) {
+            $insertrans = $this->dbc->query("INSERT INTO `transacciones` (`idtransacciones`, `codigotransaccion`, `fechatransaccion`, `tipodecambio`, `ndocumento`, `glosa`, `consolidar`,`estado`, `tipotransaccion_idtipotransaccion`, `organizacion_idorganizacion`, `sucursal`, `idgestion`) 
+            VALUES (NULL, '$codigo', '$fecha', '1', '0', '$glosa', '1','1', '$tipotransaccion', '$ide', '$sucursal', '$gestion');");
+            //nuevat transaccion
+            $transis = $this->dbc->query("SELECT * FROM transacciones WHERE codigotransaccion='$codigo' AND  organizacion_idorganizacion='$ide' ORDER BY idtransacciones DESC LIMIT 1");
+            $ww = $this->dbc->fetch($transis);
+            $trans = $ww['idtransacciones'];
+            //$detallepago
+            $editar_recibo = $this->dbc->query("UPDATE cuentaspor SET transaccion = '$trans' WHERE idcuentaspor ='$idRecibo'");
+            $debe = 0;
+            $haber = 0;
+            $tasiento = $this->dbc->query("SELECT * FROM asiento WHERE idasientotipo='$asiento'");
+            $orden = 1;
+            while ($qwe = $this->dbc->fetch($tasiento)) {
+                $pcuenta = $qwe['idcuenta'];
+                if ($qwe['tipo'] == "DEBE") {
+                    $debe = $monto * ($qwe['porciento'] / 100);
+                    $haber = 0;
+                } elseif ($qwe['tipo'] == "HABER") {
+                    $debe = 0;
+                    $haber = $monto * ($qwe['porciento'] / 100);
+                }
+                //$pcuenta=$_POST['plandecuenta'];
+                $ppresupuestario = 0; //$_POST['planpresupuestario'];
+                $nota = "-";
+                $estado = 1; //$_POST['estado'];
+                $crear = $this->dbc->query("INSERT INTO detalletransaccion(debe,haber,nota,transacciones_idtransacciones,idplandecuenta,idcuentapresupuestaria,estado,cobrar,pagar,idorganizacion,idsucursal,orden)
+                VALUES ('$debe','$haber','$nota','$trans','$pcuenta','$ppresupuestario','$estado','2','2','$ide','$sucursal','$orden')");
+
+                $orden = $orden + 1;
+            }
+        } else {
+            $trans = $qq['idtransacciones'];
+            $editar_recibo = $this->dbc->query("UPDATE cuentaspor SET transaccion = '$trans' WHERE idcuentaspor ='$idRecibo'");
+        }
+        if($insertrans == TRUE){
+            $res = array("success", "Registro exitoso","registrar_transaccion_recibo");
+        }else{
+            $res = array("danger", "No se pudo registrar","registrar_transaccion_recibo");
+        }
+        echo json_encode($res);
     }
 }
