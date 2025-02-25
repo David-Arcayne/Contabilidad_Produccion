@@ -104,6 +104,9 @@ $cont->facturas($ver[1]);
 }elseif($ver[0]=="listaproveedores"){
 $cont=new Contabilidad();
 $cont->listaproveedores($ver[1]);
+}elseif($ver[0]=="listaclientes"){
+    $cont=new Contabilidad();
+    $cont->listaclientes($ver[1]);
 }elseif($ver[0]=="listaasientos"){
 $cont=new Contabilidad();
 $cont->listaasientos($ver[1]);
@@ -117,7 +120,7 @@ $cont->listaasientosc($ver[1]);
 $cont=new Contabilidad();
 $cont->eliminartasiento($ver[1]);
 }
-// elseif($ver[0]=="listafactura"){
+// elseif($ver[0]=="listafactura"){ listaclientes proveedor
 // $cont=new Contabilidad();
 // $cont->listafactura($ver[1]); individual
 // }

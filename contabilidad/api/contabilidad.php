@@ -448,6 +448,9 @@ WHERE md5(p.organizacion_idorganizacion)='$ide'");
 
     public function listaclientes($id)
     {
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
         $lista = [];
         $ide = $this->getidempresa($id);
         $registro = $this->dbcm->query("SELECT c.id_cliente,c.nombre, c.nombrecomercial, c.tipo , c.codigo,c.nit, c.detalle,c.direccion,c.telefono,c.mobil,c.email,c.web,c.pais, c.ciudad,c.zona,c.contacto, c.tipodocumento FROM cliente as c where c.idempresa='$ide' order by c.nombre asc");
@@ -1224,10 +1227,13 @@ WHERE
 
     public function registrocobrarfactura($idfactura, $idtransaccion,$idcaja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$archivo)
     {
+        // echo json_encode(array($idfactura, $idtransaccion,$caja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$archivo));
+
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
     
+        $caja_bancos = json_decode($idcaja_bancos, true);
         $res = "";
         $sucursal = $this->getidsucursal($sucursal);
         $ide = $this->getidempresa($empresa);
@@ -1280,10 +1286,17 @@ WHERE
         //------------------------------------------------------------------------------------
 
         if(empty($archivo['name'])){
-            $registropago = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,idcaja_bancos,archivo)
-            VALUES(NULL,'$nrecibo','$fecha','$idcliente','$persona','$ci','$monto','$idfactura','$trans','$idcuenta','$idcaja_bancos',NULL)");
+            $registropago = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,archivo)
+            VALUES(NULL,'$nrecibo','$fecha','$idcliente','$persona','$ci','$monto','$idfactura','$trans','$idcuenta',NULL)");
 
         if ($registropago === TRUE) {
+
+            $idcuentaspof = $this->dbc->insert_id;
+            foreach($caja_bancos as $cajaBanco){
+                $registropago3 = $this->dbc->query("INSERT INTO detalle_caja_bancos(idcaja_bancos,monto,idcuentaspof)
+                VALUES('$cajaBanco[id]','$cajaBanco[monto]','$idcuentaspof')");
+            }
+
             $res = array("success", "Registro Realizado", "registrocobrarfactura");
         } else {
             $res = array("danger", "No se pudo realizar el registrooo",$nrecibo,$fecha,$idcliente,$persona,$ci,$monto,$idfactura,$trans,$idcuenta);
@@ -1305,10 +1318,17 @@ WHERE
         }
         if(move_uploaded_file($archivo_tmp, $ruta_destino)){
              //registrar pago, preguntar guardar la anterior transaccion o la nueva
-        $registropago2 = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,idcaja_bancos,archivo)
-        VALUES(NULL,'$nrecibo','$fecha','$idcliente','$persona','$ci','$monto','$idfactura','$trans','$idcuenta','$idcaja_bancos','$unique_name')");
+        $registropago2 = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,archivo)
+        VALUES(NULL,'$nrecibo','$fecha','$idcliente','$persona','$ci','$monto','$idfactura','$trans','$idcuenta','$unique_name')");
 
+        
         if ($registropago2 === TRUE) {
+            $idcuentaspof = $this->dbc->insert_id;
+            foreach($caja_bancos as $cajaBanco){
+                $registropago3 = $this->dbc->query("INSERT INTO detalle_caja_bancos(idcaja_bancos,monto,idcuentaspof)
+                VALUES('$cajaBanco[id]','$cajaBanco[monto]','$idcuentaspof')");
+            }
+
             $res = array("success", "Registro Realizado", "registrocobrarfactura");
         } else {
             $res = array("danger", "No se pudo realizar el registro");
@@ -1866,4 +1886,4 @@ WHERE
      
     //listafactura eliminartransaccion  eliminarcliente listafactura_cobrado eliminarproveedor listafactura_pagado registrocobrarfactura
 }//eliminarcobrados listapagos registrardesconsolidar registrotransaccion cambiarestadoconsolidado  registrocobrarfactura
-//registrardesconsolidar crearfactura listapagos crearfacturasapi lista_cobrar_cobrado_factura registropagarfactura
+//registrardesconsolidar crearfactura listapagos crearfacturasapi lista_cobrar_cobrado_factura registropagarfactura listaclientes

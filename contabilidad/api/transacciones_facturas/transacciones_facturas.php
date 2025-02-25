@@ -301,7 +301,7 @@ $nroTransaccion = $resultado12['codigotransaccion'] + 1;
         $ide = $this->getidempresa($empresa);
         $sucursal = $this->getidsucursal($sucursal);
         $gestion = $this->getgestionactualid($ide);
-        $tipotransaccion = 1; //ingreso
+        $tipotransaccion = 1; //ingreso decode
         $trans = "";
         $transi = $this->dbc->query("SELECT * FROM transacciones WHERE organizacion_idorganizacion='$ide' and sucursal='$sucursal' order by codigotransaccion desc Limit 1");
         $qq = $this->dbc->fetch($transi);
