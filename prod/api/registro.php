@@ -1500,7 +1500,7 @@ else{
             // Iterar sobre cada detalle y realizar la operación necesaria registrar_grupo_etapa
             
             $rcompra->registrar_distribucion($data['numerodoc'],$data['fecha'],$data['hora'], $data['estado'],$data['usuario_idusuario'],$data['empresa_idempresa'],$data['rubro_idrubro'],$data['detalle']);
-            // echo json_encode(array("siPasoParametros", "epa")); registro_despacho_producto
+            // echo json_encode(array("siPasoParametros", "epa")); registro_despacho_producto editar_estado_modopago
 
         } else {
             echo json_encode(array("Error", "Faltan parámetros en la solicitud principal", $data));

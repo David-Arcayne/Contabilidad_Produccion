@@ -272,8 +272,10 @@ public function registrar_anular_eliminar_activar_transaccion($idtransaccion,$mo
                     $res = array("success", "Se Acepto la anulacion de la transaccion", "cambiarEstado_anular_eliminar_transaccion");
 
                 }else{ //DENEGADO --> estado_solicitud == 3
-                    //NO SE ANULARA NI CAMBIARA ESTADO DE TRANSACCION NI DETALLE TRANSACCION  
-                    $res = array("danger", "Se Denego el permiso para anular", "cambiarEstado_anular_eliminar_transaccion");
+                    //NO SE ANULARA PERO SI CAMBIARA ESTADO DE TRANSACCION  
+                    $update_trans=$this->dbc->query("UPDATE transacciones SET estado = '1' 
+                        WHERE idtransacciones = '$idtransaccion'");  
+                    $res = array("success", "Se Denego el permiso para anular", "cambiarEstado_anular_eliminar_transaccion");
 
                 }
             }elseif($estado_opcion == 2){ //ELIMINAR estado_opcion = 2

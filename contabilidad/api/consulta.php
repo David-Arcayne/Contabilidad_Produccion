@@ -321,6 +321,9 @@ $cont->lista_cobrar_cobrado_factura($ver[1]);
 }elseif($ver[0]=="listar_recibo_pago_por_id"){
     $cont=new Contabilidad();
     $cont->listar_recibo_pago_por_id($ver[1]);
+}elseif($ver[0]=="listar_cajas_bancos_por_recibo"){
+    $cont=new Contabilidad();
+    $cont->listar_cajas_bancos_por_recibo($ver[1]);
 }
 //listafactura eliminartransaccion eliminardetalletransaccion listapagos_individuales listatransaciones factura
 ?>

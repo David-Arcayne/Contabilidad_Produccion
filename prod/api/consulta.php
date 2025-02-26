@@ -604,6 +604,6 @@ elseif($url[0] == "listar_ListaCompraEditable"){
 }elseif($url[0] == "eliminar_detalle_gasto_general"){
     $prov = new Gastos_generales();
     $prov->eliminar_detalle_gasto_general($url[1]);
-}//produccion_etapa 
+}//produccion_etapa  listar_modopago 
 
 ?>         

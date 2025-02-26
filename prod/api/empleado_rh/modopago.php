@@ -79,7 +79,7 @@ class Modopago extends DB{
                 ");
              
                 while($qwe=$this->dbrh->fetch($getPedido)){
-                     $res=array("idmodopago"=>$qwe[0],"nombre"=>$qwe[1],"descripcion"=>$qwe[2],"fecha"=>$qwe[3]); //'nombre' sale del formulario de input hidden
+                     $res=array("idmodopago"=>$qwe[0],"nombre"=>$qwe[1],"descripcion"=>$qwe[2],"fecha"=>$qwe['fecha'],"estado"=>$qwe['estado']); //'nombre' sale del formulario de input hidden
                     array_push($lista,$res);                                      
                  }
                   echo json_encode($lista);
