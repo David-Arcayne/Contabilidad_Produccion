@@ -167,41 +167,44 @@ class Cuentaspof extends DB{
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
         // [
-        //     cajasBancos:  [{\"iddetalle_caja_bancos_cobrar\":0,\"monto\":\"0\",\"idcaja_bancos\":\"11\"}]",
+        //     cajasBancos:  [{\"iddetalle_caja_bancos_cobrar\":0,\"monto\":\"0\",\"idcaja_bancos\":\"11\"},
+        // {\"iddetalle_caja_bancos_cobrar\":8,\"monto\":\"3\",\"idcaja_bancos\":\"12\"}]",
         //     idrecibo: “154”,
         //     ver:”nombre de la api”
         // ]
+//[{\"iddetalle_caja_bancos_cobrar\":7,\"monto\":\"1\",\"idcaja_bancos\":\"5\"},{\"iddetalle_caja_bancos_cobrar\":8,\"monto\":\"3\",\"idcaja_bancos\":\"12\"}]
         $caja_bancos = json_decode($cajasBancos, true);
-        // $idempresa = $this->getidempresa($empresa);
-        foreach($caja_bancos as $caja_banco){
-            if($caja_banco['iddetalle_caja_bancos_cobrar'] < 0){// SE ELIMINA
+        echo json_encode(array($idrecibo,$caja_bancos,$cajasBancos));
+        
+        // foreach($caja_bancos as $caja_banco){
+        //     if($caja_banco['iddetalle_caja_bancos_cobrar'] < 0){// SE ELIMINA
 
-                $iddtCajaBanco = $caja_banco['iddetalle_caja_bancos_cobrar'] * (-1);
-                $editar = $this->dbp->query("DELETE FROM detalle_caja_bancos_cobrar WHERE iddetalle_caja_bancos_cobrar = '$iddtCajaBanco'");
+        //         $iddtCajaBanco = $caja_banco['iddetalle_caja_bancos_cobrar'] * (-1);
+        //         $editar = $this->dbp->query("DELETE FROM detalle_caja_bancos_cobrar WHERE iddetalle_caja_bancos_cobrar = '$iddtCajaBanco'");
             
-        }elseif($caja_banco['iddetalle_caja_bancos_cobrar'] == 0){ // SE AGREGARA
+        // }elseif($caja_banco['iddetalle_caja_bancos_cobrar'] == 0){ // SE AGREGARA
 
-                $editar = $this->dbp->query("INSERT INTO detalle_caja_bancos_cobrar (idcaja_bancos, monto, idcuentaspof)
-                VALUES('$caja_banco[idcaja_bancos]','$caja_banco[monto]','$idrecibo')");
+        //         $editar = $this->dbp->query("INSERT INTO detalle_caja_bancos_cobrar (idcaja_bancos, monto, idcuentaspof)
+        //         VALUES('$caja_banco[idcaja_bancos]','$caja_banco[monto]','$idrecibo')");
 
-            }else{ // SE EDITARA
-                $select_cajaBanco = $this->dbc->query("SELECT tipo_cuenta FROM caja_bancos WHERE idcaja_bancos = '$caja_banco[idcaja_bancos]'");
-                $tipoCuenta = $select_cajaBanco->fetch_assoc();
+        //     }else{ // SE EDITARA
+        //         $select_cajaBanco = $this->dbc->query("SELECT tipo_cuenta FROM caja_bancos WHERE idcaja_bancos = '$caja_banco[idcaja_bancos]'");
+        //         $tipoCuenta = $select_cajaBanco->fetch_assoc();
 
-                $editar = $this->dbp->query("UPDATE detalle_caja_bancos_cobrar
-                SET monto = '$caja_banco[monto]',
-                idcaja_bancos = '$caja_banco[idcaja_bancos]'
-                -- tipo = '$tipoCuenta[tipo_cuenta]'
-                WHERE iddetalle_caja_bancos_cobrar = '$caja_banco[ididdetalle_caja_bancos_cobrar]';");
-            }
-        }
-        if($editar == TRUE){
-            $res = array("success", "Edicion Realizada", "editar_caja_bancos_recibo");
-        }else{
-            $res = array("danger", "Ocurrio un error al editar", "editar_caja_bancos_recibo");
-        }
+        //         $editar = $this->dbp->query("UPDATE detalle_caja_bancos_cobrar
+        //         SET monto = '$caja_banco[monto]',
+        //         idcaja_bancos = '$caja_banco[idcaja_bancos]'
+        //         -- tipo = '$tipoCuenta[tipo_cuenta]'
+        //         WHERE iddetalle_caja_bancos_cobrar = '$caja_banco[ididdetalle_caja_bancos_cobrar]';");
+        //     }
+        // }
+        // if($editar == TRUE){
+        //     $res = array("success", "Edicion Realizada", "editar_caja_bancos_recibo");
+        // }else{
+        //     $res = array("danger", "Ocurrio un error al editar", "editar_caja_bancos_recibo");
+        // }
        
-        echo json_encode($res);
+        // echo json_encode($res);
     }
 
     public function listar_cajas_bancos_por_recibo($idrecibo){
