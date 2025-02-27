@@ -1919,6 +1919,7 @@ while ($qwe = $this->dbc->fetch($registro)) {
             $datos = $caja->fetch_assoc();
             $res = array(
                 "iddetalle_caja_bancos_cobrar" => $datos_caja['iddetalle_caja_bancos_cobrar'],
+                "idcaja_bancos" => $datos['idcaja_bancos'],
                 "tipo_cuenta" => $datos['tipo_cuenta'],
                 "monto" => $datos_caja['monto']
             );

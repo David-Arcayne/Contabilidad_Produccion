@@ -36,12 +36,12 @@ class Reporte_produccion extends DB{
             WHERE gastos_generales_idgastos_generales ='$gastos_generales[idgastos_generales]';");
              $det_ggenral = $dgg->fetch_assoc();
             // $totalRegistros = $det_ggenral['total']; 
-                if($det_ggenral['tipo'] == 1){ // mensual
-                    $aaa = $det_ggenral['monto']/()
-                }
-                else{ // anual
+                // if($det_ggenral['tipo'] == 1){ // mensual
+                //     $aaa = $det_ggenral['monto']/()
+                // }
+                // else{ // anual
 
-                }
+                // }
 
             }
             
