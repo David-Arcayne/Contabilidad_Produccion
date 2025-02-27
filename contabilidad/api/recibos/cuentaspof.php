@@ -176,7 +176,10 @@ class Cuentaspof extends DB{
         foreach($caja_bancos as $caja_banco){
             if($caja_banco['iddetalle_caja_bancos_cobrar'] < 0){// SE ELIMINA
 
-            }elseif($caja_banco['iddetalle_caja_bancos_cobrar'] == 0){ // SE AGREGARA
+                $iddtCajaBanco = $caja_banco['iddetalle_caja_bancos_cobrar'] * (-1);
+                $editar = $this->dbp->query("DELETE FROM detalle_caja_bancos_cobrar WHERE iddetalle_caja_bancos_cobrar = '$iddtCajaBanco'");
+            
+        }elseif($caja_banco['iddetalle_caja_bancos_cobrar'] == 0){ // SE AGREGARA
 
                 $editar = $this->dbp->query("INSERT INTO detalle_caja_bancos_cobrar (idcaja_bancos, monto, idcuentaspof)
                 VALUES('$caja_banco[idcaja_bancos]','$caja_banco[monto]','$idrecibo')");
@@ -187,30 +190,17 @@ class Cuentaspof extends DB{
 
                 $editar = $this->dbp->query("UPDATE detalle_caja_bancos_cobrar
                 SET monto = '$caja_banco[monto]',
-                tipo = '$tipoCuenta[tipo_cuenta]'
+                idcaja_bancos = '$caja_banco[idcaja_bancos]'
+                -- tipo = '$tipoCuenta[tipo_cuenta]'
                 WHERE iddetalle_caja_bancos_cobrar = '$caja_banco[ididdetalle_caja_bancos_cobrar]';");
             }
         }
-        $consulta = $this->dbp->query("SELECT COUNT(*) AS total FROM caracteristicas WHERE caracteristica = '$nombre' AND empresa_idempresa = '$idempresa' AND idcaracteristicas != '$id'");
-        $resultado = $consulta->fetch_assoc();
-        $totalRegistros = $resultado['total'];
-
-        if ($totalRegistros > 0) {
-            $res = array("Error", "El registro ya existe","editarCaracteristicas");
-        }else {
-            // Insertar el nuevo registro
-            $registroListaCompra = $this->dbp->query("UPDATE caracteristicas
-                                    SET caracteristica = '$nombre',
-                                    tipo = '$tipo',
-                                    minimo = '$minimo',
-                                    maximo = '$maximo'
-                                    WHERE idcaracteristicas = '$id';");
-            if ($registroListaCompra === TRUE) {                                                                                                                                                                
-                $res = array("success", "Edición exitosa","editarCaracteristicas");
-            } else {
-                $res = array("danger", "No se pudo editar",$id,$nombre,$empresa);
-            }
+        if($editar == TRUE){
+            $res = array("success", "Edicion Realizada", "editar_caja_bancos_recibo");
+        }else{
+            $res = array("danger", "Ocurrio un error al editar", "editar_caja_bancos_recibo");
         }
+       
         echo json_encode($res);
     }
 

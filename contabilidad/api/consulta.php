@@ -326,5 +326,6 @@ $cont->lista_cobrar_cobrado_factura($ver[1]);
     $cont=new Cuentaspof();
     $cont->listar_cajas_bancos_por_recibo($ver[1]);
 }
-//listafactura eliminartransaccion eliminardetalletransaccion listapagos_individuales listatransaciones factura
+//listafactura eliminartransaccion listapagos_individuales listatransaciones factura lista_cobrar_cobrado
+//reporteactivodisponible
 ?>

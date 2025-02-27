@@ -59,24 +59,25 @@ public function getidgestion($md5){
         $acreedor=0;
         $ide=$this->getidempresa($empresa);
         $gestion=$this->getidgestion($empresa);
-        $reporteA=$this->dbc->query("select
-        pc.numero as codigo,
-        pc.nombreplan as nombre,
-        sum(dt.debe) as debe,
-        sum(dt.haber) as haber
-      from
-        plandecuenta as pc
-        inner join transacciones as t ON pc.organizacion_idorganizacion = t.organizacion_idorganizacion
-        and t.fechatransaccion >= '$fechai'
-        and t.fechatransaccion <= '$fechaf'
-        inner join detalletransaccion as dt ON dt.transacciones_idtransacciones = t.idtransacciones
-        and dt.idplandecuenta = pc.idplandecuenta
-      where
+        $reporteA=$this->dbc->query("SELECT
+        pc.numero AS codigo,
+        pc.nombreplan AS nombre,
+        sum(dt.debe) AS debe,
+        sum(dt.haber) AS haber
+      FROM
+        plandecuenta AS pc
+        INNER JOIN transacciones AS t ON pc.organizacion_idorganizacion = t.organizacion_idorganizacion
+        AND t.fechatransaccion >= '$fechai'
+        AND t.fechatransaccion <= '$fechaf'
+        AND t.estado != '4'
+        INNER JOIN detalletransaccion AS dt ON dt.transacciones_idtransacciones = t.idtransacciones
+        AND dt.idplandecuenta = pc.idplandecuenta
+      WHERE
         pc.organizacion_idorganizacion = '$ide'
-        and pc.numero < '1.1.2.00.00'
-        and pc.numero > '1.1.1.00.00' 
-        and t.idgestion='$gestion'
-      group by
+        AND pc.numero < '1.1.2.00.00'
+        AND pc.numero > '1.1.1.00.00' 
+        AND t.idgestion='$gestion'
+      GROUP BY
         pc.nombreplan");
         while($qwe=$this->dbc->fetch($reporteA)){
         $deudor=$qwe[2]-$qwe[3]; 
@@ -95,23 +96,24 @@ public function getidgestion($md5){
         $total=[];
         $ide=$this->getidempresa($empresa);
         $gestion=$this->getidgestion($empresa);
-        $transacciones=$this->dbc->query("select
+        $transacciones=$this->dbc->query("SELECT
         t.codigotransaccion,
         t.fechatransaccion,
         t.glosa,
         t.idtransacciones
-      from
-        transacciones as t
-      where
+      FROM
+        transacciones AS t
+      WHERE
         t.organizacion_idorganizacion = '$ide'
-        and t.fechatransaccion >= '$fechai'
-        and t.fechatransaccion <= '$fechaf'
-        and t.idgestion='$gestion'");
+        AND t.fechatransaccion >= '$fechai'
+        AND t.fechatransaccion <= '$fechaf'
+        AND t.estado != 4
+        AND t.idgestion='$gestion'");
         while($qwe=$this->dbc->fetch($transacciones)){
         $productos=array();
         
-        $detallet=$this->dbc->query("SELECT p.nombreplan,p.numero,d.debe,d.haber,d.nota FROM detalletransaccion as d 
-        INNER JOIN plandecuenta as p ON p.idplandecuenta=d.idplandecuenta WHERE d.transacciones_idtransacciones='".$qwe[3]."';");
+        $detallet=$this->dbc->query("SELECT p.nombreplan,p.numero,d.debe,d.haber,d.nota FROM detalletransaccion AS d 
+        INNER JOIN plandecuenta AS p ON p.idplandecuenta=d.idplandecuenta WHERE d.transacciones_idtransacciones='".$qwe[3]."';");
         while($asd=$this->dbc->fetch($detallet)){
             $produ=array(
                 "plan"=>$asd[0],
@@ -203,8 +205,7 @@ public function getidgestion($md5){
       $gestion = $this->getidgestion($empresa);
   
       // Obtener todas las transacciones relevantes
-      $transacciones = $this->dbc->query("
-          SELECT DISTINCT t.codigotransaccion, t.fechatransaccion, t.glosa, t.idtransacciones
+      $transacciones = $this->dbc->query("SELECT DISTINCT t.codigotransaccion, t.fechatransaccion, t.glosa, t.idtransacciones
           FROM transacciones AS t
           LEFT JOIN factura AS f ON t.idtransacciones = f.transacciones_idtransacciones
           WHERE t.organizacion_idorganizacion = '$ide'
@@ -216,8 +217,7 @@ public function getidgestion($md5){
   
       // Obtener las facturas relacionadas (filtrando por clasefactura)
       $facturasPorTransaccion = [];
-      $facturas = $this->dbc->query("
-          SELECT 
+      $facturas = $this->dbc->query("SELECT 
               f.transacciones_idtransacciones AS transaccion_id,
               f.fecha,
               f.nfactura,
@@ -871,24 +871,25 @@ $totalHaber = 0;
         $ide=$this->getidempresa($empresa);
         $gestion=$this->getidgestion($empresa);
 
-        $reporteA=$this->dbc->query("select
-        pc.numero as codigo,
-        pc.nombreplan as nombre,
-        sum(dt.debe) as debe,
-        sum(dt.haber) as haber
-      from
-        plandecuenta as pc
-        inner join transacciones as t ON pc.organizacion_idorganizacion = t.organizacion_idorganizacion
-        and t.codigotransaccion >= '$fechai'
-        and t.codigotransaccion <= '$fechaf'
-        inner join detalletransaccion as dt ON dt.transacciones_idtransacciones = t.idtransacciones
-        and dt.idplandecuenta = pc.idplandecuenta
-      where
+        $reporteA=$this->dbc->query("SELECT
+        pc.numero AS codigo,
+        pc.nombreplan AS nombre,
+        sum(dt.debe) AS debe,
+        sum(dt.haber) AS haber
+      FROM
+        plandecuenta AS pc
+        INNER JOIN transacciones AS t ON pc.organizacion_idorganizacion = t.organizacion_idorganizacion
+        AND t.codigotransaccion >= '$fechai'
+        AND t.codigotransaccion <= '$fechaf'
+        INNER JOIN detalletransaccion AS dt ON dt.transacciones_idtransacciones = t.idtransacciones
+        AND dt.idplandecuenta = pc.idplandecuenta
+        AND dt.estado = '1'
+      WHERE
         pc.organizacion_idorganizacion = '$ide'
-        and pc.numero < '1.1.2.00.00'
-        and pc.numero > '1.1.1.00.00'
-        and t.idgestion='$gestion'
-      group by
+        AND pc.numero < '1.1.2.00.00'
+        AND pc.numero > '1.1.1.00.00'
+        AND t.idgestion='$gestion'
+      GROUP BY
         pc.nombreplan;
       ");
         while($qwe=$this->dbc->fetch($reporteA)){
@@ -908,23 +909,24 @@ $totalHaber = 0;
         $ide=$this->getidempresa($empresa);
         $gestion=$this->getidgestion($empresa);
         //reconfigurar consulta para que solo se muestre solo la gestion.
-        $registro=$this->dbc->query("select
+        $registro=$this->dbc->query("SELECT
         t.codigotransaccion,
         t.fechatransaccion,
         t.tipotransaccion_idtipotransaccion,
         t.idtransacciones
         
-      from
-        transacciones as t
-      where
+      FROM
+        transacciones AS t
+      WHERE
         t.organizacion_idorganizacion = '$ide'
-        and t.fechatransaccion >= '$fechai'
-        and t.fechatransaccion <= '$fechaf'
-        and t.idgestion = '$gestion'
-      order by
-        t.codigotransaccion asc");
+        AND t.fechatransaccion >= '$fechai'
+        AND t.fechatransaccion <= '$fechaf'
+        AND t.estado != 4
+        AND t.idgestion = '$gestion'
+      ORDER BY
+        t.codigotransaccion ASC");
         while($qwe=$this->dbc->fetch($registro)){
-            $tipotrans=$this->dbc->query("select nombre from tipotransaccion where idtipotransaccion='$qwe[2]'"); //antes era dba
+            $tipotrans=$this->dbc->query("SELECT nombre FROM tipotransaccion WHERE idtipotransaccion='$qwe[2]'"); //antes era dba
             $tipo=$this->dbc->fetch($tipotrans);
             $detalle=[];
 
@@ -933,11 +935,11 @@ $totalHaber = 0;
             d.debe,
             d.haber,
             d.transacciones_idtransacciones
-          from
-            detalletransaccion as d
+          FROM
+            detalletransaccion AS d
           WHERE
             d.idplandecuenta = '$plan'
-            and d.transacciones_idtransacciones='$qwe[3]' ");
+            AND d.transacciones_idtransacciones='$qwe[3]' ");
             while($asd=$this->dbc->fetch($detallet)){
                 $res=array("debe"=>$asd[1],"haber"=>$asd[2]);
                 array_push($detalle,$res);
@@ -1110,7 +1112,8 @@ $totalHaber = 0;
     }
     return $result;  // Devolver el array con los valores calculados nota
   }
-//reportecomprobantecontable
+  //reportedetallefpt reporteactivodiaponibledos
+//reportecomprobantecontable reporteactivodisponible reportedetalletransaccion mayorcuentacontable reportecomprobantecontable
 
 }
 
