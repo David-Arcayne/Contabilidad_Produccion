@@ -22,27 +22,28 @@ class Reporte_produccion extends DB{
          while ($gastos_generales = $this->dbp->fetch($gastosGen)) {
             $monto =0;
             // $sumaHorasEtapa=0;
-            $detalle_gastos = $this->dbp->query("SELECT monto FROM detalle_gastos 
-            WHERE gastos_generales_idgastos_generales ='$gastos_generales[idgastos_generales]';"); 
+            // $detalle_gastos = $this->dbp->query("SELECT monto FROM detalle_gastos 
+            // WHERE gastos_generales_idgastos_generales ='$gastos_generales[idgastos_generales]';"); 
+
+             $detalle_gastos = $this->dbp->query("SELECT * FROM detalle_gasto_general
+            WHERE gastos_generales_idgastos_generales ='$gastos_generales[idgastos_generales]';");
+           
              //si hay resultados en la tabla detalle_gastos 
              if ($detalle_gastos->num_rows > 0) {
                 //hago el calculo de la antigua forma suma de montos
-                while ($dtgastos = $this->dbp->fetch($detalle_gastos)) {
-                    $monto = $monto + $dtgastos['monto'];
-                 }
-                 $montoPromedio = $montoPromedio + ($monto/12);
-            }else{
-                $dgg = $this->dbp->query("SELECT * FROM detalle_gasto_general
-            WHERE gastos_generales_idgastos_generales ='$gastos_generales[idgastos_generales]';");
-             $det_ggenral = $dgg->fetch_assoc();
-            // $totalRegistros = $det_ggenral['total']; 
-                // if($det_ggenral['tipo'] == 1){ // mensual
-                //     $aaa = $det_ggenral['monto']/()
-                // }
-                // else{ // anual
+                  $det_ggenral = $detalle_gastos->fetch_assoc();
+                  if($det_ggenral['tipo'] == 1){ //MENSUAL
+                    $montoPromedio = $montoPromedio + $det_ggenral['monto'];
 
-                // }
-
+                  }else{// ANUAL --> tipo = 0
+                    $montoPromedio = $montoPromedio + ($det_ggenral['monto']/12);
+                  }
+                // while ($dtgastos = $this->dbp->fetch($detalle_gastos)) {
+                //     $monto = $monto + $dtgastos['monto'];
+                //  }
+                //  $montoPromedio = $montoPromedio + ($monto/12);
+            }else{ 
+               // NO EXISTE DETALLE GASTOS GENERAL     
             }
             
             }

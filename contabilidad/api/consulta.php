@@ -8,6 +8,7 @@ require_once "./transacciones_facturas/transFactura_pagar.php";
 require_once "./solicitudes/insertar_transaccion.php";
 require_once "./solicitudes/anulacion_transaccion.php";
 require_once "./transacciones_facturas/transacciones.php";
+require_once "./recibos/cuentaspof.php";
 
 $ver=explode("/",$_GET['ver']); //dividiendo los "/"  ver[0],ver[1],ver[x] listafacturaapi_cobrado
 if($ver[0]=="verificacion"){
@@ -322,7 +323,7 @@ $cont->lista_cobrar_cobrado_factura($ver[1]);
     $cont=new Contabilidad();
     $cont->listar_recibo_pago_por_id($ver[1]);
 }elseif($ver[0]=="listar_cajas_bancos_por_recibo"){
-    $cont=new Contabilidad();
+    $cont=new Cuentaspof();
     $cont->listar_cajas_bancos_por_recibo($ver[1]);
 }
 //listafactura eliminartransaccion eliminardetalletransaccion listapagos_individuales listatransaciones factura

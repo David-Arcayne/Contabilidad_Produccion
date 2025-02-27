@@ -503,10 +503,10 @@ $totalHaber = 0;
         $lista=[];
         $ide=$this->getidempresa($empresa);
         $gestion=$this->getidgestion($empresa);
-        $reporte=$this->dbc->query("select p.numero,p.nombreplan,SUM(d.debe) as debe,SUM(d.haber) as haber,SUM(debe)-SUM(haber) as deudor,SUM(haber)-SUM(debe) as acreedor from plandecuenta as p
-        INNER JOIN transacciones as t ON t.organizacion_idorganizacion='$ide'
-        INNER JOIN detalletransaccion as d ON d.idplandecuenta=p.idplandecuenta and t.idtransacciones=d.transacciones_idtransacciones
-        WHERE p.organizacion_idorganizacion='$ide' and t.fechatransaccion<='$fechaf' and p.numero<'4.0.0.00.00' and t.idgestion='$gestion'  
+        $reporte=$this->dbc->query("SELECT p.numero,p.nombreplan,SUM(d.debe) AS debe,SUM(d.haber) as haber,SUM(debe)-SUM(haber) as deudor,SUM(haber)-SUM(debe) as acreedor from plandecuenta as p
+        INNER JOIN transacciones AS t ON t.organizacion_idorganizacion='$ide'
+        INNER JOIN detalletransaccion AS d ON d.idplandecuenta=p.idplandecuenta AND t.idtransacciones=d.transacciones_idtransacciones
+        WHERE p.organizacion_idorganizacion='$ide' AND t.fechatransaccion<='$fechaf' AND p.numero<'4.0.0.00.00' and t.idgestion='$gestion'  
         GROUP by p.nombreplan 
         ORDER by p.numero ASC;");
         $totalDebe = 0;
