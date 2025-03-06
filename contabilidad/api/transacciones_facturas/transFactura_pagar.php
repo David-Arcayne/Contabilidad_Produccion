@@ -147,6 +147,7 @@ class TransFactura_pagar extends DB{
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
     
+        $caja_bancos = json_decode($idcaja_bancos, true);
         $facturas = json_decode($data, true);
         // echo json_encode(array($fecha,$nrecibo,$persona,$ci,$monto,$idasientotipo,$empresa,$sucursal,$archivo,$facturas));
         $ide = $this->getidempresa($empresa);
@@ -202,13 +203,14 @@ $nroTransaccion = $resultado12['codigotransaccion'] + 1;
 // --------------------------------------------------------------------------------------------------------
 
 if(empty($archivo['name'])){
-    $registropago = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,idcaja_bancos,archivo)
-    VALUES(NULL,'$nrecibo','$fecha','varios clientes','$persona','$ci','$monto','0','$idtrans','0','$idcaja_bancos',NULL)");
+    $registropago = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,archivo)
+    VALUES(NULL,'$nrecibo','$fecha','varios clientes','$persona','$ci','$monto','0','$idtrans','0',NULL)");
 
 // $registropago = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta)
 // VALUES('$nrecibo','$fecha','varios clientes','$persona','$ci','$monto','0','$idtrans','0')");
 
 if ($registropago === TRUE) {
+    $idcuentasPor = $this->dbc->insert_id;
     $res = array("success", "Registro Realizado", "registropagarfacturaGrupal");
 } else {
     $res = array("danger", "No se pudo realizar el registro");
@@ -230,8 +232,8 @@ if ($archivo['error'] == UPLOAD_ERR_OK) {
 }
 if(move_uploaded_file($archivo_tmp, $ruta_destino)){
      //registrar pago, preguntar guardar la anterior transaccion o la nueva
-     $registropago2 = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,idcaja_bancos,archivo)
-    VALUES(NULL,'$nrecibo','$fecha','varios clientes','$persona','$ci','$monto','0','$idtrans','0','$idcaja_bancos','$unique_name')");
+     $registropago2 = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,archivo)
+    VALUES(NULL,'$nrecibo','$fecha','varios clientes','$persona','$ci','$monto','0','$idtrans','0','$unique_name')");
 
 if ($registropago2 === TRUE) {
     $res = array("success", "Registro Realizado", "registropagarfacturaGrupal");
@@ -263,7 +265,10 @@ foreach($facturas as $factura){
     // $montoFacturas += $factura['monto'];
     // $updatetranscodigo = $this->dbc->query("UPDATE factura SET transacciones_idtransacciones = '$idtrans' WHERE idfactura = '{$factura['idfactura']}'");
 }
-
+foreach($caja_bancos as $cajaBanco){
+    $registropago3 = $this->dbc->query("INSERT INTO detalle_caja_bancos_pagar(idcaja_bancos,monto,idcuentaspor,idfactura)
+    VALUES('$cajaBanco[id]','$cajaBanco[monto]','$idcuentasPor','$cajaBanco[idfactura]')");
+}
 if ($registrarTabla === TRUE) {
     $res = array("success", "Registro Realizado", "registropagarfacturaGrupal");
 } else {
