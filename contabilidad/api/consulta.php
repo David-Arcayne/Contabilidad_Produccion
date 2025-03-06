@@ -318,8 +318,8 @@ $cont->lista_cobrar_cobrado_factura($ver[1]);
     $cont=new Plandecuentas();
     $cont->eliminar_caja_bancos($ver[1]);
 }elseif($ver[0]=="listar_recibo_por_id"){
-    $cont=new Contabilidad();
-    $cont->listar_recibo_por_id($ver[1]);
+    $cont=new Cuentaspof();
+    $cont->listar_recibo_por_id($ver[1],$ver[2]);
 }elseif($ver[0]=="listar_recibo_pago_por_id"){
     $cont=new Contabilidad();
     $cont->listar_recibo_pago_por_id($ver[1]);

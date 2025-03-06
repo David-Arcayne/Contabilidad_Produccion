@@ -1565,50 +1565,7 @@ WHERE
         }
         echo json_encode($res);
     } 
-    public function listar_recibo_por_id($idrecibo)
-    {
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
-        $lista = [];
-        
-        $registro = $this->dbc->query("SELECT * FROM cuentaspof WHERE idcuentaspof = '$idrecibo'");
-
-while ($qwe = $this->dbc->fetch($registro)) {
-    $caja_banco = $this->dbc->query("SELECT * FROM detalle_caja_bancos_cobrar WHERE idcuentaspof = '$qwe[idcuentaspof]'");
-    
-    if ($caja_banco->num_rows > 0) {
-        while ($datos_caja = $this->dbc->fetch($caja_banco)) {
-            $caja= $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '$datos_caja[idcaja_bancos]'");
-            $datos = $caja->fetch_assoc();
-            $res = array(
-                "nrecibo" => $qwe['nrecibo'],
-                "fecha" => $qwe['fecha'],
-                "persona" => $qwe['persona'],
-                "monto_recibo" => $qwe[6],
-                "idcaja_bancos" => $datos['idcaja_bancos'],
-                "codigo" => $datos['codigo'],
-                "nombre" => $datos['tipo_cuenta'],
-                "monto" => $datos_caja['monto']
-            );
-            array_push($lista, $res);
-        }
-    } else {
-        $res = array(
-            "nrecibo" => $qwe['nrecibo'],
-            "fecha" => $qwe['fecha'],
-            "monto" => $qwe['monto'],
-            "persona" => $qwe['persona'],
-            // "idcaja_bancos" => $qwe['idcaja_bancos'],
-            // "codigo" => NULL,
-            // "nombre" => NULL
-        );
-        array_push($lista, $res);
-    }
-}
-
-        echo json_encode($lista);
-    }
+   
     public function listar_recibo_pago_por_id($idrecibo)
     {
         ini_set('display_errors', 1);
@@ -1631,42 +1588,6 @@ while ($qwe = $this->dbc->fetch($registro)) {
             // $nroTransaccion = $resultado12['codigotransaccion'] + 1;
             array_push($lista, $res);
         }
-        echo json_encode($lista);
-    }
-    public function listar_cajas_bancos_por_recibo($idrecibo){
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
-        $lista = [];
-        
-        // $registro = $this->dbc->query("SELECT * FROM cuentaspof WHERE idcuentaspof = '$idrecibo'");
-
-    $caja_banco = $this->dbc->query("SELECT * FROM detalle_caja_bancos_cobrar WHERE idcuentaspof = '$idrecibo'");
-    
-    if ($caja_banco->num_rows > 0) {
-        while ($datos_caja = $this->dbc->fetch($caja_banco)) {
-            $caja= $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '$datos_caja[idcaja_bancos]'");
-            $datos = $caja->fetch_assoc();
-            $res = array(
-                "iddetalle_caja_bancos_cobrar" => $datos_caja['iddetalle_caja_bancos_cobrar'],
-                "idcaja_bancos" => $datos['idcaja_bancos'],
-                "tipo_cuenta" => $datos['tipo_cuenta'],
-                "monto" => $datos_caja['monto']
-            );
-            array_push($lista, $res);
-        }
-    } else {
-        // $res = array(
-        //     "nrecibo" => $qwe['nrecibo'],
-        //     "fecha" => $qwe['fecha'],
-        //     "monto" => $qwe['monto'],
-        //     "persona" => $qwe['persona'],
-        //     "idcaja_bancos" => $qwe['idcaja_bancos'],
-        //     "codigo" => NULL,
-        //     "nombre" => NULL
-        // );
-        // array_push($lista, $res);
-    }
         echo json_encode($lista);
     }
      

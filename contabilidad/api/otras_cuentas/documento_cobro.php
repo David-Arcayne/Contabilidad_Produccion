@@ -1,10 +1,11 @@
 <?php
 require_once "../../db/db.php";
 class Documento_cobro extends DB{
-    public function registrar_otras_cuentas($fecha,$lugar,$cliente,$nro_tributario,$contacto,$nro_doc_identidad,$idtipo,$condiciones,$observaciones,$precio,$forma_pago,$empresa){
+    public function registrar_otras_cuentas($fecha,$lugar,$cliente,$nro_tributario,$contacto,$nro_doc_identidad,$idtipo,$concepto,$condiciones,$observaciones,$precio,$forma_pago,$empresa){
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
+        // echo json_encode(array($fecha,$lugar,$cliente,$nro_tributario,$contacto,$nro_doc_identidad,$idtipo,$condiciones,$observaciones,$precio,$forma_pago,$empresa));
         $idempresa = $this->getidempresa($empresa);
         $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM otras_cuentas WHERE idempresa = '$idempresa'");
         $resultado = $consulta->fetch_assoc();
@@ -15,8 +16,8 @@ class Documento_cobro extends DB{
         } else {
             // Insertar el nuevo registro
         
-            $registroProveedor = $this->dbc->query("INSERT INTO otras_cuentas(fecha,lugar,cliente,nro_tributario,contacto,nro_doc_identidad,idtipo,condiciones,observaciones,precio,forma_pago) 
-            VALUES ('$fecha','$nro_otras_cuentas','$lugar','$cliente','$nro_tributario','$contacto','$nro_doc_identidad','$idtipo','$condiciones','$observaciones','$precio','$forma_pago')");
+            $registroProveedor = $this->dbc->query("INSERT INTO otras_cuentas(fecha,nro_otras_cuentas,lugar,cliente,nro_tributario,contacto,nro_doc_identidad,idtipo,concepto,condiciones,observaciones,precio,forma_pago,idempresa) 
+            VALUES ('$fecha','$nro_otras_cuentas','$lugar','$cliente','$nro_tributario','$contacto','$nro_doc_identidad','$idtipo','$concepto','$condiciones','$observaciones','$precio','$forma_pago','$idempresa')");
             if ($registroProveedor === TRUE) {                                                                                                                                                                
                 $res = array("success", "Registro exitoso","registroCaracteristicas");
             } else {
@@ -32,8 +33,10 @@ class Documento_cobro extends DB{
     
         // Preparar la consulta
         $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idempresa = '$idempresa' ORDER BY idotras_cuentas DESC");
-    
+
         while ($qwe = $this->dbc->fetch($getPedido)) {
+            $getTipo = $this->dbc->query("SELECT nombre FROM tipo WHERE idtipo = '$qwe[idtipo]'");
+            $resultado2 = $getTipo->fetch_assoc();
             $res = array(
                 "idotras_cuentas" => $qwe['idotras_cuentas'],
                 "fecha" => $qwe['fecha'],
@@ -44,6 +47,8 @@ class Documento_cobro extends DB{
                 "contacto" => $qwe['contacto'],
                 "nro_doc_identidad" => $qwe['nro_doc_identidad'],
                 "idtipo" => $qwe['idtipo'],
+                "concepto" => $qwe['concepto'],
+                "nombre_tipo" => $resultado2['nombre'],
                 "condiciones" => $qwe['condiciones'],
                 "observaciones" => $qwe['observaciones'],
                 "precio" => $qwe['precio'],
@@ -54,7 +59,7 @@ class Documento_cobro extends DB{
     
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
-    public function editar_otras_cuentas($idotras_cuentas,$fecha,$lugar,$cliente,$nro_tributario,$contacto,$nro_doc_identidad,$idtipo,$condiciones,$observaciones,$precio,$forma_pago) {
+    public function editar_otras_cuentas($idotras_cuentas,$fecha,$lugar,$cliente,$nro_tributario,$contacto,$nro_doc_identidad,$idtipo,$concepto,$condiciones,$observaciones,$precio,$forma_pago) {
         // $idempresa = $this->getidempresa($empresa);
 
         // $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM caracteristicas WHERE caracteristica = '$nombre' AND empresa_idempresa = '$idempresa' AND idcaracteristicas != '$id'");
@@ -73,6 +78,7 @@ class Documento_cobro extends DB{
                                     contacto = '$contacto',
                                     nro_doc_identidad = '$nro_doc_identidad',
                                     idtipo = '$idtipo',
+                                    concepto = '$concepto',
                                     condiciones = '$condiciones',
                                     observaciones = '$observaciones',
                                     precio = '$precio',
