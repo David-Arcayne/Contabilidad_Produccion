@@ -134,11 +134,11 @@ class Transacciones_facturas extends DB{
     }
 
     // public function registrocobrarfactura($idfactura, $idtransaccion, $idcuenta, $fecha, $nrecibo, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa)
-    public function registrocobrarfacturaGrupal($fecha,$nrecibo,$persona,$ci,$monto,$idtransaccion,$idcaja_bancos,$idasientotipo,$idempresa,$idsucursal,$archivo,$data)
+    public function registrocobrarfacturaGrupal($fecha,$persona,$ci,$monto,$idtransaccion,$idcaja_bancos,$idasientotipo,$idempresa,$idsucursal,$archivo,$data)
     {
-    
+    $caja_bancos = json_decode($idcaja_bancos, true);
         $facturas = json_decode($data, true);
-        //  echo json_encode(array("success","hola",$fecha,$nrecibo,$persona,$ci,$monto,$idasientotipo,$idempresa,$idsucursal,$archivo,$facturas));
+    // echo json_encode(array("success","hola",$fecha,$nrecibo,$persona,$ci,$monto,$caja_bancos,$idasientotipo,$idempresa,$idsucursal,$archivo,$facturas));
 //---------------------------------------------------------------------------------------
 
         ini_set('display_errors', 1);
@@ -149,6 +149,10 @@ class Transacciones_facturas extends DB{
         $sucursal = $this->getidsucursal($idsucursal); 
         $gestion = $this->getgestionactualid($ide);
         
+        $count = $this->dbc->query("SELECT COUNT(*) AS canti_total FROM cuentaspof cp
+        INNER JOIN transacciones t ON t.idtransacciones = cp.transaccion WHERE t.organizacion_idorganizacion='$ide'");
+        $hh = $this->dbc->fetch($count);
+        $nrecibo = $hh['canti_total'];
 // Obtener el número de transacción más reciente y sumar 1  emp
 $nroTrans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE organizacion_idorganizacion=$ide AND idgestion='$gestion' ORDER BY codigotransaccion DESC LIMIT 1;");
 $resultado12 = $nroTrans->fetch_assoc();
@@ -203,9 +207,21 @@ $nroTransaccion = $resultado12['codigotransaccion'] + 1;
 
 //-------------------------------------------------------------------------------------------------
         if(empty($archivo['name'])){
-            $registropago = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,idcaja_bancos,archivo)
-            VALUES(NULL,'$nrecibo','$fecha','varios clientes','$persona','$ci','$monto','0','$idtrans','0','$idcaja_bancos',NULL)");
+            $registropago = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,archivo)
+            VALUES(NULL,'$nrecibo','$fecha','varios clientes','$persona','$ci','$monto','0','$idtrans','0',NULL)");
 
+        if ($registropago === TRUE) {
+
+            $idcuentaspof = $this->dbc->insert_id;
+            // foreach($caja_bancos as $cajaBanco){
+            //     $registropago3 = $this->dbc->query("INSERT INTO detalle_caja_bancos_cobrar(idcaja_bancos,monto,idcuentaspof,idfactura)
+            //     VALUES('$cajaBanco[id]','$cajaBanco[monto]','$idcuentaspof','$cajaBanco[idfactura]')");
+            // }
+
+            $res = array("success", "Registro Realizado", "registrocobrarfactura");
+        } else {
+            $res = array("danger", "No se pudo realizar el registrooo",$nrecibo,$fecha,$idcliente,$persona,$ci,$monto,$idfactura,$trans,$idcuenta);
+        }
 // $registropago = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta)
 // VALUES('$nrecibo','$fecha','varios clientes','$persona','$ci','$monto','0','$idtrans','0')");
 
@@ -235,6 +251,7 @@ $nroTransaccion = $resultado12['codigotransaccion'] + 1;
             VALUES(NULL,'$nrecibo','$fecha','varios clientes','$persona','$ci','$monto','0','$idtrans','0','$idcaja_bancos','$unique_name')");
 
         if ($registropago2 === TRUE) {
+            $idcuentaspof = $this->dbc->insert_id;
             $res = array("success", "Registro Realizado", "registrocobrarfactura");
         } else {
             $res = array("danger", "No se pudo realizar el registro");
@@ -248,23 +265,25 @@ $nroTransaccion = $resultado12['codigotransaccion'] + 1;
         // $registropago = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta)VALUES('$nrecibo','$fecha','varios clientes','$persona','$ci','$monto','0','$idtrans','0')");
         // Obtener el ID del registro recién insertado
 
-        $idcuentasPof = $this->dbc->insert_id;
         foreach($facturas as $factura){
 
             $cobras = $this->dbc->query("SELECT SUM(monto) AS montoSuma FROM cuentaspof WHERE idfactura='$factura[idfactura]'"); //173
             // $asd = $this->dbc->fetch($cobras);
             $asd = $cobras->fetch_assoc();
             if($asd['montoSuma'] == NULL){
-                $registrarTabla = $this->dbc->query("INSERT INTO cuentascobrar_grupal(idcuentaspof,idfactura,monto)VALUES('$idcuentasPof','$factura[idfactura]','$factura[monto]')");
+                $registrarTabla = $this->dbc->query("INSERT INTO cuentascobrar_grupal(idcuentaspof,idfactura,monto)VALUES('$idcuentaspof','$factura[idfactura]','$factura[monto]')");
             }else{
                 $montoSuma = $asd['montoSuma'];
                 $montoCobrado = $factura['monto'] - $montoSuma;
-                $registrarTabla = $this->dbc->query("INSERT INTO cuentascobrar_grupal(idcuentaspof,idfactura,monto)VALUES('$idcuentasPof','$factura[idfactura]','$montoCobrado')");
+                $registrarTabla = $this->dbc->query("INSERT INTO cuentascobrar_grupal(idcuentaspof,idfactura,monto)VALUES('$idcuentaspof','$factura[idfactura]','$montoCobrado')");
             }
             // $montoFacturas += $factura['monto'];
             // $updatetranscodigo = $this->dbc->query("UPDATE factura SET transacciones_idtransacciones = '$idtrans' WHERE idfactura = '{$factura['idfactura']}'");
         }
-       
+        foreach($caja_bancos as $cajaBanco){
+            $registropago3 = $this->dbc->query("INSERT INTO detalle_caja_bancos_cobrar(idcaja_bancos,monto,idcuentaspof,idfactura)
+            VALUES('$cajaBanco[id]','$cajaBanco[monto]','$idcuentaspof','$cajaBanco[idfactura]')");
+        }
         if ($registrarTabla === TRUE) {
             $res = array("success", "Registro Realizado", "registrocobrarfacturaGrupal");
         } else {

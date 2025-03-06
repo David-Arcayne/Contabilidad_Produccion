@@ -27,7 +27,7 @@ class Contabilidad extends DB
         $codigo = date("Ymd") . rand(100, 1000);
         
         try {
-            // Inicialización de la variable de éxito de inserción y de datos
+            // Inicialización de la variable de éxito de inserción y de datos registrogestion
             $insertSuccess = true;
             $datos = [];
     
@@ -1763,6 +1763,46 @@ while ($qwe = $this->dbc->fetch($registro)) {
         echo json_encode($lista);
     }
      
+    public function registroCaracteristicas($nombre,$tipo,$minimo,$maximo,$empresa){
+        $idempresa = $this->getidempresa($empresa);
+        $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM caracteristicas WHERE caracteristica = '$nombre' AND empresa_idempresa = '$idempresa'");
+        $resultado = $consulta->fetch_assoc();
+        $totalRegistros = $resultado['total'];
+
+        if ($totalRegistros > 0) {
+            $res = array("Error", "El registro ya existe","Error");
+        } else {
+            // Insertar el nuevo registro
+            $registroProveedor = $this->dbc->query("INSERT INTO caracteristicas(caracteristica,tipo,minimo,maximo,empresa_idempresa) VALUES ('$nombre','$tipo','$minimo','$maximo','$idempresa')");
+            if ($registroProveedor === TRUE) {                                                                                                                                                                
+                $res = array("success", "Registro exitoso","registroCaracteristicas");
+            } else {
+                $res = array("danger", "No se pudo registrar",$nombre);
+            }
+        }
+        echo json_encode($res);
+        
+    }
+    public function listar_tipo($empresa) {
+        $lista = [];
+        $idempresa = $this->getidempresa($empresa);
+    
+        // Preparar la consulta
+        $getPedido = $this->dbc->query("SELECT * FROM tipo WHERE idempresa = '$idempresa' ORDER BY idtipo DESC");
+    
+        while ($qwe = $this->dbc->fetch($getPedido)) {
+            $res = array(
+                "idcaracteristicas" => $qwe['idcaracteristicas'],
+                "caracteristica" => $qwe['caracteristica'],
+                "tipo" => $qwe['tipo'],
+                "minimo" => $qwe['minimo'],
+                "maximo" => $qwe['maximo']
+            );
+            array_push($lista, $res);
+        }
+    
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
     //listafactura eliminartransaccion  eliminarcliente listafactura_cobrado eliminarproveedor listafactura_pagado registrocobrarfactura
 }//eliminarcobrados listapagos registrardesconsolidar registrotransaccion cambiarestadoconsolidado  registrocobrarfactura 
 //registrardesconsolidar crearfactura listapagos crearfacturasapi lista_cobrar_cobrado_factura registropagarfactura listaclientes
