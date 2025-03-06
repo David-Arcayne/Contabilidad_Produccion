@@ -8,6 +8,7 @@ require_once "./solicitudes/insertar_transaccion.php";
 require_once "./solicitudes/anulacion_transaccion.php";
 require_once "./transacciones_facturas/transacciones.php";
 require_once "./recibos/cuentaspof.php";
+require_once "./otras_cuentas/documento_cobro.php";
 
 $ver=$_POST['ver'];
 $json = file_get_contents('php://input'); // Decodificar el JSON en un arreglo PHP  
@@ -267,7 +268,39 @@ if($data['ver'] == "cobrofacturasaasientomodelo") {
     else{
         echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idrecibo'],$_POST['cajasBancos']));
     }
+}elseif($ver == "registrar_tipo"){
+    if(isset($_POST['nombre'],$_POST['descripcion'],$_POST['empresa'])){
+        // decode echo json_encode(array("danger", "Faltan parámetros en la solicitud", $_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$facturas));
+        $cont=new Contabilidad();
+        $cont->registrar_tipo($_POST['nombre'],$_POST['descripcion'],$_POST['empresa']);
+    }
+    else{
+        echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['nombre'],$_POST['descripcion'],$_POST['empresa']));
+    }
 }
+elseif($ver == "registrar_otras_cuentas"){
+
+    if(isset($_POST['fecha'],$_POST['lugar'],$_POST['cliente'],$_POST['nro_tributario'],$_POST['contacto'],$_POST['nro_doc_identidad'],$_POST['idtipo'],$_POST['condiciones'],$_POST['observaciones'],$_POST['precio'],$_POST['forma_pago'],$_POST['empresa'])){
+        // decode echo json_encode(array("danger", "Faltan parámetros en la solicitud", $_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$facturas));
+        $cont=new Documento_cobro();
+        $cont->registrar_otras_cuentas($_POST['fecha'],$_POST['lugar'],$_POST['cliente'],$_POST['nro_tributario'],$_POST['contacto'],$_POST['nro_doc_identidad'],$_POST['idtipo'],$_POST['condiciones'],$_POST['observaciones'],$_POST['precio'],$_POST['forma_pago'],$_POST['empresa']);
+    }
+    else{
+        echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['fecha'],$_POST['lugar'],$_POST['cliente'],$_POST['nro_tributario'],$_POST['contacto'],$_POST['nro_doc_identidad'],$_POST['idtipo'],$_POST['condiciones'],$_POST['observaciones'],$_POST['precio'],$_POST['forma_pago'],$_POST['empresa']));
+    }
+}elseif($ver == "editar_otras_cuentas"){
+
+    if(isset($_POST['idotras_cuentas'],$_POST['fecha'],$_POST['lugar'],$_POST['cliente'],$_POST['nro_tributario'],$_POST['contacto'],$_POST['nro_doc_identidad'],$_POST['idtipo'],$_POST['condiciones'],$_POST['observaciones'],$_POST['precio'],$_POST['forma_pago'])){
+        // decode echo json_encode(array("danger", "Faltan parámetros en la solicitud", $_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$facturas));
+        $cont=new Documento_cobro();
+        $cont->registrar_otras_cuentas($_POST['idotras_cuentas'],$_POST['fecha'],$_POST['lugar'],$_POST['cliente'],$_POST['nro_tributario'],$_POST['contacto'],$_POST['nro_doc_identidad'],$_POST['idtipo'],$_POST['condiciones'],$_POST['observaciones'],$_POST['precio'],$_POST['forma_pago']);
+    }
+    else{
+        echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idotras_cuentas'],$_POST['fecha'],$_POST['lugar'],$_POST['cliente'],$_POST['nro_tributario'],$_POST['contacto'],$_POST['nro_doc_identidad'],$_POST['idtipo'],$_POST['condiciones'],$_POST['observaciones'],$_POST['precio'],$_POST['forma_pago']));
+    }
+}
+
+
 //  registrotransaccion registrotransaccionf5 duplicartransaccion registrocobrarfactura registrocobrarfacturaGrupal factura registrocobrarfactura registrocobrarfacturaGrupal
 }
 ?>

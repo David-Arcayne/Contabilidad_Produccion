@@ -1763,17 +1763,17 @@ while ($qwe = $this->dbc->fetch($registro)) {
         echo json_encode($lista);
     }
      
-    public function registroCaracteristicas($nombre,$tipo,$minimo,$maximo,$empresa){
+    public function registrar_tipo($nombre,$descripcion,$empresa){
         $idempresa = $this->getidempresa($empresa);
-        $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM caracteristicas WHERE caracteristica = '$nombre' AND empresa_idempresa = '$idempresa'");
+        $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM tipo WHERE nombre = '$nombre' AND idempresa = '$idempresa'");
         $resultado = $consulta->fetch_assoc();
         $totalRegistros = $resultado['total'];
 
         if ($totalRegistros > 0) {
-            $res = array("Error", "El registro ya existe","Error");
+            $res = array("danger", "El registro ya existe","danger");
         } else {
             // Insertar el nuevo registro
-            $registroProveedor = $this->dbc->query("INSERT INTO caracteristicas(caracteristica,tipo,minimo,maximo,empresa_idempresa) VALUES ('$nombre','$tipo','$minimo','$maximo','$idempresa')");
+            $registroProveedor = $this->dbc->query("INSERT INTO tipo(nombre,descripcion,idempresa) VALUES ('$nombre','$descripcion','$idempresa')");
             if ($registroProveedor === TRUE) {                                                                                                                                                                
                 $res = array("success", "Registro exitoso","registroCaracteristicas");
             } else {
@@ -1792,11 +1792,10 @@ while ($qwe = $this->dbc->fetch($registro)) {
     
         while ($qwe = $this->dbc->fetch($getPedido)) {
             $res = array(
-                "idcaracteristicas" => $qwe['idcaracteristicas'],
-                "caracteristica" => $qwe['caracteristica'],
-                "tipo" => $qwe['tipo'],
-                "minimo" => $qwe['minimo'],
-                "maximo" => $qwe['maximo']
+                "idtipo" => $qwe['idtipo'],
+                "nombre" => $qwe['nombre'],
+                "descripcion" => $qwe['descripcion'],
+                "idempresa" => $qwe['idempresa']
             );
             array_push($lista, $res);
         }
