@@ -61,14 +61,14 @@ class Cuentaspor extends DB{
 // -------------------------------------------------------------------------------------------
 
     if(empty($archivo['name'])){
-        $registropago = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,idcaja_bancos,archivo)
-        VALUES(NULL,'$nrecibo','$fecha','$idcliente','$persona','$ci','$monto','$idfactura','$trans','$idcuenta','$idcaja_bancos',NULL)");
+        $registropago = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
+        VALUES(NULL,'$nrecibo','$fecha','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$idcuenta',NULL)");
 
     if ($registropago === TRUE) {
         $idcuentaspor = $this->dbc->insert_id;
             foreach($caja_bancos as $cajaBanco){
-                $registropago3 = $this->dbc->query("INSERT INTO detalle_caja_bancos_pagar(idcaja_bancos,monto,idcuentaspor)
-                VALUES('$cajaBanco[id]','$cajaBanco[monto]','$idcuentaspor')");
+                $registropago3 = $this->dbc->query("INSERT INTO detalle_caja_bancos_pagar(idcaja_bancos,monto,idcuentaspor,idfactura,idotras_cuentas)
+                VALUES('$cajaBanco[id]','$cajaBanco[monto]','$idcuentaspor','$idfactura','0')");
             }
         $res = array("success", "Registro Realizado", "registropagarfactura");
     } else {
@@ -91,14 +91,14 @@ class Cuentaspor extends DB{
     }
     if(move_uploaded_file($archivo_tmp, $ruta_destino)){
          //registrar pago, preguntar guardar la anterior transaccion o la nueva
-    $registropago2 = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,idcaja_bancos,archivo)
-    VALUES(NULL,'$nrecibo','$fecha','$idcliente','$persona','$ci','$monto','$idfactura','$trans','$idcuenta','$idcaja_bancos','$unique_name')");
+    $registropago2 = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
+    VALUES(NULL,'$nrecibo','$fecha','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$idcuenta','$unique_name')");
 
     if ($registropago2 === TRUE) {
         $idcuentaspor = $this->dbc->insert_id;
         foreach($caja_bancos as $cajaBanco){
-            $registropago3 = $this->dbc->query("INSERT INTO detalle_caja_bancos_pagar(idcaja_bancos,monto,idcuentaspor)
-            VALUES('$cajaBanco[id]','$cajaBanco[monto]','$idcuentaspor')");
+            $registropago3 = $this->dbc->query("INSERT INTO detalle_caja_bancos_pagar(idcaja_bancos,monto,idcuentaspor,idfactura,idotras_cuentas)
+            VALUES('$cajaBanco[id]','$cajaBanco[monto]','$idcuentaspor','$idfactura','0')");
         }
         $res = array("success", "Registro Realizado", "registropagarfactura");
     } else {
@@ -171,7 +171,7 @@ class Cuentaspor extends DB{
             
         }elseif($caja_banco['iddetalle_caja_bancos_pagar'] == 0){ // SE AGREGARA
 
-                $editar = $this->dbc->query("INSERT INTO detalle_caja_bancos_pagar(idcaja_bancos, monto, idcuentaspof)
+                $editar = $this->dbc->query("INSERT INTO detalle_caja_bancos_pagar(idcaja_bancos, monto, idcuentaspor)
                 VALUES('$caja_banco[idcaja_bancos]','$caja_banco[monto]','$idrecibo')");
 
             }else{ // SE EDITARA

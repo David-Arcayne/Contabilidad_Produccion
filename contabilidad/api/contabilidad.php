@@ -464,12 +464,7 @@ WHERE md5(p.organizacion_idorganizacion)='$ide'");
     public function eliminarcliente($id)
     {
         $res = "";
-        // $registro = $this->dbcm->query("delete from cliente where id_cliente='$cliente'");
-        // if ($registro === TRUE) {
-        //     $res = array("success", "Se elimino");
-        // } else {
-        //     $res = array("danger", "No se pudo eliminar");
-        // }
+   
         $this->dbcm->begin_transaction();
     
         try {
@@ -1566,7 +1561,7 @@ WHERE
         echo json_encode($res);
     } 
    
-    public function listar_recibo_pago_por_id($idrecibo)
+    public function listar_recibo_pago_por_id($idrecibo,$idfactura)
     {
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
@@ -1576,17 +1571,33 @@ WHERE
         $registro = $this->dbc->query("SELECT * FROM cuentaspor WHERE idcuentaspor = '$idrecibo'");
 
         while ($qwe = $this->dbc->fetch($registro)) {
-            $caja_banco = $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '$qwe[idcaja_bancos]'");
-            if($caja_banco->num_rows > 0){
-                $datos_caja = $caja_banco->fetch_assoc();
-                $res = array("nrecibo" => $qwe['nrecibo'],"fecha" => $qwe['fecha'], "monto" => $qwe['monto'], "persona" => $qwe['persona'],"idcaja_bancos" => $datos_caja['idcaja_bancos'], "codigo" => $datos_caja['codigo'], "nombre" => $datos_caja['tipo_cuenta']);
-            }else{
-                $res = array("nrecibo" => $qwe['nrecibo'],"fecha" => $qwe['fecha'], "monto" => $qwe['monto'], "persona" => $qwe['persona'],"idcaja_bancos" => $qwe['idcaja_bancos'], "codigo" => NULL, "nombre" => NULL);
-
-            }
+            $caja_banco = $this->dbc->query("SELECT * FROM detalle_caja_bancos_pagar WHERE idcuentaspor = '$qwe[idcuentaspor]' AND idfactura = '$idfactura'");
             
-            // $nroTransaccion = $resultado12['codigotransaccion'] + 1;
-            array_push($lista, $res);
+            if ($caja_banco->num_rows > 0) {
+                while ($datos_caja = $this->dbc->fetch($caja_banco)) {
+                    $caja= $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '$datos_caja[idcaja_bancos]'");
+                    $datos = $caja->fetch_assoc();
+                    $res = array(
+                        "nrecibo" => $qwe['nrecibo'],
+                        "fecha" => $qwe['fecha'],
+                        "persona" => $qwe['persona'],
+                        "monto_recibo" => $qwe[6],
+                        "idcaja_bancos" => $datos['idcaja_bancos'],
+                        "codigo" => $datos['codigo'],
+                        "nombre" => $datos['tipo_cuenta'],
+                        "monto" => $datos_caja['monto']
+                    );
+                    array_push($lista, $res);
+                }
+            } else {
+                $res = array(
+                    "nrecibo" => $qwe['nrecibo'],
+                    "fecha" => $qwe['fecha'],
+                    "monto" => $qwe['monto'],
+                    "persona" => $qwe['persona'],
+                );
+                array_push($lista, $res);
+            }
         }
         echo json_encode($lista);
     }
@@ -1649,6 +1660,41 @@ WHERE
         }
     
         echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
+    public function eliminar_tipo($id)
+    {
+        $res = "";
+   
+        $this->dbc->begin_transaction();
+    
+        try {
+            $relacionadas = [
+                // 'detalletransaccion' => 'No se puede eliminar porque hay registros en producción',
+                ['tabla' => 'otras_cuentas', 'campo' => 'idtipo', 'mensaje' => 'No se puede eliminar']
+                // ['tabla' => 'asiento', 'campo' => 'idcuenta', 'mensaje' => 'No se puede eliminar'],
+                // ['tabla' => 'vinculacion_cuenta_xcxp ', 'campo' => 'idplandecuenta', 'mensaje' => 'No se puede eliminar'],
+                // ['tabla' => 'relacionip', 'campo' => 'idplandecuenta', 'mensaje' => 'No se puede eliminar']
+            ];
+    
+            foreach ($relacionadas as $relacion) {
+                $query = "SELECT 1 FROM {$relacion['tabla']} WHERE {$relacion['campo']} = $id";
+                $result = $this->dbc->query($query);
+                if ($result->num_rows > 0) {
+                    throw new Exception($relacion['mensaje']);
+                }
+            }
+    // $registro = $this->dbcm->query("DELETE FROM plandecuenta WHERE idplandecuenta='$dato'");
+            $query = "DELETE FROM tipo WHERE idtipo='$id'";
+            $this->dbc->query($query);
+            
+            $this->dbc->commit();
+            $res = array("success", "Se eliminó correctamente", "eliminarcliente");
+    
+        } catch (Exception $e) {
+            $this->dbc->rollback();
+            $res = array("danger", $e->getMessage(), "eliminarcliente");
+        }
+        echo json_encode($res);
     }
     //listafactura eliminartransaccion  eliminarcliente listafactura_cobrado eliminarproveedor listafactura_pagado registrocobrarfactura
 }//eliminarcobrados listapagos registrardesconsolidar registrotransaccion cambiarestadoconsolidado  registropagarfactura 

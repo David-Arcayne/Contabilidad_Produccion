@@ -140,7 +140,7 @@ class TransFactura_pagar extends DB{
     }
 
     // public function registrocobrarfactura($idfactura, $idtransaccion, $idcuenta, $fecha, $nrecibo, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa)
-    public function registropagarfacturaGrupal($fecha,$nrecibo,$persona,$ci,$monto,$idasientotipo,$idcaja_bancos,$empresa,$sucursal,$archivo,$data)
+    public function registropagarfacturaGrupal($fecha,$persona,$ci,$monto,$idasientotipo,$idcaja_bancos,$empresa,$sucursal,$archivo,$data)
     {
         // echo json_encode($data);
         ini_set('display_errors', 1);
@@ -159,6 +159,10 @@ $nroTrans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE
 $resultado12 = $nroTrans->fetch_assoc();
 $nroTransaccion = $resultado12['codigotransaccion'] + 1;
 
+$count = $this->dbc->query("SELECT COUNT(*) AS canti_total FROM cuentaspof cp
+INNER JOIN transacciones t ON t.idtransacciones = cp.transaccion WHERE t.organizacion_idorganizacion='$ide'");
+$hh = $this->dbc->fetch($count);
+$nrecibo = $hh['canti_total'];
         $res = "";
         $glosa = "Registro cobro $nrecibo";
         // $gestion = $this->getgestionactualid($ide);
