@@ -118,13 +118,13 @@ class Cuentaspof extends DB{
         echo json_encode($res);
     }
 
-    public function registrocobrarfacturaf5($idrecibo,$fecha, $nrecibo, $persona, $ci,$archivo)
+    public function registrocobrarfacturaf5($idrecibo,$fecha, $nrecibo, $persona, $ci, $lugar,$archivo)
     {
         $res = "";
 
         if(empty($archivo['name'])){
 
-            $update = $this->dbc->query("UPDATE cuentaspof SET nrecibo='$nrecibo',fecha='$fecha',persona='$persona',ci='$ci' WHERE idcuentaspof='$idrecibo'");
+            $update = $this->dbc->query("UPDATE cuentaspof SET nrecibo='$nrecibo',fecha='$fecha',persona='$persona',ci='$ci',lugar='$lugar' WHERE idcuentaspof='$idrecibo'");
 
             if ($update === TRUE) {
                 $res = array("success", "Registro Realizado", "registrocobrarfactura",$idrecibo,$fecha, $nrecibo, $persona, $ci,$archivo);

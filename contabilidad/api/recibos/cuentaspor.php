@@ -155,14 +155,14 @@ class Cuentaspor extends DB{
         echo json_encode($res);
     }
 
-    public function editar_caja_bancos_pagar_recibo($idrecibo,$cajasBancos) {
+    public function editar_caja_bancos_pagar_recibo($idrecibo,$cajasBancos,$idfactura,$idotras_cuentas) {
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
 
         $caja_bancos = json_decode($cajasBancos, true);
         // echo json_encode(array($idrecibo,$caja_bancos,$cajasBancos));
-        
+        if($idfactura == 0){
         foreach($caja_bancos as $caja_banco){
             if($caja_banco['iddetalle_caja_bancos_pagar'] < 0){// SE ELIMINA
 
@@ -171,8 +171,8 @@ class Cuentaspor extends DB{
             
         }elseif($caja_banco['iddetalle_caja_bancos_pagar'] == 0){ // SE AGREGARA
 
-                $editar = $this->dbc->query("INSERT INTO detalle_caja_bancos_pagar(idcaja_bancos, monto, idcuentaspor)
-                VALUES('$caja_banco[idcaja_bancos]','$caja_banco[monto]','$idrecibo')");
+                $editar = $this->dbc->query("INSERT INTO detalle_caja_bancos_pagar(idcaja_bancos, monto, idcuentaspor,idfactura,idotras_cuentas)
+                VALUES('$caja_banco[idcaja_bancos]','$caja_banco[monto]','$idrecibo','0','$idotras_cuentas')");
 
             }else{ // SE EDITARA
                 $select_cajaBanco = $this->dbc->query("SELECT tipo_cuenta FROM caja_bancos WHERE idcaja_bancos = '$caja_banco[idcaja_bancos]'");
@@ -185,6 +185,30 @@ class Cuentaspor extends DB{
                 WHERE iddetalle_caja_bancos_pagar = '$caja_banco[iddetalle_caja_bancos_pagar]';");
             }
         }
+    }else{
+        foreach($caja_bancos as $caja_banco){
+            if($caja_banco['iddetalle_caja_bancos_pagar'] < 0){// SE ELIMINA
+
+                $iddtCajaBanco = $caja_banco['iddetalle_caja_bancos_pagar'] * (-1);
+                $editar = $this->dbc->query("DELETE FROM detalle_caja_bancos_pagar WHERE iddetalle_caja_bancos_pagar = '$iddtCajaBanco'");
+            
+        }elseif($caja_banco['iddetalle_caja_bancos_pagar'] == 0){ // SE AGREGARA
+
+                $editar = $this->dbc->query("INSERT INTO detalle_caja_bancos_pagar(idcaja_bancos, monto, idcuentaspor,idfactura,idotras_cuentas)
+                VALUES('$caja_banco[idcaja_bancos]','$caja_banco[monto]','$idrecibo','$idfactura','0')");
+
+            }else{ // SE EDITARA
+                $select_cajaBanco = $this->dbc->query("SELECT tipo_cuenta FROM caja_bancos WHERE idcaja_bancos = '$caja_banco[idcaja_bancos]'");
+                $tipoCuenta = $select_cajaBanco->fetch_assoc();
+
+                $editar = $this->dbc->query("UPDATE detalle_caja_bancos_pagar
+                SET monto = '$caja_banco[monto]',
+                idcaja_bancos = '$caja_banco[idcaja_bancos]'
+                -- tipo = '$tipoCuenta[tipo_cuenta]'
+                WHERE iddetalle_caja_bancos_pagar = '$caja_banco[iddetalle_caja_bancos_pagar]';");
+            }
+        }
+    }
         if($editar == TRUE){
             $res = array("success", "Edicion Realizada", "editar_caja_bancos_recibo");
         }else{
