@@ -343,6 +343,9 @@ $cont->lista_cobrar_cobrado_factura($ver[1]);
 }elseif($ver[0]=="listar_recibo_otras_cuentas"){
     $cont=new Recibo_otras_cuentas();
     $cont->listar_recibo_otras_cuentas($ver[1]);
+}elseif($ver[0]=="listar_recibo_por_id_otras_cuentas"){
+    $cont=new Documento_cobro();
+    $cont->listar_recibo_por_id_otras_cuentas($ver[1],$ver[2]);
 }
 
 //listafactura eliminartransaccion listapagos_individuales listatransaciones factura lista_cobrar_cobrado
