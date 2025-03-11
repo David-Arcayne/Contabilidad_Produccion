@@ -11,6 +11,7 @@ require_once "./transacciones_facturas/transacciones.php";
 require_once "./recibos/cuentaspof.php";
 require_once "./recibos/cuentaspor.php";
 require_once "./otras_cuentas/documento_cobro.php";
+require_once "./otras_cuentas/recibo_otras_cuentas.php";
 
 $ver=explode("/",$_GET['ver']); //dividiendo los "/"  ver[0],ver[1],ver[x] listafacturaapi_cobrado
 if($ver[0]=="verificacion"){
@@ -339,6 +340,9 @@ $cont->lista_cobrar_cobrado_factura($ver[1]);
 }elseif($ver[0]=="listar_cajas_bancos_pagar_por_recibo"){
     $cont=new Cuentaspor();
     $cont->listar_cajas_bancos_pagar_por_recibo($ver[1]);
+}elseif($ver[0]=="listar_recibo_otras_cuentas"){
+    $cont=new Recibo_otras_cuentas();
+    $cont->listar_recibo_otras_cuentas($ver[1]);
 }
 
 //listafactura eliminartransaccion listapagos_individuales listatransaciones factura lista_cobrar_cobrado

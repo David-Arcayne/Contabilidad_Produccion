@@ -2,7 +2,7 @@
 require_once "../../db/db.php";
 class Cuentaspof extends DB{
 
-    public function registrocobrarfactura($idfactura, $idtransaccion,$idcaja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$archivo)
+    public function registrocobrarfactura($idfactura,$lugar, $idtransaccion,$idcaja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$archivo)
     {
         // echo json_encode(array($idfactura, $idtransaccion,$caja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$archivo));
 
@@ -63,8 +63,8 @@ class Cuentaspof extends DB{
         //------------------------------------------------------------------------------------
 
         if(empty($archivo['name'])){
-            $registropago = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
-            VALUES(NULL,'$nrecibo','$fecha','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$idcuenta',NULL)");
+            $registropago = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
+            VALUES(NULL,'$nrecibo','$fecha','$lugar','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$idcuenta',NULL)");
 
         if ($registropago === TRUE) {
 
@@ -95,8 +95,8 @@ class Cuentaspof extends DB{
         }
         if(move_uploaded_file($archivo_tmp, $ruta_destino)){
              //registrar pago, preguntar guardar la anterior transaccion o la nueva
-        $registropago2 = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
-        VALUES(NULL,'$nrecibo','$fecha','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$idcuenta','$unique_name')");
+        $registropago2 = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
+        VALUES(NULL,'$nrecibo','$fecha','$lugar','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$idcuenta','$unique_name')");
 
         
         if ($registropago2 === TRUE) {

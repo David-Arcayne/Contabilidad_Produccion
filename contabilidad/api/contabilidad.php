@@ -1246,29 +1246,29 @@ WHERE
         if($hayIndividuales > 0){
             if($hayGrupales > 0){
                 // hay grupales e individuales
-                        $mostrarIndi = $this->dbc->query(" SELECT nrecibo,fecha,persona,ci,monto,idcuentaspof,transaccion,archivo 
+                        $mostrarIndi = $this->dbc->query("SELECT nrecibo,fecha,persona,ci,monto,idcuentaspof,transaccion,archivo,lugar 
                         FROM cuentaspof WHERE idfactura = '$idfactura'");
     
                         while ($zxc = $this->dbc->fetch($mostrarIndi)) {
-                            $res = array("recibo" => $zxc[0], "fecha" => $zxc[1], "persona" => $zxc[2], "ci" => $zxc[3], "monto" => $zxc[4], "id" => $zxc[5],"transaccion" => $zxc[6],"nombre_archivo" => $zxc[7],"nit" => $cl['nit'],"direccion" => $cl['direccion']);
+                            $res = array("recibo" => $zxc[0], "fecha" => $zxc[1], "persona" => $zxc[2], "ci" => $zxc[3], "monto" => $zxc[4], "id" => $zxc[5],"transaccion" => $zxc[6],"nombre_archivo" => $zxc[7],"lugar" => $zxc[8],"nit" => $cl['nit'],"direccion" => $cl['direccion']);
                             array_push($lista, $res);
                         }
     
                 $listaGrup2 = $this->dbc->query("SELECT * FROM cuentascobrar_grupal WHERE idfactura='$idfactura'");
                 $resultado33 = $listaGrup2->fetch_assoc();
                 $idrecibo2 = $resultado33['idcuentaspof'];
-                $datosRecibo2 = $this->dbc->query("SELECT nrecibo,fecha,persona,ci,monto,idcuentaspof,transaccion,archivo FROM cuentaspof WHERE idcuentaspof='$idrecibo2'");
+                $datosRecibo2 = $this->dbc->query("SELECT nrecibo,fecha,persona,ci,monto,idcuentaspof,transaccion,archivo,lugar FROM cuentaspof WHERE idcuentaspof='$idrecibo2'");
                 
                 while ($www = $this->dbc->fetch($datosRecibo2)) {
-                    $res2 = array("recibo" => $www[0], "fecha" => $www[1], "persona" => $www[2], "ci" => $www[3], "monto" => $resultado33['monto'], "id" => $www[5],"transaccion" => $www[6],"nombre_archivo" => $www[7],"nit" => $cl['nit'],"direccion" => $cl['direccion']);
+                    $res2 = array("recibo" => $www[0], "fecha" => $www[1], "persona" => $www[2], "ci" => $www[3], "monto" => $resultado33['monto'], "id" => $www[5],"transaccion" => $www[6],"nombre_archivo" => $www[7],"lugar" => $www[8],"nit" => $cl['nit'],"direccion" => $cl['direccion']);
                     array_push($lista, $res2);
                 }
     
             }else{
                 //SOLO HAY INDIVIDUALES
-                $registro = $this->dbc->query("SELECT c.idcuentaspof,c.nrecibo,c.fecha,c.monto,c.persona,c.ci,c.transaccion,c.archivo FROM cuentaspof as c WHERE c.idfactura='$idfactura'");
+                $registro = $this->dbc->query("SELECT c.idcuentaspof,c.nrecibo,c.fecha,c.monto,c.persona,c.ci,c.transaccion,c.archivo,c.lugar FROM cuentaspof as c WHERE c.idfactura='$idfactura'");
                 while ($qwe = $this->dbc->fetch($registro)) {
-                    $res = array("id" => $qwe[0], "recibo" => $qwe[1], "fecha" => $qwe[2], "monto" => $qwe[3], "persona" => $qwe[4], "ci" => $qwe[5],"transaccion" => $qwe[6],"nombre_archivo" => $qwe[7],"nit" => $cl['nit'],"direccion" => $cl['direccion']);
+                    $res = array("id" => $qwe[0], "recibo" => $qwe[1], "fecha" => $qwe[2], "monto" => $qwe[3], "persona" => $qwe[4], "ci" => $qwe[5],"transaccion" => $qwe[6],"nombre_archivo" => $qwe[7],"lugar" => $qwe[8],"nit" => $cl['nit'],"direccion" => $cl['direccion']);
                     array_push($lista, $res);
                 }
         }
@@ -1699,4 +1699,4 @@ WHERE
     //listafactura eliminartransaccion  eliminarcliente listafactura_cobrado eliminarproveedor listafactura_pagado registrocobrarfactura
 }//eliminarcobrados listapagos registrardesconsolidar registrotransaccion cambiarestadoconsolidado  registropagarfactura 
 //registrardesconsolidar crearfactura listapagos crearfacturasapi lista_cobrar_cobrado_factura registropagarfactura listaclientes
-// $gestion = $this->getgestionactualid($ide);
+// $gestion = $this->getgestionactualid($ide); listapagos

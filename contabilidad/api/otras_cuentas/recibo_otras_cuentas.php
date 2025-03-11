@@ -1,7 +1,7 @@
 <?php
 require_once "../../db/db.php";
 class Recibo_otras_cuentas extends DB{
-public function registrar_recibo_otras_cuentas($idotras_cuentas, $idtransaccion,$idcaja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$archivo)
+public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtransaccion,$idcaja_bancos, $fecha, $persona, $ci, $monto, $asiento, $sucursal, $empresa,$archivo)
     {
         // echo json_encode(array($idfactura, $idtransaccion,$caja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$archivo));
 
@@ -62,8 +62,8 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $idtransaccion,
         //------------------------------------------------------------------------------------
 
         if(empty($archivo['name'])){
-            $registropago = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
-            VALUES(NULL,'$nrecibo','$fecha','$idcliente','$persona','$ci','$monto','0','$idotras_cuentas','$trans','$idcuenta',NULL)");
+            $registropago = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
+            VALUES(NULL,'$nrecibo','$fecha','$lugar','0','$persona','$ci','$monto','0','$idotras_cuentas','$trans','0',NULL)");
 
         if ($registropago === TRUE) {
 
@@ -94,8 +94,8 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $idtransaccion,
         }
         if(move_uploaded_file($archivo_tmp, $ruta_destino)){
              //registrar pago, preguntar guardar la anterior transaccion o la nueva
-        $registropago2 = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
-        VALUES(NULL,'$nrecibo','$fecha','$idcliente','$persona','$ci','$monto','0','$idotras_cuentas','$trans','$idcuenta','$unique_name')");
+        $registropago2 = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
+        VALUES(NULL,'$nrecibo','$fecha','$lugar','0','$persona','$ci','$monto','0','$idotras_cuentas','$trans','0','$unique_name')");
 
         
         if ($registropago2 === TRUE) {
@@ -160,6 +160,25 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $idtransaccion,
     }
         echo json_encode($res);
     }
+    public function listar_recibo_otras_cuentas($idotras_cuentas) {
+        $lista = [];
+        // $idempresa = $this->getidempresa($empresa);
+    
+        // Preparar la consulta
+      $listado = $this->dbc->query("SELECT c.idcuentaspof,c.nrecibo,c.fecha,c.monto,c.persona,c.ci,c.transaccion,c.archivo,c.lugar FROM cuentaspof as c WHERE c.idotras_cuentas='$idotras_cuentas'");
+     while ($qwe = $this->dbc->fetch($listado)) {
+         $res = array("id" => $qwe[0], "recibo" => $qwe[1], "fecha" => $qwe[2], "monto" => $qwe[3], "persona" => $qwe[4], "ci" => $qwe[5],"transaccion" => $qwe[6],"nombre_archivo" => $qwe[7],"lugar" => $qwe[8]);
+         array_push($lista, $res);
+     }
+    
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
+    //  //SOLO HAY INDIVIDUALES
+    //  $registro = $this->dbc->query("SELECT c.idcuentaspof,c.nrecibo,c.fecha,c.monto,c.persona,c.ci,c.transaccion,c.archivo FROM cuentaspof as c WHERE c.idfactura='$idfactura'");
+    //  while ($qwe = $this->dbc->fetch($registro)) {
+    //      $res = array("id" => $qwe[0], "recibo" => $qwe[1], "fecha" => $qwe[2], "monto" => $qwe[3], "persona" => $qwe[4], "ci" => $qwe[5],"transaccion" => $qwe[6],"nombre_archivo" => $qwe[7],"nit" => $cl['nit'],"direccion" => $cl['direccion']);
+    //      array_push($lista, $res);
+    //  }
     public function getidempresa($md5)
     {
         $registro = $this->dbe->query("select * from organizacion where md5(idorganizacion)='$md5'");
