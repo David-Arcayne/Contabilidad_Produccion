@@ -72,6 +72,7 @@ class Documento_cobro extends DB{
         echo json_encode($res);
         
     }
+
     public function listar_recibo_por_id_otras_cuentas($idrecibo,$idotras_cuentas)
     {
         ini_set('display_errors', 1);
@@ -199,6 +200,10 @@ while ($qwe = $this->dbc->fetch($registro)) {
         }
         echo json_encode($res);
     }
+
+// ------------------------------------------------------------------------------------------------------
+
+
     public function listar_recibo_por_id_otras_cuentas_pagar($idrecibo,$idotras_cuentas)
     {
         ini_set('display_errors', 1);
@@ -242,6 +247,57 @@ while ($qwe = $this->dbc->fetch($registro)) {
 }
 
         echo json_encode($lista);
+    }
+
+    public function listar_otras_cuentas_pagar($empresa) {
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+        $lista = [];
+        $idempresa = $this->getidempresa($empresa);
+    
+        // Preparar la consulta
+        // $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idempresa = '$idempresa' ORDER BY idotras_cuentas DESC");
+
+               $getPedido = $this->dbc->query("SELECT *
+                    FROM otras_cuentas oc,transacciones t
+                    WHERE oc.clase_otras_cuentas='1' AND oc.idempresa='$idempresa' AND oc.transacciones_idtransacciones=t.idtransacciones ORDER BY oc.idotras_cuentas DESC");
+
+        while ($qwe = $this->dbc->fetch($getPedido)) {
+
+            $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='" . $qwe[5] . "'");
+            $pro = $this->dbcm->fetch($proveedor);
+
+            $cobras = $this->dbc->query("SELECT SUM(monto) FROM cuentaspor WHERE idotras_cuentas='$qwe[0]'"); //173
+                    $asd = $this->dbc->fetch($cobras);
+                    $saldo = $qwe['precio'] - $asd[0];
+
+            $getTipo = $this->dbc->query("SELECT nombre FROM tipo WHERE idtipo = '$qwe[idtipo]'");
+            $resultado2 = $getTipo->fetch_assoc();
+            $res = array(
+                "idotras_cuentas" => $qwe['idotras_cuentas'],
+                "fecha" => $qwe['fecha'],
+                "nro_otras_cuentas" => $qwe['nro_otras_cuentas'],
+                "lugar" => $qwe['lugar'],
+                "id_cliente_proveedor" => $qwe['id_cliente_proveedor'],
+                "nombrep" => $pro['nombre'],
+                "nro_tributario" => $qwe['nro_tributario'],
+                "contacto" => $qwe['contacto'],
+                "nro_doc_identidad" => $qwe['nro_doc_identidad'],
+                "idtipo" => $qwe['idtipo'],
+                "concepto" => $qwe['concepto'],
+                "nombre_tipo" => $resultado2['nombre'],
+                "condiciones" => $qwe['condiciones'],
+                "observaciones" => $qwe['observaciones'],
+                "precio" => $qwe['precio'],
+                "pagado" => $asd[0],
+                "saldo" => $saldo,
+                "forma_pago" => $qwe['forma_pago']
+            );
+            array_push($lista, $res);
+        }
+    
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
     public function getidempresa($md5)
     {

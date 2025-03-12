@@ -111,16 +111,16 @@ class Cuentaspor extends DB{
         echo json_encode($res);
     }
 
-    public function registropagarfacturaf5($idrecibo,$fecha, $nrecibo, $persona, $ci,$archivo)
+    public function registropagarfacturaf5($idrecibo,$fecha, $persona, $ci,$archivo)
     {
         $res = "";
 
         if(empty($archivo['name'])){
 
-            $update = $this->dbc->query("UPDATE cuentaspor SET nrecibo='$nrecibo',fecha='$fecha',persona='$persona',ci='$ci' WHERE idcuentaspor='$idrecibo'");
+            $update = $this->dbc->query("UPDATE cuentaspor SET fecha='$fecha',persona='$persona',ci='$ci' WHERE idcuentaspor='$idrecibo'");
 
             if ($update === TRUE) {
-                $res = array("success", "Registro Realizado", "registrocobrarfactura",$idrecibo,$fecha, $nrecibo, $persona, $ci,$archivo);
+                $res = array("success", "Registro Realizado", "registrocobrarfactura",$idrecibo,$fecha, $persona, $ci,$archivo);
             } else {
                 $res = array("danger", "No se pudo realizar el registro");
             }
@@ -141,7 +141,7 @@ class Cuentaspor extends DB{
         }
         if(move_uploaded_file($archivo_tmp, $ruta_destino)){
              //registrar pago, preguntar guardar la anterior transaccion o la nueva
-        $updateArch = $this->dbc->query("UPDATE cuentaspor SET nrecibo='$nrecibo',fecha='$fecha',persona='$persona',ci='$ci',archivo='$unique_name' WHERE idcuentaspor='$idrecibo'");
+        $updateArch = $this->dbc->query("UPDATE cuentaspor SET fecha='$fecha',persona='$persona',ci='$ci',archivo='$unique_name' WHERE idcuentaspor='$idrecibo'");
 
         if ($updateArch === TRUE) {
             $res = array("success", "Edicion Realizada", "registrocobrarfactura");

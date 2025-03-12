@@ -108,7 +108,7 @@ else{
 //echo json_encode($res); 
 }elseif($ver=="registrocobrarfacturaf5"){
     $cont=new Cuentaspof();
-    $cont->registrocobrarfacturaf5($_POST['idcuentaspof'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['lugar'],$_FILES['archivo']);
+    $cont->registrocobrarfacturaf5($_POST['idcuentaspof'],$_POST['fecha'],$_POST['persona'],$_POST['ci'],$_POST['lugar'],$_FILES['archivo']);
     //$res=array($_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente']);
     //echo json_encode($res);
 }elseif($ver=="registropagarfactura"){
@@ -116,7 +116,7 @@ else{
     $cont->registropagarfactura($_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcaja_bancos'],$_POST['idcuenta'],$_POST['fecha'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$_FILES['archivo']);
 }elseif($ver=="registropagarfacturaf5"){
     $cont=new Cuentaspor();
-    $cont->registropagarfacturaf5($_POST['idrecibo'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['archivo']);
+    $cont->registropagarfacturaf5($_POST['idrecibo'],$_POST['fecha'],$_POST['persona'],$_POST['ci'],$_POST['archivo']);
 }elseif($ver=="registrogestion"){
 $cont=new Contabilidad();
 $cont->registrogestion($_POST['nombre'],$_POST['fechaini'],$_POST['fechafin'],$_POST['empresa']);
@@ -341,9 +341,19 @@ if($data['ver'] == "cobrofacturasaasientomodelo") {
         else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idotras_cuentas'],$_POST['fecha'],$_POST['lugar'],$_POST['id_cliente_proveedor'],$_POST['nro_tributario'],$_POST['contacto'],$_POST['nro_doc_identidad'],$_POST['idtipo'],$_POST['concepto'],$_POST['condiciones'],$_POST['observaciones'],$_POST['precio'],$_POST['forma_pago']));
         }
-    } 
+    }elseif($ver=="registrar_recibo_otras_cuentas_pagar"){
+        if(isset($_POST['idotras_cuentas'],$_POST['lugar'],$_POST['idtransaccion'],$_POST['idcaja_bancos'],$_POST['fecha'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['sucursal'],$_POST['empresa'],$_FILES['archivo'])){
+            $cont=new Recibo_otras_cuentas();
+            $cont->registrar_recibo_otras_cuentas_pagar($_POST['idotras_cuentas'],$_POST['lugar'],$_POST['idtransaccion'],$_POST['idcaja_bancos'],$_POST['fecha'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['sucursal'],$_POST['empresa'],$_FILES['archivo']);
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud", $_POST['idotras_cuentas'],$_POST['lugar'],$_POST['idtransaccion'],$_POST['idcaja_bancos'],$_POST['fecha'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['sucursal'],$_POST['empresa'],$_FILES['archivo']));
+        }
+        //$res=array($_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente']);
+        //echo json_encode($res); 
+        } 
 
-
+//registrar_recibo_otras_cuentas_pagar
 //  registrotransaccion registrotransaccionf5 duplicartransaccion registrocobrarfactura registrocobrarfacturaGrupal factura registropagarfactura registrocobrarfacturaGrupal
 }//editar_caja_bancos_pagar_recibo registropagarfacturaf5 registropagarfacturaGrupal  editar_caja_bancos_pagar_recibo
 ?> 

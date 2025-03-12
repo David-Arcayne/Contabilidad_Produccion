@@ -255,7 +255,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
 
             $res = array("success", "Registro Realizado", "registrocobrarfactura");
         } else {
-            $res = array("danger", "No se pudo realizar el registrooo",$nrecibo,$fecha,$idcliente,$persona,$ci,$monto,$idfactura,$trans,$idcuenta);
+            $res = array("danger", "No se pudo realizar el registrooo");
         }
         }else{
          // Manejar la carga del archivo
@@ -341,6 +341,10 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
         echo json_encode($res);
     }
     public function listar_recibo_otras_cuentas_pagar($idotras_cuentas) {
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+
         $lista = [];
         // $idempresa = $this->getidempresa($empresa);
     
