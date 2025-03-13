@@ -83,6 +83,13 @@ class Documento_cobro extends DB{
         $registro = $this->dbc->query("SELECT * FROM cuentaspof WHERE idcuentaspof = '$idrecibo'");
 
 while ($qwe = $this->dbc->fetch($registro)) {
+
+    $otrasCuentas = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idotras_cuentas = $qwe[idotras_cuentas]");
+    $cl = $otrasCuentas->fetch_assoc();
+
+    $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $cl['id_cliente_proveedor'] . "'");
+    $cli = $cliente->fetch_assoc();
+
     $caja_banco = $this->dbc->query("SELECT * FROM detalle_caja_bancos_cobrar WHERE idcuentaspof = '$qwe[idcuentaspof]' AND idotras_cuentas = '$idotras_cuentas'");
     
     if ($caja_banco->num_rows > 0) {
@@ -93,6 +100,8 @@ while ($qwe = $this->dbc->fetch($registro)) {
                 "nrecibo" => $qwe['nrecibo'],
                 "fecha" => $qwe['fecha'],
                 "persona" => $qwe['persona'],
+                "nit" => $cli['nit'],
+                "direccion" => $cli['direccion'],
                 "monto_recibo" => $qwe[6],
                 "idcaja_bancos" => $datos['idcaja_bancos'],
                 "codigo" => $datos['codigo'],
@@ -214,6 +223,13 @@ while ($qwe = $this->dbc->fetch($registro)) {
         $registro = $this->dbc->query("SELECT * FROM cuentaspor WHERE idcuentaspor = '$idrecibo'");
 
 while ($qwe = $this->dbc->fetch($registro)) {
+    $otrasCuentas = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idotras_cuentas = $qwe[idotras_cuentas]");
+    $cl = $otrasCuentas->fetch_assoc();
+
+    $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='" . $cl['id_cliente_proveedor'] . "'");
+    $prov = $proveedor->fetch_assoc();
+    // $otrasCuentas = $this->dbc->query("SELECT * FROM cli WHERE idotras_cuentas = $qwe[id_cliente_proveedor]");
+
     $caja_banco = $this->dbc->query("SELECT * FROM detalle_caja_bancos_pagar WHERE idcuentaspor = '$qwe[idcuentaspor]' AND idotras_cuentas = '$idotras_cuentas'");
     
     if ($caja_banco->num_rows > 0) {
@@ -224,6 +240,8 @@ while ($qwe = $this->dbc->fetch($registro)) {
                 "nrecibo" => $qwe['nrecibo'],
                 "fecha" => $qwe['fecha'],
                 "persona" => $qwe['persona'],
+                "nit" => $prov['nit'],
+                "direccion" => $prov['direccion'],
                 "monto_recibo" => $qwe[6],
                 "idcaja_bancos" => $datos['idcaja_bancos'],
                 "codigo" => $datos['codigo'],
