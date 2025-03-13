@@ -140,8 +140,8 @@ class Cuentaspor extends DB{
             // move_uploaded_file($archivo_tmp, $ruta_destino);
         }
         if(move_uploaded_file($archivo_tmp, $ruta_destino)){
-             //registrar pago, preguntar guardar la anterior transaccion o la nueva
-        $updateArch = $this->dbc->query("UPDATE cuentaspor SET lugar = '$lugar',fecha='$fecha',persona='$persona',ci='$ci',archivo='$unique_name' WHERE idcuentaspor='$idrecibo'");
+            //registrar pago, preguntar guardar la anterior transaccion o la nueva
+            $updateArch = $this->dbc->query("UPDATE cuentaspor SET lugar = '$lugar',fecha='$fecha',persona='$persona',ci='$ci',archivo='$unique_name' WHERE idcuentaspor='$idrecibo'");
 
         if ($updateArch === TRUE) {
             $res = array("success", "Edicion Realizada", "registrocobrarfactura");
@@ -159,7 +159,7 @@ class Cuentaspor extends DB{
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
-
+        
         $caja_bancos = json_decode($cajasBancos, true);
         // echo json_encode(array($idrecibo,$caja_bancos,$cajasBancos));
         if($idfactura == 0){
@@ -266,6 +266,33 @@ class Cuentaspor extends DB{
         $qwe = $this->dbc->fetch($registro);
         //$res=array("id"=>,"nombre"=>$qwe['nombre']); listapagarfactura
         return $qwe['idgestion'];
+    }
+    public function listar_factura_comercial($empresa){
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+        $lista = [];
+        
+        // $registro = $this->dbc->query("SELECT * FROM cuentaspof WHERE idcuentaspof = '$idrecibo'");
+
+    $caja_banco = $this->dbc->query("SELECT * FROM factura_venta WHERE idfactura_venta = '$idrecibo'");
+    
+    if($caja_banco->num_rows > 0) {
+        while ($datos_caja = $this->dbc->fetch($caja_banco)) {
+            $caja= $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '$datos_caja[idcaja_bancos]'");
+            $datos = $caja->fetch_assoc();
+            $res = array(
+                "iddetalle_caja_bancos_pagar" => $datos_caja['iddetalle_caja_bancos_pagar'],
+                "idcaja_bancos" => $datos['idcaja_bancos'],
+                "tipo_cuenta" => $datos['tipo_cuenta'],
+                "monto" => $datos_caja['monto']
+            );
+            array_push($lista, $res);
+        }
+    } else {
+
+    }
+        echo json_encode($lista);
     }
 }
 ?>
