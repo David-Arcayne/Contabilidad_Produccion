@@ -12,6 +12,7 @@ require_once "./recibos/cuentaspof.php";
 require_once "./recibos/cuentaspor.php";
 require_once "./otras_cuentas/documento_cobro.php";
 require_once "./otras_cuentas/recibo_otras_cuentas.php";
+require_once "./configuracion/divisa.php";
 
 $ver=explode("/",$_GET['ver']); //dividiendo los "/"  ver[0],ver[1],ver[x] listafacturaapi_cobrado
 if($ver[0]=="verificacion"){
@@ -356,6 +357,9 @@ elseif($ver[0]=="listar_recibo_otras_cuentas_pagar"){
 }elseif($ver[0]=="listar_otras_cuentas_pagar"){
     $cont=new Documento_cobro();
     $cont->listar_otras_cuentas_pagar($ver[1],$ver[2]);
+}elseif($ver[0]=="listar_divisa"){
+    $cont=new Divisa();
+    $cont->listar_divisa($ver[1]);
 }
 
 //listafactura eliminartransaccion listapagos_individuales listatransaciones factura lista_cobrar_cobrado

@@ -11,6 +11,7 @@ require_once "./recibos/cuentaspof.php";
 require_once "./otras_cuentas/documento_cobro.php";
 require_once "./recibos/cuentaspor.php";
 require_once "./otras_cuentas/recibo_otras_cuentas.php";
+require_once "./configuracion/divisa.php";
 
 $ver=$_POST['ver'];
 $json = file_get_contents('php://input'); // Decodificar el JSON en un arreglo PHP  
@@ -116,7 +117,7 @@ else{
     $cont->registropagarfactura($_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcaja_bancos'],$_POST['idcuenta'],$_POST['fecha'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$_FILES['archivo']);
 }elseif($ver=="registropagarfacturaf5"){
     $cont=new Cuentaspor();
-    $cont->registropagarfacturaf5($_POST['idrecibo'],$_POST['fecha'],$_POST['persona'],$_POST['ci'],$_POST['archivo']);
+    $cont->registropagarfacturaf5($_POST['idrecibo'],$_POST['lugar'],$_POST['fecha'],$_POST['persona'],$_POST['ci'],$_POST['archivo']);
 }elseif($ver=="registrogestion"){
 $cont=new Contabilidad();
 $cont->registrogestion($_POST['nombre'],$_POST['fechaini'],$_POST['fechafin'],$_POST['empresa']);
@@ -349,9 +350,31 @@ if($data['ver'] == "cobrofacturasaasientomodelo") {
         else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud", $_POST['idotras_cuentas'],$_POST['lugar'],$_POST['idtransaccion'],$_POST['idcaja_bancos'],$_POST['fecha'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['sucursal'],$_POST['empresa'],$_FILES['archivo']));
         }
-        //$res=array($_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente']);
-        //echo json_encode($res); 
-        } 
+    }elseif($ver=="registrar_divisa"){
+        if(isset($_POST['simbolo'],$_POST['nombre'],$_POST['estado'],$_POST['idempresa'])){
+            $cont=new Divisa();
+            $cont->registrar_divisa($_POST['simbolo'],$_POST['nombre'],$_POST['estado'],$_POST['idempresa']);
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['simbolo'],$_POST['nombre'],$_POST['estado'],$_POST['idempresa']));
+        }
+    }elseif($ver=="editar_divisa"){
+        if(isset($_POST['iddivisa'],$_POST['simbolo'],$_POST['nombre'],$_POST['idempresa'])){
+            $cont=new Divisa();
+            $cont->editar_divisa($_POST['iddivisa'],$_POST['simbolo'],$_POST['nombre'],$_POST['idempresa']);
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['iddivisa'],$_POST['simbolo'],$_POST['nombre'],$_POST['idempresa']));
+        }
+    }elseif($ver=="activar_divisa"){
+        if(isset($_POST['iddivisa'])){
+            $cont=new Divisa();
+            $cont->activar_divisa($_POST['iddivisa']);
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['iddivisa']));
+        }
+    }   
 
 //registrar_recibo_otras_cuentas_pagar
 //  registrotransaccion registrotransaccionf5 duplicartransaccion registrocobrarfactura registrocobrarfacturaGrupal factura registropagarfactura registrocobrarfacturaGrupal
