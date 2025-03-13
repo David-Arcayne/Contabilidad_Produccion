@@ -280,7 +280,7 @@ class Cuentaspor extends DB{
     if($caja_banco->num_rows > 0) {
         while ($datos_caja = $this->dbc->fetch($caja_banco)) {
             $caja= $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '$datos_caja[idcaja_bancos]'");
-            $datos = $caja->fetch_assoc();
+            $datos = $caja->fetch_assoc(); 
             $res = array(
                 "iddetalle_caja_bancos_pagar" => $datos_caja['iddetalle_caja_bancos_pagar'],
                 "idcaja_bancos" => $datos['idcaja_bancos'],
@@ -290,7 +290,7 @@ class Cuentaspor extends DB{
             array_push($lista, $res);
         }
     } else {
-
+        
     }
         echo json_encode($lista);
     }
