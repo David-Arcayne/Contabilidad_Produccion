@@ -905,6 +905,9 @@ $totalHaber = 0;
     }
 
     public function mayorcuentacontable($fechai,$fechaf,$plan,$empresa){
+      ini_set('display_errors', 1);
+      ini_set('display_startup_errors', 1);
+      error_reporting(E_ALL);
         $lista=[];
         $ide=$this->getidempresa($empresa);
         $gestion=$this->getidgestion($empresa);
