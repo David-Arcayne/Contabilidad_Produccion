@@ -267,6 +267,7 @@ class Cuentaspor extends DB{
         //$res=array("id"=>,"nombre"=>$qwe['nombre']); listapagarfactura
         return $qwe['idgestion'];
     }
+    
     public function listar_factura_comercial($empresa){
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
@@ -290,7 +291,7 @@ class Cuentaspor extends DB{
             array_push($lista, $res);
         }
     } else {
-        
+
     }
         echo json_encode($lista);
     }

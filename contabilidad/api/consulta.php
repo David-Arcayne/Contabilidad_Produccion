@@ -99,10 +99,10 @@ $rep->reportebalancegeneralhasta($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
     $rep->reportebalancegeneralhastapp($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
 }elseif($ver[0]=="reportecomprobantecontable"){
 $rep=new Reportes();
-$rep->reportecomprobantecontable($ver[1],$ver[2],$ver[3],$ver[4]);
+$rep->reportecomprobantecontable($ver[1],$ver[2],$ver[3],$ver[4],$ver[5],$ver[6]);
 }elseif($ver[0]=="reporteactivodiaponibledos"){
 $rep=new Reportes();
-$rep->reporteactivodiaponibledos($ver[1],$ver[2],$ver[3]);
+$rep->reporteactivodiaponibledos($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
 }elseif($ver[0]=="facturas"){
 $cont=new Contabilidad();
 $cont->facturas($ver[1]);
@@ -361,6 +361,7 @@ elseif($ver[0]=="listar_recibo_otras_cuentas_pagar"){
     $cont=new Divisa();
     $cont->listar_divisa($ver[1]);
 }
+//reportecomprobantecontable
 
 //listafactura eliminartransaccion listapagos_individuales listatransaciones factura lista_cobrar_cobrado
 //reporteactivodisponible listar_cajas_bancos_pagar_por_recibo listar_recibo_por_id_otras_cuentas_pagar
