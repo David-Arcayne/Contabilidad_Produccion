@@ -13,6 +13,7 @@ require_once "./recibos/cuentaspor.php";
 require_once "./otras_cuentas/documento_cobro.php";
 require_once "./otras_cuentas/recibo_otras_cuentas.php";
 require_once "./configuracion/divisa.php";
+require_once "./configuracion/asiento.php";
 
 $ver=explode("/",$_GET['ver']); //dividiendo los "/"  ver[0],ver[1],ver[x] listafacturaapi_cobrado
 if($ver[0]=="verificacion"){
@@ -363,8 +364,14 @@ elseif($ver[0]=="listar_recibo_otras_cuentas_pagar"){
 }elseif($ver[0]=="reporte_comprobante_ingreso_egreso"){
     $cont=new Reportes();
     $cont->reporte_comprobante_ingreso_egreso($ver[1],$ver[2],$ver[3],$ver[4],$ver[5],$ver[6]);
+}elseif($ver[0]=="listar_operacion_modulo"){
+    $cont=new Asiento();
+    $cont->listar_operacion_modulo($ver[1]);
+}elseif($ver[0]=="listar_asignacion_asiento_operacion"){
+    $cont=new Asiento();
+    $cont->listar_asignacion_asiento_operacion($ver[1]);
 }
-//reportecomprobantecontable
+//reportecomprobantecontable listafactura_cobrado_trans
 
 //listafactura eliminartransaccion listapagos_individuales listatransaciones factura lista_cobrar_cobrado
 //reporteactivodisponible listar_cajas_bancos_pagar_por_recibo listar_recibo_por_id_otras_cuentas_pagar
