@@ -1297,10 +1297,10 @@ $totalHaber = 0;
          }  
 
          //]]]]}}}}}--------------------------------------------------------------------------------------
-
+        // LISTADO RECIBOS GRUPALES
          while($qwe2=$this->dbc->fetch($registroGrupal)){
 
-          $factura = $this->dbc->query("SELECT * FROM factura WHERE idfactura= '$qwe[idfactura]'");
+          $factura = $this->dbc->query("SELECT * FROM factura WHERE idfactura= '$qwe2[idfactura]'");
           $fact = $factura->fetch_assoc();
           // '$fact[proveedorcliente_idproveedorcliente]'
           $proveedor = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='$fact[proveedorcliente_idproveedorcliente]'");
@@ -1314,9 +1314,9 @@ $totalHaber = 0;
            "monto_recibo" => $qwe['monto'],
            "fecha_factura" => $fact['fecha'],
            "nfactura" => $fact['nfactura'],
-            "nit" => $cl['nit'],
-            "direccion" => $cl['direccion'],
-            "nombre_cliente" => $cl['nombre'],
+           "nit" => $cl['nit'],
+           "direccion" => $cl['direccion'],
+           "nombre_cliente" => $cl['nombre'],
            "detalle"=>[]
        );
 

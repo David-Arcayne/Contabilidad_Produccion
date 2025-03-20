@@ -298,7 +298,7 @@ class Gastos_generales extends DB{
                              "monto"=>$qwe['monto'],
                              "tipo"=>$qwe['tipo'],
                              "gastos_generales_idgastos_generales"=>$qwe['gastos_generales_idgastos_generales']
-                            ); //'nombre' sale del formulario de input hidden
+                            ); //'nombre' sale del formulario de input hidden listar_detalle_gasto_general
                             array_push($lista,$res);
                          }
                           echo json_encode($lista);

@@ -12,6 +12,7 @@ require_once "./otras_cuentas/documento_cobro.php";
 require_once "./recibos/cuentaspor.php";
 require_once "./otras_cuentas/recibo_otras_cuentas.php";
 require_once "./configuracion/divisa.php";
+require_once "./configuracion/asiento.php";
 
 $ver=$_POST['ver'];
 $json = file_get_contents('php://input'); // Decodificar el JSON en un arreglo PHP  
@@ -374,7 +375,15 @@ if($data['ver'] == "cobrofacturasaasientomodelo") {
         else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['iddivisa']));
         }
-    }   
+    }elseif($ver=="registrar_asignacion_asiento_operacion"){
+        if(isset($_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['idempresa'])){
+            $cont=new Asiento();
+            $cont->registrar_asignacion_asiento_operacion($_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['idempresa']);
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['idempresa']));
+        }
+    }    
 
 //registrar_recibo_otras_cuentas_pagar
 //  registrotransaccion registrotransaccionf5 duplicartransaccion registrocobrarfactura registrocobrarfacturaGrupal factura registropagarfactura registrocobrarfacturaGrupal

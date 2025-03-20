@@ -59,6 +59,25 @@ class Asiento extends DB{
     
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
+    public function listar_operacion_modulo_filtrado($nombre) {
+        $lista = [];
+        // $idempresa = $this->getidempresa($empresa);
+    
+        // Preparar la consulta
+        $getPedido = $this->dbc->query("SELECT * FROM operacion_modulos WHERE nombre_modulo = '$nombre'");
+    
+        while ($qwe = $this->dbc->fetch($getPedido)) {
+            $res = array(
+                "idoperacion_modulos" => $qwe['idoperacion_modulos'],
+                "nombre_modulo" => $qwe['nombre_modulo'],
+                "nombre_operacion" => $qwe['nombre_operacion'],
+                "descripcion" => $qwe['descripcion']
+            );
+            array_push($lista, $res);
+        }
+
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
     
     public function editar_divisa($id,$simbolo,$nombre,$empresa) {
         $idempresa = $this->getidempresa($empresa);

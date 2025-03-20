@@ -50,7 +50,7 @@ require_once "./empleado_rh/contrataciones.php";
 require_once "./empleado_rh/modopago.php";
 require_once "./gastos/costo_produccion.php";
 require_once "./gastos/gastos_generales.php";
-require_once "./despachar/despachar_producto.php";//listado_produccion_grupo_etapas
+require_once "./despachar/despachar_producto.php";//listado_produccion_grupo_etapas listar_detalle_gasto_general
 require_once "./merma_fisico/alma_fisic_merma.php";
 
 $url=explode("/",$_GET['ver']); 
