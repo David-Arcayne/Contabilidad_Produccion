@@ -360,6 +360,9 @@ elseif($ver[0]=="listar_recibo_otras_cuentas_pagar"){
 }elseif($ver[0]=="listar_divisa"){
     $cont=new Divisa();
     $cont->listar_divisa($ver[1]);
+}elseif($ver[0]=="reporte_comprobante_ingreso_egreso"){
+    $cont=new Reportes();
+    $cont->reporte_comprobante_ingreso_egreso($ver[1],$ver[2],$ver[3],$ver[4],$ver[5],$ver[6]);
 }
 //reportecomprobantecontable
 
