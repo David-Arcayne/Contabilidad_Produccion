@@ -30,10 +30,20 @@ class Asiento extends DB{
         $getPedido = $this->dbc->query("SELECT * FROM asignacion_asiento_operacion_modulos WHERE idempresa = '$idempresa'");
     
         while ($qwe = $this->dbc->fetch($getPedido)) {
+           
+            $getPedido2 = $this->dbc->query("SELECT * FROM operacion_modulos WHERE idoperacion_modulos = ' $qwe[idoperacion_modulos]'");
+            $operacionModulo = $getPedido2->fetch_assoc();
+
+            $getPedido3 = $this->dbc->query("SELECT * FROM asientotipo WHERE idasientotipo = ' $qwe[idasientotipo]'");
+            $asiento = $getPedido3->fetch_assoc();
+
             $res = array(
-                "idasignacion_asiento_operacion" => $qwe['idasignacion_asiento_operacion'],
+                "idasignacion_asiento_operacion_modulos" => $qwe['idasignacion_asiento_operacion_modulos'],
                 "idoperacion_modulos" => $qwe['idoperacion_modulos'],
-                "idasientotipo" => $qwe['idasientotipo']
+                "nombre_modulo" => $operacionModulo['nombre_modulo'],
+                "nombre_operacion" => $operacionModulo['nombre_operacion'],   
+                "idasientotipo" => $qwe['idasientotipo'],
+                "nombre_asiento" => $asiento['nombre']
             );
             array_push($lista, $res);
         }
