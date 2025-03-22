@@ -1172,6 +1172,9 @@ $totalHaber = 0;
  
   public function reporte_comprobante_ingreso_egreso($fechaIni,$fechaFin,$numeroIni,$numeroFin,$esIngreso,$empresa){
     //reporteactivodiaponible
+    ini_set('display_errors', 1);
+      ini_set('display_startup_errors', 1);
+      error_reporting(E_ALL);
         $lista=[];
   
         $ide=$this->getidempresa($empresa);
@@ -1203,7 +1206,7 @@ $totalHaber = 0;
           LEFT JOIN cuentaspof r ON r.idcuentaspof = c.idcuentaspof
         WHERE
           r.fecha >= '$fechaIni'
-          AND r.fecha <= '$fechaIni'
+          AND r.fecha <= '$fechaFin'
           AND f.idorganizacion = '$ide'
         ORDER BY
           c.idcuentascobrar_grupal ASC;
@@ -1244,111 +1247,169 @@ $totalHaber = 0;
 //------------------------------------------------------------------------
 
 
-          while($qwe=$this->dbc->fetch($registro)){
+        //   while($qwe=$this->dbc->fetch($registro)){
 
-            $factura = $this->dbc->query("SELECT * FROM factura WHERE idfactura= '$qwe[idfactura]'");
-            $fact = $factura->fetch_assoc();
-            // '$fact[proveedorcliente_idproveedorcliente]'
-            $proveedor = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='$fact[proveedorcliente_idproveedorcliente]'");
-            $cl = $proveedor->fetch_assoc();
+        //     $factura = $this->dbc->query("SELECT * FROM factura WHERE idfactura= '$qwe[idfactura]'");
+        //     $fact = $factura->fetch_assoc();
+        //     // '$fact[proveedorcliente_idproveedorcliente]'
+        //     $proveedor = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='$fact[proveedorcliente_idproveedorcliente]'");
+        //     $cl = $proveedor->fetch_assoc();
 
-            $res = array(
-             "nrecibo" => $qwe['nrecibo'],
-             "fecha_recibo" => $qwe['fecha'],
-             "lugar" => $qwe['lugar'],
-             "persona" => $qwe['persona'],
-             "monto_recibo" => $qwe['monto'],
-             "fecha_factura" => $fact['fecha'],
-             "nfactura" => $fact['nfactura'],
-              "nit" => $cl['nit'],
-              "direccion" => $cl['direccion'],
-              "nombre_cliente" => $cl['nombre'],
-             "detalle"=>[]
-         );
+        //     $res = array(
+        //      "nrecibo" => $qwe['nrecibo'],
+        //      "fecha_recibo" => $qwe['fecha'],
+        //      "lugar" => $qwe['lugar'],
+        //      "persona" => $qwe['persona'],
+        //      "monto_recibo" => $qwe['monto'],
+        //      "fecha_factura" => $fact['fecha'],
+        //      "nfactura" => $fact['nfactura'],
+        //       "nit" => $cl['nit'],
+        //       "direccion" => $cl['direccion'],
+        //       "nombre_cliente" => $cl['nombre'],
+        //      "detalle"=>[]
+        //  );
  
-         $pcuentas=$this->dbc->query("SELECT * FROM detalle_caja_bancos_cobrar WHERE idcuentaspof='$qwe[idcuentaspof]'");
-            if($pcuentas->num_rows > 0){
-             while ($datos_caja = $this->dbc->fetch($pcuentas)) {
-               $caja= $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '$datos_caja[idcaja_bancos]'");
-               $datos = $caja->fetch_assoc();
-                $det=array("idcaja_bancos"=>$datos['idcaja_bancos'],"codigo"=>$datos['codigo'],"nombre"=>$datos['tipo_cuenta'],"monto"=>$datos_caja['monto']);
-                array_push($res['detalle'],$det);
+        //  $pcuentas=$this->dbc->query("SELECT * FROM detalle_caja_bancos_cobrar WHERE idcuentaspof='$qwe[idcuentaspof]'");
+        //     if($pcuentas->num_rows > 0){
+        //      while ($datos_caja = $this->dbc->fetch($pcuentas)) {
+        //        $caja= $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '$datos_caja[idcaja_bancos]'");
+        //        $datos = $caja->fetch_assoc();
+        //         $det=array("idcaja_bancos"=>$datos['idcaja_bancos'],"codigo"=>$datos['codigo'],"nombre"=>$datos['tipo_cuenta'],"monto"=>$datos_caja['monto']);
+        //         array_push($res['detalle'],$det);
  
-           }
+        //    }
  
-            }else{
+        //     }else{
      
-             $res = array(
-              "nrecibo" => $qwe['nrecibo'],
-             "fecha_recibo" => $qwe['fecha'],
-             "lugar" => $qwe['lugar'],
-             "persona" => $qwe['persona'],
-             "monto_recibo" => $qwe['monto'],
-             "fecha_factura" => $fact['fecha'],
-             "nfactura" => $fact['nfactura'],
-              "nit" => $cl['nit'],
-              "direccion" => $cl['direccion'],
-              "nombre_cliente" => $cl['nombre'],
-             "detalle"=>[]
-           );
+        //      $res = array(
+        //       "nrecibo" => $qwe['nrecibo'],
+        //      "fecha_recibo" => $qwe['fecha'],
+        //      "lugar" => $qwe['lugar'],
+        //      "persona" => $qwe['persona'],
+        //      "monto_recibo" => $qwe['monto'],
+        //      "fecha_factura" => $fact['fecha'],
+        //      "nfactura" => $fact['nfactura'],
+        //       "nit" => $cl['nit'],
+        //       "direccion" => $cl['direccion'],
+        //       "nombre_cliente" => $cl['nombre'],
+        //      "detalle"=>[]
+        //    );
  
-            }
-            array_push($lista, $res);
-         }  
+        //     }
+        //     array_push($lista, $res);
+        //  }  
 
          //]]]]}}}}}--------------------------------------------------------------------------------------
         // LISTADO RECIBOS GRUPALES
-         while($qwe2=$this->dbc->fetch($registroGrupal)){
+       
 
-          $factura = $this->dbc->query("SELECT * FROM factura WHERE idfactura= '$qwe2[idfactura]'");
-          $fact = $factura->fetch_assoc();
-          // '$fact[proveedorcliente_idproveedorcliente]'
-          $proveedor = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='$fact[proveedorcliente_idproveedorcliente]'");
-          $cl = $proveedor->fetch_assoc();
+        $aux = 0;
+        $idFactura = 0;
+        $arrayResultados = [];
+        while($qwe2=$this->dbc->fetch($registroGrupal)){
+        // $arrayResultados = [];
+        if($qwe2['idcuentaspof'] == $aux && $qwe2['idfactura'] == $idFactura){
+// ES EL MISMO RECIBO  y LA MISMA FACTURA
+// su cajaBancos ya esta usandose 
+// no se debe hacer nada aqui solo saltar un espacio en el while
 
-          $res = array(
-           "nrecibo" => $qwe['nrecibo'],
-           "fecha_recibo" => $qwe['fecha'],
-           "lugar" => $qwe['lugar'],
-           "persona" => $qwe['persona'],
-           "monto_recibo" => $qwe['monto'],
+        }elseif($qwe2['idcuentaspof'] == $aux && $qwe2['idfactura'] != $idFactura){
+        // ES EL MISMO RECIBO  y DIFERENTE FACTURA
+        //SOLO NECESITO SUMAR LAS CAJA_BANCOS IGUALES DE MIS FACTURAS
+        $pcuentas=$this->dbc->query("SELECT * FROM detalle_caja_bancos_cobrar WHERE idfactura='$qwe2[idfactura]'");
+        if($pcuentas->num_rows > 0){
+          
+          while ($datos_caja = $this->dbc->fetch($pcuentas)) {
+            foreach($arrayResultados as $arr){
+              if($datos_caja['idcaja_bancos'] == $arr[1]){
+                //se suman los montos
+                $arr[2] + $datos_caja['monto'];
+              }else{
+
+              }
+            }
+           $caja= $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '$datos_caja[idcaja_bancos]'");
+           $datos = $caja->fetch_assoc();
+            $det=array("idcaja_bancos"=>$datos['idcaja_bancos'],"codigo"=>$datos['codigo'],"nombre"=>$datos['tipo_cuenta'],"monto"=>$datos_caja['monto']);
+            array_push($res['detalle'],$det);
+       
+       }
+       
+        }
+        //    $res = array(
+        //      "nrecibo" => '11'
+        //  );
+        //  array_push($lista, $res);
+         }else{
+           //ES DIFERENTE RECIBO
+           $aux = $qwe2['idcuentaspof'];
+           $idFactura = $qwe2['idfactura'];
+
+         $factura = $this->dbc->query("SELECT * FROM factura WHERE idfactura= '$qwe2[idfactura]'");
+         $fact = $factura->fetch_assoc();
+         // '$fact[proveedorcliente_idproveedorcliente]'
+         $proveedor = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='$fact[proveedorcliente_idproveedorcliente]'");
+         $cl = $proveedor->fetch_assoc();
+        
+         $recibo_cobro = $this->dbc->query("SELECT * FROM cuentaspof WHERE idcuentaspof='$qwe2[idcuentaspof]'");
+         $recibo = $recibo_cobro->fetch_assoc();
+         $res = array(
+           "nrecibo" => $recibo['nrecibo'],
+           "fecha_recibo" => $recibo['fecha'],
+           "lugar" => $recibo['lugar'],
+           "persona" => $recibo['persona'],
+           "monto_recibo" => $recibo['monto'],
            "fecha_factura" => $fact['fecha'],
            "nfactura" => $fact['nfactura'],
            "nit" => $cl['nit'],
            "direccion" => $cl['direccion'],
            "nombre_cliente" => $cl['nombre'],
            "detalle"=>[]
-       );
+        );
+        
+        $pcuentas=$this->dbc->query("SELECT * FROM detalle_caja_bancos_cobrar WHERE idfactura='$qwe2[idfactura]'");
+         if($pcuentas->num_rows > 0){
+       
+          // while ($fila = $pcuentas->fetch_assoc()) {
+          //     $arrayResultados[] = $fila;
+          // }
 
-       $pcuentas=$this->dbc->query("SELECT * FROM detalle_caja_bancos_cobrar WHERE idcuentaspof='$qwe[idcuentaspof]'");
-          if($pcuentas->num_rows > 0){
-           while ($datos_caja = $this->dbc->fetch($pcuentas)) {
-             $caja= $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '$datos_caja[idcaja_bancos]'");
-             $datos = $caja->fetch_assoc();
-              $det=array("idcaja_bancos"=>$datos['idcaja_bancos'],"codigo"=>$datos['codigo'],"nombre"=>$datos['tipo_cuenta'],"monto"=>$datos_caja['monto']);
-              array_push($res['detalle'],$det);
-
+          // $arrayResultados = [];
+          
+          while ($datos_caja = $this->dbc->fetch($pcuentas)) {
+            $arrayResultados[] = $datos_caja;
+            $caja= $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '$datos_caja[idcaja_bancos]'");
+            $datos = $caja->fetch_assoc();
+             $det=array("idcaja_bancos"=>$datos['idcaja_bancos'],"codigo"=>$datos['codigo'],"nombre"=>$datos['tipo_cuenta'],"monto"=>$datos_caja['monto']);
+             array_push($res['detalle'],$det);
+            //  array_push($lista, $arrayResultados);
+        
+        }
+        // array_push($lista, $arrayResultados);
+        
+         }else{
+        
+          $res = array(
+           "nrecibo" => $recibo['nrecibo'],
+          "fecha_recibo" => $recibo['fecha'],
+          "lugar" => $recibo['lugar'],
+          "persona" => $recibo['persona'],
+          "monto_recibo" => $recibo['monto'],
+          "fecha_factura" => $fact['fecha'],
+          "nfactura" => $fact['nfactura'],
+           "nit" => $cl['nit'],
+           "direccion" => $cl['direccion'],
+           "nombre_cliente" => $cl['nombre'],
+          "detalle"=>[]
+        );
+        //  array_push($lista, $res2);
          }
-
-          }else{
-   
-           $res = array(
-            "nrecibo" => $qwe['nrecibo'],
-           "fecha_recibo" => $qwe['fecha'],
-           "lugar" => $qwe['lugar'],
-           "persona" => $qwe['persona'],
-           "monto_recibo" => $qwe['monto'],
-           "fecha_factura" => $fact['fecha'],
-           "nfactura" => $fact['nfactura'],
-            "nit" => $cl['nit'],
-            "direccion" => $cl['direccion'],
-            "nombre_cliente" => $cl['nombre'],
-           "detalle"=>[]
-         );
-
-          }
-          array_push($lista, $res);
-       }  
+         array_push($lista, $res);
+        //  array_push($lista, $arrayResultados);
+         }
+         
+        }  
+       //AQUI TERMINA ES INGRESO
       }else{
 
         if($numeroIni == 0 && $numeroFin == 0){
