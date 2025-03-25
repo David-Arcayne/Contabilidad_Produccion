@@ -1001,8 +1001,20 @@ $totalHaber = 0;
                 $res=array("debe"=>$asd[1],"haber"=>$asd[2]);
                 array_push($detalle,$res);
             }
-            $red=array("codigo"=>$qwe[0],"fecha"=>$qwe[1],"tipo"=>$tipo[0],"detalle"=>$detalle);
+            if($tipotrans->num_rows > 0 ){
+              $red=array("codigo"=>$qwe[0],
+            "fecha"=>$qwe[1],
+            "tipo"=>$tipo[0],
+            "detalle"=>$detalle);
             array_push($lista,$red);
+            }else{
+              $red=array("codigo"=>$qwe[0],
+              "fecha"=>$qwe[1],
+              "tipo"=> 0,
+              "detalle"=>$detalle);
+              array_push($lista,$red);
+            }
+         
 
         }
         
