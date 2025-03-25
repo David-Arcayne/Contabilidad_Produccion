@@ -374,7 +374,7 @@ elseif($ver[0]=="listar_recibo_otras_cuentas_pagar"){
     $cont=new Asiento();
     $cont->listar_asiento_por_modulo($ver[1],$ver[2]);
 }
-//reportecomprobantecontable listafactura_cobrado_trans
+//reportecomprobantecontable listafactura_cobrado_trans asientotipo
 
 //listafactura eliminartransaccion listapagos_individuales listatransaciones factura lista_cobrar_cobrado
 //reporteactivodisponible listar_cajas_bancos_pagar_por_recibo listar_recibo_por_id_otras_cuentas_pagar

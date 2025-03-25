@@ -72,9 +72,20 @@ class Asiento extends DB{
     public function listar_operacion_modulo_filtrado($nombre) {
         $lista = [];
         // $idempresa = $this->getidempresa($empresa);
-    
+        // SELECT o.* 
+        //  FROM operacion_modulos o
+        //  LEFT JOIN asignacion_asiento_operacion_modulos aaom ON o.idoperacion_modulos = aaom.idoperacion_modulos
+        //  WHERE aaom.idasignacion_asiento_operacion_modulos IS NULL;
+        
+        
         // Preparar la consulta
-        $getPedido = $this->dbc->query("SELECT * FROM operacion_modulos WHERE nombre_modulo = '$nombre'");
+        $getPedido = $this->dbc->query("SELECT o.* 
+            FROM operacion_modulos o
+            LEFT JOIN asignacion_asiento_operacion_modulos aaom 
+                ON o.idoperacion_modulos = aaom.idoperacion_modulos
+            WHERE aaom.idasignacion_asiento_operacion_modulos IS NULL
+            AND o.nombre_modulo = '$nombre';
+            ");
     
         while ($qwe = $this->dbc->fetch($getPedido)) {
             $res = array(
@@ -154,6 +165,9 @@ class Asiento extends DB{
         return $qwe['idorganizacion'];
     }
     public function listar_asiento_por_modulo($nombre, $empresa) {
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
         $lista = [];
         $idempresa = $this->getidempresa($empresa);
     
