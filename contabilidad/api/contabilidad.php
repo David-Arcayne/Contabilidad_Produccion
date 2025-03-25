@@ -3,7 +3,7 @@ session_start();
 //require_once "db.php"; lista_cobrar_cobrado_factura crearfacturas listadesconsolidar decode cuentaspof
 require_once "../../db/db.php";
 class Contabilidad extends DB
-{
+{//registroasiento
 
     public function registrardesconsolidar($idtransaccion,$motivo,$estado,$hora,$fecha,$idusuario,$idempresa){
         $res="";
@@ -933,11 +933,11 @@ ORDER BY
         return $qwe['idsucursalcontable'];
     }
 
-    public function registroasiento($nombre, $tipo, $empresa)
+    public function registroasiento($nombre, $tipo, $tipo_modulo, $empresa)
     {
         $res = "";
         $ide = $this->getidempresa($empresa);
-        $registro = $this->dbc->query("insert into asientotipo(idasientotipo,nombre,tipo,idorganizacion)values(NULL,'$nombre','$tipo','$ide')");
+        $registro = $this->dbc->query("insert into asientotipo(idasientotipo,nombre,tipo, tipo_modulo,idorganizacion)values(NULL,'$nombre','$tipo', '$tipo_modulo','$ide')");
         if ($registro === TRUE) {
             $res = array("success", "Registro Correcto", "registroasiento");
         } else {
@@ -962,11 +962,11 @@ ORDER BY
     {
         $lista = [];
         $ide = $this->getidempresa($empresa);
-        $registro = $this->dbc->query("SELECT idasientotipo,nombre,tipo FROM asientotipo WHERE idorganizacion='$ide'");
+        $registro = $this->dbc->query("SELECT idasientotipo,nombre,tipo,tipo_modulo FROM asientotipo WHERE idorganizacion='$ide'");
         while ($qwe = $this->dbc->fetch($registro)) {
             $tipo = $this->dbc->query("select nombre from tipotransaccion where idtipotransaccion='" . $qwe['tipo'] . "'");
             $tt = $this->dbc->fetch($tipo);
-            $res = array("id" => $qwe[0], "nombre" => $qwe[1], "idtipo"=>$qwe[2], "tipo" => $tt[0]);
+            $res = array("id" => $qwe[0], "nombre" => $qwe[1], "idtipo"=>$qwe[2], "tipo_modulo"=>$qwe[3], "tipo" => $tt[0]);
             array_push($lista, $res);
         }
         echo json_encode($lista);
@@ -1699,4 +1699,4 @@ WHERE
     //listafactura eliminartransaccion  eliminarcliente listafactura_cobrado eliminarproveedor listafactura_pagado registrocobrarfactura
 }//eliminarcobrados listapagos registrardesconsolidar registrotransaccion cambiarestadoconsolidado  registropagarfactura 
 //registrardesconsolidar crearfactura listapagos crearfacturasapi lista_cobrar_cobrado_factura registropagarfactura listaclientes
-// $gestion = $this->getgestionactualid($ide); listapagos cobrar_cobrado listafactura_cobrado_trans
+// $gestion = $this->getgestionactualid($ide); listapagos listaasientos

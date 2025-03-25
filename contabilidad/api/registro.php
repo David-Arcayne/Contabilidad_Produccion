@@ -85,7 +85,7 @@ $cont->crearfacturas($_POST['fechatfactura'],$_POST['nfactura'],$_POST['nautoriz
 
 }elseif($ver=="registroasiento"){
 $cont=new Contabilidad();
-$cont->registroasiento($_POST['nombre'],$_POST['tipo'],$_POST['empresa']);
+$cont->registroasiento($_POST['nombre'],$_POST['tipo'],$_POST['tipo_modulo'],$_POST['empresa']);
 }elseif($ver=="registroasientof5"){
     $cont=new Contabilidad();
     $cont->registroasientof5($_POST['id'],$_POST['nombre'],$_POST['tipo'],$_POST['empresa']);
@@ -383,9 +383,17 @@ if($data['ver'] == "cobrofacturasaasientomodelo") {
         else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['idempresa']));
         }
+    }elseif($ver=="registro_transaccion_comercial"){
+        if(isset($_POST['fecha'],$_POST['idasignacion_asiento'],$_POST['empresa'],$_POST['sucursal'])){
+            $cont=new Transacciones();
+            $cont->registro_transaccion_comercial($_POST['fecha'],$_POST['idasignacion_asiento'],$_POST['empresa'],$_POST['sucursal']);
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['fecha'],$_POST['idasignacion_asiento'],$_POST['empresa'],$_POST['sucursal']));
+        }
     }    
 
-//registrar_recibo_otras_cuentas_pagar
+//registrar_recibo_otras_cuentas_pagar asiento registroasiento
 //  registrotransaccion registrotransaccionf5 duplicartransaccion registrocobrarfactura registrocobrarfacturaGrupal factura registropagarfactura registrocobrarfacturaGrupal
 }//editar_caja_bancos_pagar_recibo registropagarfacturaf5 registropagarfacturaGrupal  editar_caja_bancos_pagar_recibo
 ?> 

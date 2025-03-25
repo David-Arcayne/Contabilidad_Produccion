@@ -153,5 +153,24 @@ class Asiento extends DB{
         $qwe = $this->dbe->fetch($registro);
         return $qwe['idorganizacion'];
     }
+    public function listar_asiento_por_modulo($nombre, $empresa) {
+        $lista = [];
+        $idempresa = $this->getidempresa($empresa);
+    
+        // Preparar la consulta
+        $getPedido = $this->dbc->query("SELECT * FROM asientotipo WHERE tipo_modulo = '$nombre' AND idorganizacion = '$idempresa'");
+    
+        while ($qwe = $this->dbc->fetch($getPedido)) {
+            $res = array(
+                "idasientotipo" => $qwe['idasientotipo'],
+                "nombre" => $qwe['nombre'],
+                "tipo" => $qwe['tipo'],
+                "tipo_modulo" => $qwe['tipo_modulo']
+            );
+            array_push($lista, $res);
+        }
+    
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
 }
 ?>

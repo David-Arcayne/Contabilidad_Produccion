@@ -370,6 +370,9 @@ elseif($ver[0]=="listar_recibo_otras_cuentas_pagar"){
 }elseif($ver[0]=="listar_asignacion_asiento_operacion"){
     $cont=new Asiento();
     $cont->listar_asignacion_asiento_operacion($ver[1]);
+}elseif($ver[0]=="listar_asiento_por_modulo"){
+    $cont=new Asiento();
+    $cont->listar_asiento_por_modulo($ver[1],$ver[2]);
 }
 //reportecomprobantecontable listafactura_cobrado_trans
 

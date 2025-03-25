@@ -300,4 +300,40 @@ class Transacciones extends DB{
         //$res=array("id"=>,"nombre"=>$qwe['nombre']); detalletransaccion
         return $qwe['idgestion'];
     }
+
+    public function registro_transaccion_comercial($fecha, $idasignacion_asiento, $empresa, $sucursal)
+    {
+        // function getgestionactualid($empresa)
+        // {
+    
+        //     $res = "";
+        //     $registro = $this->dbc->query("select * from gestion where idempresa='$empresa' and estado='2' Limit 1");
+        //     $qwe = $this->dbc->fetch($registro);
+        //     //$res=array("id"=>,"nombre"=>$qwe['nombre']);
+        //     return $qwe['idgestion'];
+        // }
+
+        $ide = $this->getidempresa($empresa);
+        $idsucursal = $this->getidsucursal($sucursal);
+        $gestion = $this->getgestionactualid($empresa);
+        $res = "";
+        // aqui la condicional si hay una nueva gestion
+
+        $nroTrans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE organizacion_idorganizacion=$ide AND idgestion='$gestion' ORDER BY codigotransaccion DESC LIMIT 1;");
+        $resultado12 = $nroTrans->fetch_assoc();
+        $nroTransaccion = $resultado12['codigotransaccion'] + 1;
+
+        $res = "";
+        $glosa = "Registro glosa comercial";
+        $tipotransaccion = 1; //ingreso
+
+        $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,idasignacion_asiento,organizacion_idorganizacion,sucursal,idgestion)
+        VALUE('$nroTransaccion','$fecha','0','0','$glosa','1','1','$tipotransaccion','$idasignacion_asiento','$ide','$idsucursal','$gestion')");
+        if ($writetrans === TRUE) {
+            $res = array("success", "Se Registro Correctamente", "registrotransaccion");
+        } else {
+            $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
+        }
+        echo json_encode($res);
+    }
 }
