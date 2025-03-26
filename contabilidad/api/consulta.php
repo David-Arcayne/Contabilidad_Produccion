@@ -373,8 +373,11 @@ elseif($ver[0]=="listar_recibo_otras_cuentas_pagar"){
 }elseif($ver[0]=="listar_asiento_por_modulo"){
     $cont=new Asiento();
     $cont->listar_asiento_por_modulo($ver[1],$ver[2]);
+}elseif($ver[0]=="listar_operacion_modulo_filtrado"){
+    $cont=new Asiento();
+    $cont->listar_operacion_modulo_filtrado($ver[1]);
 }
-//reportecomprobantecontable listafactura_cobrado_trans asientotipo
+//reportecomprobantecontable listafactura_cobrado_trans asientotipo listar_operacion_modulo_filtrado
 
 //listafactura eliminartransaccion listapagos_individuales listatransaciones factura lista_cobrar_cobrado
 //reporteactivodisponible listar_cajas_bancos_pagar_por_recibo listar_recibo_por_id_otras_cuentas_pagar

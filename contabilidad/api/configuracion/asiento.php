@@ -70,6 +70,7 @@ class Asiento extends DB{
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
     public function listar_operacion_modulo_filtrado($nombre) {
+        
         $lista = [];
         // $idempresa = $this->getidempresa($empresa);
         // SELECT o.* 
