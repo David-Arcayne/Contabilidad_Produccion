@@ -300,7 +300,19 @@ class Transacciones extends DB{
         //$res=array("id"=>,"nombre"=>$qwe['nombre']); detalletransaccion
         return $qwe['idgestion'];
     }
+    public function existe_empresa_modulo($empresa)
+    {
 
+        $ide = $this->getidempresa($empresa);
+        $res = "";
+        // aqui la condicional si hay una nueva gestion
+
+        $existe = $this->dbc->query("SELECT COUNT(*) AS total FROM plandecuenta WHERE organizacion_idorganizacion = '$ide'");
+        $resultado12 = $existe->fetch_assoc();
+
+            return $resultado12['total'] > 0;
+
+    }
     public function registro_transaccion_comercial($fecha, $idasignacion_asiento, $empresa, $sucursal)
     {
         // function getgestionactualid($empresa)
@@ -318,22 +330,76 @@ class Transacciones extends DB{
         $gestion = $this->getgestionactualid($empresa);
         $res = "";
         // aqui la condicional si hay una nueva gestion
+        $asignacion = $this->dbc->query("SELECT * FROM asignacion_asiento_operacion_modulos WHERE idasignacion_asiento_operacion_modulos='$idasignacion_asiento'");
+        $aux_asignacion = $asignacion->fetch_assoc();
 
+        $asient = $this->dbc->query("SELECT * FROM asientotipo WHERE idasientotipo='$aux_asignacion[idasientotipo]'");
+        $tipotransaccion = $asient->fetch_assoc();
+        
         $nroTrans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE organizacion_idorganizacion=$ide AND idgestion='$gestion' ORDER BY codigotransaccion DESC LIMIT 1;");
         $resultado12 = $nroTrans->fetch_assoc();
         $nroTransaccion = $resultado12['codigotransaccion'] + 1;
 
         $res = "";
         $glosa = "Registro glosa comercial";
-        $tipotransaccion = 1; //ingreso
 
-        $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,idasignacion_asiento,organizacion_idorganizacion,sucursal,idgestion)
-        VALUE('$nroTransaccion','$fecha','0','0','$glosa','1','1','$tipotransaccion','$idasignacion_asiento','$ide','$idsucursal','$gestion')");
+        if($aux_asignacion['bandera'] == 1){
+            //REVISION
+            $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,idasignacion_asiento,organizacion_idorganizacion,sucursal,idgestion)
+        VALUE('$nroTransaccion','$fecha','0','0','$glosa','1','6','$tipotransaccion[tipo]','$idasignacion_asiento','$ide','$idsucursal','$gestion')");
+        }else{
+            // REGISTRA TRANSACCION DIRECTO
+            $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,idasignacion_asiento,organizacion_idorganizacion,sucursal,idgestion)
+        VALUE('$nroTransaccion','$fecha','0','0','$glosa','1','1','$tipotransaccion[tipo]','$idasignacion_asiento','$ide','$idsucursal','$gestion')");
+        }
+    
         if ($writetrans === TRUE) {
             $res = array("success", "Se Registro Correctamente", "registrotransaccion");
         } else {
             $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
         }
         echo json_encode($res);
+    }
+
+    public function listatransacciones_comercial($empresa)
+    {
+        $lista = [];
+        // 
+        $ide = $this->getidempresa($empresa);
+        $getG = $this->getgestionactualC($empresa);
+        $gestion = $getG['id'];
+        $registro = $this->dbc->query("SELECT
+        t.idtransacciones,
+        t.codigotransaccion,
+        t.fechatransaccion,
+        t.glosa,
+        t.consolidar,
+        t.tipotransaccion_idtipotransaccion,
+        t.idgestion,
+        t.estado,
+        t.tipodecambio
+      FROM
+        transacciones as t
+      where
+        t.organizacion_idorganizacion = '$ide'
+        and idgestion = '$gestion'
+        and t.estado = 6
+      order by
+        t.codigotransaccion desc;");
+        while ($qwe = $this->dbc->fetch($registro)) {
+            $tt = $this->dbc->query("select * from tipotransaccion where idtipotransaccion='" . $qwe[5] . "'");
+            $asd = $this->dbc->fetch($tt);
+            $detalle = [];
+
+            $transdeta = $this->dbc->query("select d.iddetalletransaccion,p.nombreplan,d.debe,d.haber,d.nota,d.estado,d.idorganizacion,d.idplandecuenta from detalletransaccion as d,plandecuenta as p where p.idplandecuenta=d.idplandecuenta and d.transacciones_idtransacciones='$qwe[0]'");
+            while ($qq = $this->dbc->fetch($transdeta)) {
+                $ress = array("id" => $qq[0], "plan" => $qq[1], "debe" => $qq[2], "haber" => $qq[3], "nota" => $qq[4], "estado" => $qq[5], "idempresa" => $qq[6], "idplan" => $qq[7]);
+                array_push($detalle, $ress);
+            }
+
+            $res = array("id" => $qwe[0], "ntransaccion" => $qwe[1], "fecha" => $qwe[2], "glosa" => $qwe[3], "consolidar" => $qwe[4], "ttransaccion" => $asd['nombre'],"idtipotransaccion"=>$qwe[5], "gestion" => $qwe[6],"estado" => $qwe[7], "detalle" => $detalle, "tipocambio" => $qwe[8]);
+            array_push($lista, $res);
+        }
+        echo json_encode($lista);
     }
 }

@@ -15,7 +15,7 @@ require_once "./otras_cuentas/recibo_otras_cuentas.php";
 require_once "./configuracion/divisa.php";
 require_once "./configuracion/asiento.php";
 
-$ver=explode("/",$_GET['ver']); //dividiendo los "/"  ver[0],ver[1],ver[x] listafacturaapi_cobrado
+$ver=explode("/",$_GET['ver']); //dividiendo los "/"  ver[0],ver[1],ver[x] listafacturaapi_cobrado eliminarasiento
 if($ver[0]=="verificacion"){
 $ad=new Admin();
 $ad->verificacion();
@@ -376,9 +376,12 @@ elseif($ver[0]=="listar_recibo_otras_cuentas_pagar"){
 }elseif($ver[0]=="listar_operacion_modulo_filtrado"){
     $cont=new Asiento();
     $cont->listar_operacion_modulo_filtrado($ver[1]);
+}elseif($ver[0]=="listatransacciones_comercial"){
+    $cont=new Transacciones();
+    $cont->listatransacciones_comercial($ver[1]);
 }
-//reportecomprobantecontable listafactura_cobrado_trans asientotipo listar_operacion_modulo_filtrado
+//reportecomprobantecontable listafactura_cobrado_trans asientotipo listar_operacion_modulo_filtrado creartipoasientodelete
 
 //listafactura eliminartransaccion listapagos_individuales listatransaciones factura lista_cobrar_cobrado
-//reporteactivodisponible listar_cajas_bancos_pagar_por_recibo listar_recibo_por_id_otras_cuentas_pagar
+//reporteactivodisponible listar_cajas_bancos_pagar_por_recibo listar_recibo_por_id_otras_cuentas_pagar lista_transaccion
 ?>

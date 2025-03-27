@@ -92,41 +92,34 @@ class Admin extends DB
 
     public function creartipoasientodelete($id)
     {
-        // Validar que el ID no esté vacío o sea nulo
-        if (empty($id)) {
-            $res = array("ok" => "danger", "mensaje" => "ID no válido");
-            echo json_encode($res);
-            return;
-        }
-
-        // Preparar la respuesta por defecto
-        $res = array("ok" => "danger", "mensaje" => "Registro no Eliminado");
-
-        // Preparar la consulta SQL con una consulta preparada
-        $stmt = $this->dbc->prepare("DELETE FROM tipotransaccion WHERE idtipotransaccion = ?");
-
-        if ($stmt) {
-            // Vincular el parámetro para evitar inyección SQL
-            $stmt->bind_param("i", $id);
-
-            // Ejecutar la consulta
-            if ($stmt->execute()) {
-                // Verificar si se eliminó alguna fila
-                if ($stmt->affected_rows > 0) {
-                    $res = array("ok" => "success", "mensaje" => "Registro Eliminado");
-                } else {
-                    $res['mensaje'] = 'No se encontró ningún registro con ese ID';
+        $this->dbc->begin_transaction();
+    
+        try {
+            $relacionadas = [
+                // 'detalletransaccion' => 'No se puede eliminar porque hay registros en producción',
+                ['tabla' => 'asientotipo', 'campo' => 'tipo', 'mensaje' => 'No se puede eliminar']
+                // ['tabla' => 'asiento', 'campo' => 'idcuenta', 'mensaje' => 'No se puede eliminar'],
+                // ['tabla' => 'vinculacion_cuenta_xcxp ', 'campo' => 'idplandecuenta', 'mensaje' => 'No se puede eliminar'],
+                // ['tabla' => 'relacionip', 'campo' => 'idplandecuenta', 'mensaje' => 'No se puede eliminar']
+            ];
+    
+            foreach ($relacionadas as $relacion) {
+                $query = "SELECT 1 FROM {$relacion['tabla']} WHERE {$relacion['campo']} = $id";
+                $result = $this->dbc->query($query);
+                if ($result->num_rows > 0) {
+                    throw new Exception($relacion['mensaje']);
                 }
-            } else {
-                // Si hubo un error en la ejecución de la consulta
-                $res['mensaje'] = 'Error en la ejecución de la consulta: ' . $stmt->error;
             }
-
-            // Cerrar la consulta preparada
-            $stmt->close();
-        } else {
-            // Si hubo un error en la preparación de la consulta
-            $res['mensaje'] = 'Error en la preparación de la consulta: ' . $this->db->error;
+    // $registro = $this->dbc->query("DELETE FROM plandecuenta WHERE idplandecuenta='$dato'");
+            $query = "DELETE FROM tipotransaccion WHERE idtipotransaccion = $id";
+            $this->dbc->query($query);
+            
+            $this->dbc->commit();
+            $res = array("success", "Se eliminó correctamente", "creartipoasientodelete");
+    
+        } catch (Exception $e) {
+            $this->dbc->rollback();
+            $res = array("danger", $e->getMessage(), "creartipoasientodelete");
         }
 
         // Devolver el resultado en formato JSON
@@ -783,7 +776,7 @@ class Admin extends DB
         }
     }
 
-    // Devolver resultados en JSON
+    // Devolver resultados en JSON creartipoasientodelete
     $res = array("Datos Actualizados" => "Ingreso:$ingreso , Egreso:$egreso , Diario:$diario");
     echo json_encode($res);
 }

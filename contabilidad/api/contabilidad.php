@@ -3,7 +3,7 @@ session_start();
 //require_once "db.php"; lista_cobrar_cobrado_factura crearfacturas listadesconsolidar decode cuentaspof
 require_once "../../db/db.php";
 class Contabilidad extends DB
-{//registroasiento
+{//registroasiento eliminarasiento
 
     public function registrardesconsolidar($idtransaccion,$motivo,$estado,$hora,$fecha,$idusuario,$idempresa){
         $res="";
@@ -973,13 +973,36 @@ ORDER BY
     }
     public function eliminarasiento($asiento)
     {
-        $res = "";
-        $registro = $this->dbc->query("delete from asientotipo where idasientotipo='$asiento'");
-        if ($registro === TRUE) {
-            $res = array("success", "Registro Correcto");
-        } else {
-            $res = array("danger", "No se pudo ");
+        $this->dbc->begin_transaction();
+    
+        try {
+            $relacionadas = [
+                // 'detalletransaccion' => 'No se puede eliminar porque hay registros en producción',
+                ['tabla' => 'asignacion_asiento_operacion_modulos', 'campo' => 'idasientotipo', 'mensaje' => 'No se puede eliminar']
+                // ['tabla' => 'asiento', 'campo' => 'idcuenta', 'mensaje' => 'No se puede eliminar'],
+                // ['tabla' => 'vinculacion_cuenta_xcxp ', 'campo' => 'idplandecuenta', 'mensaje' => 'No se puede eliminar'],
+                // ['tabla' => 'relacionip', 'campo' => 'idplandecuenta', 'mensaje' => 'No se puede eliminar']
+            ];
+    
+            foreach ($relacionadas as $relacion) {
+                $query = "SELECT 1 FROM {$relacion['tabla']} WHERE {$relacion['campo']} = $asiento";
+                $result = $this->dbc->query($query);
+                if ($result->num_rows > 0) {
+                    throw new Exception($relacion['mensaje']);
+                }
+            }
+    // $registro = $this->dbc->query("DELETE FROM plandecuenta WHERE idplandecuenta='$dato'");
+            $query = "DELETE FROM asientotipo WHERE idasientotipo='$asiento'";
+            $this->dbc->query($query);
+            
+            $this->dbc->commit();
+            $res = array("success", "Se eliminó correctamente", "eliminarasiento");
+    
+        } catch (Exception $e) {
+            $this->dbc->rollback();
+            $res = array("danger", $e->getMessage(), "creartipoasientodelete");
         }
+
         echo json_encode($res);
     }
 

@@ -49,8 +49,8 @@ public function registrar_transaccionEn_espera($idtransaccion,$estado,$hora,$fec
                     }
 
 
-                        $descTRan2=$this->dbc->query("INSERT INTO transacciones(codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
-                        VALUES('$resultado[codigotransaccion]','$resultado[fecha_proceso]','$resultado[tipodecambio]','$resultado[ndocumento]','$resultado[glosa]','1','$resultado[tipotransaccion_idtipotransaccion]','$resultado[idempresa]','$resultado[sucursal]','$resultado[idgestion]')");
+                        $descTRan2=$this->dbc->query("INSERT INTO transacciones(codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
+                        VALUES('$resultado[codigotransaccion]','$resultado[fecha_proceso]','$resultado[tipodecambio]','$resultado[ndocumento]','$resultado[glosa]','1','1','$resultado[tipotransaccion_idtipotransaccion]','$resultado[idempresa]','$resultado[sucursal]','$resultado[idgestion]')");
          
                 
                 
