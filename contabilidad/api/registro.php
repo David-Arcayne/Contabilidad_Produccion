@@ -376,12 +376,12 @@ if($data['ver'] == "cobrofacturasaasientomodelo") {
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['iddivisa']));
         }
     }elseif($ver=="registrar_asignacion_asiento_operacion"){
-        if(isset($_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['idempresa'])){
+        if(isset($_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['bandera'],$_POST['idempresa'])){
             $cont=new Asiento();
-            $cont->registrar_asignacion_asiento_operacion($_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['idempresa']);
+            $cont->registrar_asignacion_asiento_operacion($_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['bandera'],$_POST['idempresa']);
         }
         else{
-            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['idempresa']));
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['bandera'],$_POST['idempresa']));
         }
     }elseif($ver=="registro_transaccion_comercial"){
         if(isset($_POST['fecha'],$_POST['idasignacion_asiento'],$_POST['empresa'],$_POST['sucursal'])){
@@ -390,6 +390,14 @@ if($data['ver'] == "cobrofacturasaasientomodelo") {
         }
         else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['fecha'],$_POST['idasignacion_asiento'],$_POST['empresa'],$_POST['sucursal']));
+        }
+    }elseif($ver=="editar_asignacion_asiento_operacion"){
+        if(isset($_POST['idasignacion_asiento_operacion_modulos'],$_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['bandera'])){
+            $cont=new Asiento();
+            $cont->editar_asignacion_asiento_operacion($_POST['idasignacion_asiento_operacion_modulos'],$_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['bandera']);
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idasignacion_asiento_operacion_modulos'],$_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['bandera']));
         }
     }    
 

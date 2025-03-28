@@ -59,9 +59,9 @@ $rep->reportedetallefpt($ver[1],$ver[2],$ver[3]);
 }elseif($ver[0]=="reportedetallefptclasefactura"){
     $rep=new Reportes();
     $rep->reportedetallefptclasefactura($ver[1],$ver[2],$ver[3],$ver[4]);
-    }elseif($ver[0]=="reportedetalletransaccion"){
+}elseif($ver[0]=="reportedetalletransaccion"){
 $rep=new Reportes();
-$rep->reportedetalletransaccion($ver[1],$ver[2],$ver[3],$ver[4]);
+$rep->reportedetalletransaccion($ver[1],$ver[2],$ver[3]);
 }elseif($ver[0]=="reporteactivodisponible"){
 $rep=new Reportes();
 $rep->reporteactivodisponible($ver[1],$ver[2],$ver[3],$ver[4]);
@@ -370,7 +370,8 @@ elseif($ver[0]=="listar_recibo_otras_cuentas_pagar"){
 }elseif($ver[0]=="listar_asignacion_asiento_operacion"){
     $cont=new Asiento();
     $cont->listar_asignacion_asiento_operacion($ver[1]);
-}elseif($ver[0]=="listar_asiento_por_modulo"){
+}
+elseif($ver[0]=="listar_asiento_por_modulo"){
     $cont=new Asiento();
     $cont->listar_asiento_por_modulo($ver[1],$ver[2]);
 }elseif($ver[0]=="listar_operacion_modulo_filtrado"){
@@ -379,9 +380,13 @@ elseif($ver[0]=="listar_recibo_otras_cuentas_pagar"){
 }elseif($ver[0]=="listatransacciones_comercial"){
     $cont=new Transacciones();
     $cont->listatransacciones_comercial($ver[1]);
+}elseif($ver[0]=="existe_empresa_modulo"){
+    $cont=new Transacciones();
+    $cont->existe_empresa_modulo($ver[1]);
 }
+
 //reportecomprobantecontable listafactura_cobrado_trans asientotipo listar_operacion_modulo_filtrado creartipoasientodelete
 
-//listafactura eliminartransaccion listapagos_individuales listatransaciones factura lista_cobrar_cobrado
+//listafactura eliminartransaccion listapagos_individuales listatransaciones factura lista_cobrar_cobrado reportedetalletransaccion
 //reporteactivodisponible listar_cajas_bancos_pagar_por_recibo listar_recibo_por_id_otras_cuentas_pagar lista_transaccion
 ?>

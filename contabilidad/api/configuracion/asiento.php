@@ -1,7 +1,7 @@
 <?php
 require_once "../../db/db.php";
 class Asiento extends DB{
-    public function registrar_asignacion_asiento_operacion($idoperacion_modulos,$idasientotipo,$empresa){
+    public function registrar_asignacion_asiento_operacion($idoperacion_modulos,$idasientotipo,$bandera,$empresa){
         $idempresa = $this->getidempresa($empresa);
         // $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM divisa WHERE nombre = '$nombre' AND idempresa = '$idempresa'");
         // $resultado = $consulta->fetch_assoc();
@@ -11,7 +11,7 @@ class Asiento extends DB{
             $res = array("danger", "El registro ya existe","Error");
         } else {
             // Insertar el nuevo registro
-            $registroProveedor = $this->dbc->query("INSERT INTO asignacion_asiento_operacion_modulos(idoperacion_modulos,idasientotipo,idempresa) VALUES ('$idoperacion_modulos','$idasientotipo','$idempresa')");
+            $registroProveedor = $this->dbc->query("INSERT INTO asignacion_asiento_operacion_modulos(idoperacion_modulos,idasientotipo,bandera,idempresa) VALUES ('$idoperacion_modulos','$idasientotipo','$bandera','$idempresa')");
             if ($registroProveedor === TRUE) {                                                                                                                                                                
                 $res = array("success", "Registro exitoso","registroCaracteristicas");
             } else {
@@ -20,6 +20,31 @@ class Asiento extends DB{
         }
         echo json_encode($res);
         
+    }
+
+    public function editar_asignacion_asiento_operacion($id,$idoperacion_modulos,$idasientotipo,$bandera) {
+        // $idempresa = $this->getidempresa($empresa);
+
+        // $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM divisa WHERE nombre = '$nombre' AND idempresa = '$idempresa' AND iddivisa != '$id'");
+        // $resultado = $consulta->fetch_assoc();
+        // $totalRegistros = $resultado['total'];
+
+        if (0 > 0) {
+            $res = array("danger", "El registro ya existe","editarCaracteristicas");
+        }else {
+            // Insertar el nuevo registro
+            $registroListaCompra = $this->dbc->query("UPDATE asignacion_asiento_operacion_modulos
+                                    SET idoperacion_modulos = '$idoperacion_modulos',
+                                    idasientotipo = '$idasientotipo',
+                                    bandera = '$bandera'
+                                    WHERE idasignacion_asiento_operacion_modulos = '$id';");
+            if ($registroListaCompra === TRUE) {                                                                                                                                                                
+                $res = array("success", "Edición exitosa","editarCaracteristicas");
+            } else {
+                $res = array("danger", "No se pudo editar");
+            }
+        }
+        echo json_encode($res);
     }
 
     public function listar_asignacion_asiento_operacion($empresa) {
@@ -43,7 +68,8 @@ class Asiento extends DB{
                 "nombre_modulo" => $operacionModulo['nombre_modulo'],
                 "nombre_operacion" => $operacionModulo['nombre_operacion'],   
                 "idasientotipo" => $qwe['idasientotipo'],
-                "nombre_asiento" => $asiento['nombre']
+                "nombre_asiento" => $asiento['nombre'],
+                "bandera" => $qwe['bandera'],
             );
             array_push($lista, $res);
         }

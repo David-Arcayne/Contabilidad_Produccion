@@ -91,7 +91,10 @@ public function getidgestion($md5){
         echo json_encode($lista);
     }
 
-    public function reportedetalletransaccion($fechai,$fechaf,$reporte,$empresa){
+    public function reportedetalletransaccion($fechai,$fechaf,$empresa){
+      ini_set('display_errors', 1);
+      ini_set('display_startup_errors', 1);
+      error_reporting(E_ALL);
         $lista=[];
         $total=[];
         $ide=$this->getidempresa($empresa);
@@ -108,13 +111,13 @@ public function getidgestion($md5){
         t.organizacion_idorganizacion = '$ide'
         AND t.fechatransaccion >= '$fechai'
         AND t.fechatransaccion <= '$fechaf'
-        -- AND t.estado != 4
+        AND t.estado != 4
         AND t.idgestion='$gestion'");
         while($qwe=$this->dbc->fetch($transacciones)){
         $productos=array();
         
         $detallet=$this->dbc->query("SELECT p.nombreplan,p.numero,d.debe,d.haber,d.nota FROM detalletransaccion AS d 
-        INNER JOIN plandecuenta AS p ON p.idplandecuenta=d.idplandecuenta WHERE d.transacciones_idtransacciones='".$qwe[3]."';");
+        INNER JOIN plandecuenta AS p ON p.idplandecuenta=d.idplandecuenta WHERE d.transacciones_idtransacciones='".$qwe[4]."';");
         while($asd=$this->dbc->fetch($detallet)){
             $produ=array(
                 "plan"=>$asd[0],
@@ -323,7 +326,7 @@ public function getidgestion($md5){
       $ide = $this->getidempresa($empresa);
       $gestion = $this->getidgestion($empresa);
       $reporte = $this->dbc->query("SELECT p.numero, p.nombreplan, SUM(d.debe) AS debe, SUM(d.haber) AS haber, SUM(debe) - SUM(haber) AS deudor, SUM(haber) - SUM(debe) AS acreedor FROM plandecuenta AS p
-      INNER JOIN transacciones AS t ON t.organizacion_idorganizacion='$ide' AND t.consolidar=2
+      INNER JOIN transacciones AS t ON t.organizacion_idorganizacion='$ide'
       INNER JOIN detalletransaccion AS d ON d.idplandecuenta=p.idplandecuenta AND t.idtransacciones=d.transacciones_idtransacciones
       WHERE p.organizacion_idorganizacion='$ide' AND t.fechatransaccion>='$fechai' AND t.fechatransaccion<='$fechaf' AND 
       t.idgestion='$gestion' 
@@ -472,7 +475,7 @@ public function getidgestion($md5){
         $ide=$this->getidempresa($empresa);
         $gestion=$this->getidgestion($empresa);
         $reporte=$this->dbc->query("SELECT p.numero,p.nombreplan,SUM(d.debe) AS debe,SUM(d.haber) AS haber,SUM(debe)-SUM(haber) AS deudor,SUM(haber)-SUM(debe) AS acreedor FROM plandecuenta AS p
-        INNER JOIN transacciones AS t ON t.organizacion_idorganizacion='$ide'
+        INNER JOIN transacciones AS t ON t.organizacion_idorganizacion='$ide' AND t.consolidar= 2 
         INNER JOIN detalletransaccion AS d ON d.idplandecuenta=p.idplandecuenta AND t.idtransacciones=d.transacciones_idtransacciones
         WHERE p.organizacion_idorganizacion='$ide' AND t.fechatransaccion>='$fechai' AND t.fechatransaccion<='$fechaf' AND p.numero<'4.0.0.00.00' AND t.idgestion='$gestion' 
         GROUP by p.nombreplan 
@@ -594,18 +597,19 @@ $totalHaber = 0;
 
 
         while($qwe=$this->dbc->fetch($registro)){
-            $detalle=$this->dbc->query("select
-            SUM(d.debe) - SUM(d.haber) as total,
+            $detalle=$this->dbc->query("SELECT
+            SUM(d.debe) - SUM(d.haber) AS total,
             d.idplandecuenta
-          from
-            detalletransaccion as d,
-            transacciones as t
-          where
+          FROM
+            detalletransaccion AS d,
+            transacciones AS t
+          WHERE
             d.idplandecuenta = '$qwe[2]'
-            and t.idgestion = '$gestion'
-            and t.fechatransaccion>='$fechai'
-            and t.fechatransaccion<='$fechaf'
-            and t.idtransacciones = d.transacciones_idtransacciones");
+            AND t.idgestion = '$gestion'
+            AND t.fechatransaccion>='$fechai'
+            AND t.fechatransaccion<='$fechaf'
+            AND t.consolidar = 2
+            AND t.idtransacciones = d.transacciones_idtransacciones");
             $asd=$this->dbc->fetch($detalle);
             if($qwe[2]==$asd[1]){
             $res=array("numero"=>$qwe[0],"plan"=>$qwe[1],"total"=>$asd[0]);
@@ -636,36 +640,38 @@ $totalHaber = 0;
     ");
       while($qwe=$this->dbc->fetch($registro)){
         if($qwe[3]=="DEBE"){
-          $detalle=$this->dbc->query("select
-          SUM(d.debe) - SUM(d.haber) as total,
+          $detalle=$this->dbc->query("SELECT
+          SUM(d.debe) - SUM(d.haber) AS total,
           d.idplandecuenta
-        from
-          detalletransaccion as d,
+        FROM
+          detalletransaccion AS d,
           transacciones as t
-        where
+        WHERE
           d.idplandecuenta = '$qwe[2]'
-          and t.idgestion = '$gestion'
-          and t.fechatransaccion>='$fechai'
-          and t.fechatransaccion<='$fechaf'
-          and t.idtransacciones = d.transacciones_idtransacciones");
+          AND t.idgestion = '$gestion'
+          AND t.fechatransaccion>='$fechai'
+          AND t.fechatransaccion<='$fechaf'
+          AND t.consolidar = 2
+          AND t.idtransacciones = d.transacciones_idtransacciones");
           $asd=$this->dbc->fetch($detalle);
           if($qwe[2]==$asd[1]){
           $res=array("numero"=>$qwe[0],"plan"=>$qwe[1],"total"=>$asd[0]);
           array_push($lista,$res);
           }
         }else{
-          $detalle=$this->dbc->query("select
-          SUM(d.haber) - SUM(d.debe) as total,
+          $detalle=$this->dbc->query("SELECT
+          SUM(d.haber) - SUM(d.debe) AS total,
           d.idplandecuenta
-        from
-          detalletransaccion as d,
-          transacciones as t
-        where
+        FROM
+          detalletransaccion AS d,
+          transacciones AS t
+        WHERE
           d.idplandecuenta = '$qwe[2]'
-          and t.idgestion = '$gestion'
-          and t.fechatransaccion>='$fechai'
-          and t.fechatransaccion<='$fechaf'
-          and t.idtransacciones = d.transacciones_idtransacciones");
+          AND t.idgestion = '$gestion'
+          AND t.fechatransaccion>='$fechai'
+          AND t.fechatransaccion<='$fechaf'
+          AND t.consolidar = 2
+          AND t.idtransacciones = d.transacciones_idtransacciones");
           $asd=$this->dbc->fetch($detalle);
           if($qwe[2]==$asd[1]){
           $res=array("numero"=>$qwe[0],"plan"=>$qwe[1],"total"=>$asd[0]);
@@ -1675,7 +1681,7 @@ if ($pcuentas->num_rows > 0) {
 
         echo json_encode($lista); 
        }
-  //reportedetallefpt reporteactivodiaponibledos reportedetalletransaccion estado consolidar
+  //reportedetallefpt reporteactivodiaponibledos reportedetalletransaccion estado consolidar reporteactivoypasivo
 //reportecomprobantecontable reporteactivodisponible reportedetalletransaccion mayorcuentacontable reportecomprobantecontable
 
 }
