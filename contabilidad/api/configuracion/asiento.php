@@ -67,6 +67,7 @@ class Asiento extends DB{
                 "idoperacion_modulos" => $qwe['idoperacion_modulos'],
                 "nombre_modulo" => $operacionModulo['nombre_modulo'],
                 "nombre_operacion" => $operacionModulo['nombre_operacion'],   
+                "descripcion_operacion" => $operacionModulo['descripcion'], 
                 "idasientotipo" => $qwe['idasientotipo'],
                 "nombre_asiento" => $asiento['nombre'],
                 "bandera" => $qwe['bandera'],

@@ -69,7 +69,7 @@ public function getidgestion($md5){
         INNER JOIN transacciones AS t ON pc.organizacion_idorganizacion = t.organizacion_idorganizacion
         AND t.fechatransaccion >= '$fechai'
         AND t.fechatransaccion <= '$fechaf'
-        AND t.estado != '4'
+         AND t.estado NOT IN (4, 5, 6)
         INNER JOIN detalletransaccion AS dt ON dt.transacciones_idtransacciones = t.idtransacciones
         AND dt.idplandecuenta = pc.idplandecuenta
       WHERE
@@ -111,7 +111,7 @@ public function getidgestion($md5){
         t.organizacion_idorganizacion = '$ide'
         AND t.fechatransaccion >= '$fechai'
         AND t.fechatransaccion <= '$fechaf'
-        AND t.estado != 4
+        AND t.estado NOT IN (4, 5, 6)
         AND t.idgestion='$gestion'");
         while($qwe=$this->dbc->fetch($transacciones)){
         $productos=array();
@@ -146,33 +146,34 @@ public function getidgestion($md5){
         //$total=[];
         $ide=$this->getidempresa($empresa);
         $gestion=$this->getidgestion($empresa);
-        $transacciones=$this->dbc->query("select
+        $transacciones=$this->dbc->query("SELECT
         t.codigotransaccion,
         t.fechatransaccion,
         t.glosa,
         t.idtransacciones,
         t.estado
-      from
-        transacciones as t
-      where
+      FROM
+        transacciones AS t
+      WHERE
         t.organizacion_idorganizacion = '$ide'
-        and t.fechatransaccion >= '$fechai'
-        and t.fechatransaccion <= '$fechaf'
-        and t.idgestion='$gestion'");
+        AND t.fechatransaccion >= '$fechai'
+        AND t.fechatransaccion <= '$fechaf'
+        AND t.estado NOT IN (4, 5, 6)
+        AND t.idgestion='$gestion'");
         while($qwe=$this->dbc->fetch($transacciones)){
         $facturas=[];
     
-            $factud=$this->dbc->query("select * from factura where transacciones_idtransacciones='".$qwe[3]."' order by fecha asc");
+            $factud=$this->dbc->query("SELECT * FROM factura WHERE transacciones_idtransacciones='".$qwe[3]."' ORDER BY fecha ASC");
             $sdf=$this->dbc->fetch($factud);
             if($sdf['transacciones_idtransacciones']!=$qwe[3])
             {}else{
               
-            $factu=$this->dbc->query("select * from factura where transacciones_idtransacciones='".$qwe[3]."' order by fecha asc");
+            $factu=$this->dbc->query("SELECT * FROM factura WHERE transacciones_idtransacciones='".$qwe[3]."' ORDER by fecha asc");
             while($asd=$this->dbc->fetch($factu)){
                 $nit=0;$cliente="";
                 if($asd['clasefactura']==1){ // clasefactura 1 proveedor  y 2 cliente 
                   
-                $proveedor=$this->dbcm->query("select * from proveedor where id_proveedor='".$asd['proveedorcliente_idproveedorcliente']."'");
+                $proveedor=$this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='".$asd['proveedorcliente_idproveedorcliente']."'");
                 $zxc=$this->dbcm->fetch($proveedor);
                 $nit=$zxc['nit'];
                 $cliente=$zxc['nombre'];
@@ -326,7 +327,7 @@ public function getidgestion($md5){
       $ide = $this->getidempresa($empresa);
       $gestion = $this->getidgestion($empresa);
       $reporte = $this->dbc->query("SELECT p.numero, p.nombreplan, SUM(d.debe) AS debe, SUM(d.haber) AS haber, SUM(debe) - SUM(haber) AS deudor, SUM(haber) - SUM(debe) AS acreedor FROM plandecuenta AS p
-      INNER JOIN transacciones AS t ON t.organizacion_idorganizacion='$ide'
+      INNER JOIN transacciones AS t ON t.organizacion_idorganizacion='$ide' AND t.estado NOT IN (4, 5, 6)
       INNER JOIN detalletransaccion AS d ON d.idplandecuenta=p.idplandecuenta AND t.idtransacciones=d.transacciones_idtransacciones
       WHERE p.organizacion_idorganizacion='$ide' AND t.fechatransaccion>='$fechai' AND t.fechatransaccion<='$fechaf' AND 
       t.idgestion='$gestion' 
@@ -808,6 +809,7 @@ $totalHaber = 0;
       t.fechatransaccion >= '$fechaIni'
       AND t.fechatransaccion <= '$fechaFin'
       AND t.organizacion_idorganizacion = '$ide'
+      AND t.estado NOT IN (4, 5, 6)
       AND t.idgestion='$gestion'
     ORDER BY
       t.codigotransaccion ASC;
@@ -977,14 +979,13 @@ $totalHaber = 0;
         t.fechatransaccion,
         t.tipotransaccion_idtipotransaccion,
         t.idtransacciones
-        
       FROM
         transacciones AS t
       WHERE
         t.organizacion_idorganizacion = '$ide'
         AND t.fechatransaccion >= '$fechai'
         AND t.fechatransaccion <= '$fechaf'
-        AND t.estado != 4
+        AND t.estado NOT IN (4, 5, 6)
         AND t.idgestion = '$gestion'
       ORDER BY
         t.codigotransaccion ASC");
