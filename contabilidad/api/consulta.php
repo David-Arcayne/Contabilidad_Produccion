@@ -14,6 +14,7 @@ require_once "./otras_cuentas/documento_cobro.php";
 require_once "./otras_cuentas/recibo_otras_cuentas.php";
 require_once "./configuracion/divisa.php";
 require_once "./configuracion/asiento.php";
+require_once "./recibos/caja_bancos_recibos.php";
 
 $ver=explode("/",$_GET['ver']); //dividiendo los "/"  ver[0],ver[1],ver[x] listafacturaapi_cobrado eliminarasiento
 if($ver[0]=="verificacion"){
@@ -383,6 +384,9 @@ elseif($ver[0]=="listar_asiento_por_modulo"){
 }elseif($ver[0]=="existe_empresa_modulo"){
     $cont=new Transacciones();
     $cont->existe_empresa_modulo($ver[1]);
+}elseif($ver[0]=="listar_recibo_por_caja_bancos"){
+    $cont=new caja_bancos_recibos();
+    $cont->listar_recibo_por_caja_bancos($ver[1]);
 }
 
 //reportecomprobantecontable listafactura_cobrado_trans asientotipo listar_operacion_modulo_filtrado creartipoasientodelete
