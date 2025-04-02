@@ -110,7 +110,7 @@ else{
 //echo json_encode($res); 
 }elseif($ver=="registrocobrarfacturaf5"){
     $cont=new Cuentaspof();
-    $cont->registrocobrarfacturaf5($_POST['idcuentaspof'],$_POST['fecha'],$_POST['persona'],$_POST['ci'],$_POST['lugar'],$_FILES['archivo']);
+    $cont->registrocobrarfacturaf5($_POST['idcuentaspof'],$_POST['fecha'],$_POST['persona'],$_POST['ci'],$_POST['lugar'],$_POST['idtransaccion'],$_FILES['archivo']);
     //$res=array($_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente']);
     //echo json_encode($res);
 }elseif($ver=="registropagarfactura"){
@@ -401,7 +401,7 @@ if($data['ver'] == "cobrofacturasaasientomodelo") {
         }
     }    
 
-//registrar_recibo_otras_cuentas_pagar asiento registroasiento
+//registrar_recibo_otras_cuentas_pagar asiento registroasiento registrocobrarfacturaf5
 //  registrotransaccion registrotransaccionf5 duplicartransaccion registrocobrarfactura registrocobrarfacturaGrupal factura registropagarfactura registrocobrarfacturaGrupal
 }//editar_caja_bancos_pagar_recibo registropagarfacturaf5 registropagarfacturaGrupal  editar_caja_bancos_pagar_recibo
 ?> 

@@ -118,13 +118,13 @@ class Cuentaspof extends DB{
         echo json_encode($res);
     }
 
-    public function registrocobrarfacturaf5($idrecibo,$fecha, $persona, $ci, $lugar,$archivo)
+    public function registrocobrarfacturaf5($idrecibo,$fecha, $persona, $ci, $lugar,$idtransaccion,$archivo)
     {
         $res = "";
 
         if(empty($archivo['name'])){
 
-            $update = $this->dbc->query("UPDATE cuentaspof SET fecha='$fecha',persona='$persona',ci='$ci',lugar='$lugar' WHERE idcuentaspof='$idrecibo'");
+            $update = $this->dbc->query("UPDATE cuentaspof SET fecha='$fecha',persona='$persona',ci='$ci',lugar='$lugar',transaccion='$idtransaccion' WHERE idcuentaspof='$idrecibo'");
 
             if ($update === TRUE) {
                 $res = array("success", "Registro Realizado", "registrocobrarfactura",$idrecibo,$fecha, $persona, $ci,$archivo);
@@ -148,7 +148,7 @@ class Cuentaspof extends DB{
         }
         if(move_uploaded_file($archivo_tmp, $ruta_destino)){
              //registrar pago, preguntar guardar la anterior transaccion o la nueva
-        $updateArch = $this->dbc->query("UPDATE cuentaspof SET fecha='$fecha',persona='$persona',ci='$ci',archivo='$unique_name' WHERE idcuentaspof='$idrecibo'");
+        $updateArch = $this->dbc->query("UPDATE cuentaspof SET fecha='$fecha',persona='$persona',ci='$ci',lugar='$lugar',transaccion='$idtransaccion',archivo='$unique_name' WHERE idcuentaspof='$idrecibo'");
 
         if ($updateArch === TRUE) {
             $res = array("success", "Edicion Realizada", "registrocobrarfactura");
