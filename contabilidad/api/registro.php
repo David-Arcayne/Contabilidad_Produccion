@@ -13,6 +13,7 @@ require_once "./recibos/cuentaspor.php";
 require_once "./otras_cuentas/recibo_otras_cuentas.php";
 require_once "./configuracion/divisa.php";
 require_once "./configuracion/asiento.php";
+require_once "./recibos/caja_bancos_recibos.php";
 
 $ver=$_POST['ver'];
 $json = file_get_contents('php://input'); // Decodificar el JSON en un arreglo PHP  
@@ -399,9 +400,17 @@ if($data['ver'] == "cobrofacturasaasientomodelo") {
         else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idasignacion_asiento_operacion_modulos'],$_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['bandera']));
         }
+    }elseif($ver=="registrar_factura_recibo_cajaBancos"){
+        if(isset($_POST['fecha'],$_POST['nfactura'],$_POST['nautorizacion'],$_POST['codigocontrol'],$_POST['montofactura'],$_POST['tasacero'],$_POST['export'],$_POST['npoliza'],$_POST['iceiecdhotros'],$_POST['descuentobonificacion'],$_POST['clasefactura'],$_POST['cobrado'],$_POST['pagado'],$_POST['especificacion'],$_POST['trans'],$_POST['cliente'],$_POST['empresa'],$_POST['cuenta'],$_POST['sucursal'],$_POST['asiento'],$_POST['idcaja_bancos'])){
+            $cont=new Caja_bancos_recibos();
+            $cont->registrar_factura_recibo_cajaBancos($_POST['fecha'],$_POST['nfactura'],$_POST['nautorizacion'],$_POST['codigocontrol'],$_POST['montofactura'],$_POST['tasacero'],$_POST['export'],$_POST['npoliza'],$_POST['iceiecdhotros'],$_POST['descuentobonificacion'],$_POST['clasefactura'],$_POST['cobrado'],$_POST['pagado'],$_POST['especificacion'],$_POST['trans'],$_POST['cliente'],$_POST['empresa'],$_POST['cuenta'],$_POST['sucursal'],$_POST['asiento'],$_POST['idcaja_bancos']);
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['fecha'],$_POST['nfactura'],$_POST['nautorizacion'],$_POST['codigocontrol'],$_POST['montofactura'],$_POST['tasacero'],$_POST['export'],$_POST['npoliza'],$_POST['iceiecdhotros'],$_POST['descuentobonificacion'],$_POST['clasefactura'],$_POST['cobrado'],$_POST['pagado'],$_POST['especificacion'],$_POST['trans'],$_POST['cliente'],$_POST['empresa'],$_POST['cuenta'],$_POST['sucursal'],$_POST['asiento'],$_POST['idcaja_bancos']));
+        }
     }    
 
-//registrar_recibo_otras_cuentas_pagar asiento registroasiento registrocobrarfacturaf5
+//registrar_recibo_otras_cuentas_pagar asiento registroasiento registrocobrarfacturaf5 crearsolofacturasapi
 //  registrotransaccion registrotransaccionf5 duplicartransaccion registrocobrarfactura registrocobrarfacturaGrupal factura registropagarfactura registrocobrarfacturaGrupal
 }//editar_caja_bancos_pagar_recibo registropagarfacturaf5 registropagarfacturaGrupal  editar_caja_bancos_pagar_recibo
 ?> 
