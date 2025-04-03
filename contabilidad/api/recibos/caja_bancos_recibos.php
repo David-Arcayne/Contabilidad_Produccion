@@ -1,6 +1,33 @@
 <?php
 require_once "../../db/db.php";
+// require_once "./contabilidad/api/configuracion/empresa.php";
 class caja_bancos_recibos extends DB{
+
+    public function registrar_factura_recibo_cajaBancos($fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento,$clasefactura,$cobro, $pagar, $espesificacion,$trans, $cliente, $empresa,   $cuenta,  $sucursal)
+    {
+        $idsucursal = $this->getidsucursal($sucursal);
+        $idempresa = $this->getidempresa($empresa);
+        $co = 0;
+        $pa = 0;
+        if ($cobro == 1 || $cobro == 2) {
+            $co = $cobro;
+        }
+        if ($pagar == 1 || $pagar == 2) {
+            $pa = $pagar;
+        }
+        $res = ""; //array($fecha,$nfactura,$nautorizacion,$codigocontrol,$monto,$tasacero,$export,$npoliza,$ice,$descuento,$espesificacion,$cliente,$co,$pa,$trans,$clasefactura,$cuenta,$idempresa,$idsucursal);
+        $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa', '$espesificacion', '1', '1', '$trans', '$cliente', '$idempresa', '$cuenta', '$idsucursal');");
+        
+        $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,archivo)
+                VALUES('$nroRecibo','$fact[fecha]','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$fact[montofactura]','$fact[idfactura]','$idtrans','0',NULL)");
+                
+        if ($registro === TRUE) {
+            $res = array("success", "Registro Correcto", "crearfactura", $trans, $clasefactura, $cuenta);
+        } else {
+            $res = array("danger", "No se pudo realizar el registro ");
+        }
+        echo json_encode($res);
+    }
 
     public function listar_recibo_por_caja_bancos($idcaja_bancos) {
         $lista = [];
@@ -8,10 +35,10 @@ class caja_bancos_recibos extends DB{
     
         // Preparar la consulta
         $getPedido = $this->dbc->query("SELECT cp.idcuentaspof,cp.nrecibo,cp.fecha,cp.cliente,cp.idfactura,cp.idotras_cuentas,cp.archivo, dc.idcaja_bancos,dc.monto,dc.idfactura, t.codigotransaccion
-FROM detalle_caja_bancos_cobrar dc
-INNER JOIN cuentaspof cp ON cp.idcuentaspof = dc.idcuentaspof
-INNER JOIN transacciones t ON t.idtransacciones = cp.transaccion
-WHERE dc.idcaja_bancos = '$idcaja_bancos';");
+    FROM detalle_caja_bancos_cobrar dc
+    INNER JOIN cuentaspof cp ON cp.idcuentaspof = dc.idcuentaspof
+    INNER JOIN transacciones t ON t.idtransacciones = cp.transaccion
+    WHERE dc.idcaja_bancos = '$idcaja_bancos';");
     
         while ($qwe = $this->dbc->fetch($getPedido)) {
             // $recibo = $this->dbc->query("SELECT * FROM cuentaspof WHERE idcuentaspof= '$qwe[idcuentaspof]'");
@@ -92,5 +119,19 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
     
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
+
+    public function getidempresa($md5)
+    {
+        $registro = $this->dbe->query("select * from organizacion where md5(idorganizacion)='$md5'");
+        $qwe = $this->dbe->fetch($registro);
+        return $qwe['idorganizacion'];
+    }
+    public function getidsucursal($md5)
+    {
+        $registro = $this->dbe->query("select * from sucursalcontable where md5(idsucursalcontable)='$md5'");
+        $qwe = $this->dbe->fetch($registro);
+        return $qwe['idsucursalcontable'];
+    }
+
 }
 ?>

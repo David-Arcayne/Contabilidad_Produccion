@@ -1,7 +1,10 @@
 <?php
 require_once "../../db/db.php";
+// require_once "../configuracion/empresa.php";
+
 class Divisa extends DB{
     public function registrar_divisa($simbolo,$nombre,$estado,$empresa){
+        // $idempresa = Empresa::getidempresa($empresa);
         $idempresa = $this->getidempresa($empresa);
         $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM divisa WHERE nombre = '$nombre' AND idempresa = '$idempresa'");
         $resultado = $consulta->fetch_assoc();

@@ -392,5 +392,5 @@ elseif($ver[0]=="listar_asiento_por_modulo"){
 //reportecomprobantecontable listafactura_cobrado_trans asientotipo listar_operacion_modulo_filtrado creartipoasientodelete
 
 //listafactura eliminartransaccion listapagos_individuales listatransaciones factura lista_cobrar_cobrado reportedetalletransaccion
-//reporteactivodisponible listar_cajas_bancos_pagar_por_recibo listar_recibo_por_id_otras_cuentas_pagar lista_transaccion
+//reporteactivodisponible listar_cajas_bancos_pagar_por_recibo listar_recibo_por_id_otras_cuentas_pagar lista_transaccion getidempresa
 ?>

@@ -370,7 +370,7 @@ public function getidgestion($md5){
     $ide = $this->getidempresa($empresa);
     $gestion = $this->getidgestion($empresa);
     $reporte = $this->dbc->query("SELECT p.numero, p.nombreplan, SUM(d.debe) AS debe, SUM(d.haber) AS haber, SUM(debe) - SUM(haber) AS deudor, SUM(haber) - SUM(debe) AS acreedor FROM plandecuenta AS p
-    INNER JOIN transacciones AS t ON t.organizacion_idorganizacion='$ide'
+    INNER JOIN transacciones AS t ON t.organizacion_idorganizacion='$ide' AND t.estado NOT IN (4, 5, 6)
     INNER JOIN detalletransaccion AS d ON d.idplandecuenta=p.idplandecuenta AND t.idtransacciones=d.transacciones_idtransacciones
     WHERE p.organizacion_idorganizacion='$ide' AND t.fechatransaccion<='$fechaf' AND 
     t.idgestion='$gestion' 
