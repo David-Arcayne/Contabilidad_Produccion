@@ -90,10 +90,12 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             }
 
             if($qwe['idotras_cuentas'] != 0){
-                $aux_descripcion = "Cobro de factura N° '$oc[nro_otras_cuentas]' con fecha: '$oc[fecha]'";
+                $aux_descripcion = "Cobro de factura N° $oc[nro_otras_cuentas] con fecha: $oc[fecha]";
+
                 $res = array(
                     "fecha" => $qwe['fecha'],
                     "nrecibo" => $qwe['nrecibo'],
+                    "nro_documento" => "$oc[nro_otras_cuentas]",
                     "codigotransaccion" => $qwe['codigotransaccion'],
                     "nombre_cliente" => $cl['nombre'],
                     //descripcion saldra de la factura o otras cuentas 
@@ -102,10 +104,14 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
                 );
             }else{
-                $aux_descripcion = "Cobro de factura N° '$fact[nfactura]' con fecha: '$fact[fecha]'";
+                $aux_descripcion = "Cobro de factura N° $fact[nfactura] con fecha: $fact[fecha]";
+
+                 $aux_factura = "cero $fact[nfactura]";
+                 $factu = str_replace("cero ", "", $aux_factura);
                 $res = array(
                     "fecha" => $qwe['fecha'],
                     "nrecibo" => $qwe['nrecibo'],
+                    "nro_documento" => $factu,
                     "codigotransaccion" => $qwe['codigotransaccion'],
                     "nombre_cliente" => $cl['nombre'],
                     //descripcion saldra de la factura o otras cuentas 
