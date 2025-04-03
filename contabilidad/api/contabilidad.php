@@ -1283,7 +1283,9 @@ WHERE
                 $datosRecibo2 = $this->dbc->query("SELECT nrecibo,fecha,persona,ci,monto,idcuentaspof,transaccion,archivo,lugar FROM cuentaspof WHERE idcuentaspof='$idrecibo2'");
                 
                 while ($www = $this->dbc->fetch($datosRecibo2)) {
-                    $res2 = array("recibo" => $www[0], "fecha" => $www[1], "persona" => $www[2], "ci" => $www[3], "monto" => $resultado33['monto'], "id" => $www[5],"transaccion" => $www[6],"nombre_archivo" => $www[7],"lugar" => $www[8],"nit" => $cl['nit'],"direccion" => $cl['direccion']);
+                    $trans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE idtransacciones='$www[transaccion]'");
+                    $idtr = $trans->fetch_assoc();
+                    $res2 = array("recibo" => $www[0], "fecha" => $www[1], "persona" => $www[2], "ci" => $www[3], "monto" => $resultado33['monto'], "id" => $www[5],"transaccion" => $www[6],"codigotransaccion" => $idtr['codigotransaccion'],"nombre_archivo" => $www[7],"lugar" => $www[8],"nit" => $cl['nit'],"direccion" => $cl['direccion']);
                     array_push($lista, $res2);
                 }
     
@@ -1291,7 +1293,11 @@ WHERE
                 //SOLO HAY INDIVIDUALES
                 $registro = $this->dbc->query("SELECT c.idcuentaspof,c.nrecibo,c.fecha,c.monto,c.persona,c.ci,c.transaccion,c.archivo,c.lugar FROM cuentaspof as c WHERE c.idfactura='$idfactura'");
                 while ($qwe = $this->dbc->fetch($registro)) {
-                    $res = array("id" => $qwe[0], "recibo" => $qwe[1], "fecha" => $qwe[2], "monto" => $qwe[3], "persona" => $qwe[4], "ci" => $qwe[5],"transaccion" => $qwe[6],"nombre_archivo" => $qwe[7],"lugar" => $qwe[8],"nit" => $cl['nit'],"direccion" => $cl['direccion']);
+                    
+                    $trans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE idtransacciones='$qwe[transaccion]'");
+                    $idtr = $trans->fetch_assoc();
+                  
+                    $res = array("id" => $qwe[0], "recibo" => $qwe[1], "fecha" => $qwe[2], "monto" => $qwe[3], "persona" => $qwe[4], "ci" => $qwe[5],"transaccion" => $qwe[6],"codigotransaccion" => $idtr['codigotransaccion'],"nombre_archivo" => $qwe[7],"lugar" => $qwe[8],"nit" => $cl['nit'],"direccion" => $cl['direccion']);
                     array_push($lista, $res);
                 }
         }
@@ -1303,7 +1309,11 @@ WHERE
                        $datosRecibo = $this->dbc->query("SELECT nrecibo,fecha,persona,ci,monto,idcuentaspof,transaccion,archivo FROM cuentaspof WHERE idcuentaspof='$idrecibo'");
                        
                        while ($zxc = $this->dbc->fetch($datosRecibo)) {
-                           $res = array("recibo" => $zxc[0], "fecha" => $zxc[1], "persona" => $zxc[2], "ci" => $zxc[3], "monto" => $resultado3['monto'], "id" => $zxc[5],"transaccion" => $zxc[6],"nombre_archivo" => $zxc[7],"nit" => $cl['nit'],"direccion" => $cl['direccion']);
+
+                        $trans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE idtransacciones='$zxc[transaccion]'");
+                        $idtr = $trans->fetch_assoc();
+
+                           $res = array("recibo" => $zxc[0], "fecha" => $zxc[1], "persona" => $zxc[2], "ci" => $zxc[3], "monto" => $resultado3['monto'], "id" => $zxc[5],"transaccion" => $zxc[6],"codigotransaccion" => $idtr['codigotransaccion'],"nombre_archivo" => $zxc[7],"nit" => $cl['nit'],"direccion" => $cl['direccion']);
                            array_push($lista, $res);
                        }
                     //    $res = array("id" => $qwe[0], "fecha" => $qwe[1], "numero" => $qwe[2], "codigo" => $qwe[3], "idproveedor" => $qwe[5], "nombrep" => $pro['nombre'], "monto" => $qwe[4], "pagado" => $resultado3['monto'], "saldo" => 0, "transaccion" => $qwe[6], "cuenta" => $qwe[7], "detalle" => $pagados);
@@ -1722,4 +1732,4 @@ WHERE
     //listafactura eliminartransaccion  eliminarcliente listafactura_cobrado eliminarproveedor listafactura_pagado registrocobrarfactura
 }//eliminarcobrados listapagos registrardesconsolidar registrotransaccion cambiarestadoconsolidado  registropagarfactura 
 //registrardesconsolidar crearfactura listapagos crearfacturasapi lista_cobrar_cobrado_factura registropagarfactura listaclientes
-// $gestion = $this->getgestionactualid($ide); listapagos listaasientos cliente
+// $gestion = $this->getgestionactualid($ide); listapagos listaasientos cliente   603  listapagos 

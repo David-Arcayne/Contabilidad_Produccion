@@ -118,7 +118,7 @@ else{
     $cont->registropagarfactura($_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcaja_bancos'],$_POST['idcuenta'],$_POST['fecha'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$_FILES['archivo']);
 }elseif($ver=="registropagarfacturaf5"){
     $cont=new Cuentaspor();
-    $cont->registropagarfacturaf5($_POST['idrecibo'],$_POST['lugar'],$_POST['fecha'],$_POST['persona'],$_POST['ci'],$_POST['archivo']);
+    $cont->registropagarfacturaf5($_POST['idrecibo'],$_POST['lugar'],$_POST['fecha'],$_POST['persona'],$_POST['ci'],$_POST['idtransaccion'],$_POST['archivo']);
 }elseif($ver=="registrogestion"){
 $cont=new Contabilidad();
 $cont->registrogestion($_POST['nombre'],$_POST['fechaini'],$_POST['fechafin'],$_POST['empresa']);
