@@ -687,6 +687,28 @@ WHERE md5(p.organizacion_idorganizacion)='$ide'");
         echo json_encode($res);
     }
 
+    public function registrar_factura_con_recibo($fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento,$clasefactura,$cobro, $pagar, $espesificacion,$trans, $cliente, $empresa,   $cuenta,  $sucursal, $asiento)
+    {
+        $idsucursal = $this->getidsucursal($sucursal);
+        $idempresa = $this->getidempresa($empresa);
+        $co = 0;
+        $pa = 0;
+        if ($cobro == 1 || $cobro == 2) {
+            $co = $cobro;
+        }
+        if ($pagar == 1 || $pagar == 2) {
+            $pa = $pagar;
+        }
+        $res = ""; //array($fecha,$nfactura,$nautorizacion,$codigocontrol,$monto,$tasacero,$export,$npoliza,$ice,$descuento,$espesificacion,$cliente,$co,$pa,$trans,$clasefactura,$cuenta,$idempresa,$idsucursal);
+        $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa', '$espesificacion', '1', '1', '$trans', '$cliente', '$idempresa', '$cuenta', '$idsucursal');");
+        if ($registro === TRUE) {
+            $res = array("success", "Registro Correcto", "crearfactura", $trans, $clasefactura, $cuenta);
+        } else {
+            $res = array("danger", "No se pudo realizar el registro ");
+        }
+        echo json_encode($res);
+    }
+
     public function crearsolofacturasapif5($id, $fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento, $espesificacion, $cliente, $cobro, $pagar, $trans, $clasefactura, $cuenta)
     {
         //$idsucursal=$this->getidsucursal($sucursal);
@@ -1732,8 +1754,6 @@ WHERE
     //listafactura eliminartransaccion  eliminarcliente listafactura_cobrado eliminarproveedor listafactura_pagado registrocobrarfactura
 }//eliminarcobrados listapagos registrardesconsolidar registrotransaccion cambiarestadoconsolidado  registropagarfactura 
 //registrardesconsolidar crearfactura listapagos crearfacturasapi lista_cobrar_cobrado_factura registropagarfactura listaclientes
-<<<<<<< HEAD
 // $gestion = $this->getgestionactualid($ide); listapagos listaasientos cliente crearsolofacturasapi 
-=======
-// $gestion = $this->getgestionactualid($ide); listapagos listaasientos cliente   603  listapagos 
->>>>>>> 8f0adc4749faa395d76606595009703921d833ed
+
+
