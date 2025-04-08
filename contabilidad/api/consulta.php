@@ -386,7 +386,7 @@ elseif($ver[0]=="listar_asiento_por_modulo"){
     $cont->existe_empresa_modulo($ver[1]);
 }elseif($ver[0]=="listar_recibo_por_caja_bancos"){
     $cont=new caja_bancos_recibos();
-    $cont->listar_recibo_por_caja_bancos($ver[1]);
+    $cont->listar_recibo_por_caja_bancos($ver[1],$ver[2],$ver[3]);
 }
 
 //reportecomprobantecontable listafactura_cobrado_trans asientotipo listar_operacion_modulo_filtrado creartipoasientodelete
