@@ -35,7 +35,7 @@ class Transacciones_facturas extends DB{
         //$res=array("id"=>,"nombre"=>$qwe['nombre']);
         return $qwe['idgestion'];
     }
-    public function cobrofacturasaasientomodelo($data) {
+    public function asignar_asiento_A_factura($data) {
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
@@ -133,7 +133,7 @@ class Transacciones_facturas extends DB{
         echo json_encode($res);
     }
 
-    public function asignar_asiento_A_factura($data) {
+    public function cobrofacturasaasientomodelo($data) {
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
