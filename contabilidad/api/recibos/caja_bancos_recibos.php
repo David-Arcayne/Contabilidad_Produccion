@@ -118,7 +118,7 @@ class caja_bancos_recibos extends DB{
     
     }
 
-    public function listar_recibo_por_caja_bancos($idcaja_bancos) {
+    public function listar_recibo_por_caja_bancos($idcaja_bancos,$fecha_ini,$fecha_fin) {
         $lista = [];
         // $idempresa = $this->getidempresa($empresa);
     
@@ -132,7 +132,9 @@ class caja_bancos_recibos extends DB{
     $getPedido = $this->dbc->query("SELECT cp.idcuentaspof,cp.nrecibo,cp.fecha,cp.cliente,cp.idfactura,cp.idotras_cuentas,cp.archivo, dc.idcaja_bancos,dc.monto,dc.idfactura
     FROM detalle_caja_bancos_cobrar dc
     INNER JOIN cuentaspof cp ON cp.idcuentaspof = dc.idcuentaspof
-    WHERE dc.idcaja_bancos = '$idcaja_bancos';");
+    WHERE dc.idcaja_bancos = '$idcaja_bancos'
+    AND cp.fecha >= '$fecha_ini'
+    AND cp.fecha <= '$fecha_fin';");
 
         while ($qwe = $this->dbc->fetch($getPedido)) {
             $cuentaspof = $this->dbc->query("SELECT * FROM cuentaspof WHERE idcuentaspof= '$qwe[idcuentaspof]'");
