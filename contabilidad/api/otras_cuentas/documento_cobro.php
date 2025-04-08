@@ -1,6 +1,6 @@
 <?php
 require_once "../../db/db.php";
-class Documento_cobro extends DB{
+class Documento_cobro extends DB{ //          idtransaccion, asiento,fecha, id_cliente_proveedor, concepto, precio, idtipo
     public function registrar_otras_cuentas($idtransaccion,$asiento,$fecha,$lugar,$id_cliente_proveedor,$coc,$pagado,$cobrado,$nro_tributario,$contacto,$nro_doc_identidad,$idtipo,$concepto,$condiciones,$observaciones,$precio,$forma_pago,$empresa,$sucursal){
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
