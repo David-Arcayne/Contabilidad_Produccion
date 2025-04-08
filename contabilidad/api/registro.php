@@ -75,11 +75,14 @@ $cont->crearfacturas($_POST['fechatfactura'],$_POST['nfactura'],$_POST['nautoriz
         $cont=new Contabilidad();
         $cont->crearfacturasapif5($_POST['idfactura'],$_POST['fechatfactura'],$_POST['nfactura'],$_POST['nautorizacion'],$_POST['codigocontrol'],$_POST['montofactura'],$_POST['tasacero'],$_POST['export'],$_POST['npoliza'],$_POST['iceiecdhotros'],$_POST['descuentobonificacion'],$_POST['especificacion'],$_POST['cliente'],$_POST['cobrar'],$_POST['pagar'],$_POST['trans'],$_POST['clasefactura'],$_POST['cuenta']);
     
-}elseif($ver=="crearsolofacturasapi"){
+}elseif($ver=="registrar_factura_cobros_tributario"){
     $cont=new Contabilidad();
-    $cont->crearsolofacturasapi($_POST['fecha'],$_POST['nfactura'],$_POST['nautorizacion'],$_POST['codigocontrol'],$_POST['montofactura'],$_POST['tasacero'],$_POST['export'],$_POST['npoliza'],$_POST['iceiecdhotros'],$_POST['descuentobonificacion'],$_POST['clasefactura'],$_POST['cobrado'],$_POST['pagado'],$_POST['especificacion'],$_POST['trans'],$_POST['cliente'],$_POST['empresa'],$_POST['cuenta'],$_POST['sucursal']);
-    
-    
+    $cont->registrar_factura_cobros_tributario($_POST['fecha'],$_POST['nfactura'],$_POST['nautorizacion'],$_POST['codigocontrol'],$_POST['montofactura'],$_POST['tasacero'],$_POST['export'],$_POST['npoliza'],$_POST['iceiecdhotros'],$_POST['descuentobonificacion'],$_POST['clasefactura'],$_POST['cobrado'],$_POST['pagado'],$_POST['especificacion'],$_POST['trans'],$_POST['cliente'],$_POST['empresa'],$_POST['cuenta'],$_POST['sucursal'],$_POST['asiento']);
+     
+}elseif($ver=="registrar_factura_pagos_tributario"){
+    $cont=new Contabilidad();
+    $cont->registrar_factura_pagos_tributario($_POST['fecha'],$_POST['nfactura'],$_POST['nautorizacion'],$_POST['codigocontrol'],$_POST['montofactura'],$_POST['tasacero'],$_POST['export'],$_POST['npoliza'],$_POST['iceiecdhotros'],$_POST['descuentobonificacion'],$_POST['clasefactura'],$_POST['cobrado'],$_POST['pagado'],$_POST['especificacion'],$_POST['trans'],$_POST['cliente'],$_POST['empresa'],$_POST['cuenta'],$_POST['sucursal'],$_POST['asiento']);
+ 
 }elseif($ver=="crearsolofacturasapif5"){
     $cont=new Contabilidad();
     $cont->crearsolofacturasapif5($_POST['idfactura'],$_POST['fechatfactura'],$_POST['nfactura'],$_POST['nautorizacion'],$_POST['codigocontrol'],$_POST['montofactura'],$_POST['tasacero'],$_POST['export'],$_POST['npoliza'],$_POST['iceiecdhotros'],$_POST['descuentobonificacion'],$_POST['especificacion'],$_POST['cliente'],$_POST['cobrado'],$_POST['pagado'],$_POST['trans'],$_POST['clasefactura'],$_POST['cuenta']);
@@ -186,9 +189,9 @@ $cont->cambiarestadoconsolidado($_POST['grupo'],$_POST['estado'],$_POST['fecha']
 
 // ---------------------------------------------------------------------------- registropagarfactura registrogestion
 else{
-if($data['ver'] == "cobrofacturasaasientomodelo") {
+if($data['ver'] == "asignar_asiento_A_factura") {
     $cont=new Transacciones_facturas();
-    $cont->cobrofacturasaasientomodelo($data);
+    $cont->asignar_asiento_A_factura($data);
 }elseif($ver == "registrocobrarfacturaGrupal"){//cajaBancos
     if(isset($_POST['fecha'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['idtransaccion'],$_POST['cajasBancos'],$_POST['idasientotipo'],$_POST['empresa'],$_POST['sucursal'],$_FILES['archivo'],$_POST['facturas'])){
         // decode echo json_encode(array("danger", "Faltan parámetros en la solicitud", $_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$facturas));
@@ -198,9 +201,6 @@ if($data['ver'] == "cobrofacturasaasientomodelo") {
     else{
         echo json_encode(array("danger", "Faltan parámetros en la solicitud", $_POST['fecha'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['idtransaccion'],$_POST['cajasBancos'],$_POST['idasientotipo'],$_POST['empresa'],$_POST['sucursal'],$_FILES['archivo'],$_POST['facturas']));
     }
-}elseif($data['ver'] == "pagofacturasaasientomodelo"){
-    $cont=new TransFactura_pagar();
-    $cont->pagofacturasaasientomodelo($data);
 }elseif($ver == "registropagarfacturaGrupal"){
     if(isset($_POST['fecha'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['idasientotipo'],$_POST['cajasBancos'],$_POST['empresa'],$_POST['sucursal'],$_FILES['archivo'],$_POST['facturas'])){
         // decode echo json_encode(array("danger", "Faltan parámetros en la solicitud", $_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$facturas));
@@ -412,5 +412,5 @@ if($data['ver'] == "cobrofacturasaasientomodelo") {
 
 //registrar_recibo_otras_cuentas_pagar asiento registroasiento registrocobrarfacturaf5 crearsolofacturasapi
 //  registrotransaccion registrotransaccionf5 duplicartransaccion registrocobrarfactura registrocobrarfacturaGrupal factura registropagarfactura registrocobrarfacturaGrupal
-}//editar_caja_bancos_pagar_recibo registropagarfacturaf5 registropagarfacturaGrupal  editar_caja_bancos_pagar_recibo
+}//editar_caja_bancos_pagar_recibo registropagarfacturaf5 registropagarfacturaGrupal  editar_caja_bancos_pagar_recibo cobrofacturasaasientomodelo
 ?> 

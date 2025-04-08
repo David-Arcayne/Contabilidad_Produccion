@@ -1683,7 +1683,7 @@ if ($pcuentas->num_rows > 0) {
         echo json_encode($lista); 
        }
   //reportedetallefpt reporteactivodiaponibledos reportedetalletransaccion estado consolidar reporteactivoypasivo
-//reportecomprobantecontable reporteactivodisponible reportedetalletransaccion mayorcuentacontable reportecomprobantecontable
+//reportecomprobantecontable reporteactivodisponible reportedetalletransaccion mayorcuentacontable reportecomprobantecontable firmas
 
 }
 
