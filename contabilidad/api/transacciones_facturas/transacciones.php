@@ -15,7 +15,7 @@ class Transacciones extends DB{
         $res = "";
         // aqui la condicional si hay una nueva gestion
 
-        if($tipocambio != 0){
+        if($tipocambio != ""){
             // EXISTE TIPO DE CAMBIO PARA LA FECHA DE HOY O SE SELECCIONARA UNA Q YA EXISTE
             $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
         VALUE(NULL,'$codigo','$fecha','$tipocambio','$ndocumento','$glosa','1','1','$tipotransaccion','$ide','$idsucursal','$idgestion')");

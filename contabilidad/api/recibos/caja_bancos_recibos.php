@@ -99,7 +99,7 @@ class caja_bancos_recibos extends DB{
         }
       
         
-        $crear_detalle_cajaBancos = $this->dbc->query("INSERT INTO detalle_caja_bancos_cobrar(idcaja_bancos,monto,idcuentaspof,idfactura,idotras_cuentas)
+        $crear_detalle_cajaBancos = $this->dbc->query("INSERT INTO detalle_caja_bancos_cobrar(idcaja_bancos,monto,r,idfactura,idotras_cuentas)
         VALUES('$idcaja_bancos','$monto','$idrecibo','$idfact','0')");
 
         if ($crearRecibo === TRUE) {
@@ -320,7 +320,7 @@ class caja_bancos_recibos extends DB{
         }
       
         
-        $crear_detalle_cajaBancos = $this->dbc->query("INSERT INTO detalle_caja_bancos_cobrar(idcaja_bancos,monto,idcuentaspof,idfactura,idotras_cuentas)
+        $crear_detalle_cajaBancos = $this->dbc->query("INSERT INTO detalle_caja_bancos_cobrar(idcaja_bancos,monto,r,idfactura,idotras_cuentas)
         VALUES('$idcaja_bancos','$precio','$idrecibo','0','$idotras_cuentas')");
 
         if ($crearRecibo === TRUE) {
@@ -444,26 +444,26 @@ class caja_bancos_recibos extends DB{
         echo json_encode($res);
 
     }
-    public function listar_recibo_por_caja_bancos($idcaja_bancos,$fecha_ini,$fecha_fin) {
+    public function listar_recibo_por_caja_bancos_incompleto($idcaja_bancos,$fecha_ini,$fecha_fin) {
         $lista = [];
         // $idempresa = $this->getidempresa($empresa);
     
         // Preparar la consulta
-    //     $getPedido = $this->dbc->query("SELECT cp.idcuentaspof,cp.nrecibo,cp.fecha,cp.cliente,cp.idfactura,cp.idotras_cuentas,cp.archivo, dc.idcaja_bancos,dc.monto,dc.idfactura, t.codigotransaccion
+    //     $getPedido = $this->dbc->query("SELECT cp.r,cp.nrecibo,cp.fecha,cp.cliente,cp.idfactura,cp.idotras_cuentas,cp.archivo, dc.idcaja_bancos,dc.monto,dc.idfactura, t.codigotransaccion
     // FROM detalle_caja_bancos_cobrar dc
-    // INNER JOIN cuentaspof cp ON cp.idcuentaspof = dc.idcuentaspof
+    // INNER JOIN cuentaspof cp ON cp.r = dc.r
     // INNER JOIN transacciones t ON t.idtransacciones = cp.transaccion
     // WHERE dc.idcaja_bancos = '$idcaja_bancos';");
     
-    $getPedido = $this->dbc->query("SELECT cp.idcuentaspof,cp.nrecibo,cp.fecha,cp.cliente,cp.idfactura,cp.idotras_cuentas,cp.archivo, dc.idcaja_bancos,dc.monto,dc.idfactura
+    $getPedido = $this->dbc->query("SELECT cp.r,cp.nrecibo,cp.fecha,cp.cliente,cp.idfactura,cp.idotras_cuentas,cp.archivo, dc.idcaja_bancos,dc.monto,dc.idfactura
     FROM detalle_caja_bancos_cobrar dc
-    INNER JOIN cuentaspof cp ON cp.idcuentaspof = dc.idcuentaspof
+    INNER JOIN cuentaspof cp ON cp.r = dc.r
     WHERE dc.idcaja_bancos = '$idcaja_bancos'
     AND cp.fecha >= '$fecha_ini'
     AND cp.fecha <= '$fecha_fin';");
 
         while ($qwe = $this->dbc->fetch($getPedido)) {
-            $cuentaspof = $this->dbc->query("SELECT * FROM cuentaspof WHERE idcuentaspof= '$qwe[idcuentaspof]'");
+            $cuentaspof = $this->dbc->query("SELECT * FROM cuentaspof WHERE r= '$qwe[r]'");
             $cp = $cuentaspof->fetch_assoc();
 
              $transac = $this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones= '$cp[transaccion]'");
@@ -553,14 +553,17 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
     // ---------------------------------------------------------------------------------------------------------------------------
 
-    public function listar_recibo_por_caja_bancos_completo($idcaja_bancos,$fecha_ini,$fecha_fin,$tipo_filtro) {
+    public function listar_recibo_por_caja_bancos($idcaja_bancos,$fecha_ini,$fecha_fin,$tipo_filtro) {
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
         $lista = [];
         // $idempresa = $this->getidempresa($empresa);
     
         // Preparar la consulta
-    //     $getPedido = $this->dbc->query("SELECT cp.idcuentaspof,cp.nrecibo,cp.fecha,cp.cliente,cp.idfactura,cp.idotras_cuentas,cp.archivo, dc.idcaja_bancos,dc.monto,dc.idfactura, t.codigotransaccion
+    //     $getPedido = $this->dbc->query("SELECT cp.r,cp.nrecibo,cp.fecha,cp.cliente,cp.idfactura,cp.idotras_cuentas,cp.archivo, dc.idcaja_bancos,dc.monto,dc.idfactura, t.codigotransaccion
     // FROM detalle_caja_bancos_cobrar dc
-    // INNER JOIN cuentaspof cp ON cp.idcuentaspof = dc.idcuentaspof
+    // INNER JOIN cuentaspof cp ON cp.r = dc.r
     // INNER JOIN transacciones t ON t.idtransacciones = cp.transaccion
     // WHERE dc.idcaja_bancos = '$idcaja_bancos';");
     if($tipo_filtro == '1'){ //TIPO = 1 --> INGRESO,  2-->EGRESO, 3--> AMBOS
@@ -572,8 +575,10 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
     AND cp.fecha >= '$fecha_ini'
     AND cp.fecha <= '$fecha_fin';");
 
+$aux_contador = 0;
+$saldo = 0;
         while ($qwe = $this->dbc->fetch($getPedido)) {
-            // $cuentaspof = $this->dbc->query("SELECT * FROM cuentaspof WHERE idcuentaspof= '$qwe[idcuentaspof]'");
+            // $cuentaspof = $this->dbc->query("SELECT * FROM cuentaspof WHERE r= '$qwe[r]'");
             // $cp = $cuentaspof->fetch_assoc();
 
              $transac = $this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones= '$qwe[transaccion]'");
@@ -626,7 +631,39 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
             if($qwe['idotras_cuentas'] != 0){
                 $aux_descripcion = "Cobro de factura N° $oc[nro_otras_cuentas] con fecha: $oc[fecha]";
+                // $saldo = 0;
 
+                if($aux_contador == 0){ //ESTAMOS EN PRIMERA FILA, SUMAR LAS ANTERIORES FILAS A LA FECHA
+
+                    $fuera_rango = $this->dbc->query("SELECT cp.idcuentaspof,cp.nrecibo,cp.fecha,cp.transaccion,cp.cliente,cp.idfactura,cp.idotras_cuentas,cp.archivo, dc.idcaja_bancos,dc.monto,dc.idfactura
+                    FROM detalle_caja_bancos_cobrar dc
+                    INNER JOIN cuentaspof cp ON cp.idcuentaspof = dc.idcuentaspof
+                    WHERE dc.idcaja_bancos = '$idcaja_bancos'
+                    AND cp.fecha < '$fecha_ini';");
+                // $saldo = 0;
+                while ($zxc = $this->dbc->fetch($fuera_rango)) {
+                    $saldo = $saldo + $zxc['monto'];
+                }
+
+                $saldo = $saldo + $qwe['monto'];
+                    $res = array(
+                        "fecha" => $qwe['fecha'],
+                        "nrecibo" => $qwe['nrecibo'],
+                        "nro_documento" => "$oc[nro_otras_cuentas]",
+                        "codigotransaccion" => $tr['codigotransaccion'],
+                        "nombre_cliente" => $cl['nombre'],
+                        //descripcion saldra de la factura o otras cuentas 
+                        "descripcion" => $aux_descripcion,
+                        "ingreso" => $qwe['monto'],
+                        "saldo" => $saldo
+    
+                    );
+
+                    //AUMENTAR EL AUX_CONTADOR + 1 PARA QUE YANO VUELVA A ENTRAR A ESTA CONDICION
+                    $aux_contador = 1;
+                }else{ // ESTAMOS FILAS DESPUES DE LA PRIMERA FILA
+
+                $saldo = $saldo + $qwe['monto'];
                 $res = array(
                     "fecha" => $qwe['fecha'],
                     "nrecibo" => $qwe['nrecibo'],
@@ -635,33 +672,261 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                     "nombre_cliente" => $cl['nombre'],
                     //descripcion saldra de la factura o otras cuentas 
                     "descripcion" => $aux_descripcion,
-                    "ingreso" => $qwe['monto']
-                    //"saldo" => $qwe['monto']
+                    "ingreso" => $qwe['monto'],
+                    "saldo" => $saldo
 
                 );
+            }
+
             }else{
                 $aux_descripcion = "Cobro de factura N° $fact[nfactura] con fecha: $fact[fecha]";
 
                  $aux_factura = "cero $fact[nfactura]";
                  $factu = str_replace("cero ", "", $aux_factura);
+
+                 if($aux_contador == 0){ //ESTAMOS EN PRIMERA FILA, SUMAR LAS ANTERIORES FILAS A LA FECHA
+
+                    $fuera_rango = $this->dbc->query("SELECT cp.idcuentaspof,cp.nrecibo,cp.fecha,cp.transaccion,cp.cliente,cp.idfactura,cp.idotras_cuentas,cp.archivo, dc.idcaja_bancos,dc.monto,dc.idfactura
+                    FROM detalle_caja_bancos_cobrar dc
+                    INNER JOIN cuentaspof cp ON cp.idcuentaspof = dc.idcuentaspof
+                    WHERE dc.idcaja_bancos = '$idcaja_bancos'
+                    AND cp.fecha < '$fecha_ini';");
+                // $saldo = 0;
+                while ($zxc = $this->dbc->fetch($fuera_rango)) {
+                    $saldo = $saldo + $zxc['monto'];
+                }
+                
+                $saldo = $saldo + $qwe['monto'];
+                    $res = array(
+                        "fecha" => $qwe['fecha'],
+                        "nrecibo" => $qwe['nrecibo'],
+                        "nro_documento" => "$oc[nro_otras_cuentas]",
+                        "codigotransaccion" => $tr['codigotransaccion'],
+                        "nombre_cliente" => $cl['nombre'],
+                        //descripcion saldra de la factura o otras cuentas 
+                        "descripcion" => $aux_descripcion,
+                        "ingreso" => $qwe['monto'],
+                        "saldo" => $saldo
+    
+                    );
+
+                    //AUMENTAR EL AUX_CONTADOR + 1 PARA QUE YANO VUELVA A ENTRAR A ESTA CONDICION
+                    $aux_contador = 1;
+                }else{ // ESTAMOS FILAS DESPUES DE LA PRIMERA FILA
+
+                $saldo = $saldo + $qwe['monto'];
                 $res = array(
                     "fecha" => $qwe['fecha'],
                     "nrecibo" => $qwe['nrecibo'],
-                    "nro_documento" => $factu,
+                    "nro_documento" => "$oc[nro_otras_cuentas]",
                     "codigotransaccion" => $tr['codigotransaccion'],
                     "nombre_cliente" => $cl['nombre'],
                     //descripcion saldra de la factura o otras cuentas 
                     "descripcion" => $aux_descripcion,
-                    "ingreso" => $qwe['monto']
+                    "ingreso" => $qwe['monto'],
+                    "saldo" => $saldo
+
                 );
+            }
+
+                // $res = array(
+                //     "fecha" => $qwe['fecha'],
+                //     "nrecibo" => $qwe['nrecibo'],
+                //     "nro_documento" => $factu,
+                //     "codigotransaccion" => $tr['codigotransaccion'],
+                //     "nombre_cliente" => $cl['nombre'],
+                //     //descripcion saldra de la factura o otras cuentas 
+                //     "descripcion" => $aux_descripcion,
+                //     "ingreso" => $qwe['monto']
+                // );
             }
           
             array_push($lista, $res);
         }
     
     }elseif($tipo_filtro == '2'){// tipo = 2 --> EGRESO
+//         ini_set('display_errors', 1);
+//         ini_set('display_startup_errors', 1);
+//         error_reporting(E_ALL);
 
-    }else{// TIPO = 3 --> TODOS
+        $getPedido = $this->dbc->query("SELECT cp.idcuentaspor,cp.nrecibo,cp.fecha,cp.transaccion,cp.cliente,cp.idfactura,cp.idotras_cuentas,cp.archivo, dc.idcaja_bancos,dc.monto,dc.idfactura
+        FROM detalle_caja_bancos_pagar dc
+        INNER JOIN cuentaspor cp ON cp.idcuentaspor = dc.idcuentaspor
+        WHERE dc.idcaja_bancos = '$idcaja_bancos'
+        AND cp.fecha >= '$fecha_ini'
+        AND cp.fecha <= '$fecha_fin'
+        ORDER BY cp.fecha ASC
+        ");
+    
+    $aux_contador = 0;
+    $saldo = 0;
+            while ($qwe = $this->dbc->fetch($getPedido)) {
+    
+                 $transac = $this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones= '$qwe[transaccion]'");
+                     $tr = $transac->fetch_assoc();
+                //     $cp['transaccion']
+    
+                if($qwe['idfactura'] != 0){
+                    //es cliente y se puede obtener del campo cliente directamente 
+                    // $proveedor = $this->dbcm->query("select * from proveedor where id_proveedor='" . $qwe[18] . "'");
+                    $factura = $this->dbc->query("SELECT * 
+                    FROM factura 
+                    WHERE idfactura = '$qwe[idfactura]'");
+    
+                    $fact = $factura->fetch_assoc();
+    
+                    $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente= '$fact[proveedorcliente_idproveedorcliente]'");
+                    $cl = $cliente->fetch_assoc();
+    
+                }elseif($qwe['idotras_cuentas'] == 0){
+                    // hacer consulta a la tabla cuentascobrar_grupal y sacar de ahi factura
+                    $getTabla = $this->dbc->query("SELECT * 
+                    FROM cuentaspagar_grupal 
+                    WHERE idfactura = '$qwe[idfactura]'");
+    $cuentas_cobro_grupal = $getTabla->fetch_assoc();
+    // while ($ccg = $this->dbc->fetch($getTabla)) {
+        $factura = $this->dbc->query("SELECT * 
+                    FROM factura 
+                    WHERE idfactura = '$cuentas_cobro_grupal[idfactura]'");
+    // }
+                    // $cuentas_cobro_grupal = $getTabla->fetch_assoc();
+    
+                    
+    
+                    $fact = $factura->fetch_assoc();
+                    
+                    $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente= '$fact[proveedorcliente_idproveedorcliente]'");
+                    $cl = $cliente->fetch_assoc();
+                }else{
+                    // hacer consulta a la tabla otras_cuentas y ahi estara id_cliente_proveedor
+    
+                    $otras_cuentas = $this->dbc->query("SELECT * 
+                    FROM otras_cuentas
+                    WHERE idotras_cuentas = '$qwe[idotras_cuentas]'");
+    
+                    $oc = $otras_cuentas->fetch_assoc();
+    
+                    $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente= '$oc[id_cliente_proveedor]'");
+                    $cl = $cliente->fetch_assoc();
+                }
+    
+                if($qwe['idotras_cuentas'] != 0){
+                    $aux_descripcion = "Cobro de factura N° $oc[nro_otras_cuentas] con fecha: $oc[fecha]";
+                    // $saldo = 0;
+    
+                    if($aux_contador == 0){ //ESTAMOS EN PRIMERA FILA, SUMAR LAS ANTERIORES FILAS A LA FECHA
+    
+                        $fuera_rango = $this->dbc->query("SELECT cp.idcuentaspor,cp.nrecibo,cp.fecha,cp.transaccion,cp.cliente,cp.idfactura,cp.idotras_cuentas,cp.archivo, dc.idcaja_bancos,dc.monto,dc.idfactura
+                        FROM detalle_caja_bancos_pagar dc
+                        INNER JOIN cuentaspor cp ON cp.idcuentaspor = dc.idcuentaspor
+                        WHERE dc.idcaja_bancos = '$idcaja_bancos'
+                        AND cp.fecha < '$fecha_ini'
+                        ORDER BY cp.fecha ASC;");
+                    // $saldo = 0;
+                    while ($zxc = $this->dbc->fetch($fuera_rango)) {
+                        $saldo = $saldo + $zxc['monto'];
+                    }
+    
+                    $saldo = $saldo + $qwe['monto'];
+                        $res = array(
+                            "fecha" => $qwe['fecha'],
+                            "nrecibo" => $qwe['nrecibo'],
+                            "nro_documento" => "$oc[nro_otras_cuentas]",
+                            "codigotransaccion" => $tr['codigotransaccion'],
+                            "nombre_cliente" => $cl['nombre'],
+                            //descripcion saldra de la factura o otras cuentas 
+                            "descripcion" => $aux_descripcion,
+                            "ingreso" => $qwe['monto'],
+                            "saldo" => $saldo
+        
+                        );
+    
+                        //AUMENTAR EL AUX_CONTADOR + 1 PARA QUE YANO VUELVA A ENTRAR A ESTA CONDICION
+                        $aux_contador = 1;
+                    }else{ // ESTAMOS FILAS DESPUES DE LA PRIMERA FILA
+    
+                    $saldo = $saldo + $qwe['monto'];
+                    $res = array(
+                        "fecha" => $qwe['fecha'],
+                        "nrecibo" => $qwe['nrecibo'],
+                        "nro_documento" => "$oc[nro_otras_cuentas]",
+                        "codigotransaccion" => $tr['codigotransaccion'],
+                        "nombre_cliente" => $cl['nombre'],
+                        //descripcion saldra de la factura o otras cuentas 
+                        "descripcion" => $aux_descripcion,
+                        "ingreso" => $qwe['monto'],
+                        "saldo" => $saldo
+    
+                    );
+                }
+    
+                }else{
+                    $aux_descripcion = "Cobro de factura N° $fact[nfactura] con fecha: $fact[fecha]";
+    
+                     $aux_factura = "cero $fact[nfactura]";
+                     $factu = str_replace("cero ", "", $aux_factura);
+    
+                     if($aux_contador == 0){ //ESTAMOS EN PRIMERA FILA, SUMAR LAS ANTERIORES FILAS A LA FECHA
+    
+                        $fuera_rango = $this->dbc->query("SELECT cp.idcuentaspor,cp.nrecibo,cp.fecha,cp.transaccion,cp.cliente,cp.idfactura,cp.idotras_cuentas,cp.archivo, dc.idcaja_bancos,dc.monto,dc.idfactura
+                        FROM detalle_caja_bancos_pagar dc
+                        INNER JOIN cuentaspor cp ON cp.idcuentaspor = dc.idcuentaspor
+                        WHERE dc.idcaja_bancos = '$idcaja_bancos'
+                        AND cp.fecha < '$fecha_ini';");
+                    // $saldo = 0;
+                    while ($zxc = $this->dbc->fetch($fuera_rango)) {
+                        $saldo = $saldo + $zxc['monto'];
+                    }
+                    
+                    $saldo = $saldo + $qwe['monto'];
+                        $res = array(
+                            "fecha" => $qwe['fecha'],
+                            "nrecibo" => $qwe['nrecibo'],
+                            "nro_documento" => "$oc[nro_otras_cuentas]",
+                            "codigotransaccion" => $tr['codigotransaccion'],
+                            "nombre_cliente" => $cl['nombre'],
+                            //descripcion saldra de la factura o otras cuentas 
+                            "descripcion" => $aux_descripcion,
+                            "ingreso" => $qwe['monto'],
+                            "saldo" => $saldo
+        
+                        );
+    
+                        //AUMENTAR EL AUX_CONTADOR + 1 PARA QUE YANO VUELVA A ENTRAR A ESTA CONDICION
+                        $aux_contador = 1;
+                    }else{ // ESTAMOS FILAS DESPUES DE LA PRIMERA FILA
+    
+                    $saldo = $saldo + $qwe['monto'];
+                    $res = array(
+                        "fecha" => $qwe['fecha'],
+                        "nrecibo" => $qwe['nrecibo'],
+                        "nro_documento" => "$oc[nro_otras_cuentas]",
+                        "codigotransaccion" => $tr['codigotransaccion'],
+                        "nombre_cliente" => $cl['nombre'],
+                        //descripcion saldra de la factura o otras cuentas 
+                        "descripcion" => $aux_descripcion,
+                        "ingreso" => $qwe['monto'],
+                        "saldo" => $saldo
+    
+                    );
+                }
+    
+                    // $res = array(
+                    //     "fecha" => $qwe['fecha'],
+                    //     "nrecibo" => $qwe['nrecibo'],
+                    //     "nro_documento" => $factu,
+                    //     "codigotransaccion" => $tr['codigotransaccion'],
+                    //     "nombre_cliente" => $cl['nombre'],
+                    //     //descripcion saldra de la factura o otras cuentas 
+                    //     "descripcion" => $aux_descripcion,
+                    //     "ingreso" => $qwe['monto']
+                    // );
+                }
+              
+                array_push($lista, $res);
+            }
+
+    }else{// TIPO = 3 --> TODOS cp.r
 
         $getPedido = $this->dbc->query("SELECT 
     cp.idcuentaspor AS id_cuenta,
@@ -680,7 +945,7 @@ FROM detalle_caja_bancos_pagar dc
 INNER JOIN cuentaspor cp ON cp.idcuentaspor = dc.idcuentaspor
 WHERE dc.idcaja_bancos = '12'
 AND cp.fecha BETWEEN '$fecha_ini' AND '$fecha_fin'
-
+-- ORDER BY cp.fecha ASC
 UNION
 
 SELECT 
@@ -707,6 +972,7 @@ ORDER BY fecha ASC;");
     
                  $transac = $this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones= '$qwe[transaccion]'");
                      $tr = $transac->fetch_assoc();
+                     
                 //     $cp['transaccion']
     
                 if($qwe['tipo'] == 'COBRAR'){
