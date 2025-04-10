@@ -163,7 +163,7 @@ foreach($facturas as $factura){
         $montoCobrado = $factura['monto'] - $montoSuma;
         $registrarTabla = $this->dbc->query("INSERT INTO cuentaspagar_grupal(idcuentaspor,idfactura,monto)VALUES('$idcuentasPor','$factura[idfactura]','$montoCobrado')");
     }
-    // $montoFacturas += $factura['monto'];
+    // $montoFacturas += $factura['monto']; proveedor
     // $updatetranscodigo = $this->dbc->query("UPDATE factura SET transacciones_idtransacciones = '$idtrans' WHERE idfactura = '{$factura['idfactura']}'");
 }
 foreach($caja_bancos as $cajaBanco){

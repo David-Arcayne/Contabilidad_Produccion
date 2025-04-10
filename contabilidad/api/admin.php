@@ -449,7 +449,7 @@ class Admin extends DB
         $res = array("success", "Se agrego correctamente", "sitio");
         echo json_encode($res);
     }
-    public function registrotipodecambio($dolar, $ufv, $fecha, $empresa)
+    public function registrotipodecambio($dolar, $ufv, $fecha, $empresa) 
     {
         $res = "";
         $ide = $this->getidempresa($empresa);

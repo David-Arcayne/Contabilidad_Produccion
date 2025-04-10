@@ -551,6 +551,328 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
 
+    // ---------------------------------------------------------------------------------------------------------------------------
+
+    public function listar_recibo_por_caja_bancos_completo($idcaja_bancos,$fecha_ini,$fecha_fin,$tipo_filtro) {
+        $lista = [];
+        // $idempresa = $this->getidempresa($empresa);
+    
+        // Preparar la consulta
+    //     $getPedido = $this->dbc->query("SELECT cp.idcuentaspof,cp.nrecibo,cp.fecha,cp.cliente,cp.idfactura,cp.idotras_cuentas,cp.archivo, dc.idcaja_bancos,dc.monto,dc.idfactura, t.codigotransaccion
+    // FROM detalle_caja_bancos_cobrar dc
+    // INNER JOIN cuentaspof cp ON cp.idcuentaspof = dc.idcuentaspof
+    // INNER JOIN transacciones t ON t.idtransacciones = cp.transaccion
+    // WHERE dc.idcaja_bancos = '$idcaja_bancos';");
+    if($tipo_filtro == '1'){ //TIPO = 1 --> INGRESO,  2-->EGRESO, 3--> AMBOS
+
+    $getPedido = $this->dbc->query("SELECT cp.idcuentaspof,cp.nrecibo,cp.fecha,cp.transaccion,cp.cliente,cp.idfactura,cp.idotras_cuentas,cp.archivo, dc.idcaja_bancos,dc.monto,dc.idfactura
+    FROM detalle_caja_bancos_cobrar dc
+    INNER JOIN cuentaspof cp ON cp.idcuentaspof = dc.idcuentaspof
+    WHERE dc.idcaja_bancos = '$idcaja_bancos'
+    AND cp.fecha >= '$fecha_ini'
+    AND cp.fecha <= '$fecha_fin';");
+
+        while ($qwe = $this->dbc->fetch($getPedido)) {
+            // $cuentaspof = $this->dbc->query("SELECT * FROM cuentaspof WHERE idcuentaspof= '$qwe[idcuentaspof]'");
+            // $cp = $cuentaspof->fetch_assoc();
+
+             $transac = $this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones= '$qwe[transaccion]'");
+                 $tr = $transac->fetch_assoc();
+            //     $cp['transaccion']
+
+            if($qwe['idfactura'] != 0){
+                //es cliente y se puede obtener del campo cliente directamente 
+                // $proveedor = $this->dbcm->query("select * from proveedor where id_proveedor='" . $qwe[18] . "'");
+                $factura = $this->dbc->query("SELECT * 
+                FROM factura 
+                WHERE idfactura = '$qwe[idfactura]'");
+
+                $fact = $factura->fetch_assoc();
+
+                $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente= '$fact[proveedorcliente_idproveedorcliente]'");
+                $cl = $cliente->fetch_assoc();
+
+            }elseif($qwe['idotras_cuentas'] == 0){
+                // hacer consulta a la tabla cuentascobrar_grupal y sacar de ahi factura
+                $getTabla = $this->dbc->query("SELECT * 
+                FROM cuentascobrar_grupal 
+                WHERE idfactura = '$qwe[idfactura]'");
+$cuentas_cobro_grupal = $getTabla->fetch_assoc();
+// while ($ccg = $this->dbc->fetch($getTabla)) {
+    $factura = $this->dbc->query("SELECT * 
+                FROM factura 
+                WHERE idfactura = '$cuentas_cobro_grupal[idfactura]'");
+// }
+                // $cuentas_cobro_grupal = $getTabla->fetch_assoc();
+
+                
+
+                $fact = $factura->fetch_assoc();
+                
+                $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente= '$fact[proveedorcliente_idproveedorcliente]'");
+                $cl = $cliente->fetch_assoc();
+            }else{
+                // hacer consulta a la tabla otras_cuentas y ahi estara id_cliente_proveedor
+
+                $otras_cuentas = $this->dbc->query("SELECT * 
+                FROM otras_cuentas
+                WHERE idotras_cuentas = '$qwe[idotras_cuentas]'");
+
+                $oc = $otras_cuentas->fetch_assoc();
+
+                $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente= '$oc[id_cliente_proveedor]'");
+                $cl = $cliente->fetch_assoc();
+            }
+
+            if($qwe['idotras_cuentas'] != 0){
+                $aux_descripcion = "Cobro de factura N° $oc[nro_otras_cuentas] con fecha: $oc[fecha]";
+
+                $res = array(
+                    "fecha" => $qwe['fecha'],
+                    "nrecibo" => $qwe['nrecibo'],
+                    "nro_documento" => "$oc[nro_otras_cuentas]",
+                    "codigotransaccion" => $tr['codigotransaccion'],
+                    "nombre_cliente" => $cl['nombre'],
+                    //descripcion saldra de la factura o otras cuentas 
+                    "descripcion" => $aux_descripcion,
+                    "ingreso" => $qwe['monto']
+                    //"saldo" => $qwe['monto']
+
+                );
+            }else{
+                $aux_descripcion = "Cobro de factura N° $fact[nfactura] con fecha: $fact[fecha]";
+
+                 $aux_factura = "cero $fact[nfactura]";
+                 $factu = str_replace("cero ", "", $aux_factura);
+                $res = array(
+                    "fecha" => $qwe['fecha'],
+                    "nrecibo" => $qwe['nrecibo'],
+                    "nro_documento" => $factu,
+                    "codigotransaccion" => $tr['codigotransaccion'],
+                    "nombre_cliente" => $cl['nombre'],
+                    //descripcion saldra de la factura o otras cuentas 
+                    "descripcion" => $aux_descripcion,
+                    "ingreso" => $qwe['monto']
+                );
+            }
+          
+            array_push($lista, $res);
+        }
+    
+    }elseif($tipo_filtro == '2'){// tipo = 2 --> EGRESO
+
+    }else{// TIPO = 3 --> TODOS
+
+        $getPedido = $this->dbc->query("SELECT 
+    cp.idcuentaspor AS id_cuenta,
+    cp.nrecibo, 
+    cp.fecha, 
+    cp.transaccion, 
+    cp.cliente, 
+    cp.idfactura, 
+    cp.idotras_cuentas, 
+    cp.archivo, 
+    dc.idcaja_bancos, 
+    dc.monto, 
+    dc.idfactura,
+    'PAGAR' AS tipo
+FROM detalle_caja_bancos_pagar dc
+INNER JOIN cuentaspor cp ON cp.idcuentaspor = dc.idcuentaspor
+WHERE dc.idcaja_bancos = '12'
+AND cp.fecha BETWEEN '$fecha_ini' AND '$fecha_fin'
+
+UNION
+
+SELECT 
+    cp.idcuentaspof AS id_cuenta,
+    cp.nrecibo, 
+    cp.fecha,
+    cp.transaccion, 
+    cp.cliente, 
+    cp.idfactura, 
+    cp.idotras_cuentas, 
+    cp.archivo, 
+    dc.idcaja_bancos, 
+    dc.monto, 
+    dc.idfactura,
+    'COBRAR' AS tipo
+FROM detalle_caja_bancos_cobrar dc
+INNER JOIN cuentaspof cp ON cp.idcuentaspof = dc.idcuentaspof
+WHERE dc.idcaja_bancos = '12'
+AND cp.fecha BETWEEN '$fecha_ini' AND '$fecha_fin'
+
+ORDER BY fecha ASC;");
+    
+            while ($qwe = $this->dbc->fetch($getPedido)) {
+    
+                 $transac = $this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones= '$qwe[transaccion]'");
+                     $tr = $transac->fetch_assoc();
+                //     $cp['transaccion']
+    
+                if($qwe['tipo'] == 'COBRAR'){
+
+                    if($qwe['idfactura'] != 0){
+                        //es cliente y se puede obtener del campo cliente directamente 
+                        // $proveedor = $this->dbcm->query("select * from proveedor where id_proveedor='" . $qwe[18] . "'");
+                        $factura = $this->dbc->query("SELECT * 
+                        FROM factura 
+                        WHERE idfactura = '$qwe[idfactura]'");
+        
+                        $fact = $factura->fetch_assoc();
+        
+                        $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente= '$fact[proveedorcliente_idproveedorcliente]'");
+                        $cl = $cliente->fetch_assoc();
+        
+                    }elseif($qwe['idotras_cuentas'] == 0){
+                        // hacer consulta a la tabla cuentascobrar_grupal y sacar de ahi factura
+                        $getTabla = $this->dbc->query("SELECT * 
+                        FROM cuentascobrar_grupal 
+                        WHERE idfactura = '$qwe[idfactura]'");
+        $cuentas_cobro_grupal = $getTabla->fetch_assoc();
+        // while ($ccg = $this->dbc->fetch($getTabla)) {
+            $factura = $this->dbc->query("SELECT * 
+                        FROM factura 
+                        WHERE idfactura = '$cuentas_cobro_grupal[idfactura]'");
+        // }
+                        // $cuentas_cobro_grupal = $getTabla->fetch_assoc();
+        
+                        
+        
+                        $fact = $factura->fetch_assoc();
+                        
+                        $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente= '$fact[proveedorcliente_idproveedorcliente]'");
+                        $cl = $cliente->fetch_assoc();
+                    }else{
+                        // hacer consulta a la tabla otras_cuentas y ahi estara id_cliente_proveedor
+        
+                        $otras_cuentas = $this->dbc->query("SELECT * 
+                        FROM otras_cuentas
+                        WHERE idotras_cuentas = '$qwe[idotras_cuentas]'");
+        
+                        $oc = $otras_cuentas->fetch_assoc();
+        
+                        $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente= '$oc[id_cliente_proveedor]'");
+                        $cl = $cliente->fetch_assoc();
+                    }
+
+                }else{// PAGAR
+                    
+                    if($qwe['idfactura'] != 0){
+                        //es cliente y se puede obtener del campo cliente directamente 
+                        // $proveedor = $this->dbcm->query("select * from proveedor where id_proveedor='" . $qwe[18] . "'");
+                        $factura = $this->dbc->query("SELECT * 
+                        FROM factura 
+                        WHERE idfactura = '$qwe[idfactura]'");
+        
+                        $fact = $factura->fetch_assoc();
+        
+                        $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor= '$fact[proveedorcliente_idproveedorcliente]'");
+                        $cl = $proveedor->fetch_assoc();
+        
+                    }elseif($qwe['idotras_cuentas'] == 0){
+                        // hacer consulta a la tabla cuentascobrar_grupal y sacar de ahi factura
+                        $getTabla = $this->dbc->query("SELECT * 
+                        FROM cuentaspagar_grupal 
+                        WHERE idfactura = '$qwe[idfactura]'");
+        $cuentas_pago_grupal = $getTabla->fetch_assoc();
+        // while ($ccg = $this->dbc->fetch($getTabla)) {
+            $factura = $this->dbc->query("SELECT * 
+                        FROM factura 
+                        WHERE idfactura = '$cuentas_pago_grupal[idfactura]'");
+        // }
+                        // $cuentas_cobro_grupal = $getTabla->fetch_assoc();
+        
+                        
+        
+                        $fact = $factura->fetch_assoc();
+                        
+                        $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor= '$fact[proveedorcliente_idproveedorcliente]'");
+                        $cl = $proveedor->fetch_assoc();
+                    }else{
+                        // hacer consulta a la tabla otras_cuentas y ahi estara id_cliente_proveedor
+        
+                        $otras_cuentas = $this->dbc->query("SELECT * 
+                        FROM otras_cuentas
+                        WHERE idotras_cuentas = '$qwe[idotras_cuentas]'");
+        
+                        $oc = $otras_cuentas->fetch_assoc();
+        
+                        $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor= '$oc[id_cliente_proveedor]'");
+                        $cl = $proveedor->fetch_assoc();
+                    }
+
+                } //FIN DEL ELSE DE PAGAR
+                
+                if($qwe['tipo'] == 'COBRAR'){
+                    if($qwe['idotras_cuentas'] != 0){
+                        $aux_descripcion = "Cobro de factura N° $oc[nro_otras_cuentas] con fecha: $oc[fecha]";
+        
+                        $res = array(
+                            "fecha" => $qwe['fecha'],
+                            "nrecibo" => $qwe['nrecibo'],
+                            "nro_documento" => "$oc[nro_otras_cuentas]",
+                            "codigotransaccion" => $tr['codigotransaccion'],
+                            "nombre_cliente" => $cl['nombre'],
+                            //descripcion saldra de la factura o otras cuentas 
+                            "descripcion" => $aux_descripcion,
+                            "ingreso" => $qwe['monto']
+        
+                        );
+                    }else{
+                        $aux_descripcion = "Cobro de factura N° $fact[nfactura] con fecha: $fact[fecha]";
+        
+                         $aux_factura = "cero $fact[nfactura]";
+                         $factu = str_replace("cero ", "", $aux_factura);
+                        $res = array(
+                            "fecha" => $qwe['fecha'],
+                            "nrecibo" => $qwe['nrecibo'],
+                            "nro_documento" => $factu,
+                            "codigotransaccion" => $tr['codigotransaccion'],
+                            "nombre_cliente" => $cl['nombre'],
+                            //descripcion saldra de la factura o otras cuentas 
+                            "descripcion" => $aux_descripcion,
+                            "ingreso" => $qwe['monto']
+                        );
+                    }
+                }else{
+                    if($qwe['idotras_cuentas'] != 0){
+                        $aux_descripcion = "Cobro de factura N° $oc[nro_otras_cuentas] con fecha: $oc[fecha]";
+        
+                        $res = array(
+                            "fecha" => $qwe['fecha'],
+                            "nrecibo" => $qwe['nrecibo'],
+                            "nro_documento" => "$oc[nro_otras_cuentas]",
+                            "codigotransaccion" => $tr['codigotransaccion'],
+                            "nombre_cliente" => $cl['nombre'],
+                            //descripcion saldra de la factura o otras cuentas 
+                            "descripcion" => $aux_descripcion,
+                            "egreso" => $qwe['monto']
+                        );
+                    }else{
+                        $aux_descripcion = "Cobro de factura N° $fact[nfactura] con fecha: $fact[fecha]";
+        
+                         $aux_factura = "cero $fact[nfactura]";
+                         $factu = str_replace("cero ", "", $aux_factura);
+                        $res = array(
+                            "fecha" => $qwe['fecha'],
+                            "nrecibo" => $qwe['nrecibo'],
+                            "nro_documento" => $factu,
+                            "codigotransaccion" => $tr['codigotransaccion'],
+                            "nombre_cliente" => $cl['nombre'],
+                            //descripcion saldra de la factura o otras cuentas 
+                            "descripcion" => $aux_descripcion,
+                            "egreso" => $qwe['monto']
+                        );
+                    }
+                }
+                
+              
+                array_push($lista, $res);
+            }
+
+    }
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
     public function getidempresa($md5)
     {
         $registro = $this->dbe->query("select * from organizacion where md5(idorganizacion)='$md5'");

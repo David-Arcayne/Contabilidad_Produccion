@@ -5,7 +5,7 @@ require_once "../../db/db.php";
 class Transacciones extends DB{
     
     
-    public function registrotransaccion($codigo, $fecha, $tipocambio, $tipotransaccion, $glosa, $empresa, $sucursal)
+    public function registrotransaccion($codigo, $fecha, $tipocambio, $tipotransaccion, $glosa, $empresa, $sucursal,$ufv,$dolar)
     {
         $ndocumento = "0";
         $ide = $this->getidempresa($empresa);
@@ -15,8 +15,23 @@ class Transacciones extends DB{
         $res = "";
         // aqui la condicional si hay una nueva gestion
 
-        $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
+        if($tipocambio != 0){
+            // EXISTE TIPO DE CAMBIO PARA LA FECHA DE HOY O SE SELECCIONARA UNA Q YA EXISTE
+            $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
         VALUE(NULL,'$codigo','$fecha','$tipocambio','$ndocumento','$glosa','1','1','$tipotransaccion','$ide','$idsucursal','$idgestion')");
+
+        }else{
+            //HAY Q CREAR TIPO DE CAMBIO 
+            $registro_tipoCambio = $this->dbc->query("INSERT INTO tipodecambio(dolar,ufv,fecha,idorganizacion)
+            VALUES('$dolar','$ufv','$fecha','$ide')");
+
+            $idtipo_cambio = $this->dbc->insert_id;   
+        
+        $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
+        VALUE(NULL,'$codigo','$fecha','$idtipo_cambio','$ndocumento','$glosa','1','1','$tipotransaccion','$ide','$idsucursal','$idgestion')");
+
+        }
+       
         if ($writetrans === TRUE) {
             $res = array("success", "Se Registro Correctamente", "registrotransaccion");
         } else {
