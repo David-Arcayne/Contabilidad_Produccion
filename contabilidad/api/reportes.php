@@ -973,7 +973,10 @@ $totalHaber = 0;
         $lista=[];
         $ide=$this->getidempresa($empresa);
         $gestion=$this->getidgestion($empresa);
-        //reconfigurar consulta para que solo se muestre solo la gestion.
+
+    $planCuenta=$this->dbc->query("SELECT saldonormal FROM plandecuenta WHERE idplandecuenta='$plan'"); //antes era dba
+    $tipo_cuenta = $this->dbc->fetch($planCuenta);    
+    //reconfigurar consulta para que solo se muestre solo la gestion.
         $registro=$this->dbc->query("SELECT
         t.codigotransaccion,
         t.fechatransaccion,
@@ -1008,16 +1011,19 @@ $totalHaber = 0;
                 $res=array("debe"=>$asd[1],"haber"=>$asd[2]);
                 array_push($detalle,$res);
             }
+
             if($tipotrans->num_rows > 0 ){
               $red=array("codigo"=>$qwe[0],
             "fecha"=>$qwe[1],
             "tipo"=>$tipo[0],
+            "tipo_cuenta"=>$tipo_cuenta['saldonormal'],
             "detalle"=>$detalle);
             array_push($lista,$red);
             }else{
               $red=array("codigo"=>$qwe[0],
               "fecha"=>$qwe[1],
               "tipo"=> 0,
+              "tipo_cuenta"=>$tipo_cuenta['saldonormal'],
               "detalle"=>$detalle);
               array_push($lista,$red);
             }

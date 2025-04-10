@@ -559,13 +559,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         // error_reporting(E_ALL);
         $lista = [];
         // $idempresa = $this->getidempresa($empresa);
-    
-        // Preparar la consulta
-    //     $getPedido = $this->dbc->query("SELECT cp.r,cp.nrecibo,cp.fecha,cp.cliente,cp.idfactura,cp.idotras_cuentas,cp.archivo, dc.idcaja_bancos,dc.monto,dc.idfactura, t.codigotransaccion
-    // FROM detalle_caja_bancos_cobrar dc
-    // INNER JOIN cuentaspof cp ON cp.r = dc.r
-    // INNER JOIN transacciones t ON t.idtransacciones = cp.transaccion
-    // WHERE dc.idcaja_bancos = '$idcaja_bancos';");
+
     if($tipo_filtro == '1'){ //TIPO = 1 --> INGRESO,  2-->EGRESO, 3--> AMBOS
 
     $getPedido = $this->dbc->query("SELECT cp.idcuentaspof,cp.nrecibo,cp.fecha,cp.transaccion,cp.cliente,cp.idfactura,cp.idotras_cuentas,cp.archivo, dc.idcaja_bancos,dc.monto,dc.idfactura
@@ -654,6 +648,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         "nombre_cliente" => $cl['nombre'],
                         //descripcion saldra de la factura o otras cuentas 
                         "descripcion" => $aux_descripcion,
+                        "archivo" => $qwe['archivo'],
                         "ingreso" => $qwe['monto'],
                         "saldo" => $saldo
     
@@ -672,6 +667,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                     "nombre_cliente" => $cl['nombre'],
                     //descripcion saldra de la factura o otras cuentas 
                     "descripcion" => $aux_descripcion,
+                    "archivo" => $qwe['archivo'],
                     "ingreso" => $qwe['monto'],
                     "saldo" => $saldo
 
@@ -705,6 +701,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         "nombre_cliente" => $cl['nombre'],
                         //descripcion saldra de la factura o otras cuentas 
                         "descripcion" => $aux_descripcion,
+                        "archivo" => $qwe['archivo'],
                         "ingreso" => $qwe['monto'],
                         "saldo" => $saldo
     
@@ -723,6 +720,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                     "nombre_cliente" => $cl['nombre'],
                     //descripcion saldra de la factura o otras cuentas 
                     "descripcion" => $aux_descripcion,
+                    "archivo" => $qwe['archivo'],
                     "ingreso" => $qwe['monto'],
                     "saldo" => $saldo
 
@@ -836,6 +834,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "nombre_cliente" => $cl['nombre'],
                             //descripcion saldra de la factura o otras cuentas 
                             "descripcion" => $aux_descripcion,
+                            "archivo" => $qwe['archivo'],
                             "ingreso" => $qwe['monto'],
                             "saldo" => $saldo
         
@@ -854,6 +853,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         "nombre_cliente" => $cl['nombre'],
                         //descripcion saldra de la factura o otras cuentas 
                         "descripcion" => $aux_descripcion,
+                        "archivo" => $qwe['archivo'],
                         "ingreso" => $qwe['monto'],
                         "saldo" => $saldo
     
@@ -887,6 +887,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "nombre_cliente" => $cl['nombre'],
                             //descripcion saldra de la factura o otras cuentas 
                             "descripcion" => $aux_descripcion,
+                            "archivo" => $qwe['archivo'],
                             "ingreso" => $qwe['monto'],
                             "saldo" => $saldo
         
@@ -905,6 +906,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         "nombre_cliente" => $cl['nombre'],
                         //descripcion saldra de la factura o otras cuentas 
                         "descripcion" => $aux_descripcion,
+                        "archivo" => $qwe['archivo'],
                         "ingreso" => $qwe['monto'],
                         "saldo" => $saldo
     
@@ -926,48 +928,53 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                 array_push($lista, $res);
             }
 
-    }else{// TIPO = 3 --> TODOS cp.r
+    }else{// TIPO = 3 --> TODOS 
 
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
         $getPedido = $this->dbc->query("SELECT 
-    cp.idcuentaspor AS id_cuenta,
-    cp.nrecibo, 
-    cp.fecha, 
-    cp.transaccion, 
-    cp.cliente, 
-    cp.idfactura, 
-    cp.idotras_cuentas, 
-    cp.archivo, 
-    dc.idcaja_bancos, 
-    dc.monto, 
-    dc.idfactura,
-    'PAGAR' AS tipo
-FROM detalle_caja_bancos_pagar dc
-INNER JOIN cuentaspor cp ON cp.idcuentaspor = dc.idcuentaspor
-WHERE dc.idcaja_bancos = '12'
-AND cp.fecha BETWEEN '$fecha_ini' AND '$fecha_fin'
--- ORDER BY cp.fecha ASC
-UNION
+            cp.idcuentaspor AS id_cuenta,
+            cp.nrecibo, 
+            cp.fecha, 
+            cp.transaccion, 
+            cp.cliente, 
+            cp.idfactura, 
+            cp.idotras_cuentas, 
+            cp.archivo, 
+            dc.idcaja_bancos, 
+            dc.monto, 
+            dc.idfactura,
+            'PAGAR' AS tipo
+        FROM detalle_caja_bancos_pagar dc
+        INNER JOIN cuentaspor cp ON cp.idcuentaspor = dc.idcuentaspor
+        WHERE dc.idcaja_bancos = '$idcaja_bancos'
+        AND cp.fecha BETWEEN '$fecha_ini' AND '$fecha_fin'
 
-SELECT 
-    cp.idcuentaspof AS id_cuenta,
-    cp.nrecibo, 
-    cp.fecha,
-    cp.transaccion, 
-    cp.cliente, 
-    cp.idfactura, 
-    cp.idotras_cuentas, 
-    cp.archivo, 
-    dc.idcaja_bancos, 
-    dc.monto, 
-    dc.idfactura,
-    'COBRAR' AS tipo
-FROM detalle_caja_bancos_cobrar dc
-INNER JOIN cuentaspof cp ON cp.idcuentaspof = dc.idcuentaspof
-WHERE dc.idcaja_bancos = '12'
-AND cp.fecha BETWEEN '$fecha_ini' AND '$fecha_fin'
+        UNION
 
-ORDER BY fecha ASC;");
+        SELECT 
+            cp.idcuentaspof AS id_cuenta,
+            cp.nrecibo, 
+            cp.fecha,
+            cp.transaccion, 
+            cp.cliente, 
+            cp.idfactura, 
+            cp.idotras_cuentas, 
+            cp.archivo, 
+            dc.idcaja_bancos, 
+            dc.monto, 
+            dc.idfactura,
+            'COBRAR' AS tipo
+        FROM detalle_caja_bancos_cobrar dc
+        INNER JOIN cuentaspof cp ON cp.idcuentaspof = dc.idcuentaspof
+        WHERE dc.idcaja_bancos = '$idcaja_bancos'
+        AND cp.fecha BETWEEN '$fecha_ini' AND '$fecha_fin'
+
+        ORDER BY fecha ASC;");
     
+    $aux_contador = 0;
+    $saldo = 0;
             while ($qwe = $this->dbc->fetch($getPedido)) {
     
                  $transac = $this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones= '$qwe[transaccion]'");
@@ -1068,11 +1075,81 @@ ORDER BY fecha ASC;");
                     }
 
                 } //FIN DEL ELSE DE PAGAR
-                
+                //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+                if($aux_contador == 0){ //ESTAMOS EN PRIMERA FILA, SUMAR LAS ANTERIORES FILAS A LA FECHA
+
+                    $fuera_rango = $this->dbc->query("SELECT 
+                cp.idcuentaspof AS id_cuenta,
+                cp.nrecibo, 
+                cp.fecha,
+                cp.transaccion, 
+                cp.cliente, 
+                cp.idfactura, 
+                cp.idotras_cuentas, 
+                cp.archivo, 
+                dc.idcaja_bancos, 
+                dc.monto, 
+                dc.idfactura,
+                'COBRAR' AS tipo
+            FROM detalle_caja_bancos_cobrar dc
+            INNER JOIN cuentaspof cp ON cp.idcuentaspof = dc.idcuentaspof
+            WHERE dc.idcaja_bancos = '$idcaja_bancos'
+            AND cp.fecha < '$fecha_ini'
+
+            UNION
+
+            SELECT 
+                cp.idcuentaspor AS id_cuenta,
+                cp.nrecibo, 
+                cp.fecha, 
+                cp.transaccion, 
+                cp.cliente, 
+                cp.idfactura, 
+                cp.idotras_cuentas, 
+                cp.archivo, 
+                dc.idcaja_bancos, 
+                dc.monto, 
+                dc.idfactura,
+                'PAGAR' AS tipo
+            FROM detalle_caja_bancos_pagar dc
+            INNER JOIN cuentaspor cp ON cp.idcuentaspor = dc.idcuentaspor
+            WHERE dc.idcaja_bancos = '$idcaja_bancos'
+            AND cp.fecha < '$fecha_ini'
+
+            ORDER BY fecha ASC;");
+                // $saldo = 0;
+                while ($zxc = $this->dbc->fetch($fuera_rango)) {
+                    if($zxc['tipo'] == 'COBRAR'){
+                        $saldo = $saldo + $zxc['monto'];
+                    }else{
+                        $saldo = $saldo - $zxc['monto'];
+                    }
+                    
+                }
+
+                // $saldo = $saldo + $qwe['monto'];
+
+                    //AUMENTAR EL AUX_CONTADOR + 1 PARA QUE YANO VUELVA A ENTRAR A ESTA CONDICION
+                    $aux_contador = 1;
+                }else{ // ESTAMOS FILAS DESPUES DE LA PRIMERA FILA
+
+                // $saldo = $saldo + $qwe['monto'];
+     
+            }
+                //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
                 if($qwe['tipo'] == 'COBRAR'){
+
+                    $saldo = $saldo + $qwe['monto'];
+
                     if($qwe['idotras_cuentas'] != 0){
+                        
                         $aux_descripcion = "Cobro de factura N° $oc[nro_otras_cuentas] con fecha: $oc[fecha]";
-        
+                        
+                        // if($zxc['tipo'] == 'COBRAR'){
+                        //     $saldo = $saldo + $zxc['monto'];
+                        // }else{
+                        //     $saldo = $saldo - $zxc['monto'];
+                        // }
                         $res = array(
                             "fecha" => $qwe['fecha'],
                             "nrecibo" => $qwe['nrecibo'],
@@ -1081,7 +1158,9 @@ ORDER BY fecha ASC;");
                             "nombre_cliente" => $cl['nombre'],
                             //descripcion saldra de la factura o otras cuentas 
                             "descripcion" => $aux_descripcion,
-                            "ingreso" => $qwe['monto']
+                            "archivo" => $qwe['archivo'],
+                            "ingreso" => $qwe['monto'],
+                            "saldo" => $saldo
         
                         );
                     }else{
@@ -1097,10 +1176,15 @@ ORDER BY fecha ASC;");
                             "nombre_cliente" => $cl['nombre'],
                             //descripcion saldra de la factura o otras cuentas 
                             "descripcion" => $aux_descripcion,
-                            "ingreso" => $qwe['monto']
+                            "archivo" => $qwe['archivo'],
+                            "ingreso" => $qwe['monto'],
+                            "saldo" => $saldo
                         );
                     }
                 }else{
+
+                    $saldo = $saldo - $qwe['monto'];
+
                     if($qwe['idotras_cuentas'] != 0){
                         $aux_descripcion = "Cobro de factura N° $oc[nro_otras_cuentas] con fecha: $oc[fecha]";
         
@@ -1112,7 +1196,9 @@ ORDER BY fecha ASC;");
                             "nombre_cliente" => $cl['nombre'],
                             //descripcion saldra de la factura o otras cuentas 
                             "descripcion" => $aux_descripcion,
-                            "egreso" => $qwe['monto']
+                            "archivo" => $qwe['archivo'],
+                            "egreso" => $qwe['monto'],
+                            "saldo" => $saldo
                         );
                     }else{
                         $aux_descripcion = "Cobro de factura N° $fact[nfactura] con fecha: $fact[fecha]";
@@ -1127,7 +1213,9 @@ ORDER BY fecha ASC;");
                             "nombre_cliente" => $cl['nombre'],
                             //descripcion saldra de la factura o otras cuentas 
                             "descripcion" => $aux_descripcion,
-                            "egreso" => $qwe['monto']
+                            "archivo" => $qwe['archivo'],
+                            "egreso" => $qwe['monto'],
+                            "saldo" => $saldo
                         );
                     }
                 }
