@@ -15,6 +15,7 @@ require_once "./otras_cuentas/recibo_otras_cuentas.php";
 require_once "./configuracion/divisa.php";
 require_once "./configuracion/asiento.php";
 require_once "./recibos/caja_bancos_recibos.php";
+require_once "alertas.php";
 
 $ver=explode("/",$_GET['ver']); //dividiendo los "/"  ver[0],ver[1],ver[x] listafacturaapi_cobrado eliminarasiento
 if($ver[0]=="verificacion"){
@@ -387,10 +388,22 @@ elseif($ver[0]=="listar_asiento_por_modulo"){
 }elseif($ver[0]=="listar_recibo_por_caja_bancos"){
     $cont=new caja_bancos_recibos();
     $cont->listar_recibo_por_caja_bancos($ver[1],$ver[2],$ver[3],$ver[4]);
+}elseif($ver[0]=="alerta_desconsolidacion"){
+    $cont=new Alertas();
+    $cont->alerta_desconsolidacion($ver[1]);
+}elseif($ver[0]=="alerta_transaccionEn_espera"){
+    $cont=new Alertas();
+    $cont->alerta_transaccionEn_espera($ver[1]);
+}elseif($ver[0]=="alerta_anular_eliminar_transaccion"){
+    $cont=new Alertas();
+    $cont->alerta_anular_eliminar_transaccion($ver[1]);
+}elseif($ver[0]=="alerta_transacciones_comercial"){
+    $cont=new Alertas();
+    $cont->alerta_transacciones_comercial($ver[1]);
 }
 
 //reportecomprobantecontable listafactura_cobrado_trans asientotipo listar_operacion_modulo_filtrado creartipoasientodelete listaplanesempresa
-
+//lista_transaccionEn_espera listar_anular_eliminar_transaccion listatransacciones_comercial
 //listafactura eliminartransaccion listapagos_individuales listatransaciones factura lista_cobrar_cobrado reportedetalletransaccion
 //reporteactivodisponible listar_cajas_bancos_pagar_por_recibo listar_recibo_por_id_otras_cuentas_pagar lista_transaccion getidempresa firmas
 ?>
