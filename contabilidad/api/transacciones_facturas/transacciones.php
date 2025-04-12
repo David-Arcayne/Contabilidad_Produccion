@@ -364,6 +364,29 @@ class Transacciones extends DB{
         VALUE('$nroTransaccion','$fecha','0','0','$glosa','1','1','$tipotransaccion[tipo]','$idasignacion_asiento','$ide','$idsucursal','$gestion')");
         }
     
+        // $aux_asignacion['idasientotipo']
+        // $debe = 0; cuentapresupuestaria
+        //     $haber = 0;
+        //     $tasiento = $this->dbc->query("SELECT * FROM asiento WHERE idasientotipo='$asiento'");
+        //     $orden = 1;
+        //     while ($qwe = $this->dbc->fetch($tasiento)) {
+        //         $pcuenta = $qwe['idcuenta'];
+        //         if ($qwe['tipo'] == "DEBE") {
+        //             $debe = $monto * ($qwe['porciento'] / 100);
+        //             $haber = 0;
+        //         } elseif ($qwe['tipo'] == "HABER") {
+        //             $debe = 0;
+        //             $haber = $monto * ($qwe['porciento'] / 100);
+        //         }
+        //         //$pcuenta=$_POST['plandecuenta'];
+        //         $ppresupuestario = 0; //$_POST['planpresupuestario'];
+        //         $nota = "-";
+        //         $estado = 1; //$_POST['estado'];
+        //         $crear = $this->dbc->query("INSERT INTO detalletransaccion(debe,haber,nota,transacciones_idtransacciones,idplandecuenta,idcuentapresupuestaria,estado,cobrar,pagar,idorganizacion,idsucursal,orden)
+        //         VALUES ('$debe','$haber','$nota','$trans','$pcuenta','$ppresupuestario','$estado','2','2','$ide','$sucursal','$orden')");
+
+        //         $orden = $orden + 1;
+        //     }
         if ($writetrans === TRUE) {
             $res = array("success", "Se Registro Correctamente", "registrotransaccion");
         } else {

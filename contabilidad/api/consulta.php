@@ -400,10 +400,13 @@ elseif($ver[0]=="listar_asiento_por_modulo"){
 }elseif($ver[0]=="alerta_transacciones_comercial"){
     $cont=new Alertas();
     $cont->alerta_transacciones_comercial($ver[1]);
+}elseif($ver[0]=="eliminar_gestion_contable"){
+    $cont=new Contabilidad();
+    $cont->eliminar_gestion_contable($ver[1]);
 }
 
 //reportecomprobantecontable listafactura_cobrado_trans asientotipo listar_operacion_modulo_filtrado creartipoasientodelete listaplanesempresa
-//lista_transaccionEn_espera listar_anular_eliminar_transaccion listatransacciones_comercial
+//lista_transaccionEn_espera listar_anular_eliminar_transaccion listatransacciones_comercial gestion
 //listafactura eliminartransaccion listapagos_individuales listatransaciones factura lista_cobrar_cobrado reportedetalletransaccion
 //reporteactivodisponible listar_cajas_bancos_pagar_por_recibo listar_recibo_por_id_otras_cuentas_pagar lista_transaccion getidempresa firmas
 ?>

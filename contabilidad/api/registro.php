@@ -16,7 +16,7 @@ require_once "./configuracion/asiento.php";
 require_once "./recibos/caja_bancos_recibos.php";
 
 $ver=$_POST['ver'];
-$json = file_get_contents('php://input'); // Decodificar el JSON en un arreglo PHP  
+$json = file_get_contents('php://input'); // Decodificar el JSON en un arreglo PHP   gestion
 $data = json_decode($json, true);
 if($ver=="registroplanes"){
 $ad=new Admin();

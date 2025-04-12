@@ -633,7 +633,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                     FROM detalle_caja_bancos_cobrar dc
                     INNER JOIN cuentaspof cp ON cp.idcuentaspof = dc.idcuentaspof
                     WHERE dc.idcaja_bancos = '$idcaja_bancos'
-                    AND cp.fecha < '$fecha_ini';");
+                    AND cp.fecha < '$fecha_ini' , cp.nrecibo ASC;");
                 // $saldo = 0;
                 while ($zxc = $this->dbc->fetch($fuera_rango)) {
                     $saldo = $saldo + $zxc['monto'];
@@ -835,7 +835,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             //descripcion saldra de la factura o otras cuentas 
                             "descripcion" => $aux_descripcion,
                             "archivo" => $qwe['archivo'],
-                            "ingreso" => $qwe['monto'],
+                            "egreso" => $qwe['monto'],
                             "saldo" => $saldo
         
                         );
@@ -854,7 +854,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         //descripcion saldra de la factura o otras cuentas 
                         "descripcion" => $aux_descripcion,
                         "archivo" => $qwe['archivo'],
-                        "ingreso" => $qwe['monto'],
+                        "egreso" => $qwe['monto'],
                         "saldo" => $saldo
     
                     );
@@ -888,7 +888,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             //descripcion saldra de la factura o otras cuentas 
                             "descripcion" => $aux_descripcion,
                             "archivo" => $qwe['archivo'],
-                            "ingreso" => $qwe['monto'],
+                            "egreso" => $qwe['monto'],
                             "saldo" => $saldo
         
                         );
@@ -907,7 +907,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         //descripcion saldra de la factura o otras cuentas 
                         "descripcion" => $aux_descripcion,
                         "archivo" => $qwe['archivo'],
-                        "ingreso" => $qwe['monto'],
+                        "egreso" => $qwe['monto'],
                         "saldo" => $saldo
     
                     );
@@ -971,7 +971,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         WHERE dc.idcaja_bancos = '$idcaja_bancos'
         AND cp.fecha BETWEEN '$fecha_ini' AND '$fecha_fin'
 
-        ORDER BY fecha ASC;");
+        ORDER BY fecha ASC, nrecibo ASC;");
     
     $aux_contador = 0;
     $saldo = 0;
@@ -1116,7 +1116,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             WHERE dc.idcaja_bancos = '$idcaja_bancos'
             AND cp.fecha < '$fecha_ini'
 
-            ORDER BY fecha ASC;");
+            ORDER BY fecha ASC, nrecibo ASC;");
                 // $saldo = 0;
                 while ($zxc = $this->dbc->fetch($fuera_rango)) {
                     if($zxc['tipo'] == 'COBRAR'){

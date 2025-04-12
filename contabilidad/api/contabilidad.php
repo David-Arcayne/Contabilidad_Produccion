@@ -2062,6 +2062,40 @@ WHERE
         }
         echo json_encode($res);
     }
+    public function eliminar_gestion_contable($id)
+    {
+        $res = "";
+   
+        $this->dbc->begin_transaction();
+    
+        try {
+            $relacionadas = [
+                ['tabla' => 'transacciones', 'campo' => 'idgestion', 'mensaje' => 'No se puede eliminar'],
+                ['tabla' => 'transaccionEn_espera', 'campo' => 'idgestion', 'mensaje' => 'No se puede eliminar'],
+                ['tabla' => 'cuentapresupuestaria', 'campo' => 'gestion', 'mensaje' => 'No se puede eliminar']
+            ];
+            
+    
+            foreach ($relacionadas as $relacion) {
+                $query = "SELECT 1 FROM {$relacion['tabla']} WHERE {$relacion['campo']} = $id";
+                $result = $this->dbc->query($query);
+                if ($result->num_rows > 0) {
+                    throw new Exception($relacion['mensaje']);
+                }
+            }
+    // $registro = $this->dbcm->query("DELETE FROM plandecuenta WHERE idplandecuenta='$dato'");
+            $query = "DELETE FROM gestion WHERE idgestion='$id'";
+            $this->dbc->query($query);
+            
+            $this->dbc->commit();
+            $res = array("success", "Se eliminó correctamente", "eliminarcliente");
+    
+        } catch (Exception $e) {
+            $this->dbc->rollback();
+            $res = array("danger", $e->getMessage(), "eliminarcliente");
+        }
+        echo json_encode($res);
+    }
     //listafactura eliminartransaccion  eliminarcliente listafactura_cobrado eliminarproveedor listafactura_pagado registrocobrarfactura
 }//eliminarcobrados listapagos registrardesconsolidar registrotransaccion cambiarestadoconsolidado  registropagarfactura 
 //registrardesconsolidar crearfactura listapagos crearfacturasapi lista_cobrar_cobrado_factura registropagarfactura listaclientes
