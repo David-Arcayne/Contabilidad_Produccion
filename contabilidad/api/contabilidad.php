@@ -1927,46 +1927,6 @@ WHERE
         echo json_encode($res);
     } 
    
-    public function listar_recibo_pago_por_id($idrecibo,$idfactura)
-    {
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
-        $lista = [];
-        
-        $registro = $this->dbc->query("SELECT * FROM cuentaspor WHERE idcuentaspor = '$idrecibo'");
-
-        while ($qwe = $this->dbc->fetch($registro)) {
-            $caja_banco = $this->dbc->query("SELECT * FROM detalle_caja_bancos_pagar WHERE idcuentaspor = '$qwe[idcuentaspor]' AND idfactura = '$idfactura'");
-            
-            if ($caja_banco->num_rows > 0) {
-                while ($datos_caja = $this->dbc->fetch($caja_banco)) {
-                    $caja= $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '$datos_caja[idcaja_bancos]'");
-                    $datos = $caja->fetch_assoc();
-                    $res = array(
-                        "nrecibo" => $qwe['nrecibo'],
-                        "fecha" => $qwe['fecha'],
-                        "persona" => $qwe['persona'],
-                        "monto_recibo" => $qwe[6],
-                        "idcaja_bancos" => $datos['idcaja_bancos'],
-                        "codigo" => $datos['codigo'],
-                        "nombre" => $datos['tipo_cuenta'],
-                        "monto" => $datos_caja['monto']
-                    );
-                    array_push($lista, $res);
-                }
-            } else {
-                $res = array(
-                    "nrecibo" => $qwe['nrecibo'],
-                    "fecha" => $qwe['fecha'],
-                    "monto" => $qwe['monto'],
-                    "persona" => $qwe['persona'],
-                );
-                array_push($lista, $res);
-            }
-        }
-        echo json_encode($lista);
-    }
      
     public function registrar_tipo($nombre,$descripcion,$empresa){
         $idempresa = $this->getidempresa($empresa);
@@ -2099,6 +2059,6 @@ WHERE
     //listafactura eliminartransaccion  eliminarcliente listafactura_cobrado eliminarproveedor listafactura_pagado registrocobrarfactura
 }//eliminarcobrados listapagos registrardesconsolidar registrotransaccion cambiarestadoconsolidado  registropagarfactura 
 //registrardesconsolidar crearfactura listapagos crearfacturasapi lista_cobrar_cobrado_factura registropagarfactura listaclientes
-// $gestion = $this->getgestionactualid($ide); listapagos listaasientos cliente crearsolofacturasapi   getusuario
+// $gestion = $this->getgestionactualid($ide); listapagos listaasientos cliente crearsolofacturasapi   getusuario listar_recibo_pago_por_id
 
 

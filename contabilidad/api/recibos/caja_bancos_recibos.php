@@ -221,7 +221,8 @@ class caja_bancos_recibos extends DB{
     }
                                             
     public function registrar_otras_cuentas_recibo_cajaBancos_cobro($fecha,$coc,$cobro, $pagar,$trans, $cliente,$asiento,$concepto,$precio,$idtipo,$empresa,$sucursal,$idcaja_bancos)
-    {                                             //idtransaccion, asiento,fecha, id_cliente_proveedor, concepto, precio, idtipo
+    {                                             
+        //idtransaccion, asiento,fecha, id_cliente_proveedor, concepto, precio, idtipo
         // echo json_encode(array($fecha,$coc,$cobro, $pagar,$trans, $cliente,$asiento,$concepto,$precio,$idtipo,$empresa,$sucursal,$idcaja_bancos));
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
@@ -249,20 +250,19 @@ class caja_bancos_recibos extends DB{
         $clientSelect = $cl->fetch_assoc();
         // NUNCA ENTRA A ESTA CONDICION
 
-        // if($trans == "" && $asiento == ""){
-        //     // se crea factura sin transaccion asignada
-        //     //$trans = 0
-        //     $registro = $this->dbc->query("INSERT INTO otras_cuentas(fecha,nro_otras_cuentas,lugar,id_cliente_proveedor,clase_otras_cuentas,pagado,cobrado,nro_tributario,contacto,nro_doc_identidad,idtipo,transacciones_idtransacciones,concepto,condiciones,observaciones,precio,forma_pago,idempresa) 
-        //     VALUES ('$fecha','','','$cliente','$coc','$pagar','$cobro','','','','$idtipo','$trans','$concepto','','','$precio','','$idempresa')");
+        if($trans == "" && $asiento == ""){
+            // se crea factura sin transaccion asignada
+            //$trans = 0
+            $registro = $this->dbc->query("INSERT INTO otras_cuentas(fecha,nro_otras_cuentas,lugar,id_cliente_proveedor,clase_otras_cuentas,pagado,cobrado,nro_tributario,contacto,nro_doc_identidad,idtipo,transacciones_idtransacciones,concepto,condiciones,observaciones,precio,forma_pago,idempresa) 
+            VALUES ('$fecha','','','$cliente','$coc','$pagar','$cobro','','','','$idtipo','0','$concepto','','','$precio','','$idempresa')");
         
-        //     $idotras_cuentas = $this->dbc->insert_id;
+            $idotras_cuentas = $this->dbc->insert_id;
 
-        //     $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
-        //     VALUES('$nroRecibo','$fecha','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$precio','0','$idotras_cuentas','$trans','0',NULL)");
+            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
+            VALUES('$nroRecibo','$fecha','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$precio','0','$idotras_cuentas','0','0',NULL)");
 
-        //     $idrecibo = $this->dbc->insert_id;
-        // }
-        if($trans > 0 && $asiento == 0){
+            $idrecibo = $this->dbc->insert_id;
+        }elseif($trans > 0 && $asiento == 0){
             //SE CREA LA FACTURA CON LA TRANSACCION EXISTENTE QUE YA TE PASARON
             $registro = $this->dbc->query("INSERT INTO otras_cuentas(fecha,nro_otras_cuentas,lugar,id_cliente_proveedor,clase_otras_cuentas,pagado,cobrado,nro_tributario,contacto,nro_doc_identidad,idtipo,transacciones_idtransacciones,concepto,condiciones,observaciones,precio,forma_pago,idempresa) 
             VALUES ('$fecha','','','$cliente','$coc','$pagar','$cobro','','','','$idtipo','$trans','$concepto','','','$precio','','$idempresa')");
@@ -362,20 +362,19 @@ class caja_bancos_recibos extends DB{
         $clientSelect = $cl->fetch_assoc();
 //NUNCA ENTRA A ESTA CONDICION
 
-        // if($trans == "" && $asiento == ""){
-        //     // se crea factura sin transaccion asignada
-        //     //$trans = 0
-        //     $registro = $this->dbc->query("INSERT INTO otras_cuentas(fecha,nro_otras_cuentas,lugar,id_cliente_proveedor,clase_otras_cuentas,pagado,cobrado,nro_tributario,contacto,nro_doc_identidad,idtipo,transacciones_idtransacciones,concepto,condiciones,observaciones,precio,forma_pago,idempresa) 
-        //     VALUES ('$fecha','','','$cliente','$coc','$pagar','$cobro','','','','$idtipo','$trans','$concepto','','','$precio','','$idempresa')");
+        if($trans == "" && $asiento == ""){
+            //se crea factura sin transaccion asignada
+            //$trans = 0
+            $registro = $this->dbc->query("INSERT INTO otras_cuentas(fecha,nro_otras_cuentas,lugar,id_cliente_proveedor,clase_otras_cuentas,pagado,cobrado,nro_tributario,contacto,nro_doc_identidad,idtipo,transacciones_idtransacciones,concepto,condiciones,observaciones,precio,forma_pago,idempresa) 
+            VALUES ('$fecha','','','$cliente','$coc','$pagar','$cobro','','','','$idtipo','0','$concepto','','','$precio','','$idempresa')");
         
-        //     $idotras_cuentas = $this->dbc->insert_id;
+            $idotras_cuentas = $this->dbc->insert_id;
 
-        //     $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
-        //     VALUES('$nroRecibo','$fecha','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$precio','0','$idotras_cuentas','$trans','0',NULL)");
+            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
+            VALUES('$nroRecibo','$fecha','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$precio','0','$idotras_cuentas','0','0',NULL)");
 
-        //     $idrecibo = $this->dbc->insert_id;
-        // }
-        if($trans > 0 && $asiento == 0){
+            $idrecibo = $this->dbc->insert_id;
+        }elseif($trans > 0 && $asiento == 0){
             //SE CREA LA FACTURA CON LA TRANSACCION EXISTENTE QUE YA TE PASARON
             $registro = $this->dbc->query("INSERT INTO otras_cuentas(fecha,nro_otras_cuentas,lugar,id_cliente_proveedor,clase_otras_cuentas,pagado,cobrado,nro_tributario,contacto,nro_doc_identidad,idtipo,transacciones_idtransacciones,concepto,condiciones,observaciones,precio,forma_pago,idempresa) 
             VALUES ('$fecha','','','$cliente','$coc','$pagar','$cobro','','','','$idtipo','$trans','$concepto','','','$precio','','$idempresa')");

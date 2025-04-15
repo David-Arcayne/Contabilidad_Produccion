@@ -204,7 +204,7 @@ class Cuentaspor extends DB{
                 $editar = $this->dbc->query("UPDATE detalle_caja_bancos_pagar
                 SET monto = '$caja_banco[monto]',
                 idcaja_bancos = '$caja_banco[idcaja_bancos]'
-                -- tipo = '$tipoCuenta[tipo_cuenta]'
+                -- tipo = '$tipoCuenta[tipo_cuenta]' 
                 WHERE iddetalle_caja_bancos_pagar = '$caja_banco[iddetalle_caja_bancos_pagar]';");
             }
         }
@@ -243,6 +243,57 @@ class Cuentaspor extends DB{
     } else {
 
     }
+        echo json_encode($lista);
+    }
+
+    public function listar_recibo_pago_por_id($idrecibo)
+    {
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+        $lista = [];
+        
+        $registro = $this->dbc->query("SELECT * FROM cuentaspor WHERE idcuentaspor = '$idrecibo'");
+
+        $consulta = $this->dbc->query("SELECT SUM(monto) AS suma_monto FROM detalle_caja_bancos_pagar WHERE idcuentaspor = '$idrecibo'");
+        $mont = $consulta->fetch_assoc();
+
+        while ($qwe = $this->dbc->fetch($registro)) {
+            $caja_banco = $this->dbc->query("SELECT * FROM detalle_caja_bancos_pagar WHERE idcuentaspor = '$qwe[idcuentaspor]'");
+            
+            if ($caja_banco->num_rows > 0) {
+                while ($datos_caja = $this->dbc->fetch($caja_banco)) {
+
+                    $factura= $this->dbc->query("SELECT * FROM factura WHERE idfactura = '$datos_caja[idfactura]'");
+                    $ft = $factura->fetch_assoc();
+
+                    $caja= $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '$datos_caja[idcaja_bancos]'");
+                    $datos = $caja->fetch_assoc();
+                    $res = array(
+                        "nrecibo" => $qwe['nrecibo'],
+                        "fecha" => $qwe['fecha'],
+                        "persona" => $qwe['persona'],
+                        "monto_recibo" => $qwe[6],
+                        "idcaja_bancos" => $datos['idcaja_bancos'],
+                        "codigo" => $datos['codigo'],
+                        "nombre" => $datos['tipo_cuenta'],
+                        "monto" => $datos_caja['monto'],
+                        "monto_total" => $mont['suma_monto'],
+                        "fecha_factura" => $ft['fecha'],
+                        "nro_factura" => $ft['nfactura']
+                    );
+                    array_push($lista, $res);
+                }
+            } else {
+                $res = array(
+                    "nrecibo" => $qwe['nrecibo'],
+                    "fecha" => $qwe['fecha'],
+                    "monto" => $qwe['monto'],
+                    "persona" => $qwe['persona'],
+                );
+                array_push($lista, $res);
+            }
+        }
         echo json_encode($lista);
     }
 

@@ -6,6 +6,169 @@ class Documento_cobro extends DB{ //          idtransaccion, asiento,fecha, id_c
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
         // echo json_encode(array($fecha,$lugar,$cliente,$nro_tributario,$contacto,$nro_doc_identidad,$idtipo,$condiciones,$observaciones,$precio,$forma_pago,$empresa));
+        $idsucursal = $this->getidsucursal($sucursal);
+        $idempresa = $this->getidempresa($empresa);
+        $gestion = $this->getgestionactualid($idempresa);
+        
+        // $idempresa = $this->getidempresa($empresa);
+        $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM otras_cuentas WHERE idempresa = '$idempresa'");
+        $resultado = $consulta->fetch_assoc();
+        $nro_otras_cuentas = $resultado['total'] + 1;
+
+        $count = $this->dbc->query("SELECT COUNT(*) AS canti_total FROM cuentaspof cp
+        INNER JOIN transacciones t ON t.idtransacciones = cp.transaccion WHERE t.organizacion_idorganizacion='$idempresa'");
+        $hh = $this->dbc->fetch($count);
+        $nroRecibo = $hh['canti_total'];
+
+        $cl = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='$id_cliente_proveedor'");
+        $clientSelect = $cl->fetch_assoc();
+
+        // if($cobrado == '1'){
+            // NO SE CREARAN RECIBOS
+
+              // Insertar en transacciones
+        if($idtransaccion == "" && $asiento == ""){
+            // se crea factura sin transaccion asignada
+            //$trans = 0
+            $registro = $this->dbc->query("INSERT INTO otras_cuentas(fecha,nro_otras_cuentas,lugar,id_cliente_proveedor,clase_otras_cuentas,pagado,cobrado,nro_tributario,contacto,nro_doc_identidad,idtipo,transacciones_idtransacciones,concepto,condiciones,observaciones,precio,forma_pago,idempresa) 
+            VALUES ('$fecha','$nro_otras_cuentas','$lugar','$id_cliente_proveedor','$coc','$pagado','$cobrado','$nro_tributario','$contacto','$nro_doc_identidad','$idtipo','$idtransaccion','$concepto','$condiciones','$observaciones','$precio','$forma_pago','$idempresa')");
+        
+        }elseif($idtransaccion > 0 && $asiento == 0){
+            //SE CREA LA FACTURA CON LA TRANSACCION EXISTENTE QUE YA TE PASARON
+            $registro = $this->dbc->query("INSERT INTO otras_cuentas(fecha,nro_otras_cuentas,lugar,id_cliente_proveedor,clase_otras_cuentas,pagado,cobrado,nro_tributario,contacto,nro_doc_identidad,idtipo,transacciones_idtransacciones,concepto,condiciones,observaciones,precio,forma_pago,idempresa) 
+            VALUES ('$fecha','$nro_otras_cuentas','$lugar','$id_cliente_proveedor','$coc','$pagado','$cobrado','$nro_tributario','$contacto','$nro_doc_identidad','$idtipo','$idtransaccion','$concepto','$condiciones','$observaciones','$precio','$forma_pago','$idempresa')");
+        
+        }else{
+            // Obtener el número de transacción más reciente y sumar 1
+        $nroTrans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE organizacion_idorganizacion=$idempresa AND idgestion='$gestion' ORDER BY codigotransaccion DESC LIMIT 1;");
+        $resultado12 = $nroTrans->fetch_assoc();
+        $nroTransaccion = $resultado12['codigotransaccion'] + 1;
+
+        //el asiento es diferente a cero, se debe crear una transaccion
+        $idAsientoTipo = $this->dbc->query("SELECT * FROM asientotipo WHERE idasientotipo='$asiento' AND idorganizacion='$idempresa';");
+        $asiento = $idAsientoTipo->fetch_assoc();  // Cambiado $nroTrans->fetch_assoc() a $idAsientoTipo->fetch_assoc()
+        $tipotransaccion = $asiento['tipo'];
+        // Insertar en transacciones
+        $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion, fechatransaccion, tipodecambio, ndocumento, glosa, consolidar,estado, tipotransaccion_idtipotransaccion, organizacion_idorganizacion, sucursal, idgestion) VALUES ('$nroTransaccion', '$fecha', '1', '0', 'Registro Cobro Caja Bancos', '1','1', '$tipotransaccion', '$idempresa', '$idsucursal', '$gestion')");
+        $idtrans = $this->dbc->insert_id;
+// -----------------------------------------------------------------------------------------------------------------
+             // Obtener los asientos relacionados y calcular debe y haber
+        $tasiento = $this->dbc->query("SELECT * FROM asiento WHERE idasientotipo='$asiento'");
+        $orden = 1;
+        while ($qwe = $tasiento->fetch_assoc()) {
+            $pcuenta = $qwe['idcuenta'];
+            if ($qwe['tipo'] == "DEBE") {
+                $debe = $precio * ($qwe['porciento'] / 100);
+                $haber = 0;
+            } elseif ($qwe['tipo'] == "HABER") {
+                $debe = 0;
+                $haber = $precio * ($qwe['porciento'] / 100);
+            }
+            $ppresupuestario = 0;
+            $nota = "-";
+            $estado = 1;
+    
+            // Insertar en detalletransaccion Ocurrio un error al asignar la factura
+            $crear = $this->dbc->query("INSERT INTO detalletransaccion(debe, haber, nota, transacciones_idtransacciones, idplandecuenta, idcuentapresupuestaria, estado, cobrar, pagar, idorganizacion, idsucursal, orden) 
+            VALUES ('$debe', '$haber', '$nota', '$idtrans', '$pcuenta', '$ppresupuestario', '$estado', '2', '2', '$idempresa', '$idsucursal', '$orden')");
+            
+            $orden = $orden + 1;
+        }
+//------------------------------------------------------------------------------
+        $registro = $this->dbc->query("INSERT INTO otras_cuentas(fecha,nro_otras_cuentas,lugar,id_cliente_proveedor,clase_otras_cuentas,pagado,cobrado,nro_tributario,contacto,nro_doc_identidad,idtipo,transacciones_idtransacciones,concepto,condiciones,observaciones,precio,forma_pago,idempresa) 
+        VALUES ('$fecha','$nro_otras_cuentas','$lugar','$id_cliente_proveedor','$coc','$pagado','$cobrado','$nro_tributario','$contacto','$nro_doc_identidad','$idtipo','$idtrans','$concepto','$condiciones','$observaciones','$precio','$forma_pago','$idempresa')");
+
+        }
+
+
+//         }else{
+//             // SE CREARAN RECIBOS
+//                        // Insertar en transacciones
+//         if($idtransaccion == "" && $asiento == ""){
+//             // se crea factura sin transaccion asignada
+//             //$trans = 0
+//             $registro = $this->dbc->query("INSERT INTO otras_cuentas(fecha,nro_otras_cuentas,lugar,id_cliente_proveedor,clase_otras_cuentas,pagado,cobrado,nro_tributario,contacto,nro_doc_identidad,idtipo,transacciones_idtransacciones,concepto,condiciones,observaciones,precio,forma_pago,idempresa) 
+//             VALUES ('$fecha','$nro_otras_cuentas','$lugar','$id_cliente_proveedor','$coc','$pagado','$cobrado','$nro_tributario','$contacto','$nro_doc_identidad','$idtipo','$idtransaccion','$concepto','$condiciones','$observaciones','$precio','$forma_pago','$idempresa')");
+        
+//             $idfact = $this->dbc->insert_id;
+
+//             $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
+//             VALUES('$nroRecibo','$fecha','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$precio','$idfact','0','$idtransaccion','0',NULL)");
+
+//             $idrecibo = $this->dbc->insert_id;
+//         }elseif($idtransaccion > 0 && $asiento == 0){
+//             //SE CREA LA FACTURA CON LA TRANSACCION EXISTENTE QUE YA TE PASARON
+//             $registro = $this->dbc->query("INSERT INTO otras_cuentas(fecha,nro_otras_cuentas,lugar,id_cliente_proveedor,clase_otras_cuentas,pagado,cobrado,nro_tributario,contacto,nro_doc_identidad,idtipo,transacciones_idtransacciones,concepto,condiciones,observaciones,precio,forma_pago,idempresa) 
+//             VALUES ('$fecha','$nro_otras_cuentas','$lugar','$id_cliente_proveedor','$coc','$pagado','$cobrado','$nro_tributario','$contacto','$nro_doc_identidad','$idtipo','$idtransaccion','$concepto','$condiciones','$observaciones','$precio','$forma_pago','$idempresa')");
+        
+//             $idfact = $this->dbc->insert_id;
+
+//             $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
+//             VALUES('$nroRecibo','$fecha','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$precio','$idfact','0','$idtransaccion','0',NULL)");
+
+//             $idrecibo = $this->dbc->insert_id;
+//         }else{
+//             // Obtener el número de transacción más reciente y sumar 1
+//         $nroTrans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE organizacion_idorganizacion=$idempresa AND idgestion='$gestion' ORDER BY codigotransaccion DESC LIMIT 1;");
+//         $resultado12 = $nroTrans->fetch_assoc();
+//         $nroTransaccion = $resultado12['codigotransaccion'] + 1;
+
+//         //el asiento es diferente a cero, se debe crear una transaccion
+//         $idAsientoTipo = $this->dbc->query("SELECT * FROM asientotipo WHERE idasientotipo='$asiento' AND idorganizacion='$idempresa';");
+//         $asiento = $idAsientoTipo->fetch_assoc();  // Cambiado $nroTrans->fetch_assoc() a $idAsientoTipo->fetch_assoc()
+//         $tipotransaccion = $asiento['tipo'];
+//         // Insertar en transacciones
+//         $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion, fechatransaccion, tipodecambio, ndocumento, glosa, consolidar,estado, tipotransaccion_idtipotransaccion, organizacion_idorganizacion, sucursal, idgestion) VALUES ('$nroTransaccion', '$fecha', '1', '0', 'Registro Cobro Caja Bancos', '1','1', '$tipotransaccion', '$idempresa', '$idsucursal', '$gestion')");
+//         $idtrans = $this->dbc->insert_id;
+// // -----------------------------------------------------------------------------------------------------------------
+//              // Obtener los asientos relacionados y calcular debe y haber
+//         $tasiento = $this->dbc->query("SELECT * FROM asiento WHERE idasientotipo='$asiento'");
+//         $orden = 1;
+//         while ($qwe = $tasiento->fetch_assoc()) {
+//             $pcuenta = $qwe['idcuenta'];
+//             if ($qwe['tipo'] == "DEBE") {
+//                 $debe = $precio * ($qwe['porciento'] / 100);
+//                 $haber = 0;
+//             } elseif ($qwe['tipo'] == "HABER") {
+//                 $debe = 0;
+//                 $haber = $precio * ($qwe['porciento'] / 100);
+//             }
+//             $ppresupuestario = 0;
+//             $nota = "-";
+//             $estado = 1;
+    
+//             // Insertar en detalletransaccion Ocurrio un error al asignar la factura
+//             $crear = $this->dbc->query("INSERT INTO detalletransaccion(debe, haber, nota, transacciones_idtransacciones, idplandecuenta, idcuentapresupuestaria, estado, cobrar, pagar, idorganizacion, idsucursal, orden) VALUES ('$debe', '$haber', '$nota', '$idtrans', '$pcuenta', '$ppresupuestario', '$estado', '2', '2', '$idempresa', '$idsucursal', '$orden')");
+            
+//             $orden = $orden + 1;
+//         }
+// //------------------------------------------------------------------------------
+//         $registro = $this->dbc->query("INSERT INTO otras_cuentas(fecha,nro_otras_cuentas,lugar,id_cliente_proveedor,clase_otras_cuentas,pagado,cobrado,nro_tributario,contacto,nro_doc_identidad,idtipo,transacciones_idtransacciones,concepto,condiciones,observaciones,precio,forma_pago,idempresa) 
+//         VALUES ('$fecha','$nro_otras_cuentas','$lugar','$id_cliente_proveedor','$coc','$pagado','$cobrado','$nro_tributario','$contacto','$nro_doc_identidad','$idtipo','$idtransaccion','$concepto','$condiciones','$observaciones','$precio','$forma_pago','$idempresa')");
+
+//         $idfact = $this->dbc->insert_id;
+
+//         $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
+//             VALUES('$nroRecibo','$fecha','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$precio','$idfact','0','$idtrans','0',NULL)");
+
+//         $idrecibo = $this->dbc->insert_id;
+//         }
+//         }
+    
+        // $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa', '$espesificacion', '1', '1', '$trans', '$cliente', '$idempresa', '$cuenta', '$idsucursal');");
+        if ($registro === TRUE) {
+            $res = array("success", "Registro Correcto", "crearfactura");
+        } else {
+            $res = array("danger", "No se pudo realizar el registro ");
+        }
+        echo json_encode($res);
+        
+    }
+    public function registrar_otras_cuentas_antiguo($idtransaccion,$asiento,$fecha,$lugar,$id_cliente_proveedor,$coc,$pagado,$cobrado,$nro_tributario,$contacto,$nro_doc_identidad,$idtipo,$concepto,$condiciones,$observaciones,$precio,$forma_pago,$empresa,$sucursal){
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+        // echo json_encode(array($fecha,$lugar,$cliente,$nro_tributario,$contacto,$nro_doc_identidad,$idtipo,$condiciones,$observaciones,$precio,$forma_pago,$empresa));
         $sucursal = $this->getidsucursal($sucursal);
         $ide = $this->getidempresa($empresa);
         $count = $this->dbc->query("SELECT COUNT(*) AS canti_total FROM cuentaspof cp

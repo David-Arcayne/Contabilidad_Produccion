@@ -263,7 +263,7 @@ $caja_bancos = json_decode($cajasBancos, true);
         echo json_encode($lista);
     }
 
-    public function listar_recibo_por_id($idrecibo,$idfactura)
+    public function listar_recibo_por_id($idrecibo)
     {
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
@@ -271,12 +271,21 @@ $caja_bancos = json_decode($cajasBancos, true);
         $lista = [];
         
         $registro = $this->dbc->query("SELECT * FROM cuentaspof WHERE idcuentaspof = '$idrecibo'");
+        
+        $consulta = $this->dbc->query("SELECT SUM(monto) AS suma_monto FROM detalle_caja_bancos_cobrar WHERE idcuentaspof = '$idrecibo'");
+        $mont = $consulta->fetch_assoc();
+
 
 while ($qwe = $this->dbc->fetch($registro)) {
-    $caja_banco = $this->dbc->query("SELECT * FROM detalle_caja_bancos_cobrar WHERE idcuentaspof = '$qwe[idcuentaspof]' AND idfactura = '$idfactura'");
+    $caja_banco = $this->dbc->query("SELECT * FROM detalle_caja_bancos_cobrar WHERE idcuentaspof = '$qwe[idcuentaspof]' 
+    ");
     
     if ($caja_banco->num_rows > 0) {
         while ($datos_caja = $this->dbc->fetch($caja_banco)) {
+            $factura= $this->dbc->query("SELECT * FROM factura WHERE idfactura = '$datos_caja[idfactura]'");
+            $ft = $factura->fetch_assoc();
+
+
             $caja= $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '$datos_caja[idcaja_bancos]'");
             $datos = $caja->fetch_assoc();
             $res = array(
@@ -287,7 +296,12 @@ while ($qwe = $this->dbc->fetch($registro)) {
                 "idcaja_bancos" => $datos['idcaja_bancos'],
                 "codigo" => $datos['codigo'],
                 "nombre" => $datos['tipo_cuenta'],
-                "monto" => $datos_caja['monto']
+                "monto" => $datos_caja['monto'],
+                "monto_total" => $mont['suma_monto'],
+                "fecha_factura" => $ft['fecha'],
+                "nro_factura" => $ft['nfactura']
+
+                
             );
             array_push($lista, $res);
         }
@@ -297,6 +311,7 @@ while ($qwe = $this->dbc->fetch($registro)) {
             "fecha" => $qwe['fecha'],
             "monto" => $qwe['monto'],
             "persona" => $qwe['persona'],
+            "monto_total" => $mont['suma_monto']
             // "idcaja_bancos" => $qwe['idcaja_bancos'],
             // "codigo" => NULL,
             // "nombre" => NULL

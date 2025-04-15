@@ -325,10 +325,10 @@ $cont->lista_cobrar_cobrado_factura($ver[1]);
     $cont->eliminar_caja_bancos($ver[1]);
 }elseif($ver[0]=="listar_recibo_por_id"){
     $cont=new Cuentaspof();
-    $cont->listar_recibo_por_id($ver[1],$ver[2]);
+    $cont->listar_recibo_por_id($ver[1]);
 }elseif($ver[0]=="listar_recibo_pago_por_id"){
-    $cont=new Contabilidad();
-    $cont->listar_recibo_pago_por_id($ver[1],$ver[2]);
+    $cont=new Cuentaspor();
+    $cont->listar_recibo_pago_por_id($ver[1]);
 }elseif($ver[0]=="listar_cajas_bancos_por_recibo"){
     $cont=new Cuentaspof();
     $cont->listar_cajas_bancos_por_recibo($ver[1]);
@@ -406,7 +406,7 @@ elseif($ver[0]=="listar_asiento_por_modulo"){
 }
 
 //reportecomprobantecontable listafactura_cobrado_trans asientotipo listar_operacion_modulo_filtrado creartipoasientodelete listaplanesempresa
-//lista_transaccionEn_espera listar_anular_eliminar_transaccion listatransacciones_comercial gestion
+//lista_transaccionEn_espera listar_anular_eliminar_transaccion listatransacciones_comercial gestion listar_recibo_por_id listar_recibo_pago_por_id
 //listafactura eliminartransaccion listapagos_individuales listatransaciones factura lista_cobrar_cobrado reportedetalletransaccion
 //reporteactivodisponible listar_cajas_bancos_pagar_por_recibo listar_recibo_por_id_otras_cuentas_pagar lista_transaccion getidempresa firmas
 ?>
