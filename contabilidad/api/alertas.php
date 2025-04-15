@@ -6,7 +6,7 @@ class Alertas extends DB{
     
 public function alerta_desconsolidacion($empresa) {
         $lista = [];
-        
+
         // Consulta SQL
         $sql =$this->dbc->query("SELECT 
                 d.iddesconsolidar, 
@@ -76,7 +76,7 @@ public function alerta_anular_eliminar_transaccion($idempresa) {
     $lista = [];
     
     // Consulta SQL
-    $sql =$this->dbc->query("SELECT COUNT(*) AS cantidad FROM solicitud_anular_eliminar WHERE md5(idempresa) = '$idempresa' AND estado_solicitud = '0'");
+    $sql =$this->dbc->query("SELECT COUNT(*) AS cantidad FROM solicitud_anular_eliminar WHERE md5(idempresa) = '$idempresa' AND estado_solicitud = '1'");
     $resultado = $sql->fetch_assoc();       
 
     $res = array(
@@ -87,6 +87,7 @@ public function alerta_anular_eliminar_transaccion($idempresa) {
     // Retornar la lista en formato JSON
     echo json_encode($lista);
 }   
+
 public function alerta_transacciones_comercial($idempresa) {
     $lista = [];
     
@@ -97,6 +98,7 @@ public function alerta_transacciones_comercial($idempresa) {
     $res = array(
         "cantidad" => $resultado['cantidad']
     );
+
     // $res2= $contador;
     array_push($lista, $res);
     // Retornar la lista en formato JSON

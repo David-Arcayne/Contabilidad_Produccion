@@ -363,11 +363,14 @@ class Transacciones extends DB{
             $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,idasignacion_asiento,organizacion_idorganizacion,sucursal,idgestion)
         VALUE('$nroTransaccion','$fecha','0','0','$glosa','1','1','$tipotransaccion[tipo]','$idasignacion_asiento','$ide','$idsucursal','$gestion')");
         }
+
+        $idtrans = $this->dbc->insert_id;
     
         // $aux_asignacion['idasientotipo']
-        // $debe = 0; cuentapresupuestaria
-        //     $haber = 0;
-        //     $tasiento = $this->dbc->query("SELECT * FROM asiento WHERE idasientotipo='$asiento'");
+        
+        // $debe = 0; 
+        // $haber = 0;
+        //     $tasiento = $this->dbc->query("SELECT * FROM asiento WHERE idasientotipo= '$aux_asignacion[idasientotipo]'");
         //     $orden = 1;
         //     while ($qwe = $this->dbc->fetch($tasiento)) {
         //         $pcuenta = $qwe['idcuenta'];
@@ -383,10 +386,11 @@ class Transacciones extends DB{
         //         $nota = "-";
         //         $estado = 1; //$_POST['estado'];
         //         $crear = $this->dbc->query("INSERT INTO detalletransaccion(debe,haber,nota,transacciones_idtransacciones,idplandecuenta,idcuentapresupuestaria,estado,cobrar,pagar,idorganizacion,idsucursal,orden)
-        //         VALUES ('$debe','$haber','$nota','$trans','$pcuenta','$ppresupuestario','$estado','2','2','$ide','$sucursal','$orden')");
+        //         VALUES ('$debe','$haber','$nota','$idtrans','$pcuenta','$ppresupuestario','$estado','2','2','$ide','$sucursal','$orden')");
 
         //         $orden = $orden + 1;
         //     }
+
         if ($writetrans === TRUE) {
             $res = array("success", "Se Registro Correctamente", "registrotransaccion");
         } else {

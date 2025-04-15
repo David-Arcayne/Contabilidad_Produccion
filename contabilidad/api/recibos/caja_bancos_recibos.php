@@ -3,6 +3,7 @@ require_once "../../db/db.php";
 // require_once "./contabilidad/api/configuracion/empresa.php";
 class caja_bancos_recibos extends DB{
 
+
     public function registrar_factura_recibo_cobro_cajaBancos($fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento,$clasefactura,$cobro, $pagar, $espesificacion,$trans, $cliente, $empresa, $cuenta,  $sucursal,$asiento,$idcaja_bancos)
     {
 
@@ -99,7 +100,7 @@ class caja_bancos_recibos extends DB{
         }
       
         
-        $crear_detalle_cajaBancos = $this->dbc->query("INSERT INTO detalle_caja_bancos_cobrar(idcaja_bancos,monto,r,idfactura,idotras_cuentas)
+        $crear_detalle_cajaBancos = $this->dbc->query("INSERT INTO detalle_caja_bancos_cobrar(idcaja_bancos,monto,idcuentaspof,idfactura,idotras_cuentas)
         VALUES('$idcaja_bancos','$monto','$idrecibo','$idfact','0')");
 
         if ($crearRecibo === TRUE) {
@@ -320,7 +321,7 @@ class caja_bancos_recibos extends DB{
         }
       
         
-        $crear_detalle_cajaBancos = $this->dbc->query("INSERT INTO detalle_caja_bancos_cobrar(idcaja_bancos,monto,r,idfactura,idotras_cuentas)
+        $crear_detalle_cajaBancos = $this->dbc->query("INSERT INTO detalle_caja_bancos_cobrar(idcaja_bancos,monto,idcuentaspof,idfactura,idotras_cuentas)
         VALUES('$idcaja_bancos','$precio','$idrecibo','0','$idotras_cuentas')");
 
         if ($crearRecibo === TRUE) {
@@ -455,7 +456,7 @@ class caja_bancos_recibos extends DB{
     // INNER JOIN transacciones t ON t.idtransacciones = cp.transaccion
     // WHERE dc.idcaja_bancos = '$idcaja_bancos';");
     
-    $getPedido = $this->dbc->query("SELECT cp.r,cp.nrecibo,cp.fecha,cp.cliente,cp.idfactura,cp.idotras_cuentas,cp.archivo, dc.idcaja_bancos,dc.monto,dc.idfactura
+    $getPedido = $this->dbc->query("SELECT cp.idcuentaspof,cp.nrecibo,cp.fecha,cp.cliente,cp.idfactura,cp.idotras_cuentas,cp.archivo, dc.idcaja_bancos,dc.monto,dc.idfactura
     FROM detalle_caja_bancos_cobrar dc
     INNER JOIN cuentaspof cp ON cp.r = dc.r
     WHERE dc.idcaja_bancos = '$idcaja_bancos'
