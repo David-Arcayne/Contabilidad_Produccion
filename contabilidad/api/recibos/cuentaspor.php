@@ -279,6 +279,7 @@ class Cuentaspor extends DB{
                         "nombre" => $datos['tipo_cuenta'],
                         "monto" => $datos_caja['monto'],
                         "monto_total" => $mont['suma_monto'],
+                        "idfactura" => $ft['idfactura'],
                         "fecha_factura" => $ft['fecha'],
                         "nro_factura" => $ft['nfactura']
                     );

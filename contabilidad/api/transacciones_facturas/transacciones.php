@@ -329,7 +329,7 @@ class Transacciones extends DB{
             return $resultado12['total'] > 0;
 
     }
-    public function registro_transaccion_comercial($fecha, $idasignacion_asiento, $empresa, $sucursal)
+    public function registro_transaccion_comercial($fecha, $idasignacion_asiento,$monto, $empresa, $sucursal)
     {
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
@@ -368,33 +368,33 @@ class Transacciones extends DB{
     
         // $aux_asignacion['idasientotipo']
         
-        // $debe = 0; 
-        // $haber = 0;
-        //     $tasiento = $this->dbc->query("SELECT * FROM asiento WHERE idasientotipo= '$aux_asignacion[idasientotipo]'");
-        //     $orden = 1;
-        //     while ($qwe = $this->dbc->fetch($tasiento)) {
-        //         $pcuenta = $qwe['idcuenta'];
-        //         if ($qwe['tipo'] == "DEBE") {
-        //             $debe = $monto * ($qwe['porciento'] / 100);
-        //             $haber = 0;
-        //         } elseif ($qwe['tipo'] == "HABER") {
-        //             $debe = 0;
-        //             $haber = $monto * ($qwe['porciento'] / 100);
-        //         }
-        //         //$pcuenta=$_POST['plandecuenta'];
-        //         $ppresupuestario = 0; //$_POST['planpresupuestario'];
-        //         $nota = "-";
-        //         $estado = 1; //$_POST['estado'];
-        //         $crear = $this->dbc->query("INSERT INTO detalletransaccion(debe,haber,nota,transacciones_idtransacciones,idplandecuenta,idcuentapresupuestaria,estado,cobrar,pagar,idorganizacion,idsucursal,orden)
-        //         VALUES ('$debe','$haber','$nota','$idtrans','$pcuenta','$ppresupuestario','$estado','2','2','$ide','$sucursal','$orden')");
+        $debe = 0; 
+        $haber = 0;
+            $tasiento = $this->dbc->query("SELECT * FROM asiento WHERE idasientotipo= '$aux_asignacion[idasientotipo]'");
+            $orden = 1;
+            while ($qwe = $this->dbc->fetch($tasiento)) {
+                $pcuenta = $qwe['idcuenta'];
+                if ($qwe['tipo'] == "DEBE") {
+                    $debe = $monto * ($qwe['porciento'] / 100);
+                    $haber = 0;
+                } elseif ($qwe['tipo'] == "HABER") {
+                    $debe = 0;
+                    $haber = $monto * ($qwe['porciento'] / 100);
+                }
+                //$pcuenta=$_POST['plandecuenta'];
+                $ppresupuestario = 0; //$_POST['planpresupuestario'];
+                $nota = "-";
+                $estado = 1; //$_POST['estado'];
+                $crear = $this->dbc->query("INSERT INTO detalletransaccion(debe,haber,nota,transacciones_idtransacciones,idplandecuenta,idcuentapresupuestaria,estado,cobrar,pagar,idorganizacion,idsucursal,orden)
+                VALUES ('$debe','$haber','$nota','$idtrans','$pcuenta','$ppresupuestario','$estado','2','2','$ide','$sucursal','$orden')");
 
-        //         $orden = $orden + 1;
-        //     }
+                $orden = $orden + 1;
+            }
 
         if ($writetrans === TRUE) {
-            $res = array("success", "Se Registro Correctamente", "registrotransaccion");
+            $res = array("success", "Se Registro Correctamente", "registrotransaccion",$monto,$fecha);
         } else {
-            $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
+            $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde",$monto,$fecha);
         }
         echo json_encode($res);
     }

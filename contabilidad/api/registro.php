@@ -385,12 +385,12 @@ if($data['ver'] == "asignar_asiento_A_factura") {
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['bandera'],$_POST['idempresa']));
         }
     }elseif($ver=="registro_transaccion_comercial"){
-        if(isset($_POST['fecha'],$_POST['idasignacion_asiento'],$_POST['empresa'],$_POST['sucursal'])){
+        if(isset($_POST['fecha'],$_POST['idasignacion_asiento'],$_POST['monto'],$_POST['empresa'],$_POST['sucursal'])){
             $cont=new Transacciones();
-            $cont->registro_transaccion_comercial($_POST['fecha'],$_POST['idasignacion_asiento'],$_POST['empresa'],$_POST['sucursal']);
+            $cont->registro_transaccion_comercial($_POST['fecha'],$_POST['idasignacion_asiento'],$_POST['monto'],$_POST['empresa'],$_POST['sucursal']);
         }
         else{
-            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['fecha'],$_POST['idasignacion_asiento'],$_POST['empresa'],$_POST['sucursal']));
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['fecha'],$_POST['idasignacion_asiento'],$_POST['monto'],$_POST['empresa'],$_POST['sucursal']));
         }
     }elseif($ver=="editar_asignacion_asiento_operacion"){
         if(isset($_POST['idasignacion_asiento_operacion_modulos'],$_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['bandera'])){
@@ -432,8 +432,11 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['fecha'],$_POST['clase_otras_cuentas'],$_POST['cobrado'],$_POST['pagado'],$_POST['trans'],$_POST['id_cliente_proveedor'],$_POST['asiento'],$_POST['concepto'],$_POST['precio'],$_POST['idtipo'],$_POST['empresa'],$_POST['sucursal'],$_POST['idcaja_bancos']));
         }
-    }        
-//registrar_recibo_otras_cuentas_pagar asiento registroasiento registrocobrarfacturaf5 crearsolofacturasapi dolar
+    }elseif($data['ver'] == "asignar_asiento_A_otras_cuentas") {
+        $cont=new Documento_cobro();
+        $cont->asignar_asiento_A_otras_cuentas($data);
+    }       
+//registrar_recibo_otras_cuentas_pagar asiento registroasiento registrocobrarfacturaf5 crearsolofacturasapi dolar registro_transaccion_comercial
 //  registrotransaccion registrotransaccionf5 duplicartransaccion registrocobrarfactura registrocobrarfacturaGrupal factura registropagarfactura registrocobrarfacturaGrupal 
 }//editar_caja_bancos_pagar_recibo registropagarfacturaf5 registropagarfacturaGrupal  editar_caja_bancos_pagar_recibo cobrofacturasaasientomodelo registrar_factura_recibo_pagos_cajaBancos
 ?> 
