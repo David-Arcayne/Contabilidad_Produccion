@@ -450,4 +450,34 @@ class Transacciones extends DB{
         }
         echo json_encode($lista);
     }
+
+    public function insertar_detalle_transaccion_automatico($idplandecuenta,$ide){//10279, 50
+        $lista=[];
+        $registro=$this->dbc->query("SELECT i.idimpuesto, i.codigoimpuesto, i.nombreimpuesto, i.tasa, i.descripcion FROM impuesto AS i WHERE md5(i.idempresa)='$ide'");
+        while($qwe=$this->dbc->fetch($registro)){
+            $relacion=$this->dbc->query("SELECT * FROM relacionip WHERE idimpuesto='$qwe[0]'");
+            $rel=$this->dbc->fetch($relacion);
+            $plan = $this->getplandecuenta($rel['idplandecuenta']);
+
+            $lista[]=[
+                "idimpuesto"=>$qwe['idimpuesto'],
+                "codigo"=>$qwe['codigoimpuesto'],
+                "nombre"=>$qwe['nombreimpuesto'],
+                "tasa"=>$qwe['tasa'],
+                "descripcion"=>$qwe['descripcion'],
+                "idrelacionip"=>$rel['idrelacionip'],
+                "idplancuenta"=>$rel['idplandecuenta'],
+                "plannumero" => $plan['numero'],
+                "plancuenta" => $plan['nombreplan'],
+                "plantipo" => $plan['saldonormal'],
+                "fecha"=>$rel['fecha'],
+
+            ];
+
+        }
+
+        echo json_encode($lista);
+
+    }
+
 }
