@@ -786,5 +786,31 @@ class Admin extends DB
     echo json_encode($res);
 }
 
+public function codigo_correlativo($codigo,$empresa)
+    {
+        $ide = $this->getidempresa($empresa);
+        $lista = [];
+
+        // $idp2 = $this->dbc->query("SELECT numero FROM plandecuenta WHERE idplandecuenta='$idp'");
+        // $resultado122 = $idp2->fetch_assoc();
+        // $numeroPadre = $resultado122['numero'];
+
+        // $codigo_padre = explode(".", $numeroPadre);
+
+         $codigo_arreglo = explode(".", $codigo);
+
+        // $registro = $this->dbc->query("SELECT idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,organizacion_idorganizacion,idp FROM plandecuenta WHERE organizacion_idorganizacion='$ide' ORDER BY numero ASC");
+        // while ($qwe = $this->dbc->fetch($registro)) {
+        //     $numero_descompuesto = explode(".", $qwe[1]); 
+        //     $aux = $this->dbc->query("SELECT nombreplan FROM plandecuenta WHERE numero >= $numero_descompuesto[0] LIMIT 1");
+        //     $name_plan = $aux->fetch_assoc();
+        //     // --> select * from plandecuenta where numero >= 1 limit 1
+        //     // if($codigo_padre[0] == 1){ }
+        //     $res = array("id" => $qwe[0], "numero" => $qwe[1], "plan" => $qwe[2], "descripcion" => $qwe[3], "rubro" => $name_plan['nombreplan'], "tipo" => $qwe[4], "consolidar" => $qwe[5], "empresa" => $qwe[6], "idp" => $qwe[7]);
+
+        //     array_push($lista, $res);
+        // }
+        echo json_encode($codigo_arreglo);
+    }
 
 }

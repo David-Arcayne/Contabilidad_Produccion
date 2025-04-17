@@ -211,10 +211,24 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
         $res = "";
         $sucursal = $this->getidsucursal($sucursal);
         $ide = $this->getidempresa($empresa);
-        $count = $this->dbc->query("SELECT COUNT(*) AS canti_total FROM cuentaspor cp
-        INNER JOIN transacciones t ON t.idtransacciones = cp.transaccion WHERE t.organizacion_idorganizacion='$ide'");
-        $hh = $this->dbc->fetch($count);
-        $nrecibo = $hh['canti_total'];
+
+       $recibo_trans = $this->dbc->query("SELECT count(*) AS cant1 FROM cuentaspor cp 
+        INNER JOIN transacciones t ON t.idtransacciones=cp.transaccion 
+        WHERE t.organizacion_idorganizacion='$ide'");
+        $res1 = $recibo_trans->fetch_assoc();
+
+        $recibo_fact = $this->dbc->query("SELECT count(*) AS cant2 FROM cuentaspor cp
+            INNER JOIN factura f ON f.idfactura=cp.idfactura
+            WHERE f.idorganizacion='$ide' AND cp.transaccion = '0'");
+        $res2 = $recibo_fact->fetch_assoc();
+
+        $recibo_oc = $this->dbc->query("SELECT cp.* FROM cuentaspor cp
+        INNER JOIN otras_cuentas oc ON oc.idotras_cuentas=cp.idotras_cuentas
+        WHERE oc.idempresa='$ide' and cp.transaccion ='0'");
+        $res3 = $recibo_oc->fetch_assoc();
+
+        $nrecibo = $res1['cant1'] + $res2['cant2']+ $res3['cant3'] + 1;
+
         // $empresa = $this->emp; registropagarfactura nrecibo
         $transi = $this->dbc->query("SELECT * FROM transacciones WHERE organizacion_idorganizacion='$ide' and sucursal='$sucursal' order by codigotransaccion desc Limit 1");
         $qq = $this->dbc->fetch($transi);

@@ -1447,12 +1447,7 @@ if ($pcuentas->num_rows > 0) {
       }else{
 
         if($numeroIni == 0 && $numeroFin == 0){
-          $registro=$this->dbc->query("SELECT r.*,
-        -- r.idcuentaspof,
-        -- r.nrecibo,
-        -- r.fecha,
-        -- r.monto,
-        f.idorganizacion
+          $registro=$this->dbc->query("SELECT r.*,f.idorganizacion
       FROM
         cuentaspor AS r
         LEFT JOIN factura f ON r.idfactura = f.idfactura
@@ -1484,22 +1479,14 @@ if ($pcuentas->num_rows > 0) {
           c.idcuentaspagar_grupal ASC;
   ");
       }else{
-          $registro=$this->dbc->query("SELECT r.*,
-        -- r.idcuentaspof,
-        -- r.nrecibo,
-        -- r.fecha,
-        -- r.monto,
-        f.idorganizacion
-      FROM
-        cuentaspor AS r
-        LEFT JOIN factura f ON r.idfactura = f.idfactura
-        LEFT JOIN cuentaspagar_grupal ccg ON ccg.idcuentaspor = r.idcuentaspor
-      WHERE
-        r.nrecibo >= '$numeroIni'
-        AND r.nrecibo <= '$numeroFin'
-        AND f.idorganizacion = '$ide'
-      ORDER BY
-        r.idcuentaspor ASC;
+          $registro=$this->dbc->query("SELECT r.*, f.idorganizacion, o.idempresa
+          FROM cuentaspor AS r
+          LEFT JOIN factura f ON r.idfactura = f.idfactura
+          LEFT JOIN cuentaspagar_grupal ccg ON ccg.idcuentaspor = r.idcuentaspor
+          LEFT JOIN otras_cuentas o ON o.idotras_cuentas = r.idotras_cuentas
+          WHERE r.nrecibo BETWEEN '$numeroIni' AND '$numeroFin'
+          AND (f.idorganizacion = '$ide' OR o.idempresa = '$ide')
+          ORDER BY r.idcuentaspor ASC;
         ");
 
       $registroGrupal=$this->dbc->query("SELECT
@@ -1524,6 +1511,30 @@ if ($pcuentas->num_rows > 0) {
 
         while($qwe=$this->dbc->fetch($registro)){
 
+          if($qwe['idfactura'] == 0){
+            // 
+            $otras_cuentas = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idotras_cuentas= '$qwe[idotras_cuentas]'");
+            $oc = $otras_cuentas->fetch_assoc();
+            // '$fact[proveedorcliente_idproveedorcliente]'
+            $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='$oc[id_cliente_proveedor]'");
+            $cl = $proveedor->fetch_assoc();
+          
+            $res = array(
+              "nrecibo" => $qwe['nrecibo'],
+              "fecha_recibo" => $qwe['fecha'],
+              "lugar" => $qwe['lugar'],
+              "persona" => $qwe['persona'],
+              "monto_recibo" => $qwe['monto'],
+              "fecha_factura" => $oc['fecha'],
+              "nfactura" => $oc['nro_otras_cuentas'],
+               "nit" => $cl['nit'],
+               "direccion" => $cl['direccion'],
+               "nombre_cliente" => $cl['nombre'],
+              "detalle"=>[]
+          );
+         
+        }else{
+
           $factura = $this->dbc->query("SELECT * FROM factura WHERE idfactura= '$qwe[idfactura]'");
             $fact = $factura->fetch_assoc();
             // '$fact[proveedorcliente_idproveedorcliente]'
@@ -1543,6 +1554,7 @@ if ($pcuentas->num_rows > 0) {
             "nombre_cliente" => $cl['nombre'],
            "detalle"=>[]
        );
+      }
 
        $pcuentas=$this->dbc->query("SELECT * FROM detalle_caja_bancos_pagar WHERE idcuentaspor='$qwe[idcuentaspor]'");
           if($pcuentas->num_rows > 0){

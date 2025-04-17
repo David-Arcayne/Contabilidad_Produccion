@@ -56,10 +56,23 @@ $nroTrans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE
 $resultado12 = $nroTrans->fetch_assoc();
 $nroTransaccion = $resultado12['codigotransaccion'] + 1;
 
-$count = $this->dbc->query("SELECT COUNT(*) AS canti_total FROM cuentaspof cp
-INNER JOIN transacciones t ON t.idtransacciones = cp.transaccion WHERE t.organizacion_idorganizacion='$ide'");
-$hh = $this->dbc->fetch($count);
-$nrecibo = $hh['canti_total'];
+        $recibo_trans = $this->dbc->query("SELECT count(*) AS cant1 FROM cuentaspor cp 
+        INNER JOIN transacciones t ON t.idtransacciones=cp.transaccion 
+        WHERE t.organizacion_idorganizacion='$ide'");
+        $res1 = $recibo_trans->fetch_assoc();
+
+        $recibo_fact = $this->dbc->query("SELECT count(*) AS cant2 FROM cuentaspor cp
+            INNER JOIN factura f ON f.idfactura=cp.idfactura
+            WHERE f.idorganizacion='$ide' AND cp.transaccion = '0'");
+        $res2 = $recibo_fact->fetch_assoc();
+
+        $recibo_oc = $this->dbc->query("SELECT cp.* FROM cuentaspor cp
+        INNER JOIN otras_cuentas oc ON oc.idotras_cuentas=cp.idotras_cuentas
+        WHERE oc.idempresa='$ide' and cp.transaccion ='0'");
+        $res3 = $recibo_oc->fetch_assoc();
+
+        $nrecibo = $res1['cant1'] + $res2['cant2']+ $res3['cant3'] + 1;
+
         $res = "";
         $glosa = "Registro cobro $nrecibo";
         // $gestion = $this->getgestionactualid($ide);

@@ -409,6 +409,9 @@ elseif($ver[0]=="listar_asiento_por_modulo"){
 }elseif($ver[0]=="listar_otras_cuentas_pago_sin_transaccion"){
     $cont=new Documento_cobro();
     $cont->listar_otras_cuentas_pago_sin_transaccion($ver[1]);
+}elseif($ver[0]=="codigo_correlativo"){
+    $cont=new Admin();
+    $cont->codigo_correlativo($ver[1],$ver[2]);
 }
 
 
