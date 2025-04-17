@@ -296,13 +296,13 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     }
 }elseif($ver == "registrar_otras_cuentas"){
 
-    if(isset($_POST['idtransaccion'],$_POST['asiento'],$_POST['fecha'],$_POST['lugar'],$_POST['id_cliente_proveedor'],$_POST['clase_otras_cuentas'],$_POST['pagado'],$_POST['cobrado'],$_POST['nro_tributario'],$_POST['contacto'],$_POST['nro_doc_identidad'],$_POST['idtipo'],$_POST['concepto'],$_POST['condiciones'],$_POST['observaciones'],$_POST['precio'],$_POST['forma_pago'],$_POST['empresa'],$_POST['sucursal'])){
+    if(isset($_POST['idtransaccion'],$_POST['asiento'],$_POST['fecha'],$_POST['lugar'],$_POST['id_cliente_proveedor'],$_POST['clase_otras_cuentas'],$_POST['pagado'],$_POST['cobrado'],$_POST['nro_tributario'],$_POST['contacto'],$_POST['nro_doc_identidad'],$_POST['idtipo'],$_POST['concepto'],$_POST['condiciones'],$_POST['observaciones'],$_POST['precio'],$_POST['forma_pago'],$_POST['empresa'],$_POST['sucursal'],$_FILES['archivo'])){
         // decode echo json_encode(array("danger", "Faltan parámetros en la solicitud", $_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$facturas));
         $cont=new Documento_cobro();
-        $cont->registrar_otras_cuentas($_POST['idtransaccion'],$_POST['asiento'],$_POST['fecha'],$_POST['lugar'],$_POST['id_cliente_proveedor'],$_POST['clase_otras_cuentas'],$_POST['pagado'],$_POST['cobrado'],$_POST['nro_tributario'],$_POST['contacto'],$_POST['nro_doc_identidad'],$_POST['idtipo'],$_POST['concepto'],$_POST['condiciones'],$_POST['observaciones'],$_POST['precio'],$_POST['forma_pago'],$_POST['empresa'],$_POST['sucursal']);
+        $cont->registrar_otras_cuentas($_POST['idtransaccion'],$_POST['asiento'],$_POST['fecha'],$_POST['lugar'],$_POST['id_cliente_proveedor'],$_POST['clase_otras_cuentas'],$_POST['pagado'],$_POST['cobrado'],$_POST['nro_tributario'],$_POST['contacto'],$_POST['nro_doc_identidad'],$_POST['idtipo'],$_POST['concepto'],$_POST['condiciones'],$_POST['observaciones'],$_POST['precio'],$_POST['forma_pago'],$_POST['empresa'],$_POST['sucursal'],$_FILES['archivo']);
     }
     else{
-        echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idtransaccion'],$_POST['asiento'],$_POST['fecha'],$_POST['lugar'],$_POST['id_cliente_proveedor'],$_POST['clase_otras_cuentas'],$_POST['pagado'],$_POST['cobrado'],$_POST['nro_tributario'],$_POST['contacto'],$_POST['nro_doc_identidad'],$_POST['idtipo'],$_POST['concepto'],$_POST['condiciones'],$_POST['observaciones'],$_POST['precio'],$_POST['forma_pago'],$_POST['empresa'],$_POST['sucursal']));
+        echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idtransaccion'],$_POST['asiento'],$_POST['fecha'],$_POST['lugar'],$_POST['id_cliente_proveedor'],$_POST['clase_otras_cuentas'],$_POST['pagado'],$_POST['cobrado'],$_POST['nro_tributario'],$_POST['contacto'],$_POST['nro_doc_identidad'],$_POST['idtipo'],$_POST['concepto'],$_POST['condiciones'],$_POST['observaciones'],$_POST['precio'],$_POST['forma_pago'],$_POST['empresa'],$_POST['sucursal'],$_FILES['archivo']));
     }
 }elseif($ver == "editar_otras_cuentas"){
 
@@ -436,7 +436,7 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         $cont=new Documento_cobro();
         $cont->asignar_asiento_A_otras_cuentas($data);
     }       
-//registrar_recibo_otras_cuentas_pagar asiento registroasiento registrocobrarfacturaf5 crearsolofacturasapi dolar registro_transaccion_comercial
+//registrar_recibo_otras_cuentas_pagar asiento registroasiento registrocobrarfacturaf5 crearsolofacturasapi dolar registro_transaccion_comercial  registrar_otras_cuentas
 //  registrotransaccion registrotransaccionf5 duplicartransaccion registrocobrarfactura registrocobrarfacturaGrupal factura registropagarfactura registrocobrarfacturaGrupal 
 }//editar_caja_bancos_pagar_recibo registropagarfacturaf5 registropagarfacturaGrupal  editar_caja_bancos_pagar_recibo cobrofacturasaasientomodelo registrar_factura_recibo_pagos_cajaBancos
 ?> 
