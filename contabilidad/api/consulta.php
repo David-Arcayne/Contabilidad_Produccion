@@ -409,14 +409,14 @@ elseif($ver[0]=="listar_asiento_por_modulo"){
 }elseif($ver[0]=="listar_otras_cuentas_pago_sin_transaccion"){
     $cont=new Documento_cobro();
     $cont->listar_otras_cuentas_pago_sin_transaccion($ver[1]);
-}elseif($ver[0]=="codigo_correlativo"){
+}elseif($ver[0]=="codigo_correlativo_plandecuenta"){
     $cont=new Admin();
-    $cont->codigo_correlativo($ver[1],$ver[2]);
+    $cont->codigo_correlativo_plandecuenta($ver[1],$ver[2]);
 }
 
 
 //reportecomprobantecontable listafactura_cobrado_trans asientotipo listar_operacion_modulo_filtrado creartipoasientodelete listaplanesempresa
 //lista_transaccionEn_espera listar_anular_eliminar_transaccion listatransacciones_comercial gestion listar_recibo_por_id listar_recibo_pago_por_id
 //listafactura eliminartransaccion listapagos_individuales listatransaciones factura lista_cobrar_cobrado reportedetalletransaccion listar_asignacion
-//reporteactivodisponible listar_cajas_bancos_pagar_por_recibo listar_recibo_por_id_otras_cuentas_pagar lista_transaccion getidempresa firmas
+//reporteactivodisponible listar_cajas_bancos_pagar_por_recibo listar_recibo_por_id_otras_cuentas_pagar lista_transaccion getidempresa firmas listaimpuestoentreplan
 ?>

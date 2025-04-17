@@ -786,31 +786,57 @@ class Admin extends DB
     echo json_encode($res);
 }
 
-public function codigo_correlativo($codigo,$empresa)
+public function codigo_correlativo_plandecuenta($codigo,$empresa)
     {
+
         $ide = $this->getidempresa($empresa);
+
         $lista = [];
+        $codigo_arreglo = explode(".", $codigo); // 1, 1, 3, 05, 00
+                                                 // 0  1  2  3   4
+        $aux = "";
+        $indice = 0;
+        for ($i = count($codigo_arreglo) - 1; $i >= 0; $i--) {
+            if ($codigo_arreglo[$i] !== "0" && $codigo_arreglo[$i] !== "00") {
+                // Aumenta en 1 el valor encontrado
+                $codigo_arreglo[$i] = str_pad($codigo_arreglo[$i] + 1, strlen($codigo_arreglo[$i]), "0", STR_PAD_LEFT);
 
-        // $idp2 = $this->dbc->query("SELECT numero FROM plandecuenta WHERE idplandecuenta='$idp'");
-        // $resultado122 = $idp2->fetch_assoc();
-        // $numeroPadre = $resultado122['numero'];
+                $indice = $i;
+                break; // Detiene el recorrido después de realizar el incremento
+            }
+        }
 
-        // $codigo_padre = explode(".", $numeroPadre);
+        $arreglo_cortado = array_slice($codigo_arreglo, 0, $indice);
 
-         $codigo_arreglo = explode(".", $codigo);
+        $cadena = implode(".", $arreglo_cortado);
+        $cadena = $cadena .".%";
 
-        // $registro = $this->dbc->query("SELECT idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,organizacion_idorganizacion,idp FROM plandecuenta WHERE organizacion_idorganizacion='$ide' ORDER BY numero ASC");
-        // while ($qwe = $this->dbc->fetch($registro)) {
-        //     $numero_descompuesto = explode(".", $qwe[1]); 
-        //     $aux = $this->dbc->query("SELECT nombreplan FROM plandecuenta WHERE numero >= $numero_descompuesto[0] LIMIT 1");
-        //     $name_plan = $aux->fetch_assoc();
-        //     // --> select * from plandecuenta where numero >= 1 limit 1
-        //     // if($codigo_padre[0] == 1){ }
-        //     $res = array("id" => $qwe[0], "numero" => $qwe[1], "plan" => $qwe[2], "descripcion" => $qwe[3], "rubro" => $name_plan['nombreplan'], "tipo" => $qwe[4], "consolidar" => $qwe[5], "empresa" => $qwe[6], "idp" => $qwe[7]);
+        $registrotrans = $this->dbc->query("SELECT * FROM plandecuenta 
+            WHERE numero >= '$codigo' 
+            AND numero LIKE '$cadena' 
+            AND organizacion_idorganizacion = '$ide'
+            ORDER BY numero DESC LIMIT 1;");
 
-        //     array_push($lista, $res);
-        // }
-        echo json_encode($codigo_arreglo);
+        while ($qwe = $this->dbc->fetch($registrotrans)) {
+
+            $numero_arreglo_ultimo = explode(".", $qwe['numero']); // 1, 1, 3, 05, 00
+
+            for ($i = count($numero_arreglo_ultimo) - 1; $i >= 0; $i--) {
+                if ($numero_arreglo_ultimo[$i] !== "0" && $numero_arreglo_ultimo[$i] !== "00") {
+                    // Aumenta en 1 el valor encontrado
+                    $numero_arreglo_ultimo[$i] = str_pad($numero_arreglo_ultimo[$i] + 1, strlen($numero_arreglo_ultimo[$i]), "0", STR_PAD_LEFT);
+    
+                    $indice = $i;
+                    break; // Detiene el recorrido después de realizar el incremento
+                }
+            }
+            $nuevo_codigo = implode(".", $numero_arreglo_ultimo);
+
+            $res = array("codigo" => $nuevo_codigo);
+
+            array_push($lista, $res);
+        }
+        echo json_encode($lista);
     }
 
 }

@@ -277,9 +277,9 @@ class Contabilidad extends DB
 
     public function listaimpuestoentreplan($ide){
         $lista=[];
-        $registro=$this->dbc->query("select i.idimpuesto, i.codigoimpuesto, i.nombreimpuesto, i.tasa, i.descripcion from impuesto as i where md5(i.idempresa)='$ide'");
+        $registro=$this->dbc->query("SELECT i.idimpuesto, i.codigoimpuesto, i.nombreimpuesto, i.tasa, i.descripcion FROM impuesto AS i WHERE md5(i.idempresa)='$ide'");
         while($qwe=$this->dbc->fetch($registro)){
-            $relacion=$this->dbc->query("select * from relacionip where idimpuesto='$qwe[0]'");
+            $relacion=$this->dbc->query("SELECT * FROM relacionip WHERE idimpuesto='$qwe[0]'");
             $rel=$this->dbc->fetch($relacion);
             $plan = $this->getplandecuenta($rel['idplandecuenta']);
 
@@ -2059,6 +2059,6 @@ WHERE
     //listafactura eliminartransaccion  eliminarcliente listafactura_cobrado eliminarproveedor listafactura_pagado registrocobrarfactura
 }//eliminarcobrados listapagos registrardesconsolidar registrotransaccion cambiarestadoconsolidado  registropagarfactura 
 //registrardesconsolidar crearfactura listapagos crearfacturasapi lista_cobrar_cobrado_factura registropagarfactura listaclientes
-// $gestion = $this->getgestionactualid($ide); listapagos listaasientos cliente crearsolofacturasapi   getusuario listar_recibo_pago_por_id
+// $gestion = $this->getgestionactualid($ide); listapagos listaasientos cliente crearsolofacturasapi   getusuario listar_recibo_pago_por_id listaimpuestoentreplan
 
 
