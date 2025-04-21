@@ -450,4 +450,56 @@ class Transacciones extends DB{
         }
         echo json_encode($lista);
     }
+
+                                                 // monto, idplandecuenta
+    public function registrar_detalle_trans_monto($idtransaccion, $plandecuenta, $debe, $haber, $nota, $empresa, $sucursal, $iddetalletransaccion)
+    { //iddetalletransaccion,planCuenta, debe, haber.... , (iddetalleTrans o Nro_orden)
+        $idsucursal = $this->getidsucursal($sucursal);
+        $ide = $this->getidempresa($empresa);
+
+        $estado = 1;
+        $ppresupuestario = 0;
+        $res = "";
+
+        $listaUltimoDetalle = $this->dbc->query("SELECT * FROM relacionip WHERE idplandecuenta='$idplandecuenta'");
+
+
+        $listaUltimoDetalle = $this->dbc->query("SELECT orden FROM detalletransaccion WHERE transacciones_idtransacciones='$idtransaccion' ORDER BY orden DESC LIMIT 1;");
+        $ulti_registro = $listaUltimoDetalle->fetch_assoc();
+        $nuevaOrden = $ulti_registro['orden'] + 1;
+
+         if($iddetalletransaccion == 0){
+            $crearDet_trans = $this->dbc->query("INSERT INTO detalletransaccion(debe,haber,nota,transacciones_idtransacciones,idplandecuenta,idcuentapresupuestaria,estado,cobrar,pagar,idorganizacion,idsucursal,orden)
+            VALUES ('$debe','$haber','$nota','$idtransaccion','$plandecuenta','$ppresupuestario','$estado','2','2','$ide','$idsucursal','$nuevaOrden')");
+         }else{
+
+        // Obtener el orden del detalle transacaccion q se insertara
+        $listaDetalleOrden = $this->dbc->query("SELECT orden FROM detalletransaccion WHERE iddetalletransaccion='$iddetalletransaccion'");
+        $orden = $listaDetalleOrden->fetch_assoc();
+        $nro_orden = $orden['orden'];
+        // nro_orden --> 2
+       
+         $listaDetalleOrden = $this->dbc->query("SELECT * FROM detalletransaccion WHERE transacciones_idtransacciones='$idtransaccion' AND orden >'$nro_orden';");
+        
+         //Actualizar las ordenes de los detalles transaccion
+
+        while ($lorden = $this->dbc->fetch($listaDetalleOrden)) {
+            $ordenAux = $lorden['orden'] + 1;
+            $editarOrden = $this->dbc->query("UPDATE detalletransaccion SET orden = '$ordenAux'
+             WHERE iddetalletransaccion='$lorden[iddetalletransaccion]'");
+        }
+
+        // Insertar el nuevo detalle debajo del detalle q se selecciono
+
+        $auxiOrdenInsert = $nro_orden + 1;
+        $crearDet_trans = $this->dbc->query("INSERT INTO detalletransaccion(debe,haber,nota,transacciones_idtransacciones,idplandecuenta,idcuentapresupuestaria,estado,cobrar,pagar,idorganizacion,idsucursal,orden)
+        VALUES ('$debe','$haber','$nota','$idtransaccion','$plandecuenta','$ppresupuestario','$estado','2','2','$ide','$idsucursal','$auxiOrdenInsert')");
+    }
+       if ($crearDet_trans === TRUE) {
+            $res = array("success", "Se Registro Correctamente", "detalletransaccionnormal", $idtransaccion);
+        } else {
+            $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
+        }
+        echo json_encode($res);
+    }
 }
