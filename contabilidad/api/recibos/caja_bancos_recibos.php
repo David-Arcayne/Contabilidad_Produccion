@@ -623,6 +623,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
 $aux_contador = 0;
 $saldo = 0;
+$saldo_inicial = 0;
         while ($qwe = $this->dbc->fetch($getPedido)) {
             // $cuentaspof = $this->dbc->query("SELECT * FROM cuentaspof WHERE r= '$qwe[r]'");
             // $cp = $cuentaspof->fetch_assoc();
@@ -656,8 +657,6 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 // }
                 // $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
-                
-
                 $fact = $factura->fetch_assoc();
                 
                 $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente= '$fact[proveedorcliente_idproveedorcliente]'");
@@ -685,12 +684,13 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                     FROM detalle_caja_bancos_cobrar dc
                     INNER JOIN cuentaspof cp ON cp.idcuentaspof = dc.idcuentaspof
                     WHERE dc.idcaja_bancos = '$idcaja_bancos'
-                    AND cp.fecha < '$fecha_ini' , cp.nrecibo ASC;");
+                    AND cp.fecha < '$fecha_ini'");
                 // $saldo = 0;
                 while ($zxc = $this->dbc->fetch($fuera_rango)) {
                     $saldo = $saldo + $zxc['monto'];
                 }
 
+                $saldo_inicial = $saldo;
                 $saldo = $saldo + $qwe['monto'];
                     $res = array(
                         "fecha" => $qwe['fecha'],
@@ -702,6 +702,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         "descripcion" => $aux_descripcion,
                         "archivo" => $qwe['archivo'],
                         "ingreso" => $qwe['monto'],
+                        "saldo_inicial" => $saldo_inicial,
                         "saldo" => $saldo
     
                     );
@@ -721,6 +722,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                     "descripcion" => $aux_descripcion,
                     "archivo" => $qwe['archivo'],
                     "ingreso" => $qwe['monto'],
+                    "saldo_inicial" => $saldo_inicial,
                     "saldo" => $saldo
 
                 );
@@ -744,6 +746,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                     $saldo = $saldo + $zxc['monto'];
                 }
                 
+                $saldo_inicial = $saldo;
                 $saldo = $saldo + $qwe['monto'];
                     $res = array(
                         "fecha" => $qwe['fecha'],
@@ -755,6 +758,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         "descripcion" => $aux_descripcion,
                         "archivo" => $qwe['archivo'],
                         "ingreso" => $qwe['monto'],
+                        "saldo_inicial" => $saldo_inicial,
                         "saldo" => $saldo
     
                     );
@@ -774,6 +778,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                     "descripcion" => $aux_descripcion,
                     "archivo" => $qwe['archivo'],
                     "ingreso" => $qwe['monto'],
+                    "saldo_inicial" => $saldo_inicial,
                     "saldo" => $saldo
 
                 );
@@ -810,6 +815,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
     
     $aux_contador = 0;
     $saldo = 0;
+    $saldo_inicial = 0;
             while ($qwe = $this->dbc->fetch($getPedido)) {
     
                  $transac = $this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones= '$qwe[transaccion]'");
@@ -876,7 +882,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                     while ($zxc = $this->dbc->fetch($fuera_rango)) {
                         $saldo = $saldo + $zxc['monto'];
                     }
-    
+                    $saldo_inicial = $saldo;
                     $saldo = $saldo + $qwe['monto'];
                         $res = array(
                             "fecha" => $qwe['fecha'],
@@ -888,6 +894,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "descripcion" => $aux_descripcion,
                             "archivo" => $qwe['archivo'],
                             "egreso" => $qwe['monto'],
+                            "saldo_inicial" => $saldo_inicial,
                             "saldo" => $saldo
         
                         );
@@ -907,6 +914,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         "descripcion" => $aux_descripcion,
                         "archivo" => $qwe['archivo'],
                         "egreso" => $qwe['monto'],
+                        "saldo_inicial" => $saldo_inicial,
                         "saldo" => $saldo
     
                     );
@@ -929,7 +937,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                     while ($zxc = $this->dbc->fetch($fuera_rango)) {
                         $saldo = $saldo + $zxc['monto'];
                     }
-                    
+                    $saldo_inicial = $saldo;
                     $saldo = $saldo + $qwe['monto'];
                         $res = array(
                             "fecha" => $qwe['fecha'],
@@ -941,6 +949,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "descripcion" => $aux_descripcion,
                             "archivo" => $qwe['archivo'],
                             "egreso" => $qwe['monto'],
+                            "saldo_inicial" => $saldo_inicial,
                             "saldo" => $saldo
         
                         );
@@ -960,6 +969,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         "descripcion" => $aux_descripcion,
                         "archivo" => $qwe['archivo'],
                         "egreso" => $qwe['monto'],
+                        "saldo_inicial" => $saldo_inicial,
                         "saldo" => $saldo
     
                     );
@@ -1027,6 +1037,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
     
     $aux_contador = 0;
     $saldo = 0;
+    $saldo_inicial = 0;
             while ($qwe = $this->dbc->fetch($getPedido)) {
     
                  $transac = $this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones= '$qwe[transaccion]'");
@@ -1178,7 +1189,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                     }
                     
                 }
-
+                $saldo_inicial = $saldo;
                 // $saldo = $saldo + $qwe['monto'];
 
                     //AUMENTAR EL AUX_CONTADOR + 1 PARA QUE YANO VUELVA A ENTRAR A ESTA CONDICION
@@ -1212,6 +1223,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "descripcion" => $aux_descripcion,
                             "archivo" => $qwe['archivo'],
                             "ingreso" => $qwe['monto'],
+                            "saldo_inicial" => $saldo_inicial,
                             "saldo" => $saldo
         
                         );
@@ -1230,6 +1242,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "descripcion" => $aux_descripcion,
                             "archivo" => $qwe['archivo'],
                             "ingreso" => $qwe['monto'],
+                            "saldo_inicial" => $saldo_inicial,
                             "saldo" => $saldo
                         );
                     }
@@ -1250,6 +1263,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "descripcion" => $aux_descripcion,
                             "archivo" => $qwe['archivo'],
                             "egreso" => $qwe['monto'],
+                            "saldo_inicial" => $saldo_inicial,
                             "saldo" => $saldo
                         );
                     }else{
@@ -1267,6 +1281,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "descripcion" => $aux_descripcion,
                             "archivo" => $qwe['archivo'],
                             "egreso" => $qwe['monto'],
+                            "saldo_inicial" => $saldo_inicial,
                             "saldo" => $saldo
                         );
                     }
