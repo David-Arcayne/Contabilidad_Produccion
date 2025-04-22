@@ -25,7 +25,7 @@ class Cuentaspof extends DB{
             WHERE f.idorganizacion='$ide' AND cp.transaccion = '0'");
         $res2 = $recibo_fact->fetch_assoc();
 
-        $recibo_oc = $this->dbc->query("SELECT cp.* FROM cuentaspof cp
+        $recibo_oc = $this->dbc->query("SELECT count(*) AS cant3 FROM cuentaspof cp
         INNER JOIN otras_cuentas oc ON oc.idotras_cuentas=cp.idotras_cuentas
         WHERE oc.idempresa='$ide' and cp.transaccion ='0'");
         $res3 = $recibo_oc->fetch_assoc();
