@@ -2057,7 +2057,7 @@ WHERE
         echo json_encode($res);
     }
     //listafactura eliminartransaccion  eliminarcliente listafactura_cobrado eliminarproveedor listafactura_pagado registrocobrarfactura
-}//eliminarcobrados listapagos registrardesconsolidar registrotransaccion cambiarestadoconsolidado  registropagarfactura 
+}//eliminarcobrados listapagos registrardesconsolidar registrotransaccion cambiarestadoconsolidado  registropagarfactura listaimpuestoentreplan
 //registrardesconsolidar crearfactura listapagos crearfacturasapi lista_cobrar_cobrado_factura registropagarfactura listaclientes
 // $gestion = $this->getgestionactualid($ide); listapagos listaasientos cliente crearsolofacturasapi   getusuario listar_recibo_pago_por_id listaimpuestoentreplan
 

@@ -165,6 +165,7 @@ class Transacciones extends DB{
         $orden = $listaDetalleOrden->fetch_assoc();
         $nro_orden = $orden['orden'];
         // nro_orden --> 2
+        
        
          $listaDetalleOrden = $this->dbc->query("SELECT * FROM detalletransaccion WHERE transacciones_idtransacciones='$idtransaccion' AND orden >'$nro_orden';");
         
@@ -451,6 +452,7 @@ class Transacciones extends DB{
         echo json_encode($lista);
     }
 
+<<<<<<< HEAD
     public function insertar_detalle_transaccion_automatico($idplandecuenta,$ide){//10279, 50
         $lista=[];
         $registro=$this->dbc->query("SELECT i.idimpuesto, i.codigoimpuesto, i.nombreimpuesto, i.tasa, i.descripcion FROM impuesto AS i WHERE md5(i.idempresa)='$ide'");
@@ -480,4 +482,46 @@ class Transacciones extends DB{
 
     }
 
+=======
+                                                 // monto, idplandecuenta
+    public function listar_detalle_trans_monto($monto, $idplandecuenta, $empresa)
+    { //iddetalletransaccion,planCuenta, debe, haber.... , (iddetalleTrans o Nro_orden) 
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+        // $idsucursal = $this->getidsucursal($sucursal);
+        $ide = $this->getidempresa($empresa);
+
+        $estado = 1;
+        $ppresupuestario = 0;
+        $res = "";
+
+        $rel_ip = $this->dbc->query("SELECT * FROM relacionip WHERE idplandecuenta='$idplandecuenta' AND idempresa = '$ide'");
+
+        $plan = $this->dbc->query("SELECT saldonormal FROM plandecuenta WHERE idplandecuenta='$idplandecuenta' AND organizacion_idorganizacion = '$ide'");
+        $pdc = $plan->fetch_assoc();
+
+        if ($rel_ip->num_rows > 0){ //EXISTE EL PLANDECUENTA EN LA VINCULACION
+            $vinculacion = $rel_ip->fetch_assoc();
+            $impuesto = $this->dbc->query("SELECT * FROM impuesto WHERE idimpuesto='$vinculacion[idimpuesto]'");
+            $im = $impuesto->fetch_assoc();
+            
+            if($pdc['saldonormal'] == "DEBE"){
+                $debe = $monto * ($im['tasa'] / 100);
+                $haber = 0;
+            }else{
+                $haber = $monto * ($im['tasa'] / 100);
+                $debe = 0;
+            }
+            
+        }else{ // NO HAY CUENTAS VINCULADAS CON IMMPUESTOS
+            $debe = 0;
+            $haber = 0;
+        }
+        $res = array("debe" => $debe, "haber" => $haber);
+        // array_push($lista, $res);
+   
+        echo json_encode($res);
+    }
+>>>>>>> a0f31fa3172d92038d06da679729b5fa05b3a29d
 }
