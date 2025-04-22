@@ -710,12 +710,23 @@ class Admin extends DB
     public function impuestocrear($empresa,$codigo,$nombre,$tasa,$descripcion){
         $res="";
         $ide=$this->getidempresa($empresa);
-        $registro=$this->dbc->query("INSERT INTO impuesto(idimpuesto,codigoimpuesto,nombreimpuesto,tasa,descripcion,idempresa)VALUES(NULL,'$codigo','$nombre','$tasa','$descripcion','$ide')");
-        if($registro===TRUE){
-            $res=array("ok"=>"success","mensaje"=>"Se registro Correctamente");
+
+        $lista=$this->dbc->query("SELECT * FROM impuesto WHERE codigoimpuesto = '$codigo' AND idempresa = '$ide'");
+
+        if($lista->num_rows > 0){
+            $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
         }else{
-            $res=array("ok"=>"danger","mensaje"=>"No se registro Correctamente");
+            $registro=$this->dbc->query("INSERT INTO impuesto(idimpuesto,codigoimpuesto,nombreimpuesto,tasa,descripcion,idempresa)VALUES(NULL,'$codigo','$nombre','$tasa','$descripcion','$ide')");
+            
+            if($registro===TRUE){
+                $res = array("success", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
+            }else{
+                $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
+            }
         }
+
+        // $registro=$this->dbc->query("INSERT INTO impuesto(idimpuesto,codigoimpuesto,nombreimpuesto,tasa,descripcion,idempresa)VALUES(NULL,'$codigo','$nombre','$tasa','$descripcion','$ide')");
+       
         echo json_encode($res);
     }
     public function impuestocrearf5($idimpuesto,$codigo,$nombre,$tasa,$descripcion){
@@ -838,5 +849,5 @@ public function codigo_correlativo_plandecuenta($codigo,$empresa)
         }
         echo json_encode($lista);
     }
-
+//impuestocrear
 }

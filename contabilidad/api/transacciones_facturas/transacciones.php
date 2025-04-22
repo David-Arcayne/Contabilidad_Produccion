@@ -55,7 +55,7 @@ class Transacciones extends DB{
     public function listatransacciones($empresa)
     {
         $lista = [];
-        // 
+        // row
         $ide = $this->getidempresa($empresa);
         $getG = $this->getgestionactualC($empresa);
         $gestion = $getG['id'];
@@ -222,7 +222,7 @@ class Transacciones extends DB{
         
         echo json_encode($res);
     }
-    public function listadetalletransaccion($trans)
+    public function listadetalletransaccion_reemplazo($trans)
     {
         $lista = [];
 
@@ -262,51 +262,75 @@ class Transacciones extends DB{
         echo json_encode($lista);
     }
 
-    public function listadetalletransaccion_reemplazo($trans)
+    public function listadetalletransaccion($trans)
     {
+          ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
         $lista = [];
         $array_plancuenta = [];
-        $plancuenta = "SELECT idplandecuenta
-        FROM detalletransaccion
-        WHERE transacciones_idtransacciones = '$trans' ORDER BY orden ASC";
 
+        $plancuenta=$this->dbc->query("SELECT *
+        FROM detalletransaccion
+        WHERE transacciones_idtransacciones = '$trans' ORDER BY orden ASC");
+
+        // $plancuenta = "SELECT idplandecuenta
+        // FROM detalletransaccion
+        // WHERE transacciones_idtransacciones = '$trans' ORDER BY orden ASC";
+
+        // $result = $this->dbc->query($plancuenta);
         while ($pc = $this->dbc->fetch($plancuenta)) {
 
-            // $res = array(
-            //     "id" => $qwe['iddetalletransaccion'],
-            //     "numero"=>$qwe['numero'],
-            //     "plan" => $qwe['nombreplan'],
-            //     "debe" => $qwe['debe'],
-            //     "haber" => $qwe['haber'],
-            //     "nota" => $qwe['nota'],
-            //     "estado" => $qwe['estado'],
-            //     "idempresa" => $qwe['idorganizacion'],
-            //     "idplan" => $qwe['idplandecuenta'],
-            //     "factura" => $fa['listafactura'],
-            //     "orden"=>$qwe['orden']
-            // );
-
-            array_push($array_plancuenta, $pc['idplandecuenta']);
+            // array_push($array_plancuenta, $pc['idplandecuenta']);
+            $array_plancuenta[] = $pc['idplandecuenta'];
+            $auxi = $pc['idplandecuenta'];
+            $debe_aux = $pc['debe'];
+            $haber_aux = $pc['haber'];
         }
         $tamaño_arreglo = count($array_plancuenta);
+        // echo json_encode(array($array_plancuenta,$tamaño_arreglo,$auxi,$auxi2,$auxi3));
 
-        $filtrado = "SELECT idasientotipo
+        // Convertir valores de array a números
+        $array_plancuenta_numerico = array_map('intval', $array_plancuenta);
+
+        // Convertir a cadena separada por comas para la consulta SQL
+        $array_plancuenta_str = implode(',', $array_plancuenta_numerico);
+
+        $filtrado = $this->dbc->query("SELECT *
         FROM asiento
-        WHERE idcuenta IN (10195,10177,10170,10128)
+        WHERE idcuenta IN ($array_plancuenta_str)
         GROUP BY idasientotipo
-        HAVING COUNT(DISTINCT idcuenta) = 4;";
+        HAVING COUNT(DISTINCT idcuenta) = $tamaño_arreglo;");
+if($filtrado->num_rows > 0){
+    $resultado = $filtrado->fetch_assoc();
 
-        // Consulta optimizada
+    if($debe_aux == 0 && $haber_aux > 0){
+        $resp = (100 * $haber_aux)/$resultado['porciento'];
+    }elseif($debe_aux > 0 && $haber_aux == 0){
+        $resp = (100 * $debe_aux)/$resultado['porciento'];
+
+    }else{
+        $resp = 0;
+    }
+}else{
+    $resp = 0;
+}
+
+
+    // $resultado['porciento']/100
+
+//10195,10177,10170,10128
+    //     // Consulta optimizada
         $sql = "SELECT d.iddetalletransaccion, p.nombreplan,p.numero, d.debe, d.haber, d.nota, d.estado, d.idorganizacion, d.idplandecuenta, d.orden
             FROM detalletransaccion AS d
             INNER JOIN plandecuenta AS p ON p.idplandecuenta = d.idplandecuenta
             WHERE d.transacciones_idtransacciones = '$trans' ORDER BY d.orden ASC
         ";
-    //WHERE d.transacciones_idtransacciones = '$trans' ORDER BY d.orden ASC
-        // Ejecuta la consulta
+    // //WHERE d.transacciones_idtransacciones = '$trans' ORDER BY d.orden ASC
+    //     // Ejecuta la consulta
         $transdeta = $this->dbc->query($sql);
         
-        // Procesa los resultados
+    //     // Procesa los resultados
         while ($qwe = $this->dbc->fetch($transdeta)) {
             $facturas=$this->dbc->query("SELECT COUNT(*) as listafactura
                     FROM factura AS f 
@@ -323,15 +347,17 @@ class Transacciones extends DB{
                 "idempresa" => $qwe['idorganizacion'],
                 "idplan" => $qwe['idplandecuenta'],
                 "factura" => $fa['listafactura'],
-                "orden"=>$qwe['orden']
+                "orden"=>$qwe['orden'],
+                "monto_ini"=>$resp
             );
             
-            $aux = $qwe['debe'];
-            $aux = $qwe['haber'];
+            // $aux = $qwe['debe'];
+            // $aux2 = $qwe['haber'];
             array_push($lista, $res);
         }
     
-        echo json_encode($lista);
+         echo json_encode($lista);
+       
     }
 
     public function anular_factura($idfactura,$estado) {
@@ -569,7 +595,7 @@ class Transacciones extends DB{
         $plan = $this->dbc->query("SELECT saldonormal FROM plandecuenta WHERE idplandecuenta='$idplandecuenta' AND organizacion_idorganizacion = '$ide'");
         $pdc = $plan->fetch_assoc();
 
-        if ($rel_ip->num_rows > 0){ //EXISTE EL PLANDECUENTA EN LA VINCULACION
+        if (c){ //EXISTE EL PLANDECUENTA EN LA VINCULACION
             $vinculacion = $rel_ip->fetch_assoc();
             $impuesto = $this->dbc->query("SELECT * FROM impuesto WHERE idimpuesto='$vinculacion[idimpuesto]'");
             $im = $impuesto->fetch_assoc();

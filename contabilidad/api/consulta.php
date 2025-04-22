@@ -409,15 +409,19 @@ elseif($ver[0]=="listar_asiento_por_modulo"){
 }elseif($ver[0]=="listar_otras_cuentas_pago_sin_transaccion"){
     $cont=new Documento_cobro();
     $cont->listar_otras_cuentas_pago_sin_transaccion($ver[1]);
-<<<<<<< HEAD
 }elseif($ver[0]=="codigo_correlativo_plandecuenta"){
     $cont=new Admin();
     $cont->codigo_correlativo_plandecuenta($ver[1],$ver[2]);
-=======
+
 }elseif($ver[0]=="listar_detalle_trans_monto"){
     $cont=new Transacciones();
     $cont->listar_detalle_trans_monto($ver[1],$ver[2],$ver[3]);
->>>>>>> a0f31fa3172d92038d06da679729b5fa05b3a29d
+}elseif($ver[0]=="listadetalletransaccion_reemplazo"){
+    $cont=new Transacciones();
+    $cont->listadetalletransaccion_reemplazo($ver[1]);
+}elseif($ver[0]=="lista_plan_cuenta_no_vinculada"){
+    $cont=new Contabilidad();
+    $cont->lista_plan_cuenta_no_vinculada($ver[1]);
 }
 
 

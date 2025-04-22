@@ -193,6 +193,9 @@ class Contabilidad extends DB
         $fecha=date("Y-m-d");
         $empresa=$this->getidempresa($idempresa);
         $res="";
+//idplandecuenta ='$idplandecuenta'
+        $registro=$this->dbc->query("SELECT * FROM relacionip WHERE idimpuesto ='$idimpuesto' AND idempresa = '$empresa'");
+
         $registro=$this->dbc->query("INSERT INTO relacionip(idimpuesto,idplandecuenta,fecha,idempresa)VALUES('$idimpuesto','$idplandecuenta','$fecha','$empresa')");
         if($registro===TRUE){
             $res=array("ok"=>"success");
@@ -203,7 +206,37 @@ class Contabilidad extends DB
         echo json_encode($res);
 
     }
-
+    public function lista_plan_cuenta_no_vinculada($empresa)
+    {
+        $lista = [];
+        $idempresa = $this->getidempresa($empresa);
+        // Consulta optimizada
+        $sql = $this->dbc->query("SELECT * 
+        FROM plandecuenta 
+        WHERE organizacion_idorganizacion = '$idempresa' AND idplandecuenta NOT IN (SELECT idplandecuenta FROM relacionip WHERE idempresa = '$idempresa');");
+    //WHERE d.transacciones_idtransacciones = '$trans' ORDER BY d.orden ASC
+        // Ejecuta la consulta
+        // $transdeta = $this->dbc->query($sql);
+        
+        // Procesa los resultados
+        while ($qwe = $this->dbc->fetch($sql)) {
+            $facturas=$this->dbc->query("SELECT COUNT(*) as listafactura
+                    FROM factura AS f 
+                    WHERE f.cuenta = $qwe[7]");
+            $fa=$this->dbc->fetch($facturas);
+            $res = array(
+                "idplandecuenta" => $qwe['idplandecuenta'],
+                "numero"=>$qwe['numero'],
+                "nombreplan" => $qwe['nombreplan'],
+                "saldonormal" => $qwe['saldonormal']
+            );
+    
+            array_push($lista, $res);
+        }
+    
+        echo json_encode($lista);
+    }
+   
     public function registrorelacionipf5($id,$idimpuesto,$idplandecuenta,$idempresa){
         $fecha=date("Y-m-d");
         $empresa=$this->getidempresa($idempresa);
@@ -2056,9 +2089,9 @@ WHERE
         }
         echo json_encode($res);
     }
-    //listafactura eliminartransaccion  eliminarcliente listafactura_cobrado eliminarproveedor listafactura_pagado registrocobrarfactura
-}//eliminarcobrados listapagos registrardesconsolidar registrotransaccion cambiarestadoconsolidado  registropagarfactura listaimpuestoentreplan
-//registrardesconsolidar crearfactura listapagos crearfacturasapi lista_cobrar_cobrado_factura registropagarfactura listaclientes
-// $gestion = $this->getgestionactualid($ide); listapagos listaasientos cliente crearsolofacturasapi   getusuario listar_recibo_pago_por_id listaimpuestoentreplan
+    //listafactura listafactura_pagado registrocobrarfactura registrorelacionip
+}//eliminarcobrados listapagos  listaimpuestoentreplan
+//registrardesconsolidar crearfactura   registropagarfactura listaclientes
+// $gestion = $this->getgestionactualid($ide); listapagos listaasientos cliente      
 
 

@@ -436,7 +436,7 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         $cont=new Documento_cobro();
         $cont->asignar_asiento_A_otras_cuentas($data);
     }       
-//registrar_recibo_otras_cuentas_pagar asiento registroasiento registrocobrarfacturaf5 crearsolofacturasapi dolar registro_transaccion_comercial  registrar_otras_cuentas
-//  registrotransaccion registrotransaccionf5 duplicartransaccion registrocobrarfactura registrocobrarfacturaGrupal factura registropagarfactura registrocobrarfacturaGrupal 
-}//editar_caja_bancos_pagar_recibo registropagarfacturaf5 registropagarfacturaGrupal  editar_caja_bancos_pagar_recibo cobrofacturasaasientomodelo registrar_factura_recibo_pagos_cajaBancos
+//registrar_recibo_otras_cuentas_pagar asiento registroasiento registrorelacionip
+//  registrotransaccion   registrocobrarfactura registrocobrarfacturaGrupal  registropagarfactura registrocobrarfacturaGrupal 
+}//  editar_caja_bancos_pagar_recibo  registrar_factura_recibo_pagos_cajaBancos impuestocrear
 ?> 
