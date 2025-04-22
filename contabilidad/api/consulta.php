@@ -409,6 +409,9 @@ elseif($ver[0]=="listar_asiento_por_modulo"){
 }elseif($ver[0]=="listar_otras_cuentas_pago_sin_transaccion"){
     $cont=new Documento_cobro();
     $cont->listar_otras_cuentas_pago_sin_transaccion($ver[1]);
+}elseif($ver[0]=="listar_detalle_trans_monto"){
+    $cont=new Transacciones();
+    $cont->listar_detalle_trans_monto($ver[1],$ver[2],$ver[3]);
 }
 
 
