@@ -348,14 +348,14 @@ $cont->listaimpuestoentreplan($ver[1]);
     $cont->listar_recibo_otras_cuentas($ver[1]);
 }elseif($ver[0]=="listar_recibo_por_id_otras_cuentas"){
     $cont=new Documento_cobro();
-    $cont->listar_recibo_por_id_otras_cuentas($ver[1],$ver[2]);
+    $cont->listar_recibo_por_id_otras_cuentas($ver[1]);
 }
 elseif($ver[0]=="listar_recibo_otras_cuentas_pagar"){
     $cont=new Recibo_otras_cuentas();
     $cont->listar_recibo_otras_cuentas_pagar($ver[1]);
 }elseif($ver[0]=="listar_recibo_por_id_otras_cuentas_pagar"){
     $cont=new Documento_cobro();
-    $cont->listar_recibo_por_id_otras_cuentas_pagar($ver[1],$ver[2]);
+    $cont->listar_recibo_por_id_otras_cuentas_pagar($ver[1]);
 }elseif($ver[0]=="listar_otras_cuentas_pagar"){
     $cont=new Documento_cobro();
     $cont->listar_otras_cuentas_pagar($ver[1],$ver[2]);
@@ -424,8 +424,8 @@ elseif($ver[0]=="listar_asiento_por_modulo"){
 }
 
 
-//reportecomprobantecontable listafactura_cobrado_trans asientotipo listar_operacion_modulo_filtrado creartipoasientodelete listaplanesempresa listaimpuestoentreplan
-//lista_transaccionEn_espera milista  lista_pagar_pagado_factura listafacturaapi_cobrado listafacturaapi_pagado listafacturaapi_cobrado listar_recibo_por_caja_bancos
-//listafactura eliminartransaccion listapagos_individuales listatransaciones factura lista_cobrar_cobrado reportedetalletransaccion listar_asignacion lista_cobrar_cobrado_factura
-//reporteactivodisponible listar_cajas_bancos_pagar_por_recibo listar_recibo_por_id_otras_cuentas_pagar lista_transaccion getidempresa firmas listaimpuestoentreplan
+//  asientotipo  creartipoasientodelete listaplanesempresa listaimpuestoentreplan listar_recibo_por_id_otras_cuentas
+// milista     listafacturaapi_cobrado listar_recibo_por_caja_bancos listar_recibo_por_id_otras_cuentas_pagar
+//listafactura   listatransaciones   reportedetalletransaccion  lista_cobrar_cobrado_factura
+//reporteactivodisponible    getidempresa firmas listaimpuestoentreplan
 ?>

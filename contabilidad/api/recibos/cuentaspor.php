@@ -259,7 +259,7 @@ class Cuentaspor extends DB{
         echo json_encode($lista);
     }
 
-    public function listar_recibo_pago_por_id($idrecibo)
+    public function listar_recibo_pago_por_id_reemplazo($idrecibo)
     {
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
@@ -312,11 +312,12 @@ class Cuentaspor extends DB{
     }
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------
-public function listar_recibo_pago_por_id_reemplazo($idrecibo)
+public function listar_recibo_pago_por_id($idrecibo)
 {
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 1);
-    error_reporting(E_ALL);
+    // ini_set('display_errors', 1);
+    // ini_set('display_startup_errors', 1);
+    // error_reporting(E_ALL);
+    
     // $lista = [];
     // $detalle_facturas = [];
 
