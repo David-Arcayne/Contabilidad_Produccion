@@ -311,6 +311,73 @@ class Cuentaspor extends DB{
         echo json_encode($lista);
     }
 
+// ------------------------------------------------------------------------------------------------------------------------------------------------------
+public function listar_recibo_pago_por_id_reemplazo($idrecibo)
+{
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
+    // $lista = [];
+    // $detalle_facturas = [];
+
+    $consulta = $this->dbc->query("SELECT SUM(monto) AS suma_monto FROM detalle_caja_bancos_pagar WHERE idcuentaspor = '$idrecibo'");
+
+    $mont = $consulta->fetch_assoc();
+
+    $res = array(
+        "monto_total" => $mont['suma_monto'],
+        "facturas" => [],
+        "caja_bancos" => []
+    );
+
+    $registro = $this->dbc->query("SELECT * FROM cuentaspor WHERE idcuentaspor = '$idrecibo'");
+    $recib = $registro->fetch_assoc();
+
+    $factura_lista = $this->dbc->query("SELECT DISTINCT idfactura 
+    FROM detalle_caja_bancos_pagar 
+    WHERE idcuentaspor = '$idrecibo';");
+
+    while ($factu = $this->dbc->fetch($factura_lista)) {
+        $factura= $this->dbc->query("SELECT * FROM factura WHERE idfactura = '$factu[idfactura]'");
+        $ft = $factura->fetch_assoc();
+
+        $detalle_facturas = array(
+
+            "nrecibo" => $recib['nrecibo'],
+            "fecha" => $recib['fecha'],
+            "persona" => $recib['persona'],
+            "idfactura" => $ft['idfactura'],
+            "fecha_factura" => $ft['fecha'],
+            "nro_factura" => $ft['nfactura']
+        
+        );
+
+        array_push($res['facturas'], $detalle_facturas);
+    }
+
+            $caja_banco = $this->dbc->query("SELECT idcaja_bancos, SUM(monto) AS total_monto
+            FROM detalle_caja_bancos_pagar
+            WHERE idcuentaspor = '$idrecibo'
+            GROUP BY idcaja_bancos");
+
+    while ($datos_caja = $this->dbc->fetch($caja_banco)) {
+
+        $caja= $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '$datos_caja[idcaja_bancos]'");
+        $datos = $caja->fetch_assoc();
+        $detalle_caja_bancos = array(
+            "idcaja_bancos" => $datos['idcaja_bancos'],
+            "codigo" => $datos['codigo'],
+            "nombre" => $datos['tipo_cuenta'],
+            "monto" => $datos_caja['total_monto'],
+            
+        );
+        array_push($res['caja_bancos'], $detalle_caja_bancos);
+    }
+
+echo json_encode($res);
+}
+// -------------------------------------------------------------------------------------------------------------------------------------------------------------
+
     public function getidempresa($md5){
         $registro=$this->dbe->query("select * from organizacion where md5(idorganizacion)='$md5'");
         $qwe=$this->dbe->fetch($registro);
