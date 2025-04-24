@@ -42,6 +42,9 @@ $ad->reemplazarplanes($ver[1]);
 }elseif($ver[0]=="listafacturaapi_cobrado"){
     $ad=new Contabilidad();
     $ad->listafacturaapi_cobrado($ver[1]);
+}elseif($ver[0]=="lista_cobrar_cobrado_factura"){
+    $ad=new Contabilidad();
+    $ad->lista_cobrar_cobrado_factura($ver[1]);
 }elseif($ver[0]=="listatipodecambio"){
 $ad=new Admin();
 $ad->listatipodecambio($ver[1]);
@@ -423,6 +426,6 @@ elseif($ver[0]=="listar_asiento_por_modulo"){
 
 //reportecomprobantecontable listafactura_cobrado_trans asientotipo listar_operacion_modulo_filtrado creartipoasientodelete listaplanesempresa listaimpuestoentreplan
 //lista_transaccionEn_espera milista  lista_pagar_pagado_factura listafacturaapi_cobrado listafacturaapi_pagado listafacturaapi_cobrado listar_recibo_por_caja_bancos
-//listafactura eliminartransaccion listapagos_individuales listatransaciones factura lista_cobrar_cobrado reportedetalletransaccion listar_asignacion
+//listafactura eliminartransaccion listapagos_individuales listatransaciones factura lista_cobrar_cobrado reportedetalletransaccion listar_asignacion lista_cobrar_cobrado_factura
 //reporteactivodisponible listar_cajas_bancos_pagar_por_recibo listar_recibo_por_id_otras_cuentas_pagar lista_transaccion getidempresa firmas listaimpuestoentreplan
 ?>

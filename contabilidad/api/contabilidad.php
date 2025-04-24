@@ -2114,7 +2114,7 @@ WHERE
         echo json_encode($res);
     }
     //listafactura listafactura_pagado registrocobrarfactura registrorelacionip lista_cobrar_cobrado_factura
-}//eliminarcobrados listapagos  listaimpuestoentreplan lista_plan_cuenta_no_vinculada
+}//eliminarcobrados listapagos  listaimpuestoentreplan lista_plan_cuenta_no_vinculada lista_cobrar_cobrado_factura
 //registrardesconsolidar crearfactura   registropagarfactura listaclientes  listafacturaapi_cobrado listafacturaapi_pagado
 // $gestion = $this->getgestionactualid($ide); listapagos listaasientos cliente registrar_factura_cobros_tributario      
 

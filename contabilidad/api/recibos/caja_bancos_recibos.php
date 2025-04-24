@@ -797,7 +797,10 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             }
 
             if($qwe['idotras_cuentas'] != 0){
-                $aux_descripcion = "Cobro de factura N° $oc[nro_otras_cuentas] con fecha: $oc[fecha]";
+
+                $fecha_nueva = date("d/m/Y", strtotime($oc['fecha']));
+
+                $aux_descripcion = "Según documento N° $oc[nro_otras_cuentas] de: $fecha_nueva";
                 // $saldo = 0;
 
                 if($aux_contador == 0){ //ESTAMOS EN PRIMERA FILA, SUMAR LAS ANTERIORES FILAS A LA FECHA
@@ -815,9 +818,11 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                 $saldo_inicial = $saldo;
                 $saldo = $saldo + $qwe['monto'];
                     $res = array(
+                        "fecha_nueva" => $fecha_nueva,
                         "fecha" => $qwe['fecha'],
                         "nrecibo" => $qwe['nrecibo'],
                         "nro_documento" => "$oc[nro_otras_cuentas]",
+                        "por_concepto_de" => "$oc[concepto]",
                         "codigotransaccion" => $tr['codigotransaccion'],
                         "nombre_cliente" => $cl['nombre'],
                         //descripcion saldra de la factura o otras cuentas 
@@ -835,9 +840,11 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
                 $saldo = $saldo + $qwe['monto'];
                 $res = array(
+                    "fecha_nueva" => $fecha_nueva,
                     "fecha" => $qwe['fecha'],
                     "nrecibo" => $qwe['nrecibo'],
                     "nro_documento" => "$oc[nro_otras_cuentas]",
+                    "por_concepto_de" => "$oc[concepto]",
                     "codigotransaccion" => $tr['codigotransaccion'],
                     "nombre_cliente" => $cl['nombre'],
                     //descripcion saldra de la factura o otras cuentas 
@@ -851,7 +858,8 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             }
 
             }else{
-                $aux_descripcion = "Cobro de factura N° $fact[nfactura] con fecha: $fact[fecha]";
+                $fecha_nueva = date("d/m/Y", strtotime($fact['fecha']));
+                $aux_descripcion = "Según documento N° $fact[nfactura] de: $fecha_nueva";
 
                  $aux_factura = "cero $fact[nfactura]";
                  $factu = str_replace("cero ", "", $aux_factura);
@@ -871,9 +879,11 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                 $saldo_inicial = $saldo;
                 $saldo = $saldo + $qwe['monto'];
                     $res = array(
+                        "fecha_nueva" => $fecha_nueva,
                         "fecha" => $qwe['fecha'],
                         "nrecibo" => $qwe['nrecibo'],
                         "nro_documento" => "$oc[nro_otras_cuentas]",
+                        "por_concepto_de" => "$oc[concepto]",
                         "codigotransaccion" => $tr['codigotransaccion'],
                         "nombre_cliente" => $cl['nombre'],
                         //descripcion saldra de la factura o otras cuentas 
@@ -891,6 +901,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
                 $saldo = $saldo + $qwe['monto'];
                 $res = array(
+                    "fecha_nueva" => $fecha_nueva,
                     "fecha" => $qwe['fecha'],
                     "nrecibo" => $qwe['nrecibo'],
                     "nro_documento" => "$oc[nro_otras_cuentas]",
@@ -989,7 +1000,8 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                 }
     
                 if($qwe['idotras_cuentas'] != 0){
-                    $aux_descripcion = "Cobro de factura N° $oc[nro_otras_cuentas] con fecha: $oc[fecha]";
+                    $fecha_nueva = date("d/m/Y", strtotime($oc['fecha']));
+                    $aux_descripcion = "Según documento N° $oc[nro_otras_cuentas] de: $fecha_nueva";
                     // $saldo = 0;
     
                     if($aux_contador == 0){ //ESTAMOS EN PRIMERA FILA, SUMAR LAS ANTERIORES FILAS A LA FECHA
@@ -1007,9 +1019,11 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                     $saldo_inicial = $saldo;
                     $saldo = $saldo + $qwe['monto'];
                         $res = array(
+                            "fecha_nueva" => $fecha_nueva,
                             "fecha" => $qwe['fecha'],
                             "nrecibo" => $qwe['nrecibo'],
                             "nro_documento" => "$oc[nro_otras_cuentas]",
+                            "por_concepto_de" => "$oc[concepto]",
                             "codigotransaccion" => $tr['codigotransaccion'],
                             "nombre_cliente" => $cl['nombre'],
                             //descripcion saldra de la factura o otras cuentas 
@@ -1027,6 +1041,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
     
                     $saldo = $saldo + $qwe['monto'];
                     $res = array(
+                        "fecha_nueva" => $fecha_nueva,
                         "fecha" => $qwe['fecha'],
                         "nrecibo" => $qwe['nrecibo'],
                         "nro_documento" => "$oc[nro_otras_cuentas]",
@@ -1043,7 +1058,8 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                 }
     
                 }else{
-                    $aux_descripcion = "Cobro de factura N° $fact[nfactura] con fecha: $fact[fecha]";
+                    $fecha_nueva = date("d/m/Y", strtotime($fact['fecha']));
+                    $aux_descripcion = "Según documento N° $fact[nfactura] de: $fecha_nueva";
     
                      $aux_factura = "cero $fact[nfactura]";
                      $factu = str_replace("cero ", "", $aux_factura);
@@ -1062,9 +1078,11 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                     $saldo_inicial = $saldo;
                     $saldo = $saldo + $qwe['monto'];
                         $res = array(
+                            "fecha_nueva" => $fecha_nueva,
                             "fecha" => $qwe['fecha'],
                             "nrecibo" => $qwe['nrecibo'],
                             "nro_documento" => "$oc[nro_otras_cuentas]",
+                            "por_concepto_de" => "$oc[concepto]",
                             "por_concepto_de" => $fact['por_concepto_de'],
                             "codigotransaccion" => $tr['codigotransaccion'],
                             "nombre_cliente" => $cl['nombre'],
@@ -1086,6 +1104,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         "fecha" => $qwe['fecha'],
                         "nrecibo" => $qwe['nrecibo'],
                         "nro_documento" => "$oc[nro_otras_cuentas]",
+                        "por_concepto_de" => "$oc[concepto]",
                         "codigotransaccion" => $tr['codigotransaccion'],
                         "nombre_cliente" => $cl['nombre'],
                         //descripcion saldra de la factura o otras cuentas 
@@ -1328,8 +1347,9 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                     $saldo = $saldo + $qwe['monto'];
 
                     if($qwe['idotras_cuentas'] != 0){
-                        
-                        $aux_descripcion = "Cobro de factura N° $oc[nro_otras_cuentas] con fecha: $oc[fecha]";
+                        //Según documento N° 11 de 24/04/2025
+                        $fecha_nueva = date("d/m/Y", strtotime($oc['fecha']));
+                        $aux_descripcion = "Según documento N° $oc[nro_otras_cuentas] de: $fecha_nueva";
                         
                         // if($zxc['tipo'] == 'COBRAR'){
                         //     $saldo = $saldo + $zxc['monto'];
@@ -1340,6 +1360,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "fecha" => $qwe['fecha'],
                             "nrecibo" => $qwe['nrecibo'],
                             "nro_documento" => "$oc[nro_otras_cuentas]",
+                            "por_concepto_de" => "$oc[concepto]",
                             "codigotransaccion" => $tr['codigotransaccion'],
                             "nombre_cliente" => $cl['nombre'],
                             //descripcion saldra de la factura o otras cuentas 
@@ -1351,7 +1372,9 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         
                         );
                     }else{
-                        $aux_descripcion = "Cobro de factura N° $fact[nfactura] con fecha: $fact[fecha]";
+                        $fecha_nueva = date("d/m/Y", strtotime($fact['fecha']));
+
+                        $aux_descripcion = "Según documento N° $fact[nfactura] de: $fecha_nueva";
         
                          $aux_factura = "cero $fact[nfactura]";
                          $factu = str_replace("cero ", "", $aux_factura);
@@ -1375,12 +1398,14 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                     $saldo = $saldo - $qwe['monto'];
 
                     if($qwe['idotras_cuentas'] != 0){
-                        $aux_descripcion = "Cobro de factura N° $oc[nro_otras_cuentas] con fecha: $oc[fecha]";
+                        $fecha_nueva = date("d/m/Y", strtotime($oc['fecha']));
+                        $aux_descripcion = "Según documento N° $oc[nro_otras_cuentas] de: $fecha_nueva";
         
                         $res = array(
                             "fecha" => $qwe['fecha'],
                             "nrecibo" => $qwe['nrecibo'],
                             "nro_documento" => "$oc[nro_otras_cuentas]",
+                            "por_concepto_de" => "$oc[concepto]",
                             "codigotransaccion" => $tr['codigotransaccion'],
                             "nombre_cliente" => $cl['nombre'],
                             //descripcion saldra de la factura o otras cuentas 
@@ -1391,7 +1416,9 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "saldo" => $saldo
                         );
                     }else{
-                        $aux_descripcion = "Cobro de factura N° $fact[nfactura] con fecha: $fact[fecha]";
+                        $fecha_nueva = date("d/m/Y", strtotime($fact['fecha']));
+
+                        $aux_descripcion = "Según documento N° $fact[nfactura] de: $fecha_nueva";
         
                          $aux_factura = "cero $fact[nfactura]";
                          $factu = str_replace("cero ", "", $aux_factura);
