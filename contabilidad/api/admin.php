@@ -849,5 +849,5 @@ public function codigo_correlativo_plandecuenta($codigo,$empresa)
         }
         echo json_encode($lista);
     }
-//impuestocrear
+//impuestocrear milista
 }

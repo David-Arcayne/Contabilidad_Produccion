@@ -200,7 +200,7 @@ if ($registrarTabla === TRUE) {
         $lista = [];
         $cf = 1;
         $idsucursal = $this->getidsucursal($sucursal);
-        $registro = $this->dbc->query("SELECT f.idfactura,f.fecha,f.nfactura,t.codigotransaccion, f.montofactura,f.proveedorcliente_idproveedorcliente,f.transacciones_idtransacciones,f.cuenta,f.pagado
+        $registro = $this->dbc->query("SELECT f.idfactura,f.fecha,f.nfactura,t.codigotransaccion, f.montofactura,f.proveedorcliente_idproveedorcliente,f.transacciones_idtransacciones,f.cuenta,f.pagado,f.por_concepto_de
          FROM factura f,transacciones t
          WHERE f.clasefactura='$cf' AND f.sucursal='$idsucursal' AND f.transacciones_idtransacciones=t.idtransacciones ORDER BY f.idfactura DESC");
         while ($qwe = $this->dbc->fetch($registro)) {
@@ -238,7 +238,7 @@ if ($registrarTabla === TRUE) {
                    $pes2 = array("nrecibo" => $www[0], "fechar" => $www[1], "persona" => $www[2], "ci" => $www[3], "monto" => $resultado33['monto'], "id" => $www[5]);
                    array_push($pagados, $pes2);
                }
-               $res = array("id" => $qwe[0], "fecha" => $qwe[1], "numero" => $qwe[2], "codigo" => $qwe[3], "idproveedor" => $qwe[5], "nombrep" => $pro['nombre'], "monto" => $qwe[4], "cobrado" => $resultado33['monto'], "saldo" => 0, "transaccion" => $qwe[6], "cuenta" => $qwe[7], "detalle" => $pagados);
+               $res = array("id" => $qwe[0], "fecha" => $qwe[1], "numero" => $qwe[2], "codigo" => $qwe[3], "idproveedor" => $qwe[5], "nombrep" => $pro['nombre'], "monto" => $qwe[4], "cobrado" => $resultado33['monto'], "saldo" => 0, "transaccion" => $qwe[6], "cuenta" => $qwe[7],"por_concepto_de" => $qwe['por_concepto_de'], "detalle" => $pagados);
                array_push($lista, $res);
 
                 }else{
@@ -252,7 +252,7 @@ if ($registrarTabla === TRUE) {
                                 $pes = array("nrecibo" => $zxc[0], "fechar" => $zxc[1], "persona" => $zxc[2], "ci" => $zxc[3], "monto" => $zxc[4], "id" => $zxc[5]);
                                 array_push($pagados, $pes);
                             }
-                    $res = array("id" => $qwe[0], "fecha" => $qwe[1], "numero" => $qwe[2], "codigo" => $qwe[3], "idproveedor" => $qwe[5], "nombrep" => $pro['nombre'], "monto" => $qwe[4], "cobrado" => $asd[0], "saldo" => $saldo, "transaccion" => $qwe[6], "cuenta" => $qwe[7], "detalle" => $pagados);
+                    $res = array("id" => $qwe[0], "fecha" => $qwe[1], "numero" => $qwe[2], "codigo" => $qwe[3], "idproveedor" => $qwe[5], "nombrep" => $pro['nombre'], "monto" => $qwe[4], "cobrado" => $asd[0], "saldo" => $saldo, "transaccion" => $qwe[6], "cuenta" => $qwe[7],"por_concepto_de" => $qwe['por_concepto_de'], "detalle" => $pagados);
                     array_push($lista, $res);
                 }
             }elseif($hayGrupales > 0){
@@ -266,7 +266,7 @@ if ($registrarTabla === TRUE) {
                     $pes = array("nrecibo" => $zxc[0], "fechar" => $zxc[1], "persona" => $zxc[2], "ci" => $zxc[3], "monto" => $resultado3['monto'], "id" => $zxc[5]);
                     array_push($pagados, $pes);
                 }
-                $res = array("id" => $qwe[0], "fecha" => $qwe[1], "numero" => $qwe[2], "codigo" => $qwe[3], "idproveedor" => $qwe[5], "nombrep" => $pro['nombre'], "monto" => $qwe[4], "cobrado" => $resultado3['monto'], "saldo" => 0, "transaccion" => $qwe[6], "cuenta" => $qwe[7], "detalle" => $pagados);
+                $res = array("id" => $qwe[0], "fecha" => $qwe[1], "numero" => $qwe[2], "codigo" => $qwe[3], "idproveedor" => $qwe[5], "nombrep" => $pro['nombre'], "monto" => $qwe[4], "cobrado" => $resultado3['monto'], "saldo" => 0, "transaccion" => $qwe[6], "cuenta" => $qwe[7],"por_concepto_de" => $qwe['por_concepto_de'], "detalle" => $pagados);
                 array_push($lista, $res);
             }
             elseif($qwe[8] == 2){
@@ -290,6 +290,7 @@ if ($registrarTabla === TRUE) {
                 "saldo" => 0,
                  "transaccion" => $qwe[6],
                "cuenta" => $qwe[7],
+               "por_concepto_de" => $qwe['por_concepto_de'],
                 "detalle" => $pagados);
             array_push($lista, $res);
             
@@ -300,7 +301,7 @@ if ($registrarTabla === TRUE) {
             $res = array("id" => $qwe[0], "fecha" => $qwe[1], "numero" => $qwe[2],
              "codigo" => $qwe[3], "idproveedor" => $qwe[5], "nombrep" => $pro['nombre'],
               "monto" => $qwe[4], "cobrado" => 0, "saldo" => $qwe[4], "transaccion" => $qwe[6],
-               "cuenta" => $qwe[7], "detalle" => $pagados);
+               "cuenta" => $qwe[7],"por_concepto_de" => $qwe['por_concepto_de'], "detalle" => $pagados);
             array_push($lista, $res);
             
         }
@@ -445,4 +446,5 @@ public function listapagos_individuales($idfactura)
         }
         echo json_encode($res);
     }
+    //lista_pagar_pagado_factura
 }

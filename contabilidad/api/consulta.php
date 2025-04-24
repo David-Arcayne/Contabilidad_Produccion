@@ -17,7 +17,7 @@ require_once "./configuracion/asiento.php";
 require_once "./recibos/caja_bancos_recibos.php";
 require_once "alertas.php";
 
-$ver=explode("/",$_GET['ver']); //dividiendo los "/"  ver[0],ver[1],ver[x] listafacturaapi_cobrado eliminarasiento
+$ver=explode("/",$_GET['ver']); //dividiendo los "/"  ver[0],ver[1],ver[x]  listafacturaapi_pagado eliminarasiento
 if($ver[0]=="verificacion"){
 $ad=new Admin();
 $ad->verificacion();
@@ -39,6 +39,9 @@ $ad->agregarplanes($ver[1]);
 }elseif($ver[0]=="reemplazarplanes"){
 $ad=new Admin();
 $ad->reemplazarplanes($ver[1]);
+}elseif($ver[0]=="listafacturaapi_cobrado"){
+    $ad=new Contabilidad();
+    $ad->listafacturaapi_cobrado($ver[1]);
 }elseif($ver[0]=="listatipodecambio"){
 $ad=new Admin();
 $ad->listatipodecambio($ver[1]);
@@ -268,16 +271,9 @@ $cont->listarelacionip($ver[1]);
 }elseif($ver[0]=="plancuentasout"){
 $cont=new Contabilidad();
 $cont->plancuentasout($ver[1]);
-}elseif($ver[0]=="listafacturaapi_cobrado"){
-$cont=new Contabilidad();
-$cont->listafacturaapi_cobrado($ver[1]);
 }elseif($ver[0]=="listaimpuestoentreplan"){
 $cont=new Contabilidad();
 $cont->listaimpuestoentreplan($ver[1]);
-}
-elseif($ver[0]=="lista_cobrar_cobrado_factura"){
-$cont=new Contabilidad();
-$cont->lista_cobrar_cobrado_factura($ver[1]);
 }elseif($ver[0]=="listar_vinculacion_cuentas_xcxp"){
     $cont=new Plandecuentas();
     $cont->listar_vinculacion_cuentas_xcxp($ver[1]);
@@ -426,7 +422,7 @@ elseif($ver[0]=="listar_asiento_por_modulo"){
 
 
 //reportecomprobantecontable listafactura_cobrado_trans asientotipo listar_operacion_modulo_filtrado creartipoasientodelete listaplanesempresa listaimpuestoentreplan
-//lista_transaccionEn_espera listar_anular_eliminar_transaccion listatransacciones_comercial gestion listar_recibo_por_id listar_recibo_pago_por_id
+//lista_transaccionEn_espera milista  lista_pagar_pagado_factura listafacturaapi_cobrado listafacturaapi_pagado listafacturaapi_cobrado listar_recibo_por_caja_bancos
 //listafactura eliminartransaccion listapagos_individuales listatransaciones factura lista_cobrar_cobrado reportedetalletransaccion listar_asignacion
 //reporteactivodisponible listar_cajas_bancos_pagar_por_recibo listar_recibo_por_id_otras_cuentas_pagar lista_transaccion getidempresa firmas listaimpuestoentreplan
 ?>
