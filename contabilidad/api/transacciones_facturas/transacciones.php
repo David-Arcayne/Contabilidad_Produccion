@@ -595,7 +595,7 @@ if($filtrado->num_rows > 0){
         $plan = $this->dbc->query("SELECT saldonormal FROM plandecuenta WHERE idplandecuenta='$idplandecuenta' AND organizacion_idorganizacion = '$ide'");
         $pdc = $plan->fetch_assoc();
 
-        if (c){ //EXISTE EL PLANDECUENTA EN LA VINCULACION
+        if ($rel_ip->num_rows > 0){ //EXISTE EL PLANDECUENTA EN LA VINCULACION row
             $vinculacion = $rel_ip->fetch_assoc();
             $impuesto = $this->dbc->query("SELECT * FROM impuesto WHERE idimpuesto='$vinculacion[idimpuesto]'");
             $im = $impuesto->fetch_assoc();

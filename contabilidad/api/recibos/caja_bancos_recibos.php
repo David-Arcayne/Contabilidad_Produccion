@@ -4,7 +4,7 @@ require_once "../../db/db.php";
 class caja_bancos_recibos extends DB{
 
 
-    public function registrar_factura_recibo_cobro_cajaBancos($fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento,$clasefactura,$cobro, $pagar, $espesificacion,$trans, $cliente, $empresa, $cuenta,  $sucursal,$asiento,$idcaja_bancos)
+    public function registrar_factura_recibo_cobro_cajaBancos($por_concepto_de,$fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento,$clasefactura,$cobro, $pagar, $espesificacion,$trans, $cliente, $empresa, $cuenta,  $sucursal,$asiento,$idcaja_bancos,$archivo)
     {
 
         ini_set('display_errors', 1);
@@ -48,7 +48,7 @@ class caja_bancos_recibos extends DB{
         if($trans == "" && $asiento == ""){
             // se crea factura sin transaccion asignada
             //$trans = 0
-            $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa', '$espesificacion', '1', '1', '0', '$cliente', '$idempresa', '$cuenta', '$idsucursal');");
+            $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa', '$espesificacion', '1', '1', '0', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de');");
         
             $idfact = $this->dbc->insert_id;
 
@@ -58,7 +58,7 @@ class caja_bancos_recibos extends DB{
             $idrecibo = $this->dbc->insert_id;
         }elseif($trans > 0 && $asiento == 0){
             //SE CREA LA FACTURA CON LA TRANSACCION EXISTENTE QUE YA TE PASARON
-            $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa', '$espesificacion', '1', '1', '$trans', '$cliente', '$idempresa', '$cuenta', '$idsucursal');");
+            $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa', '$espesificacion', '1', '1', '$trans', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de');");
         
             $idfact = $this->dbc->insert_id;
 
@@ -102,7 +102,7 @@ class caja_bancos_recibos extends DB{
             $orden = $orden + 1;
         }
 //------------------------------------------------------------------------------
-        $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa', '$espesificacion', '1', '1', '$idtrans', '$cliente', '$idempresa', '$cuenta', '$idsucursal');");
+        $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa', '$espesificacion', '1', '1', '$idtrans', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de');");
         
         $idfact = $this->dbc->insert_id;
 
@@ -112,7 +112,37 @@ class caja_bancos_recibos extends DB{
         $idrecibo = $this->dbc->insert_id;
         }
       
-        
+        //----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        if(empty($archivo['name'])){
+            //NO PASA NBADA EL CUENTASPOF NO SE EDITA EL ARCHIVO SIGUE SIENDO NULL
+
+        }else{
+         // Manejar la carga del archivo
+        $archivo_nombre = "";
+        if ($archivo['error'] == UPLOAD_ERR_OK) {
+            $archivo_tmp = $archivo['tmp_name'];
+            $archivo_nombre = basename($archivo['name']);
+            // ----------------------------------
+            $unique_name = uniqid("img_", true) . '.' . $archivo_nombre;
+            // $target_file = $target_dir . $unique_name;
+
+            // $ruta_destino = __DIR__ . "/archivos/" . $archivo_nombre;
+            $ruta_destino = "../archivos/" . $unique_name;
+            // $ruta_destino = "../archivos/" . $archivo_nombre;
+            // move_uploaded_file($archivo_tmp, $ruta_destino); grupal
+        }
+        if(move_uploaded_file($archivo_tmp, $ruta_destino)){
+             //registrar pago, preguntar guardar la anterior transaccion o la nueva
+        $registropago2 = $this->dbc->query("UPDATE cuentaspof SET archivo = '$unique_name' WHERE idcuentaspof = '$idrecibo'");
+
+        }else{
+            $res = array("danger", "No se movio el archivo a la carpeta");
+        }
+    }
+
+        //----------------------------------------------------------------------------------------------------------------------------------------------------------
+
         $crear_detalle_cajaBancos = $this->dbc->query("INSERT INTO detalle_caja_bancos_cobrar(idcaja_bancos,monto,idcuentaspof,idfactura,idotras_cuentas)
         VALUES('$idcaja_bancos','$monto','$idrecibo','$idfact','0')");
 
@@ -125,7 +155,7 @@ class caja_bancos_recibos extends DB{
 
     }
 
-    public function registrar_factura_recibo_pago_cajaBancos($fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento,$clasefactura,$cobro, $pagar, $espesificacion,$trans, $cliente, $empresa, $cuenta,  $sucursal,$asiento,$idcaja_bancos)
+    public function registrar_factura_recibo_pago_cajaBancos($por_concepto_de,$fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento,$clasefactura,$cobro, $pagar, $espesificacion,$trans, $cliente, $empresa, $cuenta,  $sucursal,$asiento,$idcaja_bancos,$archivo)
     {
 
         ini_set('display_errors', 1);
@@ -169,7 +199,7 @@ class caja_bancos_recibos extends DB{
         if($trans == "" && $asiento == ""){
             // se crea factura sin transaccion asignada
             //$trans = 0
-            $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa', '$espesificacion', '1', '1', '0', '$cliente', '$idempresa', '$cuenta', '$idsucursal');");
+            $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa', '$espesificacion', '1', '1', '0', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de');");
         
             $idfact = $this->dbc->insert_id;
 
@@ -179,7 +209,7 @@ class caja_bancos_recibos extends DB{
             $idrecibo = $this->dbc->insert_id;
         }elseif($trans > 0 && $asiento == 0){
             //SE CREA LA FACTURA CON LA TRANSACCION EXISTENTE QUE YA TE PASARON
-            $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa', '$espesificacion', '1', '1', '$trans', '$cliente', '$idempresa', '$cuenta', '$idsucursal');");
+            $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa', '$espesificacion', '1', '1', '$trans', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de');");
         
             $idfact = $this->dbc->insert_id;
 
@@ -223,7 +253,7 @@ class caja_bancos_recibos extends DB{
             $orden = $orden + 1;
         }
 //------------------------------------------------------------------------------
-        $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa', '$espesificacion', '1', '1', '$idtrans', '$cliente', '$idempresa', '$cuenta', '$idsucursal');");
+        $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa', '$espesificacion', '1', '1', '$idtrans', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de');");
         
         $idfact = $this->dbc->insert_id;
 
@@ -233,6 +263,36 @@ class caja_bancos_recibos extends DB{
         $idrecibo = $this->dbc->insert_id;
         }
       
+         //----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+         if(empty($archivo['name'])){
+            //NO PASA NBADA EL CUENTASPOF NO SE EDITA EL ARCHIVO SIGUE SIENDO NULL
+
+        }else{
+         // Manejar la carga del archivo
+        $archivo_nombre = "";
+        if ($archivo['error'] == UPLOAD_ERR_OK) {
+            $archivo_tmp = $archivo['tmp_name'];
+            $archivo_nombre = basename($archivo['name']);
+            // ----------------------------------
+            $unique_name = uniqid("img_", true) . '.' . $archivo_nombre;
+            // $target_file = $target_dir . $unique_name;
+
+            // $ruta_destino = __DIR__ . "/archivos/" . $archivo_nombre;
+            $ruta_destino = "../archivos/" . $unique_name;
+            // $ruta_destino = "../archivos/" . $archivo_nombre;
+            // move_uploaded_file($archivo_tmp, $ruta_destino); grupal
+        }
+        if(move_uploaded_file($archivo_tmp, $ruta_destino)){
+             //registrar pago, preguntar guardar la anterior transaccion o la nueva
+        $registropago2 = $this->dbc->query("UPDATE cuentaspor SET archivo = '$unique_name' WHERE idcuentaspor = '$idrecibo'");
+
+        }else{
+            $res = array("danger", "No se movio el archivo a la carpeta");
+        }
+    }
+
+        //----------------------------------------------------------------------------------------------------------------------------------------------------------
         
         $crear_detalle_cajaBancos = $this->dbc->query("INSERT INTO detalle_caja_bancos_pagar(idcaja_bancos,monto,idcuentaspor,idfactura,idotras_cuentas)
         VALUES('$idcaja_bancos','$monto','$idrecibo','$idfact','0')");
@@ -246,7 +306,7 @@ class caja_bancos_recibos extends DB{
 
     }
                                             
-    public function registrar_otras_cuentas_recibo_cajaBancos_cobro($fecha,$coc,$cobro, $pagar,$trans, $cliente,$asiento,$concepto,$precio,$idtipo,$empresa,$sucursal,$idcaja_bancos)
+    public function registrar_otras_cuentas_recibo_cajaBancos_cobro($fecha,$coc,$cobro, $pagar,$trans, $cliente,$asiento,$concepto,$precio,$idtipo,$empresa,$sucursal,$idcaja_bancos,$archivo)
     {                                             
         //idtransaccion, asiento,fecha, id_cliente_proveedor, concepto, precio, idtipo
         // echo json_encode(array($fecha,$coc,$cobro, $pagar,$trans, $cliente,$asiento,$concepto,$precio,$idtipo,$empresa,$sucursal,$idcaja_bancos));
@@ -359,6 +419,37 @@ class caja_bancos_recibos extends DB{
         $idrecibo = $this->dbc->insert_id;
         }
       
+            //----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+            if(empty($archivo['name'])){
+                //NO PASA NBADA EL CUENTASPOF NO SE EDITA EL ARCHIVO SIGUE SIENDO NULL
+    
+            }else{
+             // Manejar la carga del archivo
+            $archivo_nombre = "";
+            if ($archivo['error'] == UPLOAD_ERR_OK) {
+                $archivo_tmp = $archivo['tmp_name'];
+                $archivo_nombre = basename($archivo['name']);
+                // ----------------------------------
+                $unique_name = uniqid("img_", true) . '.' . $archivo_nombre;
+                // $target_file = $target_dir . $unique_name;
+    
+                // $ruta_destino = __DIR__ . "/archivos/" . $archivo_nombre;
+                $ruta_destino = "../archivos/" . $unique_name;
+                // $ruta_destino = "../archivos/" . $archivo_nombre;
+                // move_uploaded_file($archivo_tmp, $ruta_destino); grupal
+            }
+            if(move_uploaded_file($archivo_tmp, $ruta_destino)){
+                 //registrar pago, preguntar guardar la anterior transaccion o la nueva
+            $registropago2 = $this->dbc->query("UPDATE cuentaspof SET archivo = '$unique_name' WHERE idcuentaspof = '$idrecibo'");
+    
+            }else{
+                $res = array("danger", "No se movio el archivo a la carpeta");
+            }
+        }
+    
+            //----------------------------------------------------------------------------------------------------------------------------------------------------------
+    
         
         $crear_detalle_cajaBancos = $this->dbc->query("INSERT INTO detalle_caja_bancos_cobrar(idcaja_bancos,monto,idcuentaspof,idfactura,idotras_cuentas)
         VALUES('$idcaja_bancos','$precio','$idrecibo','0','$idotras_cuentas')");
@@ -372,7 +463,7 @@ class caja_bancos_recibos extends DB{
 
     }
 
-    public function registrar_otras_cuentas_recibo_cajaBancos_pago($fecha,$coc,$cobro, $pagar,$trans, $cliente,$asiento,$concepto,$precio,$idtipo,$empresa,$sucursal,$idcaja_bancos)
+    public function registrar_otras_cuentas_recibo_cajaBancos_pago($fecha,$coc,$cobro, $pagar,$trans, $cliente,$asiento,$concepto,$precio,$idtipo,$empresa,$sucursal,$idcaja_bancos,$archivo)
     {                                             //idtransaccion, asiento,fecha, id_cliente_proveedor, concepto, precio, idtipo
 
         ini_set('display_errors', 1);
@@ -484,6 +575,36 @@ class caja_bancos_recibos extends DB{
         $idrecibo = $this->dbc->insert_id;
         }
       
+            //----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+            if(empty($archivo['name'])){
+                //NO PASA NBADA EL CUENTASPOF NO SE EDITA EL ARCHIVO SIGUE SIENDO NULL
+    
+            }else{
+             // Manejar la carga del archivo
+            $archivo_nombre = "";
+            if ($archivo['error'] == UPLOAD_ERR_OK) {
+                $archivo_tmp = $archivo['tmp_name'];
+                $archivo_nombre = basename($archivo['name']);
+                // ----------------------------------
+                $unique_name = uniqid("img_", true) . '.' . $archivo_nombre;
+                // $target_file = $target_dir . $unique_name;
+    
+                // $ruta_destino = __DIR__ . "/archivos/" . $archivo_nombre;
+                $ruta_destino = "../archivos/" . $unique_name;
+                // $ruta_destino = "../archivos/" . $archivo_nombre;
+                // move_uploaded_file($archivo_tmp, $ruta_destino); grupal
+            }
+            if(move_uploaded_file($archivo_tmp, $ruta_destino)){
+                 //registrar pago, preguntar guardar la anterior transaccion o la nueva
+            $registropago2 = $this->dbc->query("UPDATE cuentaspor SET archivo = '$unique_name' WHERE idcuentaspor = '$idrecibo'");
+    
+            }else{
+                $res = array("danger", "No se movio el archivo a la carpeta");
+            }
+        }
+    
+            //----------------------------------------------------------------------------------------------------------------------------------------------------------    
         
         $crear_detalle_cajaBancos = $this->dbc->query("INSERT INTO detalle_caja_bancos_pagar(idcaja_bancos,monto,idcuentaspor,idfactura,idotras_cuentas)
         VALUES('$idcaja_bancos','$precio','$idrecibo','0','$idotras_cuentas')");
@@ -589,6 +710,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                     "fecha" => $qwe['fecha'],
                     "nrecibo" => $qwe['nrecibo'],
                     "nro_documento" => $factu,
+                    "por_concepto_de" => $fact['por_concepto_de'],
                     "codigotransaccion" => $tr['codigotransaccion'],
                     "nombre_cliente" => $cl['nombre'],
                     //descripcion saldra de la factura o otras cuentas 
@@ -675,7 +797,10 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             }
 
             if($qwe['idotras_cuentas'] != 0){
-                $aux_descripcion = "Cobro de factura N° $oc[nro_otras_cuentas] con fecha: $oc[fecha]";
+
+                $fecha_nueva = date("d/m/Y", strtotime($oc['fecha']));
+
+                $aux_descripcion = "Según documento N° $oc[nro_otras_cuentas] de: $fecha_nueva";
                 // $saldo = 0;
 
                 if($aux_contador == 0){ //ESTAMOS EN PRIMERA FILA, SUMAR LAS ANTERIORES FILAS A LA FECHA
@@ -693,9 +818,11 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                 $saldo_inicial = $saldo;
                 $saldo = $saldo + $qwe['monto'];
                     $res = array(
+                        "fecha_nueva" => $fecha_nueva,
                         "fecha" => $qwe['fecha'],
                         "nrecibo" => $qwe['nrecibo'],
                         "nro_documento" => "$oc[nro_otras_cuentas]",
+                        "por_concepto_de" => "$oc[concepto]",
                         "codigotransaccion" => $tr['codigotransaccion'],
                         "nombre_cliente" => $cl['nombre'],
                         //descripcion saldra de la factura o otras cuentas 
@@ -713,9 +840,11 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
                 $saldo = $saldo + $qwe['monto'];
                 $res = array(
+                    "fecha_nueva" => $fecha_nueva,
                     "fecha" => $qwe['fecha'],
                     "nrecibo" => $qwe['nrecibo'],
                     "nro_documento" => "$oc[nro_otras_cuentas]",
+                    "por_concepto_de" => "$oc[concepto]",
                     "codigotransaccion" => $tr['codigotransaccion'],
                     "nombre_cliente" => $cl['nombre'],
                     //descripcion saldra de la factura o otras cuentas 
@@ -729,7 +858,8 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             }
 
             }else{
-                $aux_descripcion = "Cobro de factura N° $fact[nfactura] con fecha: $fact[fecha]";
+                $fecha_nueva = date("d/m/Y", strtotime($fact['fecha']));
+                $aux_descripcion = "Según documento N° $fact[nfactura] de: $fecha_nueva";
 
                  $aux_factura = "cero $fact[nfactura]";
                  $factu = str_replace("cero ", "", $aux_factura);
@@ -749,9 +879,11 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                 $saldo_inicial = $saldo;
                 $saldo = $saldo + $qwe['monto'];
                     $res = array(
+                        "fecha_nueva" => $fecha_nueva,
                         "fecha" => $qwe['fecha'],
                         "nrecibo" => $qwe['nrecibo'],
                         "nro_documento" => "$oc[nro_otras_cuentas]",
+                        "por_concepto_de" => "$oc[concepto]",
                         "codigotransaccion" => $tr['codigotransaccion'],
                         "nombre_cliente" => $cl['nombre'],
                         //descripcion saldra de la factura o otras cuentas 
@@ -769,6 +901,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
                 $saldo = $saldo + $qwe['monto'];
                 $res = array(
+                    "fecha_nueva" => $fecha_nueva,
                     "fecha" => $qwe['fecha'],
                     "nrecibo" => $qwe['nrecibo'],
                     "nro_documento" => "$oc[nro_otras_cuentas]",
@@ -867,7 +1000,8 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                 }
     
                 if($qwe['idotras_cuentas'] != 0){
-                    $aux_descripcion = "Cobro de factura N° $oc[nro_otras_cuentas] con fecha: $oc[fecha]";
+                    $fecha_nueva = date("d/m/Y", strtotime($oc['fecha']));
+                    $aux_descripcion = "Según documento N° $oc[nro_otras_cuentas] de: $fecha_nueva";
                     // $saldo = 0;
     
                     if($aux_contador == 0){ //ESTAMOS EN PRIMERA FILA, SUMAR LAS ANTERIORES FILAS A LA FECHA
@@ -885,9 +1019,11 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                     $saldo_inicial = $saldo;
                     $saldo = $saldo + $qwe['monto'];
                         $res = array(
+                            "fecha_nueva" => $fecha_nueva,
                             "fecha" => $qwe['fecha'],
                             "nrecibo" => $qwe['nrecibo'],
                             "nro_documento" => "$oc[nro_otras_cuentas]",
+                            "por_concepto_de" => "$oc[concepto]",
                             "codigotransaccion" => $tr['codigotransaccion'],
                             "nombre_cliente" => $cl['nombre'],
                             //descripcion saldra de la factura o otras cuentas 
@@ -905,6 +1041,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
     
                     $saldo = $saldo + $qwe['monto'];
                     $res = array(
+                        "fecha_nueva" => $fecha_nueva,
                         "fecha" => $qwe['fecha'],
                         "nrecibo" => $qwe['nrecibo'],
                         "nro_documento" => "$oc[nro_otras_cuentas]",
@@ -921,7 +1058,8 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                 }
     
                 }else{
-                    $aux_descripcion = "Cobro de factura N° $fact[nfactura] con fecha: $fact[fecha]";
+                    $fecha_nueva = date("d/m/Y", strtotime($fact['fecha']));
+                    $aux_descripcion = "Según documento N° $fact[nfactura] de: $fecha_nueva";
     
                      $aux_factura = "cero $fact[nfactura]";
                      $factu = str_replace("cero ", "", $aux_factura);
@@ -940,9 +1078,12 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                     $saldo_inicial = $saldo;
                     $saldo = $saldo + $qwe['monto'];
                         $res = array(
+                            "fecha_nueva" => $fecha_nueva,
                             "fecha" => $qwe['fecha'],
                             "nrecibo" => $qwe['nrecibo'],
                             "nro_documento" => "$oc[nro_otras_cuentas]",
+                            "por_concepto_de" => "$oc[concepto]",
+                            "por_concepto_de" => $fact['por_concepto_de'],
                             "codigotransaccion" => $tr['codigotransaccion'],
                             "nombre_cliente" => $cl['nombre'],
                             //descripcion saldra de la factura o otras cuentas 
@@ -963,6 +1104,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         "fecha" => $qwe['fecha'],
                         "nrecibo" => $qwe['nrecibo'],
                         "nro_documento" => "$oc[nro_otras_cuentas]",
+                        "por_concepto_de" => "$oc[concepto]",
                         "codigotransaccion" => $tr['codigotransaccion'],
                         "nombre_cliente" => $cl['nombre'],
                         //descripcion saldra de la factura o otras cuentas 
@@ -1205,8 +1347,9 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                     $saldo = $saldo + $qwe['monto'];
 
                     if($qwe['idotras_cuentas'] != 0){
-                        
-                        $aux_descripcion = "Cobro de factura N° $oc[nro_otras_cuentas] con fecha: $oc[fecha]";
+                        //Según documento N° 11 de 24/04/2025
+                        $fecha_nueva = date("d/m/Y", strtotime($oc['fecha']));
+                        $aux_descripcion = "Según documento N° $oc[nro_otras_cuentas] de: $fecha_nueva";
                         
                         // if($zxc['tipo'] == 'COBRAR'){
                         //     $saldo = $saldo + $zxc['monto'];
@@ -1217,6 +1360,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "fecha" => $qwe['fecha'],
                             "nrecibo" => $qwe['nrecibo'],
                             "nro_documento" => "$oc[nro_otras_cuentas]",
+                            "por_concepto_de" => "$oc[concepto]",
                             "codigotransaccion" => $tr['codigotransaccion'],
                             "nombre_cliente" => $cl['nombre'],
                             //descripcion saldra de la factura o otras cuentas 
@@ -1228,7 +1372,9 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         
                         );
                     }else{
-                        $aux_descripcion = "Cobro de factura N° $fact[nfactura] con fecha: $fact[fecha]";
+                        $fecha_nueva = date("d/m/Y", strtotime($fact['fecha']));
+
+                        $aux_descripcion = "Según documento N° $fact[nfactura] de: $fecha_nueva";
         
                          $aux_factura = "cero $fact[nfactura]";
                          $factu = str_replace("cero ", "", $aux_factura);
@@ -1236,6 +1382,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "fecha" => $qwe['fecha'],
                             "nrecibo" => $qwe['nrecibo'],
                             "nro_documento" => $factu,
+                            "por_concepto_de" => $fact['por_concepto_de'],
                             "codigotransaccion" => $tr['codigotransaccion'],
                             "nombre_cliente" => $cl['nombre'],
                             //descripcion saldra de la factura o otras cuentas 
@@ -1251,12 +1398,14 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                     $saldo = $saldo - $qwe['monto'];
 
                     if($qwe['idotras_cuentas'] != 0){
-                        $aux_descripcion = "Cobro de factura N° $oc[nro_otras_cuentas] con fecha: $oc[fecha]";
+                        $fecha_nueva = date("d/m/Y", strtotime($oc['fecha']));
+                        $aux_descripcion = "Según documento N° $oc[nro_otras_cuentas] de: $fecha_nueva";
         
                         $res = array(
                             "fecha" => $qwe['fecha'],
                             "nrecibo" => $qwe['nrecibo'],
                             "nro_documento" => "$oc[nro_otras_cuentas]",
+                            "por_concepto_de" => "$oc[concepto]",
                             "codigotransaccion" => $tr['codigotransaccion'],
                             "nombre_cliente" => $cl['nombre'],
                             //descripcion saldra de la factura o otras cuentas 
@@ -1267,7 +1416,9 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "saldo" => $saldo
                         );
                     }else{
-                        $aux_descripcion = "Cobro de factura N° $fact[nfactura] con fecha: $fact[fecha]";
+                        $fecha_nueva = date("d/m/Y", strtotime($fact['fecha']));
+
+                        $aux_descripcion = "Según documento N° $fact[nfactura] de: $fecha_nueva";
         
                          $aux_factura = "cero $fact[nfactura]";
                          $factu = str_replace("cero ", "", $aux_factura);
@@ -1275,6 +1426,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "fecha" => $qwe['fecha'],
                             "nrecibo" => $qwe['nrecibo'],
                             "nro_documento" => $factu,
+                            "por_concepto_de" => $fact['por_concepto_de'],
                             "codigotransaccion" => $tr['codigotransaccion'],
                             "nombre_cliente" => $cl['nombre'],
                             //descripcion saldra de la factura o otras cuentas 
@@ -1316,6 +1468,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         //$res=array("id"=>,"nombre"=>$qwe['nombre']);
         return $qwe['idgestion'];
     }
+    // listar_recibo_por_caja_bancos
 
 }
 ?>
