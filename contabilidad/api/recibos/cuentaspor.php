@@ -338,18 +338,32 @@ public function listar_recibo_pago_por_id($idrecibo)
     FROM detalle_caja_bancos_pagar 
     WHERE idcuentaspor = '$idrecibo';");
 
+if ($factura_lista->num_rows > 0) {
     while ($factu = $this->dbc->fetch($factura_lista)) {
         $factura= $this->dbc->query("SELECT * FROM factura WHERE idfactura = '$factu[idfactura]'");
         $ft = $factura->fetch_assoc();
 
+        if($ft['cobrado'] != 0){
+            $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $ft['proveedorcliente_idproveedorcliente'] . "'");
+            $cl = $cliente->fetch_assoc();
+        }else{
+            $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='" . $ft['proveedorcliente_idproveedorcliente'] . "'");
+            $cl = $proveedor->fetch_assoc();
+        }
+        
         $detalle_facturas = array(
 
             "nrecibo" => $recib['nrecibo'],
+            "lugar" => $recib['lugar'],
             "fecha" => $recib['fecha'],
             "persona" => $recib['persona'],
             "idfactura" => $ft['idfactura'],
             "fecha_factura" => $ft['fecha'],
-            "nro_factura" => $ft['nfactura']
+            "nro_factura" => $ft['nfactura'],
+            "nombre" => $cl['nombre'],
+            "direccion" => $cl['direccion'],
+            "nit" => $cl['nit'],
+            "por_concepto_de" => $ft['por_concepto_de']
         
         );
 
@@ -373,10 +387,40 @@ public function listar_recibo_pago_por_id($idrecibo)
             
         );
         array_push($res['caja_bancos'], $detalle_caja_bancos);
-    }
+       }
+    }else{
+        $factura= $this->dbc->query("SELECT * FROM factura WHERE idfactura = '$recib[idfactura]'");
+                $ft = $factura->fetch_assoc();
 
-echo json_encode($res);
-}
+                if($ft['cobrado'] != 0){
+                    $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $ft['proveedorcliente_idproveedorcliente'] . "'");
+                    $cl = $cliente->fetch_assoc();
+                }else{
+                    $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='" . $ft['proveedorcliente_idproveedorcliente'] . "'");
+                    $cl = $proveedor->fetch_assoc();
+                }
+                
+                $detalle_facturas = array(
+        
+                    //lugar,    nombre_cliente_proveedor, nit, direccion row
+                    "nrecibo" => $recib['nrecibo'],
+                    "lugar" => $recib['lugar'],
+                    "fecha" => $recib['fecha'],
+                    "persona" => $recib['persona'],
+                    "idfactura" => $ft['idfactura'],
+                    "fecha_factura" => $ft['fecha'],
+                    "nro_factura" => $ft['nfactura'],
+                    "nombre" => $cl['nombre'],
+                    "direccion" => $cl['direccion'],
+                    "nit" => $cl['nit'],
+                    "por_concepto_de" => $ft['por_concepto_de']
+                
+                );
+
+                array_push($res['facturas'], $detalle_facturas);
+    }
+    echo json_encode($res);
+    }
 // -------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     public function getidempresa($md5){

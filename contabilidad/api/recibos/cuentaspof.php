@@ -303,42 +303,87 @@ $caja_bancos = json_decode($cajasBancos, true);
         FROM detalle_caja_bancos_cobrar 
         WHERE idcuentaspof = '$idrecibo';");
 
-        while ($factu = $this->dbc->fetch($factura_lista)) {
-            $factura= $this->dbc->query("SELECT * FROM factura WHERE idfactura = '$factu[idfactura]'");
+        if ($factura_lista->num_rows > 0) {
+            while ($factu = $this->dbc->fetch($factura_lista)) {
+                $factura= $this->dbc->query("SELECT * FROM factura WHERE idfactura = '$factu[idfactura]'");
+                $ft = $factura->fetch_assoc();
+    
+                if($ft['cobrado'] != 0){
+                    $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $ft['proveedorcliente_idproveedorcliente'] . "'");
+                    $cl = $cliente->fetch_assoc();
+                }else{
+                    $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='" . $ft['proveedorcliente_idproveedorcliente'] . "'");
+                    $cl = $proveedor->fetch_assoc();
+                }
+    
+                $detalle_facturas = array(
+    
+                    //lugar,    nombre_cliente_proveedor, nit, direccion row
+                    "nrecibo" => $recib['nrecibo'],
+                    "lugar" => $recib['lugar'],
+                    "fecha" => $recib['fecha'],
+                    "persona" => $recib['persona'],
+                    "idfactura" => $ft['idfactura'],
+                    "fecha_factura" => $ft['fecha'],
+                    "nro_factura" => $ft['nfactura'],
+                    "nombre" => $cl['nombre'],
+                    "direccion" => $cl['direccion'],
+                    "nit" => $cl['nit'],
+                    "por_concepto_de" => $ft['por_concepto_de']
+                
+                );
+    
+                array_push($res['facturas'], $detalle_facturas);
+            }
+    
+                    $caja_banco = $this->dbc->query("SELECT idcaja_bancos, SUM(monto) AS total_monto
+                    FROM detalle_caja_bancos_cobrar
+                    WHERE idcuentaspof = '$idrecibo'
+                    GROUP BY idcaja_bancos");
+    
+            while ($datos_caja = $this->dbc->fetch($caja_banco)) {
+    
+                $caja= $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '$datos_caja[idcaja_bancos]'");
+                $datos = $caja->fetch_assoc();
+                $detalle_caja_bancos = array(
+                    "idcaja_bancos" => $datos['idcaja_bancos'],
+                    "codigo" => $datos['codigo'],
+                    "nombre" => $datos['tipo_cuenta'],
+                    "monto" => $datos_caja['total_monto'],
+                    
+                );
+                array_push($res['caja_bancos'], $detalle_caja_bancos);
+            }
+        }else{
+            $factura= $this->dbc->query("SELECT * FROM factura WHERE idfactura = '$recib[idfactura]'");
             $ft = $factura->fetch_assoc();
 
-            $detalle_facturas = array(
+            if($ft['cobrado'] != 0){
+                $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $ft['proveedorcliente_idproveedorcliente'] . "'");
+                $cl = $cliente->fetch_assoc();
+            }else{
+                $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='" . $ft['proveedorcliente_idproveedorcliente'] . "'");
+                $cl = $proveedor->fetch_assoc();
+            }
 
+            $detalle_facturas = array(
+    
+                //lugar,    nombre_cliente_proveedor, nit, direccion row
                 "nrecibo" => $recib['nrecibo'],
+                "lugar" => $recib['lugar'],
                 "fecha" => $recib['fecha'],
                 "persona" => $recib['persona'],
                 "idfactura" => $ft['idfactura'],
                 "fecha_factura" => $ft['fecha'],
                 "nro_factura" => $ft['nfactura'],
+                "nombre" => $cl['nombre'],
+                "direccion" => $cl['direccion'],
+                "nit" => $cl['nit'],
                 "por_concepto_de" => $ft['por_concepto_de']
             
             );
 
             array_push($res['facturas'], $detalle_facturas);
-        }
-
-                $caja_banco = $this->dbc->query("SELECT idcaja_bancos, SUM(monto) AS total_monto
-                FROM detalle_caja_bancos_cobrar
-                WHERE idcuentaspof = '$idrecibo'
-                GROUP BY idcaja_bancos");
-
-        while ($datos_caja = $this->dbc->fetch($caja_banco)) {
-
-            $caja= $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '$datos_caja[idcaja_bancos]'");
-            $datos = $caja->fetch_assoc();
-            $detalle_caja_bancos = array(
-                "idcaja_bancos" => $datos['idcaja_bancos'],
-                "codigo" => $datos['codigo'],
-                "nombre" => $datos['tipo_cuenta'],
-                "monto" => $datos_caja['total_monto'],
-                
-            );
-            array_push($res['caja_bancos'], $detalle_caja_bancos);
         }
 
     echo json_encode($res);

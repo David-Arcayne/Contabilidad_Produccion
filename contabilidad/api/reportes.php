@@ -1206,8 +1206,9 @@ $totalHaber = 0;
         $lista=[];
   
         $ide=$this->getidempresa($empresa);
-        $gestion=$this->getidgestion($empresa);
+        // $gestion=$this->getidgestion($empresa);
         if($esIngreso == 1){
+          
           if($numeroIni == 0 && $numeroFin == 0){
             $registro=$this->dbc->query("SELECT r.*,
           f.idorganizacion
@@ -1240,6 +1241,7 @@ $totalHaber = 0;
           c.idcuentascobrar_grupal ASC;
   ");
 
+//AQUI TERMINA INGRESO--->RANGO DE FECHAS
           }else{
             $registro=$this->dbc->query("SELECT r.*,
           f.idorganizacion
@@ -1271,6 +1273,7 @@ $totalHaber = 0;
         ORDER BY
           c.idcuentascobrar_grupal ASC;
   ");
+  //AQUI TERMINA INGRESO--->RANGO DE NUMERO RECIBOS
           }
 //------------------------------------------------------------------------
 
@@ -1674,9 +1677,8 @@ if ($pcuentas->num_rows > 0) {
 
        array_push($res['detalle'], $det);
    }
-}
 
-        else{
+}else{
        //ESTO ES CUANDO NO HAY REGISTROS EN DETALLES CAJA BANCO COBRAR
          $res = array(
           "nrecibo" => $recibo['nrecibo'],
