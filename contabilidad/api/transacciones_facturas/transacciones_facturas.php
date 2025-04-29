@@ -474,4 +474,5 @@ $nroTransaccion = $resultado12['codigotransaccion'] + 1;
         }
         echo json_encode($res);
     }
+
 }
