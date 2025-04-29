@@ -421,11 +421,23 @@ elseif($ver[0]=="listar_asiento_por_modulo"){
 }elseif($ver[0]=="lista_plan_cuenta_no_vinculada"){
     $cont=new Contabilidad();
     $cont->lista_plan_cuenta_no_vinculada($ver[1]);
+}elseif($ver[0]=="listar_usuarios"){
+    $cont=new caja_bancos_recibos();
+    $cont->listar_usuarios($ver[1]);
+}elseif($ver[0]=="eliminar_caja_bancos_usuario"){
+    $cont=new caja_bancos_recibos();
+    $cont->eliminar_caja_bancos_usuario($ver[1]);
+}elseif($ver[0]=="listar_caja_bancos_usuarios"){
+    $cont=new caja_bancos_recibos();
+    $cont->listar_caja_bancos_usuarios($ver[1]);
+}elseif($ver[0]=="listar_caja_bancos_por_usuario"){
+    $cont=new Plandecuentas();
+    $cont->listar_caja_bancos_por_usuario($ver[1],$ver[2]);
 }
 
 
 //  asientotipo  creartipoasientodelete listaplanesempresa listaimpuestoentreplan listar_recibo_por_id_otras_cuentas
-// milista     listafacturaapi_cobrado listar_recibo_por_caja_bancos listar_recibo_por_id_otras_cuentas_pagar
+// milista     listafacturaapi_cobrado listar_recibo_por_caja_bancos listar_recibo_por_id_otras_cuentas_pagar caja_banco
 //listafactura   listatransaciones   reportedetalletransaccion  lista_cobrar_cobrado_factura
-//reporteactivodisponible    getidempresa firmas listaimpuestoentreplan
+//reporteactivodisponible    getidempresa firmas listaimpuestoentreplan listafacturaapi_cobrado tributario
 ?>

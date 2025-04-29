@@ -278,6 +278,8 @@ class Transacciones extends DB{
         // FROM detalletransaccion
         // WHERE transacciones_idtransacciones = '$trans' ORDER BY orden ASC";
 
+        if($plancuenta->num_rows > 0){
+
         // $result = $this->dbc->query($plancuenta);
         while ($pc = $this->dbc->fetch($plancuenta)) {
 
@@ -315,7 +317,9 @@ if($filtrado->num_rows > 0){
 }else{
     $resp = 0;
 }
-
+    }else{
+        
+    }
 
     // $resultado['porciento']/100
 
@@ -617,5 +621,25 @@ if($filtrado->num_rows > 0){
    
         echo json_encode($res);
     }
+    public function listar_registros_pendientes($empresa) {
+        $lista = [];
+        $idempresa = $this->getidempresa($empresa);
+    
+        // Preparar la consulta
+        $getPedido = $this->dbc->query("SELECT * FROM divisa WHERE idempresa = '$idempresa' ORDER BY iddivisa DESC");
+    
+        while ($qwe = $this->dbc->fetch($getPedido)) {
+            $res = array(
+                "iddivisa" => $qwe['iddivisa'],
+                "simbolo" => $qwe['simbolo'],
+                "nombre" => $qwe['nombre'],
+                "estado" => $qwe['estado']
+            );
+            array_push($lista, $res);
+        }
+    
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
+    
 
 }

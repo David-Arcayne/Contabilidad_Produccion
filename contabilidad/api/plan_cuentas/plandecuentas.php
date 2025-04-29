@@ -212,4 +212,30 @@ class Plandecuentas extends DB{
         }
         echo json_encode($lista);
     }
+    public function listar_caja_bancos_por_usuario($empresa,$usuario)
+    {
+        $lista = [];
+        $idempresa = $this->getidempresa($empresa);
+        $idusuario = $this->getidusuario($usuario);
+
+        $usuario_caja = $this->dbc->query("SELECT * FROM caja_banco_usuarios WHERE idusuario ='$idusuario' AND idempresa = '$idempresa'");
+
+        // $listado1 = $this->dbc->query("SELECT * FROM caja_bancos WHERE idempresa ='$idempresa'");
+
+        while ($qwe = $this->dbc->fetch($usuario_caja)) {
+
+            $listado2 = $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos ='$qwe[idcaja_bancos]'");
+            $aaa = $listado2->fetch_assoc();
+            // $idtransaccion = $aaa['transacciones_idtransacciones'];
+            $res = array("idcaja_bancos" => $aaa['idcaja_bancos'], "codigo" => $aaa['codigo'], "tipo_cuenta" => $aaa['tipo_cuenta'], "glosa" => $aaa['glosa']);
+            array_push($lista, $res);
+        }
+        echo json_encode($lista);
+    }
+
+    public function getidusuario($md5){
+        $registro=$this->dbrh->query("select * from usuario where md5(idusuario)='$md5'");
+        $qwe=$this->dbrh->fetch($registro);
+        return $qwe['idusuario'];
+    }  
 }

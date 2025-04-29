@@ -1491,6 +1491,90 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         //$res=array("id"=>,"nombre"=>$qwe['nombre']);
         return $qwe['idgestion'];
     }
+
+    public function registrar_caja_bancos_usuarios($idcaja_bancos,$idusuario,$empresa){
+        // $idempresa = Empresa::getidempresa($empresa);
+        $idempresa = $this->getidempresa($empresa);
+        $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM caja_banco_usuarios WHERE idcaja_bancos = '$idcaja_bancos' AND idusuario = '$idusuario'");
+        $resultado = $consulta->fetch_assoc();
+        $totalRegistros = $resultado['total'];
+
+        if ($totalRegistros > 0) {
+            $res = array("danger", "El registro ya existe","Error");
+        } else {
+            // Insertar el nuevo registro
+            $registroProveedor = $this->dbc->query("INSERT INTO caja_banco_usuarios(idcaja_bancos,idusuario,idempresa) VALUES ('$idcaja_bancos','$idusuario','$idempresa')");
+            if ($registroProveedor === TRUE) {                                                                                                                                                                
+                $res = array("success", "Registro exitoso","registroCaracteristicas");
+            } else {
+                $res = array("danger", "No se pudo registrar");
+            }
+        }
+        echo json_encode($res);
+        
+    }
+
+    public function listar_usuarios($empresa){
+        $lista = [];
+        $ide = $this->getidempresa($empresa);
+        // $registro=$this->dbrh->query("SELECT * FROM usuario WHERE md5(idusuario)='$md5'");
+        // $qwe=$this->dbrh->fetch($registro);
+        // $registro2=$this->dbrh->query("SELECT * FROM usuario WHERE idusuario = '$qwe[idusuario]'");
+        $registro2=$this->dbrh->query("SELECT * FROM usuario WHERE idempresa = '$ide'");
+        while ($bb = $this->dbc->fetch($registro2)) {
+            $res = array(
+                "idusuario" => $bb['idusuario'],
+                "nombre" => $bb['nombre']
+            );
+            array_push($lista, $res);
+        }
+        // $qwe=$this->dbrh->fetch($registro2);
+        // return $qwe['idusuario'];
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+
+    }  
+    public function listar_caja_bancos_usuarios($id){
+        $lista = [];
+
+        $registro2=$this->dbc->query("SELECT * FROM caja_banco_usuarios WHERE idcaja_bancos = '$id'");
+
+        while ($bb = $this->dbc->fetch($registro2)) {
+
+            $registro3=$this->dbrh->query("SELECT * FROM usuario WHERE idusuario = '$bb[idusuario]'");
+            $usuario = $registro3->fetch_assoc();
+            $res = array(
+                "idcaja_banco_usuarios" => $bb['idcaja_banco_usuarios'],
+                "idcaja_bancos" => $bb['idcaja_bancos'],
+                "idusuario" => $bb['idusuario'],
+                "nombre_usuario" => $usuario['nombre']
+            );
+            array_push($lista, $res);
+        }
+        // $qwe=$this->dbrh->fetch($registro2);
+        // return $qwe['idusuario'];
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+
+    }  
+
+    public function eliminar_caja_bancos_usuario($id){
+
+            // Insertar el nuevo registro
+            $registroProveedor = $this->dbc->query("DELETE FROM caja_banco_usuarios WHERE idcaja_banco_usuarios = '$id'");
+            if ($registroProveedor === TRUE) {                                                                                                                                                    
+                $res = array("success", "se elimino exitosamente","eliminar_caja_bancos_usuario");
+            } else {
+                $res = array("danger", "No se pudo registrar");
+            }
+        
+        echo json_encode($res);
+    }
+
+    public function getidusuario($md5){
+        $registro=$this->dbrh->query("select * from usuario where md5(idusuario)='$md5'");
+        $qwe=$this->dbrh->fetch($registro);
+        return $qwe['idusuario'];
+
+    }    
     // listar_recibo_por_caja_bancos
 
 }

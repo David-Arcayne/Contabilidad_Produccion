@@ -435,7 +435,15 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     }elseif($data['ver'] == "asignar_asiento_A_otras_cuentas") {
         $cont=new Documento_cobro();
         $cont->asignar_asiento_A_otras_cuentas($data);
-    }       
+    }elseif($ver=="registrar_caja_bancos_usuarios"){
+        if(isset($_POST['idcaja_bancos'],$_POST['idusuario'],$_POST['empresa'])){
+            $cont=new Caja_bancos_recibos();
+            $cont->registrar_caja_bancos_usuarios($_POST['idcaja_bancos'],$_POST['idusuario'],$_POST['empresa']);
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idcaja_bancos'],$_POST['idusuario'],$_POST['empresa']));
+        }
+    }    
 //registrar_recibo_otras_cuentas_pagar asiento registroasiento registrorelacionip registrar_factura_recibo_cobro_cajaBancos
 //  registrotransaccion   registrocobrarfactura registrocobrarfacturaGrupal  registropagarfactura registrocobrarfacturaGrupal 
 }//  editar_caja_bancos_pagar_recibo  registrar_factura_recibo_pagos_cajaBancos impuestocrear tributario
