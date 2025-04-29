@@ -128,6 +128,18 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
         }
     }
 
+    $suma_recibos = $this->dbc->query("SELECT SUM(monto) AS monto_suma FROM cuentaspof WHERE idotras_cuentas = '$idotras_cuentas'");
+    $sum = $suma_recibos->fetch_assoc();
+
+    $otras_cuentas = $this->dbc->query("SELECT precio FROM otras_cuentas WHERE idotras_cuentas = '$idotras_cuentas'");
+    $oc_monto = $otras_cuentas->fetch_assoc();
+
+    if($sum['monto_suma'] == $oc_monto['precio']){
+        //SALDO PAGADO EN TOTALIDAD, CAMBIAR LA FACTURA A UN ESTADO PAGADO
+        $editar_factura = $this->dbc->query("UPDATE otras_cuentas SET cobrado = '2' WHERE idotras_cuentas = '$idotras_cuentas'");
+    }else{
+        //TODAVIA NO SE PAGO EL TOTAL DEL SALDO
+    }
         echo json_encode($res);
     }
 
@@ -324,6 +336,19 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
         }else{
             $res = array("danger", "No se movio el archivo a la carpeta");
         }
+    }
+
+    $suma_recibos = $this->dbc->query("SELECT SUM(monto) AS monto_suma FROM cuentaspor WHERE idotras_cuentas = '$idotras_cuentas'");
+    $sum = $suma_recibos->fetch_assoc();
+
+    $otras_cuentas = $this->dbc->query("SELECT precio FROM otras_cuentas WHERE idotras_cuentas = '$idotras_cuentas'");
+    $oc_monto = $otras_cuentas->fetch_assoc();
+
+    if($sum['monto_suma'] == $oc_monto['precio']){
+        //SALDO PAGADO EN TOTALIDAD, CAMBIAR LA FACTURA A UN ESTADO PAGADO
+        $editar_factura = $this->dbc->query("UPDATE otras_cuentas SET pagado = '2' WHERE idotras_cuentas = '$idotras_cuentas'");
+    }else{
+        //TODAVIA NO SE PAGO EL TOTAL DEL SALDO
     }
 
         echo json_encode($res);

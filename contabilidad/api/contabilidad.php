@@ -762,8 +762,8 @@ WHERE md5(p.organizacion_idorganizacion)='$ide'");
 
         //el asiento es diferente a cero, se debe crear una transaccion
         $idAsientoTipo = $this->dbc->query("SELECT * FROM asientotipo WHERE idasientotipo='$asiento' AND idorganizacion='$idempresa';");
-        $asiento = $idAsientoTipo->fetch_assoc();  // Cambiado $nroTrans->fetch_assoc() a $idAsientoTipo->fetch_assoc()
-        $tipotransaccion = $asiento['tipo'];
+        $asiento_aux = $idAsientoTipo->fetch_assoc();  // Cambiado $nroTrans->fetch_assoc() a $idAsientoTipo->fetch_assoc()
+        $tipotransaccion = $asiento_aux['tipo'];
         // Insertar en transacciones
         $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion, fechatransaccion, tipodecambio, ndocumento, glosa, consolidar,estado, tipotransaccion_idtipotransaccion, organizacion_idorganizacion, sucursal, idgestion) VALUES ('$nroTransaccion', '$fecha', '1', '0', 'Registro Cobro Caja Bancos', '1','1', '$tipotransaccion', '$idempresa', '$idsucursal', '$gestion')");
         $idtrans = $this->dbc->insert_id;
@@ -825,8 +825,8 @@ WHERE md5(p.organizacion_idorganizacion)='$ide'");
 
         //el asiento es diferente a cero, se debe crear una transaccion
         $idAsientoTipo = $this->dbc->query("SELECT * FROM asientotipo WHERE idasientotipo='$asiento' AND idorganizacion='$idempresa';");
-        $asiento = $idAsientoTipo->fetch_assoc();  // Cambiado $nroTrans->fetch_assoc() a $idAsientoTipo->fetch_assoc()
-        $tipotransaccion = $asiento['tipo'];
+        $asiento_aux2 = $idAsientoTipo->fetch_assoc();  // Cambiado $nroTrans->fetch_assoc() a $idAsientoTipo->fetch_assoc()
+        $tipotransaccion = $asiento_aux2['tipo'];
         // Insertar en transacciones
         $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion, fechatransaccion, tipodecambio, ndocumento, glosa, consolidar,estado, tipotransaccion_idtipotransaccion, organizacion_idorganizacion, sucursal, idgestion) VALUES ('$nroTransaccion', '$fecha', '1', '0', 'Registro Cobro Caja Bancos', '1','1', '$tipotransaccion', '$idempresa', '$idsucursal', '$gestion')");
         $idtrans = $this->dbc->insert_id;
@@ -910,16 +910,16 @@ WHERE md5(p.organizacion_idorganizacion)='$ide'");
         if ($pagar == 1 || $pagar == 2) {
             $pa = $pagar;
         }
-        $cl = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='$cliente'");
+        $cl = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='$cliente'");
         $clientSelect = $cl->fetch_assoc();
 
-        if($cobro == '1'){
+        if($pagar == '1'){
             // NO SE CREARAN RECIBOS
 
               // Insertar en transacciones
         if($trans == "" && $asiento == ""){
             // se crea factura sin transaccion asignada
-            //$trans = 0
+            //$trans = 0 proveedor
             $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa', '$espesificacion', '1', '1', '0', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de');");
   
         }elseif($trans > 0 && $asiento == 0){
@@ -934,8 +934,8 @@ WHERE md5(p.organizacion_idorganizacion)='$ide'");
 
         //el asiento es diferente a cero, se debe crear una transaccion
         $idAsientoTipo = $this->dbc->query("SELECT * FROM asientotipo WHERE idasientotipo='$asiento' AND idorganizacion='$idempresa';");
-        $asiento = $idAsientoTipo->fetch_assoc();  // Cambiado $nroTrans->fetch_assoc() a $idAsientoTipo->fetch_assoc()
-        $tipotransaccion = $asiento['tipo'];
+        $asiento_aux = $idAsientoTipo->fetch_assoc();  // Cambiado $nroTrans->fetch_assoc() a $idAsientoTipo->fetch_assoc()
+        $tipotransaccion = $asiento_aux['tipo'];
         // Insertar en transacciones
         $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion, fechatransaccion, tipodecambio, ndocumento, glosa, consolidar,estado, tipotransaccion_idtipotransaccion, organizacion_idorganizacion, sucursal, idgestion) VALUES ('$nroTransaccion', '$fecha', '1', '0', 'Registro Cobro Caja Bancos', '1','1', '$tipotransaccion', '$idempresa', '$idsucursal', '$gestion')");
         $idtrans = $this->dbc->insert_id;
@@ -997,8 +997,8 @@ WHERE md5(p.organizacion_idorganizacion)='$ide'");
 
         //el asiento es diferente a cero, se debe crear una transaccion
         $idAsientoTipo = $this->dbc->query("SELECT * FROM asientotipo WHERE idasientotipo='$asiento' AND idorganizacion='$idempresa';");
-        $asiento = $idAsientoTipo->fetch_assoc();  // Cambiado $nroTrans->fetch_assoc() a $idAsientoTipo->fetch_assoc()
-        $tipotransaccion = $asiento['tipo'];
+        $asiento_aux2 = $idAsientoTipo->fetch_assoc();  // Cambiado $nroTrans->fetch_assoc() a $idAsientoTipo->fetch_assoc()
+        $tipotransaccion = $asiento_aux2['tipo'];
         // Insertar en transacciones
         $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion, fechatransaccion, tipodecambio, ndocumento, glosa, consolidar,estado, tipotransaccion_idtipotransaccion, organizacion_idorganizacion, sucursal, idgestion) VALUES ('$nroTransaccion', '$fecha', '1', '0', 'Registro Cobro Caja Bancos', '1','1', '$tipotransaccion', '$idempresa', '$idsucursal', '$gestion')");
         $idtrans = $this->dbc->insert_id;

@@ -129,6 +129,19 @@ class Cuentaspof extends DB{
         }
     }
 
+    $suma_recibos = $this->dbc->query("SELECT SUM(monto) AS monto_suma FROM cuentaspof WHERE idfactura = '$idfactura'");
+    $sum = $suma_recibos->fetch_assoc();
+
+    $factura = $this->dbc->query("SELECT montofactura FROM factura WHERE idfactura = '$idfactura'");
+    $factura_monto = $factura->fetch_assoc();
+
+    if($sum['monto_suma'] == $factura_monto['montofactura']){
+        //SALDO COBRADO EN TOTALIDAD, CAMBIAR LA FACTURA A UN ESTADO COBRADO
+        $editar_factura = $this->dbc->query("UPDATE factura SET cobrado = '2' WHERE idfactura = '$idfactura'");
+    }else{
+        //TODAVIA NO SE COBRO EL TOTAL DEL SALDO
+    }
+
         echo json_encode($res);
     }
 

@@ -322,7 +322,7 @@ $nroTransaccion = $resultado12['codigotransaccion'] + 1;
 
             $res = array("success", "Registro Realizado", "registrocobrarfactura");
         } else {
-            $res = array("danger", "No se pudo realizar el registrooo",$nrecibo,$fecha,$idcliente,$persona,$ci,$monto,$idfactura,$trans,$idcuenta);
+            $res = array("danger", "No se pudo realizar el registrooo",$nrecibo,$fecha,$persona,$ci,$monto,$trans);
         }
 // $registropago = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta)
 // VALUES('$nrecibo','$fecha','varios clientes','$persona','$ci','$monto','0','$idtrans','0')");
@@ -374,11 +374,15 @@ $nroTransaccion = $resultado12['codigotransaccion'] + 1;
             $asd = $cobras->fetch_assoc();
             if($asd['montoSuma'] == NULL){
                 $registrarTabla = $this->dbc->query("INSERT INTO cuentascobrar_grupal(idcuentaspof,idfactura,monto)VALUES('$idcuentaspof','$factura[idfactura]','$factura[monto]')");
+            
             }else{
                 $montoSuma = $asd['montoSuma'];
                 $montoCobrado = $factura['monto'] - $montoSuma;
                 $registrarTabla = $this->dbc->query("INSERT INTO cuentascobrar_grupal(idcuentaspof,idfactura,monto)VALUES('$idcuentaspof','$factura[idfactura]','$montoCobrado')");
             }
+
+            $updatetranscodigo = $this->dbc->query("UPDATE factura SET cobrado = '2' WHERE idfactura = '$factura[idfactura]'");
+
             // $montoFacturas += $factura['monto'];
             // $updatetranscodigo = $this->dbc->query("UPDATE factura SET transacciones_idtransacciones = '$idtrans' WHERE idfactura = '{$factura['idfactura']}'");
         }
@@ -391,6 +395,7 @@ $nroTransaccion = $resultado12['codigotransaccion'] + 1;
         } else {
             $res = array("danger", "No se pudo realizar el registro");
         }
+
         echo json_encode($res);
     }
     public function anular_factura($idfactura,$estado) {

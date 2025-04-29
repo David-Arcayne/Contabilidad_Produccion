@@ -119,7 +119,7 @@ else{
     //echo json_encode($res);
 }elseif($ver=="registropagarfactura"){
     $cont=new Cuentaspor();
-    $cont->registropagarfactura($_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcaja_bancos'],$_POST['idcuenta'],$_POST['fecha'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$_FILES['archivo']);
+    $cont->registropagarfactura($_POST['idfactura'],$_POST['lugar'],$_POST['idtransaccion'],$_POST['idcaja_bancos'],$_POST['idcuenta'],$_POST['fecha'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$_FILES['archivo']);
 }elseif($ver=="registropagarfacturaf5"){
     $cont=new Cuentaspor();
     $cont->registropagarfacturaf5($_POST['idrecibo'],$_POST['lugar'],$_POST['fecha'],$_POST['persona'],$_POST['ci'],$_POST['idtransaccion'],$_POST['archivo']);
@@ -446,5 +446,5 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     }    
 //registrar_recibo_otras_cuentas_pagar asiento registroasiento registrorelacionip registrar_factura_recibo_cobro_cajaBancos
 //  registrotransaccion   registrocobrarfactura registrocobrarfacturaGrupal  registropagarfactura registrocobrarfacturaGrupal 
-}//  editar_caja_bancos_pagar_recibo  registrar_factura_recibo_pagos_cajaBancos impuestocrear tributario
+}//  editar_caja_bancos_pagar_recibo  registrar_factura_recibo_pagos_cajaBancos impuestocrear tributario registropagarfactura
 ?> 

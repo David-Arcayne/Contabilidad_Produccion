@@ -2,7 +2,7 @@
 require_once "../../db/db.php";
 class Cuentaspor extends DB{
 
-    public function registropagarfactura($idfactura, $idtransaccion,$idcaja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$archivo)
+    public function registropagarfactura($idfactura,$lugar, $idtransaccion,$idcaja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$archivo)
     {
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
@@ -74,8 +74,8 @@ class Cuentaspor extends DB{
 // -------------------------------------------------------------------------------------------
 
     if(empty($archivo['name'])){
-        $registropago = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
-        VALUES(NULL,'$nrecibo','$fecha','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$idcuenta',NULL)");
+        $registropago = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
+        VALUES(NULL,'$nrecibo','$fecha','$lugar','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$idcuenta',NULL)");
 
     if ($registropago === TRUE) {
         $idcuentaspor = $this->dbc->insert_id;
@@ -104,8 +104,8 @@ class Cuentaspor extends DB{
     }
     if(move_uploaded_file($archivo_tmp, $ruta_destino)){
          //registrar pago, preguntar guardar la anterior transaccion o la nueva
-    $registropago2 = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
-    VALUES(NULL,'$nrecibo','$fecha','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$idcuenta','$unique_name')");
+    $registropago2 = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
+    VALUES(NULL,'$nrecibo','$fecha','$lugar','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$idcuenta','$unique_name')");
 
     if ($registropago2 === TRUE) {
         $idcuentaspor = $this->dbc->insert_id;
@@ -121,6 +121,18 @@ class Cuentaspor extends DB{
         $res = array("danger", "No se movio el archivo a la carpeta");
     }
 }
+    $suma_recibos = $this->dbc->query("SELECT SUM(monto) AS monto_suma FROM cuentaspor WHERE idfactura = '$idfactura'");
+    $sum = $suma_recibos->fetch_assoc();
+
+    $factura = $this->dbc->query("SELECT montofactura FROM factura WHERE idfactura = '$idfactura'");
+    $factura_monto = $factura->fetch_assoc();
+
+    if($sum['monto_suma'] == $factura_monto['montofactura']){
+        //SALDO PAGADO EN TOTALIDAD, CAMBIAR LA FACTURA A UN ESTADO PAGADO
+        $editar_factura = $this->dbc->query("UPDATE factura SET pagado = '2' WHERE idfactura = '$idfactura'");
+    }else{
+        //TODAVIA NO SE PAGO EL TOTAL DEL SALDO
+    }
         echo json_encode($res);
     }
 
