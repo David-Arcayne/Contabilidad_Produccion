@@ -438,11 +438,20 @@ elseif($ver[0]=="listar_asiento_por_modulo"){
 elseif($ver[0]=="listar_facturas_cobros_sin_transaccion"){
     $cont=new Filtrado_facturas();
     $cont->listar_facturas_cobros_sin_transaccion($ver[1],$ver[2],$ver[3]);
+}elseif($ver[0]=="listar_facturas_pagos_sin_transaccion"){
+    $cont=new Filtrado_facturas();
+    $cont->listar_facturas_pagos_sin_transaccion($ver[1],$ver[2],$ver[3]);
+}elseif($ver[0]=="listar_documentos_cobros_sin_transaccion"){
+    $cont=new Filtrado_facturas();
+    $cont->listar_documentos_cobros_sin_transaccion($ver[1],$ver[2],$ver[3]);
+}elseif($ver[0]=="listar_documentos_pagos_sin_transaccion"){
+    $cont=new Filtrado_facturas();
+    $cont->listar_documentos_pagos_sin_transaccion($ver[1],$ver[2],$ver[3]);
 }
 
 
 //  asientotipo  creartipoasientodelete listaplanesempresa listaimpuestoentreplan listar_recibo_por_id_otras_cuentas
 // milista     listafacturaapi_cobrado listar_recibo_por_caja_bancos listar_recibo_por_id_otras_cuentas_pagar caja_banco
-//listafactura   listatransaciones   reportedetalletransaccion  lista_cobrar_cobrado_factura
+//listafactura   listatransaciones   reportedetalletransaccion  lista_cobrar_cobrado_factura listar_otras_cuentas
 //reporteactivodisponible    getidempresa firmas listaimpuestoentreplan listafacturaapi_cobrado tributario 
 ?>
