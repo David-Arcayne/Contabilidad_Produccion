@@ -443,8 +443,16 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idcaja_bancos'],$_POST['idusuario'],$_POST['empresa']));
         }
+    }elseif($ver=="registrar_detalle_transaccion_json"){
+        if(isset($_POST['idtransaccion'],$_POST['datos_json'],$_POST['empresa'],$_POST['sucursal'])){
+            $cont=new Transacciones();
+            $cont->registrar_detalle_transaccion_json($_POST['idtransaccion'],$_POST['datos_json'],$_POST['empresa'],$_POST['sucursal']);
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idtransaccion'],$_POST['datos_json'],$_POST['empresa'],$_POST['sucursal']));
+        }
     }    
-//registrar_recibo_otras_cuentas_pagar asiento registroasiento registrorelacionip registrar_factura_recibo_cobro_cajaBancos
-//  registrotransaccion   registrocobrarfactura registrocobrarfacturaGrupal  registropagarfactura registrocobrarfacturaGrupal 
+//registrar_recibo_otras_cuentas_pagar asiento registroasiento registrorelacionip registrar_factura_recibo_cobro_cajaBancos registrocobrarfactura
+//  registrotransaccion   registrocobrarfactura registrocobrarfacturaGrupal  registropagarfactura registrocobrarfacturaGrupal registrotransaccionf5
 }//  editar_caja_bancos_pagar_recibo  registrar_factura_recibo_pagos_cajaBancos impuestocrear tributario registropagarfactura impuestocrearf5
 ?> 

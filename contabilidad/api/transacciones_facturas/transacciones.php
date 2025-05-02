@@ -639,7 +639,36 @@ if($filtrado->num_rows > 0){
         }
     
         echo json_encode($lista, JSON_NUMERIC_CHECK);
-    }
+    } 
+
+    public function registrar_detalle_transaccion_json($idtransaccion,$cuentas_json,$empresa,$sucursal) {
+
+        $cuentas_array = json_decode($cuentas_json, true);
+
+        // $lista = [];
+        $idsucursal = $this->getidsucursal($sucursal);
+        $ide = $this->getidempresa($empresa);
+        // $idempresa = $this->getidempresa($empresa);
+    
+        foreach($cuentas_array as $cuenta){
+        $listaUltimoDetalle = $this->dbc->query("SELECT orden FROM detalletransaccion WHERE transacciones_idtransacciones='$idtransaccion' ORDER BY orden DESC LIMIT 1;");
+        $ulti_registro = $listaUltimoDetalle->fetch_assoc();
+        $nuevaOrden = $ulti_registro['orden'] + 1;
+
+               $crearDet_trans = $this->dbc->query("INSERT INTO detalletransaccion(debe,haber,nota,transacciones_idtransacciones,idplandecuenta,idcuentapresupuestaria,estado,cobrar,pagar,idorganizacion,idsucursal,orden)
+            VALUES ('$cuenta[debe]','$cuenta[haber]','-','$idtransaccion','$cuenta[idplan]','0','1','2','2','$ide','$idsucursal','$nuevaOrden')");
+         
+        }
+
+        if ($crearDet_trans === TRUE) {
+            $res = array("success", "Se Registro Correctamente", "detalletransaccionnormal", $idtransaccion);
+        } else {
+            $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
+        }
+        echo json_encode($res);
+        // echo json_encode(array($idtransaccion,$cuentas_json,$cuentas_array));
+
+    } 
     
 
 }

@@ -719,7 +719,7 @@ class Admin extends DB
             $registro=$this->dbc->query("INSERT INTO impuesto(idimpuesto,codigoimpuesto,nombreimpuesto,tasa,descripcion,vencimiento,periodicidad,idempresa)VALUES(NULL,'$codigo','$nombre','$tasa','$descripcion','$vencimiento','$periodicidad','$ide')");
             
             if($registro===TRUE){
-                $res = array("success", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
+                $res = array("success", "Se Registro Correctamente");
             }else{
                 $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
             }
