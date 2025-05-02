@@ -149,10 +149,10 @@ $adm->importardato($_POST['empresa'],$_POST['template']);
     $adm->creartipoasientof5($_POST['id'],$_POST['nombre'],$_POST['detalle']);
 }elseif($ver=="impuestocrear"){
 $adm=new Admin();
-$adm->impuestocrear($_POST['idempresa'],$_POST['codigo'],$_POST['nombre'],$_POST['tasa'],$_POST['descripcion']);
+$adm->impuestocrear($_POST['idempresa'],$_POST['codigo'],$_POST['nombre'],$_POST['tasa'],$_POST['descripcion'],$_POST['vencimiento'],$_POST['periodicidad']);
 }elseif($ver=="impuestocrearf5"){
 $adm=new Admin();
-$adm->impuestocrearf5($_POST['idimpuesto'],$_POST['codigo'],$_POST['nombre'],$_POST['tasa'],$_POST['descripcion']);
+$adm->impuestocrearf5($_POST['idimpuesto'],$_POST['codigo'],$_POST['nombre'],$_POST['tasa'],$_POST['descripcion'],$_POST['vencimiento'],$_POST['periodicidad']);
 }elseif($ver=="registrardesconsolidar"){
 $cont=new Contabilidad();
 $cont->registrardesconsolidar($_POST['idtransaccion'],$_POST['motivo'],$_POST['estado'],$_POST['hora'],$_POST['fecha'],$_POST['idusuario'],$_POST['idempresa']);
@@ -446,5 +446,5 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     }    
 //registrar_recibo_otras_cuentas_pagar asiento registroasiento registrorelacionip registrar_factura_recibo_cobro_cajaBancos
 //  registrotransaccion   registrocobrarfactura registrocobrarfacturaGrupal  registropagarfactura registrocobrarfacturaGrupal 
-}//  editar_caja_bancos_pagar_recibo  registrar_factura_recibo_pagos_cajaBancos impuestocrear tributario registropagarfactura
+}//  editar_caja_bancos_pagar_recibo  registrar_factura_recibo_pagos_cajaBancos impuestocrear tributario registropagarfactura impuestocrearf5
 ?> 

@@ -700,14 +700,14 @@ class Admin extends DB
     public function impuestolista($empresa){
         $lista=[];
         $ide=$this->getidempresa($empresa);
-        $registro=$this->dbc->query("select t.idimpuesto,t.codigoimpuesto,t.nombreimpuesto,t.tasa,t.descripcion,t.idempresa from impuesto as t where t.idempresa='$ide'");
+        $registro=$this->dbc->query("SELECT t.idimpuesto,t.codigoimpuesto,t.nombreimpuesto,t.tasa,t.descripcion,t.vencimiento,t.periodicidad,t.idempresa FROM impuesto AS t WHERE t.idempresa='$ide'");
         while($qwe=$this->dbc->fetch($registro)){
-            $res=array("id"=>$qwe[0],"codigoimpuesto"=>$qwe[1],"nombreimpuesto"=>$qwe[2],"tasa"=>$qwe[3],"descripcion"=>$qwe[4],"empresa"=>$qwe[5]);
+            $res=array("id"=>$qwe[0],"codigoimpuesto"=>$qwe[1],"nombreimpuesto"=>$qwe[2],"tasa"=>$qwe[3],"descripcion"=>$qwe[4],"vencimiento"=>$qwe[5],"periodicidad"=>$qwe[6],"empresa"=>$qwe[7]);
             array_push($lista,$res);
         }
         echo json_encode($lista);
     }
-    public function impuestocrear($empresa,$codigo,$nombre,$tasa,$descripcion){
+    public function impuestocrear($empresa,$codigo,$nombre,$tasa,$descripcion,$vencimiento,$periodicidad){
         $res="";
         $ide=$this->getidempresa($empresa);
 
@@ -716,7 +716,7 @@ class Admin extends DB
         if($lista->num_rows > 0){
             $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
         }else{
-            $registro=$this->dbc->query("INSERT INTO impuesto(idimpuesto,codigoimpuesto,nombreimpuesto,tasa,descripcion,idempresa)VALUES(NULL,'$codigo','$nombre','$tasa','$descripcion','$ide')");
+            $registro=$this->dbc->query("INSERT INTO impuesto(idimpuesto,codigoimpuesto,nombreimpuesto,tasa,descripcion,vencimiento,periodicidad,idempresa)VALUES(NULL,'$codigo','$nombre','$tasa','$descripcion','$vencimiento','$periodicidad','$ide')");
             
             if($registro===TRUE){
                 $res = array("success", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
@@ -729,10 +729,10 @@ class Admin extends DB
        
         echo json_encode($res);
     }
-    public function impuestocrearf5($idimpuesto,$codigo,$nombre,$tasa,$descripcion){
+    public function impuestocrearf5($idimpuesto,$codigo,$nombre,$tasa,$descripcion,$vencimiento,$periodicidad){
         $res="";
         //$ide=$this->getidempresa($empresa);
-        $registro=$this->dbc->query("UPDATE impuesto SET codigoimpuesto='$codigo',nombreimpuesto='$nombre',tasa='$tasa',descripcion='$descripcion' WHERE idimpuesto='$idimpuesto'");
+        $registro=$this->dbc->query("UPDATE impuesto SET codigoimpuesto='$codigo',nombreimpuesto='$nombre',tasa='$tasa',descripcion='$descripcion',vencimiento='$vencimiento',periodicidad='$periodicidad' WHERE idimpuesto='$idimpuesto'");
         if($registro===TRUE){
             $res=array("ok"=>"success","mensaje"=>"Se Actualizo Correctamente");
         }else{
@@ -849,5 +849,5 @@ public function codigo_correlativo_plandecuenta($codigo,$empresa)
         }
         echo json_encode($lista);
     }
-//impuestocrear milista
+//impuestocrear milista impuestolista
 }

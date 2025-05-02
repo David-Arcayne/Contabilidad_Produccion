@@ -20,25 +20,10 @@ class Filtrado_facturas extends DB{
         $array_cajaBancos = array_map('intval', explode(",", $cadena_cajaBancos));
         $caja_bancos = implode(",", $array_cajaBancos);
         // Preparar la consulta
-   
-
-        // $det_caja_banc = $this->dbc->query("SELECT * FROM detalle_caja_bancos_cobrar WHERE idcaja_bancos IN('$caja_bancos') AND idfactura !='0'"); //POR COBRAR
-
-        // while ($factura_cajas = $this->dbc->fetch($det_caja_banc)) {
-        //     $factura_aux = $this->dbc->query("SELECT * FROM factura WHERE idfactura = '$factura_cajas[idfactura]'"); //POR COBRAR
-        //     $factu = $factura_aux->fetch_assoc();
-        //     if($factu['transacciones_idtransacciones'] == 0 && $factu['cobrado'] == 1 ){
-        //         array_push($array_idfacturas, $factura_cajas['idfactura']);
-        //     }else{
-
-        //     }
-        // }
-
-        // $factura_comas = implode(",", $array_idfacturas);
 
         if($cobrado == 1){ //POR COBRAR
 
-            $det_caja_banc = $this->dbc->query("SELECT * FROM detalle_caja_bancos_cobrar WHERE idcaja_bancos IN('$caja_bancos') AND idfactura !='0'"); //POR COBRAR
+        $det_caja_banc = $this->dbc->query("SELECT * FROM detalle_caja_bancos_cobrar WHERE idcaja_bancos IN('$caja_bancos') AND idfactura !='0'"); //POR COBRAR
 
         while ($factura_cajas = $this->dbc->fetch($det_caja_banc)) {
             $factura_aux = $this->dbc->query("SELECT * FROM factura WHERE idfactura = '$factura_cajas[idfactura]'"); //POR COBRAR
@@ -153,25 +138,23 @@ class Filtrado_facturas extends DB{
           $array_cajaBancos = array_map('intval', explode(",", $cadena_cajaBancos));
           $caja_bancos = implode(",", $array_cajaBancos);
           // Preparar la consulta
-          // select * from factura where idorganizacion = 50 and cobrado != 0 and transacciones_idtransacciones = 0
-          // echo json_encode(array($array_idfacturas,$array_cajaBancos,$empresa));
-  
-          $det_caja_banc = $this->dbc->query("SELECT * FROM detalle_caja_bancos_pagar WHERE idcaja_bancos IN('$caja_bancos') AND idfactura !='0'"); //POR COBRAR
-  
-          while ($factura_cajas = $this->dbc->fetch($det_caja_banc)) {
-              $factura_aux = $this->dbc->query("SELECT * FROM factura WHERE idfactura = '$factura_cajas[idfactura]'"); //POR COBRAR
-              $factu = $factura_aux->fetch_assoc();
-              if($factu['transacciones_idtransacciones'] == 0 && $factu['pagado'] == 1 ){
-                  array_push($array_idfacturas, $factura_cajas['idfactura']);
-              }else{
-  
-              }
-          }
-  
-          $factura_comas = implode(",", $array_idfacturas);
   
           if($cobrado == 1){ //POR PAGAR
   
+            $det_caja_banc = $this->dbc->query("SELECT * FROM detalle_caja_bancos_pagar WHERE idcaja_bancos IN('$caja_bancos') AND idfactura !='0'"); //POR COBRAR
+  
+            while ($factura_cajas = $this->dbc->fetch($det_caja_banc)) {
+                $factura_aux = $this->dbc->query("SELECT * FROM factura WHERE idfactura = '$factura_cajas[idfactura]'"); //POR COBRAR
+                $factu = $factura_aux->fetch_assoc();
+                if($factu['transacciones_idtransacciones'] == 0 && $factu['pagado'] == 1 ){
+                    array_push($array_idfacturas, $factura_cajas['idfactura']);
+                }else{
+    
+                }
+            }
+    
+            $factura_comas = implode(",", $array_idfacturas);
+
               if($factura_comas == ""){//EL ARRAY ESTABA VACIO
                    $getPedido = $this->dbc->query("SELECT * FROM factura WHERE idorganizacion = '$idempresa' AND pagado = 1 AND transacciones_idtransacciones = 0;"); //POR COBRAR
               }else{
@@ -182,6 +165,20 @@ class Filtrado_facturas extends DB{
               }
   
           }elseif($cobrado == 2){ // PAGADO
+
+            $det_caja_banc = $this->dbc->query("SELECT * FROM detalle_caja_bancos_pagar WHERE idcaja_bancos IN('$caja_bancos') AND idfactura !='0'"); //POR COBRAR
+  
+            while ($factura_cajas = $this->dbc->fetch($det_caja_banc)) {
+                $factura_aux = $this->dbc->query("SELECT * FROM factura WHERE idfactura = '$factura_cajas[idfactura]'"); //POR COBRAR
+                $factu = $factura_aux->fetch_assoc();
+                if($factu['transacciones_idtransacciones'] == 0 && $factu['pagado'] == 2 ){
+                    array_push($array_idfacturas, $factura_cajas['idfactura']);
+                }else{
+    
+                }
+            }
+    
+            $factura_comas = implode(",", $array_idfacturas);
   
               if($factura_comas == ""){//EL ARRAY ESTABA VACIO
                   $getPedido = $this->dbc->query("SELECT * FROM factura WHERE idorganizacion = '$idempresa' AND pagado = 2 AND transacciones_idtransacciones = 0;"); //POR COBRAR
@@ -192,6 +189,21 @@ class Filtrado_facturas extends DB{
   
              }
           }else{ //TODOS
+
+            $det_caja_banc = $this->dbc->query("SELECT * FROM detalle_caja_bancos_pagar WHERE idcaja_bancos IN('$caja_bancos') AND idfactura !='0'"); //POR COBRAR
+  
+            while ($factura_cajas = $this->dbc->fetch($det_caja_banc)) {
+                $factura_aux = $this->dbc->query("SELECT * FROM factura WHERE idfactura = '$factura_cajas[idfactura]'"); //POR COBRAR
+                $factu = $factura_aux->fetch_assoc();
+                if($factu['transacciones_idtransacciones'] == 0 && $factu['pagado'] != 0 ){
+                    array_push($array_idfacturas, $factura_cajas['idfactura']);
+                }else{
+    
+                }
+            }
+    
+            $factura_comas = implode(",", $array_idfacturas);
+
               if($factura_comas == ""){//EL ARRAY ESTABA VACIO
                   $getPedido = $this->dbc->query("SELECT * FROM factura WHERE idorganizacion = '$idempresa' AND pagado != 0 AND transacciones_idtransacciones = 0;"); //POR COBRAR
              }else{
@@ -245,7 +257,9 @@ class Filtrado_facturas extends DB{
           $caja_bancos = implode(",", $array_cajaBancos);
           // Preparar la consulta
   
-          $det_caja_banc = $this->dbc->query("SELECT * FROM detalle_caja_bancos_pagar WHERE idcaja_bancos IN('$caja_bancos') AND idotras_cuentas !='0'"); //POR COBRAR
+          if($cobrado == 1){ //POR PAGAR
+  
+            $det_caja_banc = $this->dbc->query("SELECT * FROM detalle_caja_bancos_pagar WHERE idcaja_bancos IN('$caja_bancos') AND idotras_cuentas !='0'"); //POR COBRAR
   
           while ($otrasCuentas_cajas = $this->dbc->fetch($det_caja_banc)) {
               $otrasCuentas_aux = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idotras_cuentas = '$otrasCuentas_cajas[idotras_cuentas]'"); //POR COBRAR
@@ -258,9 +272,7 @@ class Filtrado_facturas extends DB{
           }
   
           $otras_cuentas_comas = implode(",", $array_id_otrasCuentas);
-  
-          if($cobrado == 1){ //POR PAGAR
-  
+
               if($otras_cuentas_comas == ""){//EL ARRAY ESTABA VACIO
                    $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idempresa = '$idempresa' AND pagado = 1 AND transacciones_idtransacciones = 0;"); //POR COBRAR
               }else{
@@ -272,6 +284,19 @@ class Filtrado_facturas extends DB{
   
           }elseif($cobrado == 2){ // PAGADO
   
+            $det_caja_banc = $this->dbc->query("SELECT * FROM detalle_caja_bancos_pagar WHERE idcaja_bancos IN('$caja_bancos') AND idotras_cuentas !='0'"); //POR COBRAR
+  
+          while ($otrasCuentas_cajas = $this->dbc->fetch($det_caja_banc)) {
+              $otrasCuentas_aux = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idotras_cuentas = '$otrasCuentas_cajas[idotras_cuentas]'"); //POR COBRAR
+              $oc = $otrasCuentas_aux->fetch_assoc();
+              if($oc['transacciones_idtransacciones'] == 0 && $oc['pagado'] == 2 ){
+                  array_push($array_id_otrasCuentas, $otrasCuentas_cajas['idotras_cuentas']);
+              }else{
+  
+              }
+          }
+  
+          $otras_cuentas_comas = implode(",", $array_id_otrasCuentas);
               if($otras_cuentas_comas == ""){//EL ARRAY ESTABA VACIO
                   $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idempresa = '$idempresa' AND pagado = 2 AND transacciones_idtransacciones = 0;"); //POR COBRAR
              }else{
@@ -281,6 +306,20 @@ class Filtrado_facturas extends DB{
   
              }
           }else{ //TODOS
+
+            $det_caja_banc = $this->dbc->query("SELECT * FROM detalle_caja_bancos_pagar WHERE idcaja_bancos IN('$caja_bancos') AND idotras_cuentas !='0'"); //POR COBRAR
+  
+          while ($otrasCuentas_cajas = $this->dbc->fetch($det_caja_banc)) {
+              $otrasCuentas_aux = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idotras_cuentas = '$otrasCuentas_cajas[idotras_cuentas]'"); //POR COBRAR
+              $oc = $otrasCuentas_aux->fetch_assoc();
+              if($oc['transacciones_idtransacciones'] == 0 && $oc['pagado'] != 0 ){
+                  array_push($array_id_otrasCuentas, $otrasCuentas_cajas['idotras_cuentas']);
+              }else{
+  
+              }
+          }
+  
+          $otras_cuentas_comas = implode(",", $array_id_otrasCuentas);
 
               if($otras_cuentas_comas == ""){//EL ARRAY ESTABA VACIO
                   $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idempresa = '$idempresa' AND pagado != 0 AND transacciones_idtransacciones = 0;"); //POR COBRAR
@@ -341,7 +380,9 @@ class Filtrado_facturas extends DB{
           $caja_bancos = implode(",", $array_cajaBancos);
           // Preparar la consulta
   
-          $det_caja_banc = $this->dbc->query("SELECT * FROM detalle_caja_bancos_cobrar WHERE idcaja_bancos IN('$caja_bancos') AND idotras_cuentas !='0'"); //POR COBRAR
+          if($cobrado == 1){ //POR PAGAR
+  
+            $det_caja_banc = $this->dbc->query("SELECT * FROM detalle_caja_bancos_cobrar WHERE idcaja_bancos IN('$caja_bancos') AND idotras_cuentas !='0'"); //POR COBRAR
   
           while ($otrasCuentas_cajas = $this->dbc->fetch($det_caja_banc)) {
               $otrasCuentas_aux = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idotras_cuentas = '$otrasCuentas_cajas[idotras_cuentas]'"); //POR COBRAR
@@ -354,9 +395,7 @@ class Filtrado_facturas extends DB{
           }
   
           $otras_cuentas_comas = implode(",", $array_id_otrasCuentas);
-  
-          if($cobrado == 1){ //POR PAGAR
-  
+
               if($otras_cuentas_comas == ""){//EL ARRAY ESTABA VACIO
                    $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idempresa = '$idempresa' AND cobrado = 1 AND transacciones_idtransacciones = 0;"); //POR COBRAR
               }else{
@@ -368,6 +407,20 @@ class Filtrado_facturas extends DB{
   
           }elseif($cobrado == 2){ // PAGADO
   
+            $det_caja_banc = $this->dbc->query("SELECT * FROM detalle_caja_bancos_cobrar WHERE idcaja_bancos IN('$caja_bancos') AND idotras_cuentas !='0'"); //POR COBRAR
+  
+          while ($otrasCuentas_cajas = $this->dbc->fetch($det_caja_banc)) {
+              $otrasCuentas_aux = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idotras_cuentas = '$otrasCuentas_cajas[idotras_cuentas]'"); //POR COBRAR
+              $oc = $otrasCuentas_aux->fetch_assoc();
+              if($oc['transacciones_idtransacciones'] == 0 && $oc['cobrado'] == 2 ){
+                  array_push($array_id_otrasCuentas, $otrasCuentas_cajas['idotras_cuentas']);
+              }else{
+  
+              }
+          }
+  
+          $otras_cuentas_comas = implode(",", $array_id_otrasCuentas);
+
               if($otras_cuentas_comas == ""){//EL ARRAY ESTABA VACIO
                   $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idempresa = '$idempresa' AND cobrado = 2 AND transacciones_idtransacciones = 0;"); //POR COBRAR
              }else{
@@ -377,6 +430,20 @@ class Filtrado_facturas extends DB{
   
              }
           }else{ //TODOS
+
+            $det_caja_banc = $this->dbc->query("SELECT * FROM detalle_caja_bancos_cobrar WHERE idcaja_bancos IN('$caja_bancos') AND idotras_cuentas !='0'"); //POR COBRAR
+  
+          while ($otrasCuentas_cajas = $this->dbc->fetch($det_caja_banc)) {
+              $otrasCuentas_aux = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idotras_cuentas = '$otrasCuentas_cajas[idotras_cuentas]'"); //POR COBRAR
+              $oc = $otrasCuentas_aux->fetch_assoc();
+              if($oc['transacciones_idtransacciones'] == 0 && $oc['cobrado'] != 0 ){
+                  array_push($array_id_otrasCuentas, $otrasCuentas_cajas['idotras_cuentas']);
+              }else{
+  
+              }
+          }
+  
+          $otras_cuentas_comas = implode(",", $array_id_otrasCuentas);
 
               if($otras_cuentas_comas == ""){//EL ARRAY ESTABA VACIO
                   $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idempresa = '$idempresa' AND cobrado != 0 AND transacciones_idtransacciones = 0;"); //POR COBRAR
