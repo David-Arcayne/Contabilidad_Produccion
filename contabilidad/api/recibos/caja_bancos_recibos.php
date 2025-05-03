@@ -1569,6 +1569,88 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         echo json_encode($res);
     }
 
+    public function editar_caja_bancos_facturas($idrecibo,$tipo_documento,$fecha,$monto,$por_concepto_de,$cliente_prov){
+        $res="";
+        //tipo_documento = 1,2 facturas --> cobrar- pagar
+        if($tipo_documento == 1){//COBRAR   
+            $recibo_grupal = $this->dbc->query("SELECT * FROM cuentascobrar_grupal WHERE idcuentaspof = '$idrecibo'");
+            if ($recibo_grupal->num_rows > 0) {
+                //es grupal, no se podra editar
+            }else{
+                //SE EDITARA FACTURA Y RECIBO
+                $cuentaspof = $this->dbc->query("SELECT * FROM cuentaspof WHERE idcuentaspof = '$idrecibo'");
+                $resu = $this->dbc->fetch($cuentaspof);
+
+                $edicion_recibo=$this->dbc->query("UPDATE cuentaspof SET fecha='$fecha',monto='$monto' WHERE idcuentaspof='$idrecibo'");
+
+                $edicion_factura=$this->dbc->query("UPDATE factura SET fecha='$fecha',montofactura='$monto',por_concepto_de='$por_concepto_de',proveedorcliente_idproveedorcliente='$cliente_prov' WHERE idfactura='$resu[idfactura]'");
+
+            }
+        }else{ //PAGAR  2
+            $recibo_grupal = $this->dbc->query("SELECT * FROM cuentaspagar_grupal WHERE idcuentaspor = '$idrecibo'");
+            if ($recibo_grupal->num_rows > 0) {
+                //es grupal, no se podra editar
+            }else{
+                //SE EDITARA FACTURA Y RECIBO
+                $cuentaspor = $this->dbc->query("SELECT * FROM cuentaspor WHERE idcuentaspor = '$idrecibo'");
+                $resu = $this->dbc->fetch($cuentaspor);
+
+                $edicion_recibo=$this->dbc->query("UPDATE cuentaspor SET fecha='$fecha',monto='$monto' WHERE idcuentaspor='$idrecibo'");
+
+                $edicion_factura=$this->dbc->query("UPDATE factura SET fecha='$fecha',montofactura='$monto',por_concepto_de='$por_concepto_de',proveedorcliente_idproveedorcliente='$cliente_prov' WHERE idfactura='$resu[idfactura]'");
+
+            }
+        }
+
+        if($edicion_factura===TRUE){
+            $res = array("success", "Se Registro Correctamente", "detalletransaccionnormal");
+        }else{
+            $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
+        }
+        echo json_encode($res);
+    }
+
+    public function editar_caja_bancos_otras_cuentas($idrecibo,$tipo_documento,$fecha,$tipo,$precio,$concepto,$cliente_prov){
+        $res="";
+        //tipo_documento = 1,2 facturas --> cobrar- pagar
+        if($tipo_documento == 1){//COBRAR   
+            $recibo_grupal = $this->dbc->query("SELECT * FROM cuentascobrar_grupal WHERE idcuentaspof = '$idrecibo'");
+            if ($recibo_grupal->num_rows > 0) {
+                //es grupal, no se podra editar
+            }else{
+                //SE EDITARA FACTURA Y RECIBO
+                $cuentaspof = $this->dbc->query("SELECT * FROM cuentaspof WHERE idcuentaspof = '$idrecibo'");
+                $resu = $this->dbc->fetch($cuentaspof);
+
+                $edicion_recibo=$this->dbc->query("UPDATE cuentaspof SET fecha='$fecha',monto='$precio' WHERE idcuentaspof='$idrecibo'");
+
+                $edicion_factura=$this->dbc->query("UPDATE otras_cuentas SET fecha='$fecha',precio='$precio',concepto='$concepto',tipo='$tipo',id_cliente_proveedor='$cliente_prov' WHERE idotras_cuentas='$resu[idotras_cuentas]'");
+
+            }
+        }else{ //PAGAR  2
+            $recibo_grupal = $this->dbc->query("SELECT * FROM cuentaspagar_grupal WHERE idcuentaspor = '$idrecibo'");
+            if ($recibo_grupal->num_rows > 0) {
+                //es grupal, no se podra editar
+            }else{
+                //SE EDITARA FACTURA Y RECIBO
+                $cuentaspor = $this->dbc->query("SELECT * FROM cuentaspor WHERE idcuentaspor = '$idrecibo'");
+                $resu = $this->dbc->fetch($cuentaspor);
+
+                $edicion_recibo=$this->dbc->query("UPDATE cuentaspor SET fecha='$fecha',monto='$precio' WHERE idcuentaspor='$idrecibo'");
+
+                $edicion_factura=$this->dbc->query("UPDATE otras_cuentas SET fecha='$fecha',precio='$precio',concepto='$concepto',tipo='$tipo',id_cliente_proveedor='$cliente_prov' WHERE idotras_cuentas='$resu[idotras_cuentas]'");
+
+            }
+        }
+
+        if($edicion_factura===TRUE){
+            $res = array("success", "Se Registro Correctamente", "detalletransaccionnormal");
+        }else{
+            $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
+        }
+        echo json_encode($res);
+    }
+
     public function getidusuario($md5){
         $registro=$this->dbrh->query("select * from usuario where md5(idusuario)='$md5'");
         $qwe=$this->dbrh->fetch($registro);

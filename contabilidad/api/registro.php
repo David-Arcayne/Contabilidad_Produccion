@@ -451,7 +451,23 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idtransaccion'],$_POST['datos_json'],$_POST['empresa'],$_POST['sucursal']));
         }
-    }    
+    }elseif($ver=="editar_caja_bancos_facturas"){
+        if(isset($_POST['idrecibo'],$_POST['tipo_documento'],$_POST['fecha'],$_POST['monto'],$_POST ['por_concepto_de'],$_POST['cliente_prov'])){
+            $cont=new caja_bancos_recibos(); 
+            $cont->editar_caja_bancos_facturas($_POST['idrecibo'],$_POST['tipo_documento'],$_POST['fecha'],$_POST['monto'],$_POST ['por_concepto_de'],$_POST['cliente_prov']);
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idrecibo'],$_POST['tipo_documento'],$_POST['fecha'],$_POST['monto'],$_POST ['por_concepto_de'],$_POST['cliente_prov']));
+        }
+    }elseif($ver=="editar_caja_bancos_otras_cuentas"){
+        if(isset($_POST['idrecibo'],$_POST['tipo_documento'],$_POST['fecha'],$_POST['tipo'],$_POST ['precio'],$_POST['concepto'],$_POST['cliente_prov'])){
+            $cont=new caja_bancos_recibos();
+            $cont->editar_caja_bancos_otras_cuentas($_POST['idrecibo'],$_POST['tipo_documento'],$_POST['fecha'],$_POST['tipo'],$_POST ['precio'],$_POST['concepto'],$_POST['cliente_prov']);
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idrecibo'],$_POST['tipo_documento'],$_POST['fecha'],$_POST['tipo'],$_POST ['precio'],$_POST['concepto'],$_POST['cliente_prov']));
+        }
+    } 
 //registrar_recibo_otras_cuentas_pagar asiento registroasiento registrorelacionip registrar_factura_recibo_cobro_cajaBancos registrocobrarfactura
 //  registrotransaccion   registrocobrarfactura registrocobrarfacturaGrupal  registropagarfactura registrocobrarfacturaGrupal registrotransaccionf5
 }//  editar_caja_bancos_pagar_recibo  registrar_factura_recibo_pagos_cajaBancos impuestocrear tributario registropagarfactura impuestocrearf5
