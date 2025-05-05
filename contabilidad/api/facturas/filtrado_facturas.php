@@ -37,13 +37,14 @@ class Filtrado_facturas extends DB{
 
         $factura_comas = implode(",", $array_idfacturas);
 
-            if($factura_comas == ""){//EL ARRAY ESTABA VACIO
-                 $getPedido = $this->dbc->query("SELECT * FROM factura WHERE idorganizacion = '$idempresa' AND cobrado = 1 AND transacciones_idtransacciones = 0;"); //POR COBRAR
+            if($factura_comas == ""){//EL ARRAY ESTABA VACIO, NO EXISTE NINGUNA CAJA_BANCO PARA ESTA FACTURA
+                //NO DEBERIA LISTARME NADA AQUI, COMENTAR EL CODIGO
+                //NO HAY CAJA_BANCOS
+                $getPedido = $this->dbc->query("SELECT * FROM factura WHERE idorganizacion = '$idempresa' AND cobrado = 1 AND transacciones_idtransacciones = 0;"); //POR COBRAR
             }else{
                 $getPedido = $this->dbc->query("SELECT * FROM factura WHERE idfactura IN ($factura_comas)
                 UNION
                 SELECT * FROM factura WHERE idorganizacion = '$idempresa' AND cobrado = 1 AND transacciones_idtransacciones = 0;"); //POR COBRAR
-
             }
 
         }elseif($cobrado == 2){ // COBRADO
