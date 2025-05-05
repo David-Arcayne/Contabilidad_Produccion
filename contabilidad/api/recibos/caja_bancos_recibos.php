@@ -825,12 +825,15 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         "nrecibo" => $qwe['nrecibo'],
                         "nro_documento" => "$oc[nro_otras_cuentas]",
                         "por_concepto_de" => "$oc[concepto]",
+                        "idtipo" => "$oc[idtipo]",
                         "codigotransaccion" => $tr['codigotransaccion'],
+                        "id_cliente" => $cl['id_cliente'],
                         "nombre_cliente" => $cl['nombre'],
                         //descripcion saldra de la factura o otras cuentas 
                         "descripcion" => $aux_descripcion,
                         "archivo" => $qwe['archivo'],
                         "ingreso" => $qwe['monto'],
+                        "monto" => $qwe['monto'],
                         "saldo_inicial" => $saldo_inicial,
                         "saldo" => $saldo
     
@@ -849,12 +852,15 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                     "nrecibo" => $qwe['nrecibo'],
                     "nro_documento" => "$oc[nro_otras_cuentas]",
                     "por_concepto_de" => "$oc[concepto]",
+                    "idtipo" => "$oc[idtipo]",
                     "codigotransaccion" => $tr['codigotransaccion'],
+                    "id_cliente" => $cl['id_cliente'],
                     "nombre_cliente" => $cl['nombre'],
                     //descripcion saldra de la factura o otras cuentas 
                     "descripcion" => $aux_descripcion,
                     "archivo" => $qwe['archivo'],
                     "ingreso" => $qwe['monto'],
+                    "monto" => $qwe['monto'],
                     "saldo_inicial" => $saldo_inicial,
                     "saldo" => $saldo
 
@@ -891,11 +897,13 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         "nro_documento" => "$fact[nfactura]",
                         "por_concepto_de" => "$fact[por_concepto_de]",
                         "codigotransaccion" => $tr['codigotransaccion'],
+                        "id_cliente" => $cl['id_cliente'],
                         "nombre_cliente" => $cl['nombre'],
                         //descripcion saldra de la factura o otras cuentas 
                         "descripcion" => $aux_descripcion,
                         "archivo" => $qwe['archivo'],
                         "ingreso" => $qwe['monto'],
+                        "monto" => $qwe['monto'],
                         "saldo_inicial" => $saldo_inicial,
                         "saldo" => $saldo
     
@@ -914,11 +922,13 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                     "nrecibo" => $qwe['nrecibo'],
                     "nro_documento" => "$fact[nfactura]",
                     "codigotransaccion" => $tr['codigotransaccion'],
+                    "id_cliente" => $cl['id_cliente'],
                     "nombre_cliente" => $cl['nombre'],
                     //descripcion saldra de la factura o otras cuentas 
                     "descripcion" => $aux_descripcion,
                     "archivo" => $qwe['archivo'],
                     "ingreso" => $qwe['monto'],
+                    "monto" => $qwe['monto'],
                     "saldo_inicial" => $saldo_inicial,
                     "saldo" => $saldo
 
@@ -1034,12 +1044,15 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "nrecibo" => $qwe['nrecibo'],
                             "nro_documento" => "$oc[nro_otras_cuentas]",
                             "por_concepto_de" => "$oc[concepto]",
+                            "idtipo" => "$oc[idtipo]",
                             "codigotransaccion" => $tr['codigotransaccion'],
+                            "id_cliente" => $cl['id_cliente'],
                             "nombre_cliente" => $cl['nombre'],
                             //descripcion saldra de la factura o otras cuentas 
                             "descripcion" => $aux_descripcion,
                             "archivo" => $qwe['archivo'],
                             "egreso" => $qwe['monto'],
+                            "monto" => $qwe['monto'],
                             "saldo_inicial" => $saldo_inicial,
                             "saldo" => $saldo
         
@@ -1057,12 +1070,15 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         "fecha" => $qwe['fecha'],
                         "nrecibo" => $qwe['nrecibo'],
                         "nro_documento" => "$oc[nro_otras_cuentas]",
+                        "idtipo" => "$oc[idtipo]",
                         "codigotransaccion" => $tr['codigotransaccion'],
+                        "id_cliente" => $cl['id_cliente'],
                         "nombre_cliente" => $cl['nombre'],
                         //descripcion saldra de la factura o otras cuentas 
                         "descripcion" => $aux_descripcion,
                         "archivo" => $qwe['archivo'],
                         "egreso" => $qwe['monto'],
+                        "monto" => $qwe['monto'],
                         "saldo_inicial" => $saldo_inicial,
                         "saldo" => $saldo
     
@@ -1098,11 +1114,13 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "nro_documento" => "$fact[nfactura]",
                             "por_concepto_de" => $fact['por_concepto_de'],
                             "codigotransaccion" => $tr['codigotransaccion'],
+                            "id_cliente" => $cl['id_cliente'],
                             "nombre_cliente" => $cl['nombre'],
                             //descripcion saldra de la factura o otras cuentas 
                             "descripcion" => $aux_descripcion,
                             "archivo" => $qwe['archivo'],
                             "egreso" => $qwe['monto'],
+                            "monto" => $qwe['monto'],
                             "saldo_inicial" => $saldo_inicial,
                             "saldo" => $saldo
         
@@ -1121,11 +1139,13 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         "nro_documento" => "$fact[nfactura]",
                         "por_concepto_de" => "$fact[por_concepto_de]",
                         "codigotransaccion" => $tr['codigotransaccion'],
+                        "id_cliente" => $cl['id_cliente'],
                         "nombre_cliente" => $cl['nombre'],
                         //descripcion saldra de la factura o otras cuentas 
                         "descripcion" => $aux_descripcion,
                         "archivo" => $qwe['archivo'],
                         "egreso" => $qwe['monto'],
+                        "monto" => $qwe['monto'],
                         "saldo_inicial" => $saldo_inicial,
                         "saldo" => $saldo
     
@@ -1378,12 +1398,15 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "nrecibo" => $qwe['nrecibo'],
                             "nro_documento" => "$oc[nro_otras_cuentas]",
                             "por_concepto_de" => "$oc[concepto]",
+                            "idtipo" => "$oc[idtipo]",
                             "codigotransaccion" => $tr['codigotransaccion'],
+                            "id_cliente" => $cl['id_cliente'],
                             "nombre_cliente" => $cl['nombre'],
                             //descripcion saldra de la factura o otras cuentas 
                             "descripcion" => $aux_descripcion,
                             "archivo" => $qwe['archivo'],
                             "ingreso" => $qwe['monto'],
+                            "monto" => $qwe['monto'],
                             "saldo_inicial" => $saldo_inicial,
                             "saldo" => $saldo
         
@@ -1403,11 +1426,13 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "nro_documento" => $factu,
                             "por_concepto_de" => $fact['por_concepto_de'],
                             "codigotransaccion" => $tr['codigotransaccion'],
+                            "id_cliente" => $cl['id_cliente'],
                             "nombre_cliente" => $cl['nombre'],
                             //descripcion saldra de la factura o otras cuentas 
                             "descripcion" => $aux_descripcion,
                             "archivo" => $qwe['archivo'],
                             "ingreso" => $qwe['monto'],
+                            "monto" => $qwe['monto'],
                             "saldo_inicial" => $saldo_inicial,
                             "saldo" => $saldo
                         );
@@ -1427,12 +1452,15 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "nrecibo" => $qwe['nrecibo'],
                             "nro_documento" => "$oc[nro_otras_cuentas]",
                             "por_concepto_de" => "$oc[concepto]",
+                            "idtipo" => "$oc[idtipo]",
                             "codigotransaccion" => $tr['codigotransaccion'],
+                            "id_cliente" => $cl['id_proveedor'],
                             "nombre_cliente" => $cl['nombre'],
                             //descripcion saldra de la factura o otras cuentas 
                             "descripcion" => $aux_descripcion,
                             "archivo" => $qwe['archivo'],
                             "egreso" => $qwe['monto'],
+                            "monto" => $qwe['monto'],
                             "saldo_inicial" => $saldo_inicial,
                             "saldo" => $saldo
                         );
@@ -1451,11 +1479,13 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "nro_documento" => $factu,
                             "por_concepto_de" => $fact['por_concepto_de'],
                             "codigotransaccion" => $tr['codigotransaccion'],
+                            "id_cliente" => $cl['id_proveedor'],
                             "nombre_cliente" => $cl['nombre'],
                             //descripcion saldra de la factura o otras cuentas 
                             "descripcion" => $aux_descripcion,
                             "archivo" => $qwe['archivo'],
                             "egreso" => $qwe['monto'],
+                            "monto" => $qwe['monto'],
                             "saldo_inicial" => $saldo_inicial,
                             "saldo" => $saldo
                         );
@@ -1576,10 +1606,22 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             $recibo_grupal = $this->dbc->query("SELECT * FROM cuentascobrar_grupal WHERE idcuentaspof = '$idrecibo'");
             if ($recibo_grupal->num_rows > 0) {
                 //es grupal, no se podra editar
+                $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
+
             }else{
                 //SE EDITARA FACTURA Y RECIBO
                 $cuentaspof = $this->dbc->query("SELECT * FROM cuentaspof WHERE idcuentaspof = '$idrecibo'");
                 $resu = $this->dbc->fetch($cuentaspof);
+
+                $dt_cajas = $this->dbc->query("SELECT * FROM detalle_caja_bancos_cobrar WHERE idcuentaspof = '$idrecibo'");
+
+                if ($dt_cajas->num_rows > 0) {
+
+                    $edicion_dt_cajas=$this->dbc->query("UPDATE detalle_caja_bancos_cobrar SET monto='$monto' WHERE idcuentaspof='$idrecibo'");
+
+                }else{
+                    //no se edita detalle_cajaBancos
+                }
 
                 $edicion_recibo=$this->dbc->query("UPDATE cuentaspof SET fecha='$fecha',monto='$monto' WHERE idcuentaspof='$idrecibo'");
 
@@ -1590,10 +1632,23 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             $recibo_grupal = $this->dbc->query("SELECT * FROM cuentaspagar_grupal WHERE idcuentaspor = '$idrecibo'");
             if ($recibo_grupal->num_rows > 0) {
                 //es grupal, no se podra editar
+                $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
+
             }else{
                 //SE EDITARA FACTURA Y RECIBO
+
                 $cuentaspor = $this->dbc->query("SELECT * FROM cuentaspor WHERE idcuentaspor = '$idrecibo'");
                 $resu = $this->dbc->fetch($cuentaspor);
+
+                $dt_cajas = $this->dbc->query("SELECT * FROM detalle_caja_bancos_pagar WHERE idcuentaspor = '$idrecibo'");
+
+                if ($dt_cajas->num_rows > 0) {
+
+                    $edicion_dt_cajas=$this->dbc->query("UPDATE detalle_caja_bancos_pagar SET monto='$monto' WHERE idcuentaspor='$idrecibo'");
+
+                }else{
+                    //no se edita detalle_cajaBancos
+                }
 
                 $edicion_recibo=$this->dbc->query("UPDATE cuentaspor SET fecha='$fecha',monto='$monto' WHERE idcuentaspor='$idrecibo'");
 
@@ -1611,34 +1666,58 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
     }
 
     public function editar_caja_bancos_otras_cuentas($idrecibo,$tipo_documento,$fecha,$tipo,$precio,$concepto,$cliente_prov){
+       
         $res="";
         //tipo_documento = 1,2 facturas --> cobrar- pagar
         if($tipo_documento == 1){//COBRAR   
             $recibo_grupal = $this->dbc->query("SELECT * FROM cuentascobrar_grupal WHERE idcuentaspof = '$idrecibo'");
             if ($recibo_grupal->num_rows > 0) {
                 //es grupal, no se podra editar
+                $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
+
             }else{
                 //SE EDITARA FACTURA Y RECIBO
                 $cuentaspof = $this->dbc->query("SELECT * FROM cuentaspof WHERE idcuentaspof = '$idrecibo'");
                 $resu = $this->dbc->fetch($cuentaspof);
 
+                $dt_cajas = $this->dbc->query("SELECT * FROM detalle_caja_bancos_cobrar WHERE idcuentaspof = '$idrecibo'");
+
+                if ($dt_cajas->num_rows > 0) {
+
+                    $edicion_dt_cajas=$this->dbc->query("UPDATE detalle_caja_bancos_cobrar SET monto='$precio' WHERE idcuentaspof='$idrecibo'");
+
+                }else{
+                    //no se edita detalle_cajaBancos
+                }
+
                 $edicion_recibo=$this->dbc->query("UPDATE cuentaspof SET fecha='$fecha',monto='$precio' WHERE idcuentaspof='$idrecibo'");
 
-                $edicion_factura=$this->dbc->query("UPDATE otras_cuentas SET fecha='$fecha',precio='$precio',concepto='$concepto',tipo='$tipo',id_cliente_proveedor='$cliente_prov' WHERE idotras_cuentas='$resu[idotras_cuentas]'");
+                $edicion_factura=$this->dbc->query("UPDATE otras_cuentas SET fecha='$fecha',precio='$precio',concepto='$concepto',idtipo='$tipo',id_cliente_proveedor='$cliente_prov' WHERE idotras_cuentas='$resu[idotras_cuentas]'");
 
             }
         }else{ //PAGAR  2
             $recibo_grupal = $this->dbc->query("SELECT * FROM cuentaspagar_grupal WHERE idcuentaspor = '$idrecibo'");
             if ($recibo_grupal->num_rows > 0) {
                 //es grupal, no se podra editar
+                $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
+
             }else{
                 //SE EDITARA FACTURA Y RECIBO
                 $cuentaspor = $this->dbc->query("SELECT * FROM cuentaspor WHERE idcuentaspor = '$idrecibo'");
                 $resu = $this->dbc->fetch($cuentaspor);
 
+                $dt_cajas = $this->dbc->query("SELECT * FROM detalle_caja_bancos_pagar WHERE idcuentaspor = '$idrecibo'");
+
+                if ($dt_cajas->num_rows > 0) {
+
+                    $edicion_dt_cajas=$this->dbc->query("UPDATE detalle_caja_bancos_pagar SET monto='$precio' WHERE idcuentaspor='$idrecibo'");
+
+                }else{
+                    //no se edita detalle_cajaBancos
+                }
                 $edicion_recibo=$this->dbc->query("UPDATE cuentaspor SET fecha='$fecha',monto='$precio' WHERE idcuentaspor='$idrecibo'");
 
-                $edicion_factura=$this->dbc->query("UPDATE otras_cuentas SET fecha='$fecha',precio='$precio',concepto='$concepto',tipo='$tipo',id_cliente_proveedor='$cliente_prov' WHERE idotras_cuentas='$resu[idotras_cuentas]'");
+                $edicion_factura=$this->dbc->query("UPDATE otras_cuentas SET fecha='$fecha',precio='$precio',concepto='$concepto',idtipo='$tipo',id_cliente_proveedor='$cliente_prov' WHERE idotras_cuentas='$resu[idotras_cuentas]'");
 
             }
         }
@@ -1649,6 +1728,9 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
         }
         echo json_encode($res);
+        // echo json_encode(array($idrecibo,$tipo_documento,$fecha,$tipo,$precio,$concepto,$cliente_prov));
+
+        // $idrecibo,$tipo_documento,$fecha,$tipo,$precio,$concepto,$cliente_prov
     }
 
     public function getidusuario($md5){
