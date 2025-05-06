@@ -57,7 +57,7 @@ class Filtrado_facturas extends DB{
             if($factu['transacciones_idtransacciones'] == 0 && $factu['cobrado'] == 2 ){
                 array_push($array_idfacturas, $factura_cajas['idfactura']);
             }else{
-
+                
             }
         }
 
