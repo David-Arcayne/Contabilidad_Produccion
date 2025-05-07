@@ -1250,11 +1250,11 @@ $totalHaber = 0;
           LEFT JOIN factura f ON r.idfactura = f.idfactura
           LEFT JOIN cuentascobrar_grupal ccg ON ccg.idcuentaspof = r.idcuentaspof
         WHERE
-          r.nrecibo >= '$numeroIni'
-          AND r.nrecibo <= '$numeroFin'
+          r.nrecibo >= $numeroIni
+          AND r.nrecibo <= $numeroFin
           AND f.idorganizacion = '$ide'
         ORDER BY
-          r.idcuentaspof ASC;
+          r.nrecibo ASC;
           ");
 
       //--------------------------------------------------------------------
@@ -1267,8 +1267,8 @@ $totalHaber = 0;
           LEFT JOIN factura f ON c.idfactura = f.idfactura
           LEFT JOIN cuentaspof r ON r.idcuentaspof = c.idcuentaspof
         WHERE
-          r.nrecibo >= '$numeroIni'
-          AND r.nrecibo <= '$numeroFin'
+          r.nrecibo >= $numeroIni
+          AND r.nrecibo <= $numeroFin
           AND f.idorganizacion = '$ide'
         ORDER BY
           c.idcuentascobrar_grupal ASC;
@@ -1446,6 +1446,7 @@ if ($pcuentas->num_rows > 0) {
          }
          
         }  
+        
        //AQUI TERMINA ES INGRESO
       }else{
 
@@ -1487,7 +1488,7 @@ if ($pcuentas->num_rows > 0) {
           LEFT JOIN factura f ON r.idfactura = f.idfactura
           LEFT JOIN cuentaspagar_grupal ccg ON ccg.idcuentaspor = r.idcuentaspor
           LEFT JOIN otras_cuentas o ON o.idotras_cuentas = r.idotras_cuentas
-          WHERE r.nrecibo BETWEEN '$numeroIni' AND '$numeroFin'
+          WHERE r.nrecibo BETWEEN $numeroIni AND $numeroFin
           AND (f.idorganizacion = '$ide' OR o.idempresa = '$ide')
           ORDER BY r.idcuentaspor ASC;
         ");
@@ -1502,8 +1503,8 @@ if ($pcuentas->num_rows > 0) {
         LEFT JOIN factura f ON c.idfactura = f.idfactura
         LEFT JOIN cuentaspor r ON r.idcuentaspor = c.idcuentaspor
       WHERE
-        r.nrecibo >= '$numeroIni'
-        AND r.nrecibo <= '$numeroFin'
+        r.nrecibo >= $numeroIni
+        AND r.nrecibo <= $numeroFin
         AND f.idorganizacion = '$ide'
       ORDER BY
         c.idcuentaspagar_grupal ASC;
@@ -1702,6 +1703,12 @@ if ($pcuentas->num_rows > 0) {
        }  
       //AQUI TERMINA EGRESO
       }
+
+            // Ordenar por "nrecibo" en orden ascendente
+            
+      usort($lista, function($a, $b) {
+        return intval($a['nrecibo']) - intval($b['nrecibo']);
+      });
 
         echo json_encode($lista); 
        }
