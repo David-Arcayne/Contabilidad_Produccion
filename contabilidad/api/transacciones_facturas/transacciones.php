@@ -418,7 +418,7 @@ if($filtrado->num_rows > 0){
         //$res=array("id"=>,"nombre"=>$qwe['nombre']); detalletransaccion
         return $qwe['idgestion'];
     }
-    public function existe_empresa_modulo($empresa)
+    public function _modulos_modulo($empresa)
     {
 
         $ide = $this->getidempresa($empresa);
@@ -666,9 +666,23 @@ if($filtrado->num_rows > 0){
             $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
         }
         echo json_encode($res);
-        // echo json_encode(array($idtransaccion,$cuentas_json,$cuentas_array));
+        // echo json_encode(array($idtransaccion,$cuentas_json,$cuentas_array)); existe_empresa_modulo existe_empresa_modulo
 
     } 
+    public function existe_empresa_modulo($empresa) {
+        $lista = [];
+        $idempresa = $this->getidempresa($empresa);
     
+        // Preparar la consulta
+        $getPedido = $this->dbc->query("SELECT * FROM plandecuenta WHERE organizacion_idorganizacion='$idempresa'");
+        
+        // Verificar si hay resultados
+        $respu = ($getPedido->num_rows > 0) ? "true" : "false";
+
+        // Agregar la respuesta al array
+        $lista[] = ["respuesta" => $respu];
+
+        echo json_encode($lista);
+    } 
 
 }

@@ -386,7 +386,7 @@ elseif($ver[0]=="listar_asiento_por_modulo"){
     $cont=new Transacciones();
     $cont->existe_empresa_modulo($ver[1]);
 }elseif($ver[0]=="listar_recibo_por_caja_bancos"){
-    $cont=new caja_bancos_recibos();
+    $cont=new Caja_bancos_recibos();
     $cont->listar_recibo_por_caja_bancos($ver[1],$ver[2],$ver[3],$ver[4]);
 }elseif($ver[0]=="alerta_desconsolidacion"){
     $cont=new Alertas();
@@ -423,13 +423,13 @@ elseif($ver[0]=="listar_asiento_por_modulo"){
     $cont=new Contabilidad();
     $cont->lista_plan_cuenta_no_vinculada($ver[1]);
 }elseif($ver[0]=="listar_usuarios"){
-    $cont=new caja_bancos_recibos();
+    $cont=new Caja_bancos_recibos();
     $cont->listar_usuarios($ver[1]);
 }elseif($ver[0]=="eliminar_caja_bancos_usuario"){
-    $cont=new caja_bancos_recibos();
+    $cont=new Caja_bancos_recibos();
     $cont->eliminar_caja_bancos_usuario($ver[1]);
 }elseif($ver[0]=="listar_caja_bancos_usuarios"){
-    $cont=new caja_bancos_recibos();
+    $cont=new Caja_bancos_recibos();
     $cont->listar_caja_bancos_usuarios($ver[1]);
 }elseif($ver[0]=="listar_caja_bancos_por_usuario"){
     $cont=new Plandecuentas();
@@ -447,11 +447,14 @@ elseif($ver[0]=="listar_facturas_cobros_sin_transaccion"){
 }elseif($ver[0]=="listar_documentos_pagos_sin_transaccion"){
     $cont=new Filtrado_facturas();
     $cont->listar_documentos_pagos_sin_transaccion($ver[1],$ver[2],$ver[3]);
+}elseif($ver[0]=="usuario_con_permiso_registrar_transaccion"){
+    $cont=new Caja_bancos_recibos();
+    $cont->usuario_con_permiso_registrar_transaccion($ver[1],$ver[2]);
 }
 
 
 //  asientotipo  creartipoasientodelete listaplanesempresa listaimpuestoentreplan listar_recibo_por_id_otras_cuentas
 // milista     listafacturaapi_cobrado listar_recibo_por_caja_bancos listar_recibo_por_id_otras_cuentas_pagar caja_banco
-//listafactura   listatransaciones   reportedetalletransaccion  lista_cobrar_cobrado_factura listar_otras_cuentas
+//listafactura   listatransaciones   reportedetalletransaccion  lista_cobrar_cobrado_factura listar_otras_cuentas existe_empresa_modulo
 //reporteactivodisponible    getidempresa firmas listaimpuestoentreplan listafacturaapi_cobrado tributario  impuesto
 ?>
