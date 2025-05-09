@@ -14,6 +14,7 @@ require_once "./otras_cuentas/recibo_otras_cuentas.php";
 require_once "./configuracion/divisa.php";
 require_once "./configuracion/asiento.php";
 require_once "./recibos/caja_bancos_recibos.php";
+require_once "./facturas/factura_cobros.php";
 
 $ver=$_POST['ver'];
 $json = file_get_contents('php://input'); // Decodificar el JSON en un arreglo PHP   gestion
@@ -76,7 +77,7 @@ $cont->crearfacturas($_POST['fechatfactura'],$_POST['nfactura'],$_POST['nautoriz
         $cont->crearfacturasapif5($_POST['idfactura'],$_POST['fechatfactura'],$_POST['nfactura'],$_POST['nautorizacion'],$_POST['codigocontrol'],$_POST['montofactura'],$_POST['tasacero'],$_POST['export'],$_POST['npoliza'],$_POST['iceiecdhotros'],$_POST['descuentobonificacion'],$_POST['especificacion'],$_POST['cliente'],$_POST['cobrar'],$_POST['pagar'],$_POST['trans'],$_POST['clasefactura'],$_POST['cuenta']);
     
 }elseif($ver=="registrar_factura_cobros_tributario"){
-    $cont=new Contabilidad();
+    $cont=new Factura_cobros();
     $cont->registrar_factura_cobros_tributario($_POST['por_concepto_de'],$_POST['fecha'],$_POST['nfactura'],$_POST['nautorizacion'],$_POST['codigocontrol'],$_POST['montofactura'],$_POST['tasacero'],$_POST['export'],$_POST['npoliza'],$_POST['iceiecdhotros'],$_POST['descuentobonificacion'],$_POST['clasefactura'],$_POST['cobrado'],$_POST['pagado'],$_POST['especificacion'],$_POST['trans'],$_POST['cliente'],$_POST['empresa'],$_POST['cuenta'],$_POST['sucursal'],$_POST['asiento']);
      
 }elseif($ver=="registrar_factura_pagos_tributario"){
@@ -470,5 +471,5 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     } 
 //registrar_recibo_otras_cuentas_pagar asiento registroasiento registrorelacionip registrar_factura_recibo_cobro_cajaBancos registrocobrarfactura consolidar
 //  registrotransaccion   registrocobrarfactura registrocobrarfacturaGrupal  registropagarfactura registrocobrarfacturaGrupal registrotransaccionf5
-}//  editar_caja_bancos_pagar_recibo  registrar_factura_recibo_pagos_cajaBancos impuestocrear tributario registropagarfactura impuestocrearf5
+}//  editar_caja_bancos_pagar_recibo  registrar_factura_recibo_pagos_cajaBancos impuestocrear tributario registropagarfactura impuestocrearf5 registrar_factura
 ?> 
