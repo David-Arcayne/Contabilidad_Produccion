@@ -476,7 +476,7 @@ public function getidgestion($md5){
         $ide=$this->getidempresa($empresa);
         $gestion=$this->getidgestion($empresa);
         $reporte=$this->dbc->query("SELECT p.numero,p.nombreplan,SUM(d.debe) AS debe,SUM(d.haber) AS haber,SUM(debe)-SUM(haber) AS deudor,SUM(haber)-SUM(debe) AS acreedor FROM plandecuenta AS p
-        INNER JOIN transacciones AS t ON t.organizacion_idorganizacion='$ide' AND t.consolidar= 2 
+        INNER JOIN transacciones AS t ON t.organizacion_idorganizacion='$ide'
         INNER JOIN detalletransaccion AS d ON d.idplandecuenta=p.idplandecuenta AND t.idtransacciones=d.transacciones_idtransacciones
         WHERE p.organizacion_idorganizacion='$ide' AND t.fechatransaccion>='$fechai' AND t.fechatransaccion<='$fechaf' AND p.numero<'4.0.0.00.00' AND t.idgestion='$gestion' 
         GROUP by p.nombreplan 
@@ -1714,7 +1714,7 @@ if ($pcuentas->num_rows > 0) {
         echo json_encode($lista); 
        }
   //reportedetallefpt reporteactivodiaponibledos reportedetalletransaccion estado consolidar reporteactivoypasivo resultados
-//reportecomprobantecontable reporteactivodisponible reportedetalletransaccion mayorcuentacontable reportecomprobantecontable firmas
+//reportecomprobantecontable reporteactivodisponible reportedetalletransaccion mayorcuentacontable reportecomprobantecontable firmas reporteactivoypasivo
 
 }
 

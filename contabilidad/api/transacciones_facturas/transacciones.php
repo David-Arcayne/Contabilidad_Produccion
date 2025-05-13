@@ -59,6 +59,8 @@ class Transacciones extends DB{
         $ide = $this->getidempresa($empresa);
         $getG = $this->getgestionactualC($empresa);
         $gestion = $getG['id'];
+
+
         $registro = $this->dbc->query("SELECT
         t.idtransacciones,
         t.codigotransaccion,
@@ -77,7 +79,11 @@ class Transacciones extends DB{
         AND t.estado != 6 
       order by
         t.codigotransaccion desc;");
-        while ($qwe = $this->dbc->fetch($registro)) {
+
+        $existe = $this->dbc->query("SELECT * FROM cierre_transacciones WHERE (nombre_operacion = 'precierre' OR nombre_operacion = 'cierre') AND idempresa = '$ide' AND idgestion ='$gestion'");
+
+        if($existe->num_rows > 0){
+            while ($qwe = $this->dbc->fetch($registro)) {
             $tt = $this->dbc->query("SELECT * FROM tipotransaccion WHERE idtipotransaccion='" . $qwe[5] . "'");
             $asd = $this->dbc->fetch($tt);
             $detalle = [];
@@ -88,9 +94,26 @@ class Transacciones extends DB{
                 array_push($detalle, $ress);
             }
 
-            $res = array("id" => $qwe[0], "ntransaccion" => $qwe[1], "fecha" => $qwe[2], "glosa" => $qwe[3], "consolidar" => $qwe[4], "ttransaccion" => $asd['nombre'],"idtipotransaccion"=>$qwe[5], "gestion" => $qwe[6],"estado" => $qwe[7], "detalle" => $detalle, "tipocambio" => $qwe[8]);
+            $res = array("id" => $qwe[0], "ntransaccion" => $qwe[1], "fecha" => $qwe[2], "glosa" => $qwe[3], "consolidar" => $qwe[4], "ttransaccion" => $asd['nombre'],"idtipotransaccion"=>$qwe[5], "gestion" => $qwe[6],"estado" => $qwe[7], "detalle" => $detalle, "tipocambio" => $qwe[8],"existe" => 1);
             array_push($lista, $res);
         }
+        }else{
+            while ($qwe = $this->dbc->fetch($registro)) {
+            $tt = $this->dbc->query("SELECT * FROM tipotransaccion WHERE idtipotransaccion='" . $qwe[5] . "'");
+            $asd = $this->dbc->fetch($tt);
+            $detalle = [];
+
+            $transdeta = $this->dbc->query("select d.iddetalletransaccion,p.nombreplan,d.debe,d.haber,d.nota,d.estado,d.idorganizacion,d.idplandecuenta from detalletransaccion as d,plandecuenta as p where p.idplandecuenta=d.idplandecuenta and d.transacciones_idtransacciones='$qwe[0]'");
+            while ($qq = $this->dbc->fetch($transdeta)) {
+                $ress = array("id" => $qq[0], "plan" => $qq[1], "debe" => $qq[2], "haber" => $qq[3], "nota" => $qq[4], "estado" => $qq[5], "idempresa" => $qq[6], "idplan" => $qq[7]);
+                array_push($detalle, $ress);
+            }
+
+            $res = array("id" => $qwe[0], "ntransaccion" => $qwe[1], "fecha" => $qwe[2], "glosa" => $qwe[3], "consolidar" => $qwe[4], "ttransaccion" => $asd['nombre'],"idtipotransaccion"=>$qwe[5], "gestion" => $qwe[6],"estado" => $qwe[7], "detalle" => $detalle, "tipocambio" => $qwe[8],"existe" => 0);
+            array_push($lista, $res);
+        }
+        }
+        
         echo json_encode($lista);
     }
     public function eliminartransaccion($idt)
@@ -714,7 +737,7 @@ if($filtrado->num_rows > 0){
         //REGISTRAR TRANSACCION
 
          $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
-        VALUE(NULL,'$nroTransaccion','$fecha', '1', '0', 'Registro de Precierre', '1','1', '0', '$ide', '$idsucursal', '$gestion')");
+        VALUE(NULL,'$nroTransaccion','$fecha', '1', '0', 'Registro de Precierre', '2','1', '0', '$ide', '$idsucursal', '$gestion')");
 
           $idtransaccion = $this->dbc->insert_id;
 
@@ -786,6 +809,111 @@ if($filtrado->num_rows > 0){
 
         echo json_encode($res);
     // echo json_encode(array($control_consolidado,$fecha,$empresa,$sucursal,$arre));
+    } 
+
+       public function registrar_cuenta_cierre($fecha,$empresa,$sucursal) {
+
+        $idsucursal = $this->getidsucursal($sucursal);
+        $ide = $this->getidempresa($empresa);
+        $gestion=$this->getidgestion($empresa);
+        // $idempresa = $this->getidempresa($empresa);
+
+        $existe = $this->dbc->query("SELECT * FROM cierre_transacciones WHERE nombre_operacion = 'precierre' AND idempresa = '$ide' AND idgestion ='$gestion'");
+
+        if($existe->num_rows > 0){
+            //se creara transaccion de cierre nada mas
+
+            $nroTrans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE organizacion_idorganizacion=$ide AND idgestion='$gestion' ORDER BY codigotransaccion DESC LIMIT 1;");
+            $resultado12 = $nroTrans->fetch_assoc();
+            $nroTransaccion = $resultado12['codigotransaccion'] + 1;
+            //REGISTRAR TRANSACCION
+
+            $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
+            VALUE(NULL,'$nroTransaccion','$fecha', '1', '0', 'Registro de Cierre', '2','1', '0', '$ide', '$idsucursal', '$gestion')");
+
+            $idtransaccion = $this->dbc->insert_id;
+
+            $cuenta_vinculada = $this->dbc->query("SELECT * FROM vinculacion_cuenta_xcxp WHERE cobrar_pagar='3' AND idempresa ='$ide'");
+            $vinculacion = $cuenta_vinculada->fetch_assoc();
+
+
+                $cuenta_resultados = $this->dbc->query(" SELECT p.idplandecuenta,p.numero,p.nombreplan,SUM(d.debe) AS debe,SUM(d.haber) AS haber,SUM(debe)-SUM(haber) AS deudor,SUM(haber)-SUM(debe) AS acreedor FROM plandecuenta AS p
+        INNER JOIN transacciones AS t ON t.organizacion_idorganizacion='$ide'
+        INNER JOIN detalletransaccion AS d ON d.idplandecuenta=p.idplandecuenta AND t.idtransacciones=d.transacciones_idtransacciones
+        WHERE p.organizacion_idorganizacion='$ide' AND p.numero<'4.0.0.00.00' AND t.idgestion='$gestion' 
+        GROUP by p.nombreplan 
+        ORDER by p.numero ASC;");
+
+                $orden_ultimo = 0;
+            while($cr=$this->dbc->fetch($cuenta_resultados)){
+            
+            $listaUltimoDetalle = $this->dbc->query("SELECT orden FROM detalletransaccion WHERE transacciones_idtransacciones='$idtransaccion' ORDER BY orden DESC LIMIT 1;");
+            $ulti_registro = $listaUltimoDetalle->fetch_assoc();
+            $nuevaOrden = $ulti_registro['orden'] + 1;
+                // REGISTRAR DETALLE_TRANSACCION CON LA NUEVA CUENTA DE PRE_CIERRE
+                $deudor = 0;
+                $acreedor = 0;
+                if($cr['deudor'] > 0){
+                    $deudor = $cr['deudor'];
+                }else{
+                    $acreedor = $cr['acreedor'];
+                }
+
+                $crearDet_trans = $this->dbc->query("INSERT INTO detalletransaccion(debe,haber,nota,transacciones_idtransacciones,idplandecuenta,idcuentapresupuestaria,estado,cobrar,pagar,idorganizacion,idsucursal,orden)
+                VALUES ('$acreedor','$deudor','-','$idtransaccion','$cr[idplan]','0','1','2','2','$ide','$idsucursal','$nuevaOrden')");
+
+                $orden_ultimo = $nuevaOrden + 1;
+            }
+
+            $lista_ulti_transaccion = $this->dbc->query("SELECT SUM(debe) as debe,SUM(haber) as haber FROM detalletransaccion WHERE transacciones_idtransacciones ='$idtransaccion'");
+            $sumas_nuevas = $lista_ulti_transaccion->fetch_assoc(); 
+
+            $debe_nuevo =0;
+            $haber_nuevo =0;
+
+            if($sumas_nuevas['debe'] > $sumas_nuevas['haber']){
+                $diferencia_sumas = $sumas_nuevas['debe'] - $sumas_nuevas['haber'];
+                $haber_nuevo = $diferencia_sumas;
+            }else{
+                $diferencia_sumas = $sumas_nuevas['haber'] - $sumas_nuevas['debe'];
+                $debe_nuevo = $diferencia_sumas;
+            }
+            $crearDet_trans = $this->dbc->query("INSERT INTO detalletransaccion(debe,haber,nota,transacciones_idtransacciones,idplandecuenta,idcuentapresupuestaria,estado,cobrar,pagar,idorganizacion,idsucursal,orden)
+                VALUES ('$debe_nuevo','$haber_nuevo','-','$idtransaccion','$vinculacion[idplandecuenta]','0','1','2','2','$ide','$idsucursal','$orden_ultimo')");
+
+            if ($crearDet_trans === TRUE) {
+
+                $crear_cierre = $this->dbc->query("INSERT INTO cierre_transacciones(nombre_operacion,estado,idgestion,idempresa)
+                VALUES ('cierre','1','$gestion','$ide')");
+
+                $res = array("success", "Se Registro Correctamente", "detalletransaccionnormal");
+            } else {
+                $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
+            }
+
+        }else{
+            // no se creara transaccion de cierre porque todavia no existe transaccion de precierre
+            $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
+
+        }
+
+        echo json_encode($res);
+    } 
+
+    public function existe_apertura_pre_cierre($nombre_operacion,$empresa) {
+        $lista = [];
+        $idempresa = $this->getidempresa($empresa);
+        $gestion=$this->getidgestion($empresa);
+        // Preparar la consulta
+        $existe = $this->dbc->query("SELECT * FROM cierre_transacciones WHERE nombre_operacion = '$nombre_operacion' AND idempresa = '$idempresa' AND idgestion ='$gestion'");
+    
+         // Verificar si hay resultados
+        $respu = ($existe->num_rows > 0) ? "true" : "false";
+
+        // Agregar la respuesta al array
+        $lista[] = ["respuesta" => $respu];
+    
+        echo json_encode($lista);
     } 
 
     public function getidgestion($md5){
