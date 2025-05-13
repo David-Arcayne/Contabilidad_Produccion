@@ -24,6 +24,7 @@ class Plandecuentas extends DB{
         //$res=array("id"=>,"nombre"=>$qwe['nombre']);
         return $qwe['idgestion'];
     }
+
     public function registrar_vinculacion_cuentas_xcxp($idplandecuenta,$cobrar_pagar,$empresa){
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
