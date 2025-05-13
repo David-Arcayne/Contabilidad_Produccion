@@ -62,8 +62,8 @@ class Caja_bancos_recibos extends DB{
         
             $idfact = $this->dbc->insert_id;
 
-            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
-            VALUES('$nroRecibo','$fecha','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$trans','0',NULL)");
+            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
+            VALUES('$nroRecibo','$fecha','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$trans','0',NULL,'$registro_desde')");
 
             $idrecibo = $this->dbc->insert_id;
         }else{
@@ -1602,6 +1602,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                 "idusuario" => $bb['idusuario'],
                 "nombre_usuario" => $usuario['nombre'],
                 "nombre_trabajador" => $traba['nombre_trabajador']." ".$traba['apellido'],
+                "ci" => $traba['ci'],
                 "funcion" => $bb['funcion'],
                 "permiso_registrar" => $bb['permiso_registrar']
                 
@@ -1797,7 +1798,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         return $qwe['idusuario'];
 
     }    
-    // listar_recibo_por_caja_bancos
+    // listar_recibo_por_caja_bancos array
 
 }
 ?>

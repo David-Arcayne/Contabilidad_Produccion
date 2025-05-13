@@ -11,6 +11,7 @@ class Documento_cobro extends DB{ //          idtransaccion, asiento,fecha, id_c
         $idempresa = $this->getidempresa($empresa);
         $gestion = $this->getgestionactualid($idempresa);
         
+    
         // $idempresa = $this->getidempresa($empresa);
         $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM otras_cuentas WHERE idempresa = '$idempresa'");
         $resultado = $consulta->fetch_assoc();

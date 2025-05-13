@@ -50,8 +50,10 @@ class UnidadTiempo_conf extends DB{
     } 
     public function editarUnidadTiempoControl($id,$unidad,$detalle,$empresa) {
         // echo json_encode(array($id,$unidad,$detalle,$idempresa));
+        //        $verificarQuery = "SELECT COUNT(*) as count FROM tipo_envase WHERE nombre = ? AND empresa_idempresa = ? AND idtipo_envase != ?";
+
         $idempresa = $this->getidempresa($empresa);
-        $consulta = $this->dbp->query("SELECT COUNT(*) AS total FROM control_unidad_tiempo WHERE unidad = '$unidad' AND empresa_idempresa = '$idempresa'");
+        $consulta = $this->dbp->query("SELECT COUNT(*) AS total FROM control_unidad_tiempo WHERE unidad = '$unidad' AND empresa_idempresa = '$idempresa' AND idcontrol_unidad_tiempo != '$id'");
         $resultado = $consulta->fetch_assoc();
         $totalRegistros = $resultado['total'];
 
