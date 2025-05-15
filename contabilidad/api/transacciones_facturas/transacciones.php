@@ -727,7 +727,6 @@ if($filtrado->num_rows > 0){
             $transaccion_2 = $this->dbc->query("SELECT * FROM transacciones WHERE idgestion ='$gestion' AND consolidar = '1' AND codigotransaccion > '0'");
             while($trans_2=$this->dbc->fetch($transaccion_2)){
                 $editar = $this->dbc->query("UPDATE transacciones SET consolidar = '2' WHERE idtransacciones ='$trans_2[idtransacciones]'");
-
             }
 
         $nroTrans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE organizacion_idorganizacion=$ide AND idgestion='$gestion' ORDER BY codigotransaccion DESC LIMIT 1;");

@@ -11,7 +11,12 @@ class Contabilidad extends DB
         $empresa=$this->getidempresa($idempresa);
         $codigo=date("Ymd").rand(100,1000);
         $registro=$this->dbc->query("INSERT INTO desconsolidar(idtransaccion,motivo,estado,hora,fecha,idusuario,idempresa,codigo)VALUES('$idtransaccion','$motivo','$estado','$hora','$fecha','$usuario','$empresa','$codigo')");
-        if($registro===TRUE){
+          
+        // y cambiar el estado de esa transaccion para q este en estado pendiente_desconsolidacion
+           $update=$this->dbc->query("UPDATE transacciones SET estado = '7' WHERE idtransacciones = '$idtransaccion'");
+
+        // $resultado12 = $registro->fetch_assoc();
+        if($registro===TRUE){    
             $res=array("ok"=>"success");
         }else{
             $res=array("ok"=>"danger $idtransaccion,$motivo,$estado,$hora,$fecha,$idusuario");
@@ -32,41 +37,65 @@ class Contabilidad extends DB
             $datos = [];
     
             // Consulta para obtener las transacciones
-            $transa = $this->dbc->query("SELECT t.idtransacciones AS transaccion, t.codigotransaccion
+            $transa1 = $this->dbc->query("SELECT *
                 FROM transacciones AS t 
                 WHERE t.codigotransaccion >= '$nTrainicio' 
                   AND t.codigotransaccion <= '$nTrafinal' 
                   AND t.organizacion_idorganizacion = '$empresa'
             ");
-            
-            // Verificación de la consulta de transacciones
-            if (!$transa) {
-                throw new Exception("Error al consultar transacciones: " . $this->dbc->error);
+
+            $se_solicitara = 0;
+            while ($qwe_aux = $this->dbc->fetch($transa1)) {
+                  $desc_ayuda = $this->dbc->query("SELECT * FROM desconsolidar WHERE idtransaccion = '$qwe_aux[idtransacciones]'");
+                if($desc_ayuda->num_rows > 0){
+                    $resultado_aux = $desc_ayuda->fetch_assoc();
+                     
+                    if($qwe_aux['consolidar'] == 1 || $resultado_aux['estado'] == 0){ // estado = 0 es q ya existe una solicitud pendiente
+                    //salirme del bucle porque no se podra realizar la solicitud
+                    $se_solicitara = 1;
+                    break;
+                    }else{
+                        //seguir con el bucle hasta finalizar 
+                    }
+                }elseif($qwe_aux['consolidar'] == 1){
+                    $se_solicitara = 1;
+                    break;
+                }
             }
             
-            // Iteración sobre los resultados de la consulta de transacciones
-            while ($qwe = $this->dbc->fetch($transa)) {
+            if($se_solicitara == 0){ 
+                        $transa2 = $this->dbc->query("SELECT t.idtransacciones AS transaccion, t.codigotransaccion
+                FROM transacciones AS t 
+                WHERE t.codigotransaccion >= '$nTrainicio' 
+                  AND t.codigotransaccion <= '$nTrafinal' 
+                  AND t.organizacion_idorganizacion = '$empresa'
+            ");  
+
+                // Iteración sobre los resultados de la consulta de transacciones
+            while ($qwe = $this->dbc->fetch($transa2)) {
                 // Inserción en la tabla desconsolidar
                 $registro = $this->dbc->query("INSERT INTO desconsolidar (idtransaccion, motivo, estado, hora, fecha, fechaproceso, horaproceso, idusuario, idempresa, codigo)
-                    VALUES ('{$qwe['transaccion']}', '$motivo', '$estado', '$hora', '$fecha', NULL, NULL, '$usuario', '$empresa', '$codigo')
-                ");
+                    VALUES ('{$qwe['transaccion']}', '$motivo', '$estado', '$hora', '$fecha', NULL, NULL, '$usuario', '$empresa', '$codigo')");
     
+                $update=$this->dbc->query("UPDATE transacciones SET estado = '7' WHERE idtransacciones = '{$qwe['transaccion']}'");
                 // Verificación de la consulta de inserción
                 if (!$registro) {
                     $insertSuccess = false; // Marcar como falso si alguna inserción falla
                     throw new Exception("Error al insertar en desconsolidar: " . $this->dbc->error);
                 }
-    
-                // Agregar datos al arreglo
-                //$datos[] = ["datos" => $qwe['transaccion']];
             }
-    
-            // Comprobación del éxito de todas las inserciones
-            if ($insertSuccess) {
-                $res = ["ok" => "success"];
-            } else {
-                throw new Exception("Error al insertar en la tabla desconsolidar");
+
+            if($update === TRUE){
+                $res = array("success", "Se Registro Correctamente", "detalletransaccionnormal");
+
+            }else{
+                $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
+
             }
+            }else{
+             $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
+            }     
+    
         } catch (Exception $e) {
             $res = ["ok" => "error", "message" => $e->getMessage()];
         }
@@ -1771,6 +1800,6 @@ WHERE
     //listafactura listafactura_pagado registrocobrarfactura registrorelacionip lista_cobrar_cobrado_factura listaimpuestoentreplan getgestionactualid
 }//eliminarcobrados listapagos  listaimpuestoentreplan lista_plan_cuenta_no_vinculada lista_cobrar_cobrado_factura row cambiarestadoconsolidado
 //registrardesconsolidar crearfactura   registropagarfactura listaclientes  listafacturaapi_cobrado listafacturaapi_pagado registrar_factura_cobros_tributario
-// $gestion = $this->getgestionactualid($ide); listapagos listaasientos cliente registrar_factura_cobros_tributario listafacturaapi_cobrado       
+// $gestion = $this->getgestionactualid($ide); listapagos listaasientos cliente registrar_factura_cobros_tributario listafacturaapi_cobrado registrardesconsolidar  
 
 
