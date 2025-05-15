@@ -485,7 +485,15 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['fecha'],$_POST['empresa'],$_POST['sucursal']));
         }
-    }    
+    }elseif($ver=="registrar_cuenta_apertura"){
+        if(isset($_POST['fecha'],$_POST['idgestion_anterior'],$_POST['empresa'],$_POST['sucursal'])){
+            $cont=new Transacciones();
+            $cont->registrar_cuenta_apertura($_POST['fecha'],$_POST['idgestion_anterior'],$_POST['empresa'],$_POST['sucursal']);
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['fecha'],$_POST['idgestion_anterior'],$_POST['empresa'],$_POST['sucursal']));
+        }
+    }      
     
 //registrar_recibo_otras_cuentas_pagar asiento registroasiento registrorelacionip registrar_factura_recibo_cobro_cajaBancos registrocobrarfactura consolidar vincula
 //  registrotransaccion   registrocobrarfactura registrocobrarfacturaGrupal  registropagarfactura registrocobrarfacturaGrupal registrotransaccionf5 tributario

@@ -143,12 +143,23 @@ public function registrar_anular_eliminar_activar_transaccion($idtransaccion,$mo
 
                 if ($consulta_detalle->num_rows > 0) {  
 
+                    // ELIMINAR DETALLES_TRANSACCION
                     $update_det=$this->dbc->query("DELETE FROM detalletransaccion 
                     WHERE transacciones_idtransacciones = '$idtransaccion'");        
                 }else{
                 
 
                 }
+
+                $trans_cierres=$this->dbc->query("SELECT * FROM cierre_transacciones WHERE idtransacciones='$idtransaccion'");
+
+                if ($trans_cierres->num_rows > 0) {  
+                    $delete_trans_cierres=$this->dbc->query("DELETE FROM cierre_transacciones
+                    WHERE idtransacciones = '$idtransaccion'");  
+                }else{
+
+                }
+
                 $update_factura=$this->dbc->query("UPDATE factura SET transacciones_idtransacciones = '0' 
                         WHERE transacciones_idtransacciones = '$idtransaccion'");   
 

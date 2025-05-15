@@ -453,6 +453,9 @@ elseif($ver[0]=="listar_facturas_cobros_sin_transaccion"){
 }elseif($ver[0]=="existe_apertura_pre_cierre"){
     $cont=new Transacciones();
     $cont->existe_apertura_pre_cierre($ver[1],$ver[2]);
+}elseif($ver[0]=="existe_cierre_de_gestion_anterior"){
+    $cont=new Transacciones();
+    $cont->existe_cierre_de_gestion_anterior($ver[1]);
 }
 
 
