@@ -186,7 +186,7 @@ class Contabilidad extends DB
         if($estado==1){
             $desconsolidar=$this->dbc->query("SELECT * FROM desconsolidar WHERE codigo='$grupo'");
             while($qwe=$this->dbc->fetch($desconsolidar)){
-                $descTRan=$this->dbc->query("UPDATE transacciones SET consolidar='$estado' WHERE idtransacciones='$qwe[idtransaccion]'");
+                $descTRan=$this->dbc->query("UPDATE transacciones SET consolidar='$estado', estado='1'  WHERE idtransacciones='$qwe[idtransaccion]'");
             }
         }
         if($registro===TRUE){

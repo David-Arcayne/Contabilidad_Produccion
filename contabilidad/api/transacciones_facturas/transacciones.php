@@ -699,6 +699,9 @@ if($filtrado->num_rows > 0){
         $ide = $this->getidempresa($empresa);
         $gestion=$this->getidgestion($empresa);
         // $idempresa = $this->getidempresa($empresa);
+        $existe_cuenta = $this->dbc->query("SELECT * FROM vinculacion_cuenta_xcxp WHERE cobrar_pagar ='3' AND idempresa = '$ide'");
+
+        if($existe_cuenta->num_rows > 0){
 
         //ANTES DE REGISTRAR TRANSACCION CONSOLIDAR TODAS LAS TRANSACCIONES-->SOLO CONSOLIDAR LOS Q ESTAN CUADRANDO SUS NUMEROS
         $transaccion = $this->dbc->query("SELECT * FROM transacciones WHERE idgestion ='$gestion' AND consolidar = '1' AND codigotransaccion > '0'");
@@ -805,7 +808,9 @@ if($filtrado->num_rows > 0){
         $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
 
         }
-
+    }else{
+        $res = array("warning", "Usted previamente debe seleccionar la cuenta de Cierre de gestion");
+    }
         echo json_encode($res);
     // echo json_encode(array($control_consolidado,$fecha,$empresa,$sucursal,$arre));
     } 
@@ -816,6 +821,10 @@ if($filtrado->num_rows > 0){
         $ide = $this->getidempresa($empresa);
         $gestion=$this->getidgestion($empresa);
         // $idempresa = $this->getidempresa($empresa);
+
+        $existe_cuenta = $this->dbc->query("SELECT * FROM vinculacion_cuenta_xcxp WHERE cobrar_pagar ='3' AND idempresa = '$ide'");
+
+        if($existe_cuenta->num_rows > 0){
 
         $existe = $this->dbc->query("SELECT * FROM cierre_transacciones WHERE nombre_operacion = 'precierre' AND idempresa = '$ide' AND idgestion ='$gestion'");
 
@@ -895,11 +904,14 @@ if($filtrado->num_rows > 0){
             $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
 
         }
+    }else{
+        $res = array("warning", "Usted previamente debe seleccionar la cuenta de Cierre de gestion");
 
+    }
         echo json_encode($res);
     } 
 
-          public function registrar_cuenta_apertura($fecha,$idgestion_anterior,$empresa,$sucursal) {
+    public function registrar_cuenta_apertura($fecha,$idgestion_anterior,$empresa,$sucursal) {
 
         $idsucursal = $this->getidsucursal($sucursal);
         $ide = $this->getidempresa($empresa);
@@ -989,7 +1001,7 @@ if($filtrado->num_rows > 0){
         $ga = $gestion_actual->fetch_assoc();
 
         $existe_gest_ante = $this->dbc->query("SELECT * FROM gestion 
-        WHERE idempresa = '$idempresa' AND YEAR(fechafin) = YEAR('$ga[fechaini]') - 1;");
+        WHERE idempresa = '$idempresa' AND YEAR(fechaini) = YEAR('$ga[fechaini]') - 1;");
         
         if($existe_gest_ante->num_rows > 0){
 

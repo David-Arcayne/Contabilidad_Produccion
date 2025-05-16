@@ -493,7 +493,15 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['fecha'],$_POST['idgestion_anterior'],$_POST['empresa'],$_POST['sucursal']));
         }
-    }      
+    }elseif($ver=="editar_caja_bancos_usuarios"){
+        if(isset($_POST['idcaja_banco_usuario'],$_POST['idcaja_bancos'],$_POST['idusuario'],$_POST['funcion'],$_POST['permiso_registrar'],$_POST['empresa'])){
+            $cont=new Caja_bancos_recibos();
+            $cont->editar_caja_bancos_usuarios($_POST['idcaja_banco_usuario'],$_POST['idcaja_bancos'],$_POST['idusuario'],$_POST['funcion'],$_POST['permiso_registrar'],$_POST['empresa']);
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idcaja_banco_usuario'],$_POST['idcaja_bancos'],$_POST['idusuario'],$_POST['funcion'],$_POST['permiso_registrar'],$_POST['empresa']));
+        }
+    }     
     
 //registrar_recibo_otras_cuentas_pagar asiento registroasiento registrorelacionip registrar_factura_recibo_cobro_cajaBancos registrocobrarfactura consolidar vincula
 //  registrotransaccion   registrocobrarfactura registrocobrarfacturaGrupal  registropagarfactura registrocobrarfacturaGrupal registrotransaccionf5 tributario

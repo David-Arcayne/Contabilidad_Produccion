@@ -1553,6 +1553,29 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         
     }
 
+     public function editar_caja_bancos_usuarios($idcaja_banco_usuario,$idcaja_bancos,$idusuario,$funcion,$permiso_registrar,$empresa){
+        // $idempresa = Empresa::getidempresa($empresa);
+        $idempresa = $this->getidempresa($empresa);
+        $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM caja_banco_usuarios WHERE idcaja_bancos = '$idcaja_bancos' AND idusuario = '$idusuario' AND idcaja_banco_usuarios != '$idcaja_banco_usuario'");
+        $resultado = $consulta->fetch_assoc();
+        $totalRegistros = $resultado['total'];
+
+        if ($totalRegistros > 0) {
+            $res = array("danger", "El registro ya existe","Error");
+        } else {
+            // Insertar el nuevo registro
+            $registroProveedor = $this->dbc->query("UPDATE caja_banco_usuarios 
+            SET idusuario = '$idusuario',funcion = '$funcion',permiso_registrar = '$permiso_registrar' WHERE idcaja_banco_usuarios = '$idcaja_banco_usuario'");
+            if ($registroProveedor === TRUE) {                                                                                                                                                                
+                $res = array("success", "Registro exitoso","registroCaracteristicas");
+            } else {
+                $res = array("danger", "No se pudo registrar");
+            }
+        }
+        echo json_encode($res);
+        
+    }
+
     public function listar_usuarios($empresa){
         $lista = [];
         $ide = $this->getidempresa($empresa);
