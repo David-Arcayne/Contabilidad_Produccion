@@ -743,8 +743,10 @@ class Admin extends DB
     public function impuestocreardelete($idimpuesto){
         $res="";
         //$ide=$this->getidempresa($empresa);
-        $registro=$this->dbc->query("DELETE FROM impuesto  WHERE idimpuesto='$idimpuesto'");
-        if($registro===TRUE){
+        $delete=$this->dbc->query("DELETE FROM impuesto  WHERE idimpuesto='$idimpuesto'");
+        if($delete===TRUE){
+            $vinculacion_impues=$this->dbc->query("DELETE FROM relacionip  WHERE idimpuesto='$idimpuesto'");
+       
             $res=array("ok"=>"success","mensaje"=>"Se Actualizo Correctamente");
         }else{
             $res=array("ok"=>"danger","mensaje"=>"No se Actualizo Correctamente");
@@ -849,5 +851,5 @@ public function codigo_correlativo_plandecuenta($codigo,$empresa)
         }
         echo json_encode($lista);
     }
-//impuestocrear milista impuestolista
+//impuestocrear milista impuestolista impuestocreardelete
 }

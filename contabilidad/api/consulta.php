@@ -462,5 +462,5 @@ elseif($ver[0]=="listar_facturas_cobros_sin_transaccion"){
 // asientotipo  creartipoasientodelete listaplanesempresa listaimpuestoentreplan listar_recibo_por_id_otras_cuentas
 // milista     listafacturaapi_cobrado listar_recibo_por_caja_bancos listar_recibo_por_id_otras_cuentas_pagar caja_banco
 //listafactura   listatransaciones   reportedetalletransaccion  lista_cobrar_cobrado_factura listar_otras_cuentas existe_empresa_modulo
-//reporteactivodisponible    getidempresa firmas listaimpuestoentreplan listafacturaapi_cobrado tributario  impuesto
+//reporteactivodisponible    getidempresa firmas listaimpuestoentreplan listafacturaapi_cobrado tributario  impuesto impuestocrear reportecomprobantecontable
 ?>

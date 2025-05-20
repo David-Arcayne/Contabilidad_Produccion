@@ -788,7 +788,7 @@ $totalHaber = 0;
   }
 
   public function reportecomprobantecontable($numeroIni,$numeroFin,$fechaIni,$fechaFin,$empresa,$factura){
-//reporteactivodiaponible
+//reporteactivodiaponible          La fecha, persona, ci, Nro comprobante y el monto
 // echo json_encode(array($fechaIni,$fechaFin,$numeroIni,$numeroFin,$empresa,$factura));
     $lista=[];
     $ide=$this->getidempresa($empresa);
@@ -849,6 +849,7 @@ $totalHaber = 0;
        $tt=$this->dbc->fetch($tipo);
        $detalle=[];
        $facturas=[];
+       $recibos = [];
        $fature=$this->dbc->query("SELECT
        f.idfactura,
        f.fecha,
@@ -876,7 +877,33 @@ $totalHaber = 0;
            array_push($facturas,$fat);
        }
        }
-     
+    
+        $recibo=$this->dbc->query("SELECT
+       cp.idcuentaspof,
+       cp.fecha,
+       cp.persona,
+       cp.ci,
+       cp.nrecibo,
+       cp.monto
+     FROM
+       cuentaspof AS cp
+     WHERE
+       cp.transaccion ='$qwe[5]'
+       ");
+       while($reci=$this->dbc->fetch($recibo)){
+       
+          // if($zxc['idotras_cuentas'] == 0){
+          //     $factura=$this->dbc->query("SELECT proveedorcliente_idproveedorcliente FROM factura WHERE idfactura ='$zxc[6]' ");
+          //     $fact = $factura->fetch_assoc();
+
+          // }else{
+
+          // }
+
+           $rec=array("idcuentaspof"=>$reci[0],"fecha"=>$reci[1],"persona"=>$reci[2],"ci"=>$reci[3],"nrecibo"=>$reci[4],"monto"=>$reci[5]);
+           array_push($recibos,$rec);
+       
+       }
 
 
       $dt=$this->dbc->query("SELECT p.numero,p.nombreplan,d.nota,d.debe,d.haber FROM detalletransaccion AS d
@@ -887,10 +914,20 @@ $totalHaber = 0;
            array_push($detalle,$det);
        }
 
-       if($factura==1){
+      // if($factura==1){//NO TIENE NI FACTURA NI RECIBO
+      //    $res=array("codigo"=>$qwe[0],"fecha"=>$qwe[1],"documento"=>$qwe[2],"glosa"=>$qwe[3],"idtransaccion"=>$qwe[5],"estado"=>$qwe[6],"tipo"=>$tt['nombre'],"detalle"=>$detalle);
+      //  }else{ // NO TIENE FACTURA PERO SI TIENE RECIBO
+      //    $res=array("codigo"=>$qwe[0],"fecha"=>$qwe[1],"documento"=>$qwe[2],"glosa"=>$qwe[3],"idtransaccion"=>$qwe[5],"estado"=>$qwe[6],"tipo"=>$tt['nombre'],"detalle"=>$detalle,"facturas"=>$facturas);
+      //  }
+
+       if($factura==1){//NO TIENE NI FACTURA NI RECIBO
          $res=array("codigo"=>$qwe[0],"fecha"=>$qwe[1],"documento"=>$qwe[2],"glosa"=>$qwe[3],"idtransaccion"=>$qwe[5],"estado"=>$qwe[6],"tipo"=>$tt['nombre'],"detalle"=>$detalle);
-       }else{
+       }elseif($factura==2){ // NO TIENE FACTURA PERO SI TIENE RECIBO
+         $res=array("codigo"=>$qwe[0],"fecha"=>$qwe[1],"documento"=>$qwe[2],"glosa"=>$qwe[3],"idtransaccion"=>$qwe[5],"estado"=>$qwe[6],"tipo"=>$tt['nombre'],"detalle"=>$detalle,"recibos"=>$recibos);
+       }elseif($factura==3){ //SI TIENE FACTURA PERO NO TIENE RECIBO
          $res=array("codigo"=>$qwe[0],"fecha"=>$qwe[1],"documento"=>$qwe[2],"glosa"=>$qwe[3],"idtransaccion"=>$qwe[5],"estado"=>$qwe[6],"tipo"=>$tt['nombre'],"detalle"=>$detalle,"facturas"=>$facturas);
+       }else{ // TIENE FACTURA Y TIENE RECIBO
+         $res=array("codigo"=>$qwe[0],"fecha"=>$qwe[1],"documento"=>$qwe[2],"glosa"=>$qwe[3],"idtransaccion"=>$qwe[5],"estado"=>$qwe[6],"tipo"=>$tt['nombre'],"detalle"=>$detalle,"facturas"=>$facturas,"recibos"=> $recibos);
        }
        
        array_push($lista,$res);
@@ -1713,7 +1750,7 @@ if ($pcuentas->num_rows > 0) {
 
         echo json_encode($lista); 
        }
-  //reportedetallefpt reporteactivodiaponibledos reportedetalletransaccion estado consolidar reporteactivoypasivo resultados
+  //reportedetallefpt reporteactivodiaponibledos reportedetalletransaccion estado consolidar reporteactivoypasivo resultados reportecomprobantecontable
 //reportecomprobantecontable reporteactivodisponible reportedetalletransaccion mayorcuentacontable reportecomprobantecontable firmas reporteactivoypasivo
 
 }
