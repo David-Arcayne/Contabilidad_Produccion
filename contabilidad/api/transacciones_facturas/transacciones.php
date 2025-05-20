@@ -1049,28 +1049,23 @@ if($filtrado->num_rows > 0){
         echo json_encode($lista);
     }
     public function consolidacion_multiple($transacciones) {
-        $lista = [];
+
         $transaccion_array = json_decode($transacciones, true);
 
         foreach($transaccion_array as $trans){
             if($trans['estado'] == 1 && $trans['consolidar'] == 1){
                 //consolidar
+                $editar_trans = $this->dbc->query("UPDATE transacciones SET consolidar = '2' WHERE idtransacciones = '$trans[idtransacciones]'");
+
             }else{
                 //saltar
             }
         }
-        // $idempresa = $this->getidempresa($empresa);
-    
-        // Preparar la consulta
-        $getPedido = $this->dbc->query("SELECT * FROM plandecuenta WHERE organizacion_idorganizacion='$idempresa'");
-        
-        // Verificar si hay resultados
-        $respu = ($getPedido->num_rows > 0) ? "true" : "false";
 
-        // Agregar la respuesta al array
-        $lista[] = ["respuesta" => $respu];
+        $res = array("success", "Se realizo las Consolidaciones Correctamente", "detalletransaccionnormal");
 
-        echo json_encode($lista);
+        echo json_encode($res);
+        // echo json_encode(array($transacciones,$transaccion_array));
     }  
-//array_push decode
+//array_push decode update
 }

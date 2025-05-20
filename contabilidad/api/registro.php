@@ -501,9 +501,17 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idcaja_banco_usuario'],$_POST['idcaja_bancos'],$_POST['idusuario'],$_POST['funcion'],$_POST['permiso_registrar'],$_POST['empresa']));
         }
+    }elseif($ver=="consolidacion_multiple"){
+        if(isset($_POST['transacciones'])){
+            $cont=new Transacciones();
+            $cont->consolidacion_multiple($_POST['transacciones']);
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['transacciones']));
+        }
     }     
     
 //registrar_recibo_otras_cuentas_pagar asiento registroasiento registrorelacionip registrar_factura_recibo_cobro_cajaBancos registrocobrarfactura consolidar vincula
-//  registrotransaccion   registrocobrarfactura registrocobrarfacturaGrupal  registropagarfactura registrocobrarfacturaGrupal registrotransaccionf5 tributario
+//  registrotransaccion   registrocobrarfactura registrocobrarfacturaGrupal  registropagarfactura registrocobrarfacturaGrupal registrotransaccionf5 tributario registrar_detalle_transaccion_json
 }//  editar_caja_bancos_pagar_recibo  registrar_factura_recibo_pagos_cajaBancos impuestocrear tributario registropagarfactura impuestocrearf5 registrar_factura desconsolidar
 ?> 
