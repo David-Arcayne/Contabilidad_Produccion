@@ -1047,6 +1047,30 @@ if($filtrado->num_rows > 0){
         $lista[] = ["respuesta" => $respu];
 
         echo json_encode($lista);
-    } 
-//array_push
+    }
+    public function consolidacion_multiple($transacciones) {
+        $lista = [];
+        $transaccion_array = json_decode($transacciones, true);
+
+        foreach($transaccion_array as $trans){
+            if($trans['estado'] == 1 && $trans['consolidar'] == 1){
+                //consolidar
+            }else{
+                //saltar
+            }
+        }
+        // $idempresa = $this->getidempresa($empresa);
+    
+        // Preparar la consulta
+        $getPedido = $this->dbc->query("SELECT * FROM plandecuenta WHERE organizacion_idorganizacion='$idempresa'");
+        
+        // Verificar si hay resultados
+        $respu = ($getPedido->num_rows > 0) ? "true" : "false";
+
+        // Agregar la respuesta al array
+        $lista[] = ["respuesta" => $respu];
+
+        echo json_encode($lista);
+    }  
+//array_push decode
 }

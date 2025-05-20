@@ -878,29 +878,30 @@ $totalHaber = 0;
        }
        }
     
-        $recibo=$this->dbc->query("SELECT
-       cp.idcuentaspof,
-       cp.fecha,
-       cp.persona,
-       cp.ci,
-       cp.nrecibo,
-       cp.monto
-     FROM
-       cuentaspof AS cp
-     WHERE
-       cp.transaccion ='$qwe[5]'
-       ");
+        $recibo=$this->dbc->query("SELECT 
+        cp.idcuentaspof AS idrecibo,
+        cp.fecha,
+        cp.persona,
+        cp.ci,
+        cp.nrecibo,
+        cp.monto
+    FROM cuentaspof AS cp
+    WHERE cp.transaccion = '$qwe[5]'
+
+    UNION
+
+    SELECT 
+        cp.idcuentaspor AS idrecibo,
+        cp.fecha,
+        cp.persona,
+        cp.ci,
+        cp.nrecibo,
+        cp.monto
+    FROM cuentaspor AS cp
+    WHERE cp.transaccion = '$qwe[5]';");
        while($reci=$this->dbc->fetch($recibo)){
-       
-          // if($zxc['idotras_cuentas'] == 0){
-          //     $factura=$this->dbc->query("SELECT proveedorcliente_idproveedorcliente FROM factura WHERE idfactura ='$zxc[6]' ");
-          //     $fact = $factura->fetch_assoc();
 
-          // }else{
-
-          // }
-
-           $rec=array("idcuentaspof"=>$reci[0],"fecha"=>$reci[1],"persona"=>$reci[2],"ci"=>$reci[3],"nrecibo"=>$reci[4],"monto"=>$reci[5]);
+           $rec=array("idrecibo"=>$reci[0],"fecha"=>$reci[1],"persona"=>$reci[2],"ci"=>$reci[3],"nrecibo"=>$reci[4],"monto"=>$reci[5]);
            array_push($recibos,$rec);
        
        }
@@ -1750,7 +1751,7 @@ if ($pcuentas->num_rows > 0) {
 
         echo json_encode($lista); 
        }
-  //reportedetallefpt reporteactivodiaponibledos reportedetalletransaccion estado consolidar reporteactivoypasivo resultados reportecomprobantecontable
+  //reportedetallefpt reporteactivodiaponibledos reportedetalletransaccion estado consolidar reporteactivoypasivo resultados reportecomprobantecontable                
 //reportecomprobantecontable reporteactivodisponible reportedetalletransaccion mayorcuentacontable reportecomprobantecontable firmas reporteactivoypasivo
 
 }
