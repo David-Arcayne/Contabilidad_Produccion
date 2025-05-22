@@ -17,6 +17,7 @@ require_once "./configuracion/asiento.php";
 require_once "./recibos/caja_bancos_recibos.php";
 require_once "alertas.php";
 require_once "./facturas/filtrado_facturas.php";
+require_once "./facturas/factura_comercial.php";
 
 $ver=explode("/",$_GET['ver']); //dividiendo los "/"  ver[0],ver[1],ver[x]  listafacturaapi_pagado eliminarasiento
 if($ver[0]=="verificacion"){
@@ -456,6 +457,9 @@ elseif($ver[0]=="listar_facturas_cobros_sin_transaccion"){
 }elseif($ver[0]=="existe_cierre_de_gestion_anterior"){
     $cont=new Transacciones();
     $cont->existe_cierre_de_gestion_anterior($ver[1]);
+}elseif($ver[0]=="listar_factura_comercial"){
+    $cont=new Factura_comercial();
+    $cont->listar_factura_comercial($ver[1]);
 }
 
 
