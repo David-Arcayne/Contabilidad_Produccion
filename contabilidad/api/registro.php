@@ -16,6 +16,7 @@ require_once "./configuracion/asiento.php";
 require_once "./recibos/caja_bancos_recibos.php";
 require_once "./facturas/factura_cobros.php";
 require_once "./facturas/factura_pagos.php";
+require_once "./facturas/factura_comercial.php";
 
 $ver=$_POST['ver'];
 $json = file_get_contents('php://input'); // Decodificar el JSON en un arreglo PHP   gestion
@@ -509,7 +510,15 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['transacciones']));
         }
-    }     
+    }elseif($ver=="cobro_asignacion_factura_comercial"){
+        if(isset($_POST['fecha'],$_POST['monto_total'],$_POST['monto_recibo'],$_POST['transaccion'],$_POST['cajasBancos'],$_POST['asiento_modelo'],$_POST['empresa'],$_POST['sucursal'],$_POST['facturas_comercial'])){
+            $cont=new Factura_comercial();
+            $cont->cobro_asignacion_factura_comercial($_POST['fecha'],$_POST['monto_total'],$_POST['monto_recibo'],$_POST['transaccion'],$_POST['cajasBancos'],$_POST['asiento_modelo'],$_POST['empresa'],$_POST['sucursal'],$_POST['facturas_comercial']);
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['fecha'],$_POST['monto_total'],$_POST['monto_recibo'],$_POST['transaccion'],$_POST['cajasBancos'],$_POST['asiento_modelo'],$_POST['empresa'],$_POST['sucursal'],$_POST['facturas_comercial']));
+        }
+    }  
     
 //registrar_recibo_otras_cuentas_pagar asiento registroasiento registrorelacionip registrar_factura_recibo_cobro_cajaBancos registrocobrarfactura consolidar vincula
 //  registrotransaccion   registrocobrarfactura registrocobrarfacturaGrupal  registropagarfactura registrocobrarfacturaGrupal registrotransaccionf5 tributario registrar_detalle_transaccion_json

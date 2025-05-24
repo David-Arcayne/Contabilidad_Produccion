@@ -460,6 +460,9 @@ elseif($ver[0]=="listar_facturas_cobros_sin_transaccion"){
 }elseif($ver[0]=="listar_factura_comercial"){
     $cont=new Factura_comercial();
     $cont->listar_factura_comercial($ver[1]);
+}elseif($ver[0]=="listar_factura_comercial_con_transaccion"){
+    $cont=new Factura_comercial();
+    $cont->listar_factura_comercial_con_transaccion($ver[1]);
 }
 
 
