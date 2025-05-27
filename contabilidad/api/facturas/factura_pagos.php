@@ -34,7 +34,11 @@ class Factura_pagos extends DB{
         
             $res = "";
 
-            $caja_bancos = json_decode($idcajas_bancos, true);
+            if($idcajas_bancos == ""){
+            //saltar          
+            }else{
+                $caja_bancos = json_decode($idcajas_bancos, true);  
+            }
 
         
             $recibo_trans = $this->dbc->query("SELECT count(*) AS cant1 FROM cuentaspor cp 
@@ -188,10 +192,15 @@ class Factura_pagos extends DB{
             $idrecibo = $this->dbc->insert_id;
             }
 
-            foreach($caja_bancos as $cajaBanco){
+            if($idcajas_bancos == ""){
+
+            }else{
+                foreach($caja_bancos as $cajaBanco){
                 $regis_caja_banco = $this->dbc->query("INSERT INTO detalle_caja_bancos_pagar(idcaja_bancos,monto,idcuentaspor,idfactura,idotras_cuentas)
                 VALUES('$cajaBanco[id]','$cajaBanco[monto]','$idrecibo','$idfact','0')");
             }
+            }
+            
             }
         
             // $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa', '$espesificacion', '1', '1', '$trans', '$cliente', '$idempresa', '$cuenta', '$idsucursal');");

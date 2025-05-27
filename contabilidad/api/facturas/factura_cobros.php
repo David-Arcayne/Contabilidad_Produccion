@@ -32,8 +32,11 @@ class Factura_cobros extends DB{
         $gestion = $this->getgestionactualid($idempresa);
     
         $res = "";
-
-        $caja_bancos = json_decode($idcajas_bancos, true);
+        if($idcajas_bancos == ""){
+            //saltar          
+        }else{
+            $caja_bancos = json_decode($idcajas_bancos, true);  
+        }
 
         $recibo_trans = $this->dbc->query("SELECT count(*) AS cant1 FROM cuentaspof cp 
         INNER JOIN transacciones t ON t.idtransacciones=cp.transaccion 
@@ -186,10 +189,15 @@ class Factura_cobros extends DB{
         $idrecibo = $this->dbc->insert_id;
         }
 
-        foreach($caja_bancos as $cajaBanco){
-            $regis_caja_banco = $this->dbc->query("INSERT INTO detalle_caja_bancos_cobrar(idcaja_bancos,monto,idcuentaspof,idfactura,idotras_cuentas)
-            VALUES('$cajaBanco[id]','$cajaBanco[monto]','$idrecibo','$idfact','0')");
+            if($idcajas_bancos == ""){
+                //NO REGISTRARA CAJA_BANCOS PORQ EL USUARIO NO TIENE NINGUN CAJA_BANCO
+            }else{ //SI TIENE CAJA_BANCOS ENTONCES REGISTRAMOS
+                foreach($caja_bancos as $cajaBanco){
+                $regis_caja_banco = $this->dbc->query("INSERT INTO detalle_caja_bancos_cobrar(idcaja_bancos,monto,idcuentaspof,idfactura,idotras_cuentas)
+                VALUES('$cajaBanco[id]','$cajaBanco[monto]','$idrecibo','$idfact','0')");
+            }
         }
+        
         }
     
         // $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa', '$espesificacion', '1', '1', '$trans', '$cliente', '$idempresa', '$cuenta', '$idsucursal');");

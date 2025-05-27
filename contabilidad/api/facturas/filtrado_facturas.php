@@ -7,9 +7,9 @@ class Filtrado_facturas extends DB{
       // $idempresa = $this->getidempresa($empresa);
                 // echo json_encode(array($cobrado,$idcaja_bancos,$empresa));
                 
-                ini_set('display_errors', 1);
-                ini_set('display_startup_errors', 1);
-                error_reporting(E_ALL);
+                // ini_set('display_errors', 1);
+                // ini_set('display_startup_errors', 1);
+                // error_reporting(E_ALL);
 
 
         $lista = [];
@@ -77,12 +77,17 @@ class Filtrado_facturas extends DB{
 
         while ($factura_cajas = $this->dbc->fetch($det_caja_banc)) {
             $factura_aux = $this->dbc->query("SELECT * FROM factura WHERE idfactura = '$factura_cajas[idfactura]'"); //POR COBRAR
-            $factu = $factura_aux->fetch_assoc();
-            if($factu['transacciones_idtransacciones'] == 0 && $factu['cobrado'] != 0 ){
-                array_push($array_idfacturas, $factura_cajas['idfactura']);
-            }else{
+            if($factura_aux->num_rows > 0){
+                $factu = $factura_aux->fetch_assoc();
+                if($factu['transacciones_idtransacciones'] == 0 && $factu['cobrado'] != 0 ){
+                    array_push($array_idfacturas, $factura_cajas['idfactura']);
+                }else{
 
+                }
+            }else{
+                //SALTAR
             }
+            
         }
 
         $factura_comas = implode(",", $array_idfacturas);
