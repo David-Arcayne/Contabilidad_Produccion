@@ -487,7 +487,18 @@ WHERE md5(p.organizacion_idorganizacion)='$ide'");
         $res = "";
         $ide = $this->getidempresa($empresa);
         $codigo = "CON-" . date("Ymdhi");
+
+        $consulta = $this->dbcm->query("SELECT COUNT(*) AS total FROM cliente WHERE nit = '$nit' AND idempresa = '$ide'");
+        $resultado = $consulta->fetch_assoc();
+        $totalRegistros = $resultado['total'];
+
+        if($totalRegistros > 0){
+            $res = array("danger", "No se pudo registrar");
+
+        }else{
         $registro = $this->dbcm->query("insert into cliente(id_cliente,nombre,nombrecomercial,tipo,codigo,nit,detalle,direccion,telefono,mobil,email,web,pais,ciudad,zona,contacto,idempresa,tipodocumento)values(NULL,'$nombre','$nombrecomercial','$tipo','$codigo','$nit','$detalle','$direccion','$telefono','$mobil','$email','$web','$pais','$ciudad','$zona','$contacto','$ide','$tipodocumento')");
+
+        }
         if ($registro === TRUE) {
             $res = array("success", "Se registro correctamente", "registrocliente");
         } else {
@@ -565,7 +576,18 @@ WHERE md5(p.organizacion_idorganizacion)='$ide'");
         $ide = $this->getidempresa($empresa);
         $res = "";
         $codigo = "CON-" . date("Ymdhi");
+
+         $consulta = $this->dbcm->query("SELECT COUNT(*) AS total FROM proveedor WHERE nit = '$nit' AND idempresa = '$ide'");
+        $resultado = $consulta->fetch_assoc();
+        $totalRegistros = $resultado['total'];
+
+        if($totalRegistros > 0){
+            $res = array("danger", "No se pudo registrar");
+
+        }else{
         $registro = $this->dbcm->query("insert into proveedor(id_proveedor,nombre,codigo,nit,detalle,direccion,telefono,mobil,email,web,pais,ciudad,zona,contacto,id_empresa)values(NULL,'$nombre','$codigo','$nit','$detalle','$direccion','$telefono','$mobil','0','0','$pais','$ciudad','$zona','0','$ide')");
+        
+        }
         if ($registro === TRUE) {
             $res = array("success", "Se registro correctamente", "registroproveedor");
         } else {
@@ -637,28 +659,6 @@ WHERE md5(p.organizacion_idorganizacion)='$ide'");
         } catch (Exception $e) {
             $this->dbcm->rollback();
             $res = array("danger", $e->getMessage(), "eliminarproveedor");
-        }
-        echo json_encode($res);
-    }
-
-    public function crearfacturas($fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento, $espesificacion, $cliente, $cobro, $pagar, $trans, $clasefactura, $cuenta, $empresa, $sucursal)
-    {
-        $idsucursal = $this->getidsucursal($sucursal);
-        $idempresa = $this->getidempresa($empresa);
-        $co = 0;
-        $pa = 0;
-        if ($cobro == 1 || $cobro == 2) {
-            $co = $cobro;
-        }
-        if ($pagar == 1 || $pagar == 2) {
-            $pa = $pagar;
-        }
-        $res = ""; //array($fecha,$nfactura,$nautorizacion,$codigocontrol,$monto,$tasacero,$export,$npoliza,$ice,$descuento,$espesificacion,$cliente,$co,$pa,$trans,$clasefactura,$cuenta,$idempresa,$idsucursal);
-        $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa', '$espesificacion', '1', '1', '$trans', '$cliente', '$idempresa', '$cuenta', '$idsucursal');");
-        if ($registro === TRUE) {
-            $res = array("success", "Registro Correcto", "crearfactura", $trans, $clasefactura, $cuenta);
-        } else {
-            $res = array("danger", "No se pudo realizar el registro ");
         }
         echo json_encode($res);
     }
@@ -1798,7 +1798,7 @@ WHERE
         echo json_encode($res);
     }
     //listafactura listafactura_pagado registrocobrarfactura registrorelacionip lista_cobrar_cobrado_factura listaimpuestoentreplan getgestionactualid
-}//eliminarcobrados listapagos  listaimpuestoentreplan lista_plan_cuenta_no_vinculada lista_cobrar_cobrado_factura row cambiarestadoconsolidado
+}//eliminarcobrados listapagos  listaimpuestoentreplan lista_plan_cuenta_no_vinculada lista_cobrar_cobrado_factura row cambiarestadoconsolidado crearfacturas
 //registrardesconsolidar crearfactura   registropagarfactura listaclientes  listafacturaapi_cobrado listafacturaapi_pagado registrar_factura_cobros_tributario
 // $gestion = $this->getgestionactualid($ide); listapagos listaasientos cliente registrar_factura_cobros_tributario listafacturaapi_cobrado registrardesconsolidar  
 

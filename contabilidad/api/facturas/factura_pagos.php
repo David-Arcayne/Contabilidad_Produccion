@@ -212,4 +212,77 @@ class Factura_pagos extends DB{
             echo json_encode($res);
     // echo json_encode(array($fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento,$clasefactura,$cobro, $pagar, $espesificacion,$trans, $cliente, $empresa,   $cuenta,  $sucursal,$asiento));
         }
+
+         public function registrar_factura_pagos_transaccion($idcajas_bancos,$fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento, $espesificacion, $cliente, $cobro, $pagar, $trans, $clasefactura, $cuenta, $empresa, $sucursal,$por_concepto_de)
+    {
+        $idsucursal = $this->getidsucursal($sucursal);
+        $idempresa = $this->getidempresa($empresa);
+        if($idcajas_bancos == ""){
+            //saltar          
+        }else{
+            $caja_bancos = json_decode($idcajas_bancos, true);  
+        }
+
+        $recibo_trans = $this->dbc->query("SELECT count(*) AS cant1 FROM cuentaspor cp 
+        INNER JOIN transacciones t ON t.idtransacciones=cp.transaccion 
+        WHERE t.organizacion_idorganizacion='$idempresa'");
+        $res1 = $recibo_trans->fetch_assoc();
+
+        $recibo_fact = $this->dbc->query("SELECT count(*) AS cant2 FROM cuentaspor cp
+            INNER JOIN factura f ON f.idfactura=cp.idfactura
+            WHERE f.idorganizacion='$idempresa' AND cp.transaccion = '0'");
+        $res2 = $recibo_fact->fetch_assoc();
+
+        $recibo_oc = $this->dbc->query("SELECT count(*) AS cant3 FROM cuentaspor cp
+        INNER JOIN otras_cuentas oc ON oc.idotras_cuentas=cp.idotras_cuentas
+        WHERE oc.idempresa='$idempresa' and cp.transaccion ='0'");
+        $res3 = $recibo_oc->fetch_assoc();
+
+        $nroRecibo = $res1['cant1'] + $res2['cant2']+ $res3['cant3'] + 1;
+        
+        $co = 0;
+        $pa = 0;
+        if ($cobro == 1 || $cobro == 2) {
+            $co = $cobro;
+        }
+        if ($pagar == 1 || $pagar == 2) {
+            $pa = $pagar;
+        }
+
+         $cl = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='$cliente'");
+        $clientSelect = $cl->fetch_assoc();
+
+        $res = ""; //array($fecha,$nfactura,$nautorizacion,$codigocontrol,$monto,$tasacero,$export,$npoliza,$ice,$descuento,$espesificacion,$cliente,$co,$pa,$trans,$clasefactura,$cuenta,$idempresa,$idsucursal);
+        
+        if($cobro == 1){
+            // NO SE CREARA RECIBO
+            $registro_factura = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa', '$espesificacion', '1', '1', '$trans', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de','transaccion_x_pagar');");
+
+        }else{
+            //SI SE CREARA RECIBO
+            $registro_factura = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa', '$espesificacion', '1', '1', '$trans', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de','transaccion_pagado');");
+        
+            $idfact = $this->dbc->insert_id;
+
+            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
+            VALUES('$nroRecibo','$fecha','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$trans','0',NULL,'transaccion_pagado')");
+
+            $idrecibo = $this->dbc->insert_id;
+
+            if($idcajas_bancos == ""){
+                //NO REGISTRARA CAJA_BANCOS PORQ EL USUARIO NO TIENE NINGUN CAJA_BANCO
+            }else{ //SI TIENE CAJA_BANCOS ENTONCES REGISTRAMOS
+                foreach($caja_bancos as $cajaBanco){
+                $regis_caja_banco = $this->dbc->query("INSERT INTO detalle_caja_bancos_pagar(idcaja_bancos,monto,idcuentaspor,idfactura,idotras_cuentas)
+                VALUES('$cajaBanco[id]','$cajaBanco[monto]','$idrecibo','$idfact','0')");
+            }
+        }
+        }
+        if ($registro_factura === TRUE) {
+            $res = array("success", "Registro Correcto", "crearfactura");
+        } else {
+            $res = array("danger", "No se pudo realizar el registro ");
+        }
+        echo json_encode($res);
+    }
 }

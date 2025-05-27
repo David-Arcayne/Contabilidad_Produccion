@@ -5,7 +5,7 @@ require_once "../../db/db.php";
 class Transacciones extends DB{
     
     
-    public function registrotransaccion($codigo, $fecha, $tipocambio, $tipotransaccion, $glosa, $empresa, $sucursal,$ufv,$dolar)
+    public function registrotransaccion($fecha, $tipocambio, $tipotransaccion, $glosa, $empresa, $sucursal,$ufv,$dolar)
     {
         $ndocumento = "0";
         $ide = $this->getidempresa($empresa);
@@ -15,10 +15,14 @@ class Transacciones extends DB{
         $res = "";
         // aqui la condicional si hay una nueva gestion
 
+         $nroTrans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE organizacion_idorganizacion=$ide AND idgestion='$gestion' ORDER BY codigotransaccion DESC LIMIT 1;");
+        $resultado12 = $nroTrans->fetch_assoc();
+        $nroTransaccion = $resultado12['codigotransaccion'] + 1;
+
         if($tipocambio != ""){
             // EXISTE TIPO DE CAMBIO PARA LA FECHA DE HOY O SE SELECCIONARA UNA Q YA EXISTE
             $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
-        VALUE(NULL,'$codigo','$fecha','$tipocambio','$ndocumento','$glosa','1','1','$tipotransaccion','$ide','$idsucursal','$idgestion')");
+        VALUE(NULL,'$nroTransaccion','$fecha','$tipocambio','$ndocumento','$glosa','1','1','$tipotransaccion','$ide','$idsucursal','$idgestion')");
 
         }else{
             //HAY Q CREAR TIPO DE CAMBIO 
@@ -28,7 +32,7 @@ class Transacciones extends DB{
             $idtipo_cambio = $this->dbc->insert_id;   
         
         $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
-        VALUE(NULL,'$codigo','$fecha','$idtipo_cambio','$ndocumento','$glosa','1','1','$tipotransaccion','$ide','$idsucursal','$idgestion')");
+        VALUE(NULL,'$nroTransaccion','$fecha','$idtipo_cambio','$ndocumento','$glosa','1','1','$tipotransaccion','$ide','$idsucursal','$idgestion')");
 
         }
        

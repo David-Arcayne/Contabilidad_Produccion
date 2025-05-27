@@ -206,6 +206,16 @@ class Factura_comercial extends DB{
         // $idempresa = $this->verificar->verificarIDEMPRESAMD5($idmd5);
         $idempresa = $this->getidempresa($idmd5);
         $lista = [];
+
+        $listaFactura = [];
+        $trans_fact = $this->dbc->query("SELECT idfactura_comercial FROM transaccion_factura_comercial WHERE idempresa = '$idempresa'");
+        while ($zxc = $this->dbc->fetch($trans_fact)) {
+            // $listaFactura = $zxc['idfactura_comercial'];
+            array_push($listaFactura,$zxc['idfactura_comercial']);
+        }
+
+        $facturas = implode(", ", $listaFactura);
+
         $clien = $this->dbcm->query("SELECT v.id_venta, a.nombre, v.fecha_venta, c.nombre , c.nombrecomercial, c.ciudad, v.tipo_venta, v.tipo_pago, v.monto_total, v.nfactura, v.descuento, pa.almacen_id_almacen, v.cliente_id_cliente1, s.nombre, v.estado, ca.canal, vf.cuf, vf.fechaEmission, vf.shortLink, vf.urlSin,ec.estado as estado_cobro,ec.saldo FROM venta v 
         LEFT JOIN cliente c ON v.cliente_id_cliente1=c.id_cliente
         LEFT JOIN detalle_venta dv ON v.id_venta=dv.venta_id_venta
@@ -215,7 +225,7 @@ class Factura_comercial extends DB{
         LEFT JOIN canalventa ca ON v.idcanal=ca.idcanalventa
         LEFT JOIN ventas_facturadas vf ON v.id_venta=vf.venta_id_venta
         LEFT JOIN estado_cobro ec ON ec.venta_id_venta = v.id_venta
-        WHERE c.idempresa = '$idempresa'
+        WHERE c.idempresa = '$idempresa' AND v.id_venta NOT IN ($facturas)
         GROUP BY v.id_venta
         ORDER BY v.fecha_venta DESC, v.id_venta DESC");
         while ($qwe = $this->dbcm->fetch($clien)) {
@@ -433,9 +443,18 @@ GROUP BY v.id_venta
 ORDER BY v.fecha_venta DESC, v.id_venta DESC;
 ");
 
+ $i = 0;
         while ($qwe = $this->dbcm->fetch($clien)) {
-            $res = array("id" => $qwe[0], "almacen" => $qwe[1], "fechaventa" => $qwe[2], "cliente" => $qwe[3], "nombrecomercial" => $qwe[4], "ciudad" => $qwe[5], "tipoventa" => $qwe[6], "tipopago" => $qwe[7], "montototal" => $qwe[8], "nfactura" => $qwe[9], "descuento" => $qwe[10], "idalmacen" => $qwe[11], "idcliente" => $qwe[12], "sucursal" => $qwe[13], "estado" => $qwe[14], "canal" => $qwe[15], "cuf" => $qwe[16], "fechaemision" => $qwe[17], "shortlink" => $qwe[18], "urlsin" => $qwe[19],"estado_cobro" => $qwe[20],"saldo" => $qwe[21]);
+                    
+            $trans_fact_aux = $this->dbc->query("SELECT * FROM transaccion_factura_comercial WHERE idfactura_comercial = '$listaFactura[$i]'");
+            $trans_id = $trans_fact_aux->fetch_assoc();
+
+            $transaccion = $this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones = '$trans_id[idtransaccion]'");
+            $trans_codigo = $transaccion->fetch_assoc();
+
+            $res = array("id" => $qwe[0], "almacen" => $qwe[1], "fechaventa" => $qwe[2], "cliente" => $qwe[3], "nombrecomercial" => $qwe[4], "ciudad" => $qwe[5], "tipoventa" => $qwe[6], "tipopago" => $qwe[7], "montototal" => $qwe[8], "nfactura" => $qwe[9], "descuento" => $qwe[10], "idalmacen" => $qwe[11], "idcliente" => $qwe[12], "sucursal" => $qwe[13], "estado" => $qwe[14], "canal" => $qwe[15], "cuf" => $qwe[16], "fechaemision" => $qwe[17], "shortlink" => $qwe[18], "urlsin" => $qwe[19],"estado_cobro" => $qwe[20],"saldo" => $qwe[21],"codigotransaccion" => $trans_codigo['codigotransaccion']);
             array_push($lista, $res);
+            $i++;
         }
         echo json_encode($lista);
     }
