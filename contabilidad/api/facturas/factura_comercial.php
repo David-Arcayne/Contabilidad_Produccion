@@ -321,12 +321,14 @@ $nroTransaccion = $resultado12['codigotransaccion'] + 1;
 
         //-----------------------------------------------------------------------------------------------------------
 
+       
         $aux_cont = 0;
         foreach($facturas as $factura){
 
            $registrar_fact_trans = $this->dbc->query("INSERT INTO transaccion_factura_comercial(idfactura_comercial,idtransaccion,idempresa)VALUES('$factura[idfactura]','$idtrans','$ide')");
 
-            if($factura['saldo'] > 0){
+           if($idcaja_bancos != ""){
+             if($factura['saldo'] > 0){
 
                  if($aux_cont < 1){ //ENTRA POR PRIMERA VEZ DESPUES NUNCA MAS ENTRA
 
@@ -365,7 +367,9 @@ $nroTransaccion = $resultado12['codigotransaccion'] + 1;
             }else{
                 //  NO HACE NADA
             }
-            
+           }else{
+            // NO SE REALIZARA EL COBRO
+           } 
         }
         if(empty($caja_bancos)){
             //EL ARREGLO CAJA_BANCOS ESTA VACIO

@@ -83,9 +83,10 @@ public function registrar_transaccionEn_espera($idtransaccion,$estado,$hora,$fec
 
             public function lista_transaccionEn_espera($idempresa) {
                 $lista = [];
-                
+                $gestion = $this->getgestionactualC($idempresa);
+        $idgestion = $gestion["id"];
                 // Consulta SQL
-                $sql =$this->dbc->query("SELECT * FROM transaccionEn_espera WHERE md5(idempresa) = '$idempresa' ORDER BY idtransaccionEn_espera DESC");
+                $sql =$this->dbc->query("SELECT * FROM transaccionEn_espera WHERE md5(idempresa) = '$idempresa' AND idgestion = '$idgestion' ORDER BY idtransaccionEn_espera DESC");
             
                     // Procesar los resultados
                     while ($qwe = $this->dbc->fetch($sql)) {

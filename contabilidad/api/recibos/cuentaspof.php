@@ -83,9 +83,13 @@ class Cuentaspof extends DB{
         if ($registropago === TRUE) {
 
             $idcuentaspof = $this->dbc->insert_id;
-            foreach($caja_bancos as $cajaBanco){
+            if($idcaja_bancos == ""){
+                // NO REGISTRARA CAJA_BANCOS
+            }else{
+                foreach($caja_bancos as $cajaBanco){
                 $registropago3 = $this->dbc->query("INSERT INTO detalle_caja_bancos_cobrar(idcaja_bancos,monto,idcuentaspof,idfactura,idotras_cuentas)
                 VALUES('$cajaBanco[id]','$cajaBanco[monto]','$idcuentaspof','$idfactura','0')");
+            }
             }
 
             $res = array("success", "Registro Realizado", "registrocobrarfactura");
@@ -115,11 +119,14 @@ class Cuentaspof extends DB{
         
         if ($registropago2 === TRUE) {
             $idcuentaspof = $this->dbc->insert_id;
-            foreach($caja_bancos as $cajaBanco){
+            if($idcaja_bancos == ""){
+                //NO SE REGISTRARA CAJA_BANCOS
+            }else{
+                foreach($caja_bancos as $cajaBanco){
                 $registropago3 = $this->dbc->query("INSERT INTO detalle_caja_bancos_cobrar(idcaja_bancos,monto,idcuentaspof,idfactura,idotras_cuentas)
                 VALUES('$cajaBanco[id]','$cajaBanco[monto]','$idcuentaspof','$idfactura','0')");
             }
-
+            }
             $res = array("success", "Registro Realizado", "registrocobrarfactura");
         } else {
             $res = array("danger", "No se pudo realizar el registro");

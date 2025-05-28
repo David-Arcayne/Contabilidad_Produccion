@@ -108,7 +108,8 @@ class Contabilidad extends DB
 
     public function listadesconsolidar($idempresa) {
         $lista = [];
-        
+        $gestion = $this->getgestionactualC($idempresa);
+        $idgestion = $gestion["id"];
         // Consulta SQL
         $sql =$this->dbc->query("SELECT 
                 d.iddesconsolidar, 
@@ -130,7 +131,7 @@ class Contabilidad extends DB
                 transacciones AS t 
                 ON t.idtransacciones = d.idtransaccion
             WHERE 
-                md5(d.idempresa) = '$idempresa'
+                md5(d.idempresa) = '$idempresa' AND t.idgestion = '$idgestion'
             GROUP BY 
                 d.codigo
             ORDER BY 

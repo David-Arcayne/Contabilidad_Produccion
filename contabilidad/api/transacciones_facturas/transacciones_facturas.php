@@ -225,11 +225,14 @@ class Transacciones_facturas extends DB{
     // public function registrocobrarfactura($idfactura, $idtransaccion, $idcuenta, $fecha, $nrecibo, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa)
     public function registrocobrarfacturaGrupal($fecha,$persona,$ci,$monto,$idtransaccion,$idcaja_bancos,$idasientotipo,$idempresa,$idsucursal,$archivo,$data)
     {
-    $caja_bancos = json_decode($idcaja_bancos, true);
+    if($idcaja_bancos == ""){
+// NO PASARA NADA
+    }else{
+        $caja_bancos = json_decode($idcaja_bancos, true);
+    }
         $facturas = json_decode($data, true);
     // echo json_encode(array("success","hola",$fecha,$nrecibo,$persona,$ci,$monto,$caja_bancos,$idasientotipo,$idempresa,$idsucursal,$archivo,$facturas));
 //---------------------------------------------------------------------------------------
-
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
@@ -386,10 +389,15 @@ $nroTransaccion = $resultado12['codigotransaccion'] + 1;
             // $montoFacturas += $factura['monto'];
             // $updatetranscodigo = $this->dbc->query("UPDATE factura SET transacciones_idtransacciones = '$idtrans' WHERE idfactura = '{$factura['idfactura']}'");
         }
-        foreach($caja_bancos as $cajaBanco){
+        if($idcaja_bancos == ""){
+            // NO SE REGISTRARA CAJA_BANCOS
+        }else{
+            foreach($caja_bancos as $cajaBanco){
             $registropago3 = $this->dbc->query("INSERT INTO detalle_caja_bancos_cobrar(idcaja_bancos,monto,idcuentaspof,idfactura)
             VALUES('$cajaBanco[id]','$cajaBanco[monto]','$idcuentaspof','$cajaBanco[idfactura]')");
         }
+        }
+    
         if ($registrarTabla === TRUE) {
             $res = array("success", "Registro Realizado", "registrocobrarfacturaGrupal");
         } else {

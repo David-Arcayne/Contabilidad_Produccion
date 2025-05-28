@@ -44,7 +44,12 @@ class TransFactura_pagar extends DB{
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
     
-        $caja_bancos = json_decode($idcaja_bancos, true);
+        if($idcaja_bancos == ""){
+
+        }else{
+            $caja_bancos = json_decode($idcaja_bancos, true);
+        }
+
         $facturas = json_decode($data, true);
         // echo json_encode(array($fecha,$nrecibo,$persona,$ci,$monto,$idasientotipo,$empresa,$sucursal,$archivo,$facturas));
         $ide = $this->getidempresa($empresa);
@@ -182,15 +187,20 @@ foreach($facturas as $factura){
     // $montoFacturas += $factura['monto']; proveedor
     // $updatetranscodigo = $this->dbc->query("UPDATE factura SET transacciones_idtransacciones = '$idtrans' WHERE idfactura = '{$factura['idfactura']}'");
 }
-foreach($caja_bancos as $cajaBanco){
-    $registropago3 = $this->dbc->query("INSERT INTO detalle_caja_bancos_pagar(idcaja_bancos,monto,idcuentaspor,idfactura)
-    VALUES('$cajaBanco[id]','$cajaBanco[monto]','$idcuentasPor','$cajaBanco[idfactura]')");
-}
-if ($registrarTabla === TRUE) {
-    $res = array("success", "Registro Realizado", "registropagarfacturaGrupal");
-} else {
-    $res = array("danger", "No se pudo realizar el registro");
-}
+    if($idcaja_bancos == ""){
+    // NO SE REGISTRARA CAJA_BANCOS
+    }else{
+        foreach($caja_bancos as $cajaBanco){
+        $registropago3 = $this->dbc->query("INSERT INTO detalle_caja_bancos_pagar(idcaja_bancos,monto,idcuentaspor,idfactura)
+        VALUES('$cajaBanco[id]','$cajaBanco[monto]','$idcuentasPor','$cajaBanco[idfactura]')");
+        }
+    }
+
+    if ($registrarTabla === TRUE) {
+        $res = array("success", "Registro Realizado", "registropagarfacturaGrupal");
+    } else {
+        $res = array("danger", "No se pudo realizar el registro");
+    }
         echo json_encode($res);
 }
 

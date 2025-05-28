@@ -79,10 +79,15 @@ class Cuentaspor extends DB{
 
     if ($registropago === TRUE) {
         $idcuentaspor = $this->dbc->insert_id;
-            foreach($caja_bancos as $cajaBanco){
+        if($idcaja_bancos == ""){
+
+        }else{
+             foreach($caja_bancos as $cajaBanco){
                 $registropago3 = $this->dbc->query("INSERT INTO detalle_caja_bancos_pagar(idcaja_bancos,monto,idcuentaspor,idfactura,idotras_cuentas)
                 VALUES('$cajaBanco[id]','$cajaBanco[monto]','$idcuentaspor','$idfactura','0')");
             }
+        }
+        
         $res = array("success", "Registro Realizado", "registropagarfactura");
     } else {
         $res = array("danger", "No se pudo realizar el registro");
@@ -109,10 +114,15 @@ class Cuentaspor extends DB{
 
     if ($registropago2 === TRUE) {
         $idcuentaspor = $this->dbc->insert_id;
-        foreach($caja_bancos as $cajaBanco){
+        if($idcaja_bancos == ""){
+
+        }else{
+             foreach($caja_bancos as $cajaBanco){
             $registropago3 = $this->dbc->query("INSERT INTO detalle_caja_bancos_pagar(idcaja_bancos,monto,idcuentaspor,idfactura,idotras_cuentas)
             VALUES('$cajaBanco[id]','$cajaBanco[monto]','$idcuentaspor','$idfactura','0')");
         }
+        }
+       
         $res = array("success", "Registro Realizado", "registropagarfactura");
     } else {
         $res = array("danger", "No se pudo realizar el registro");
