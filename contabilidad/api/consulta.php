@@ -306,12 +306,12 @@ $cont->listaimpuestoentreplan($ver[1]);
 }elseif($ver[0]=="listafactura_cobrado"){
     $cont=new Contabilidad();
     $cont->listafactura_cobrado($ver[1]);
-}elseif($ver[0]=="listafactura_pagado_trans"){
+}elseif($ver[0]=="listafactura_pago_trans"){
     $cont=new Contabilidad();
-    $cont->listafactura_pagado_trans($ver[1]);
-}elseif($ver[0]=="listafactura_cobrado_trans"){
+    $cont->listafactura_pago_trans($ver[1]);
+}elseif($ver[0]=="listafactura_cobro_trans"){
     $cont=new Contabilidad();
-    $cont->listafactura_cobrado_trans($ver[1]);
+    $cont->listafactura_cobro_trans($ver[1]);
 }elseif($ver[0]=="lista_transaccionEn_espera"){
     $cont=new Insertar_transaccion();
     $cont->lista_transaccionEn_espera($ver[1],$ver[2]);
@@ -466,8 +466,8 @@ elseif($ver[0]=="listar_facturas_cobros_sin_transaccion"){
 }
 
 
-// asientotipo  creartipoasientodelete listaplanesempresa listaimpuestoentreplan listar_recibo_por_id_otras_cuentas listaVentas
+// asientotipo  creartipoasientodelete listaplanesempresa listaimpuestoentreplan listar_recibo_por_id_otras_cuentas listaVentas listafactura
 // milista     listafacturaapi_cobrado listar_recibo_por_caja_bancos listar_recibo_por_id_otras_cuentas_pagar caja_banco listatransacciones_comercial
-//listafactura   listatransaciones   reportedetalletransaccion  lista_cobrar_cobrado_factura listar_otras_cuentas existe_empresa_modulo
+//listafactura   listatransaciones   reportedetalletransaccion  lista_cobrar_cobrado_factura listar_otras_cuentas existe_empresa_modulo listafactura_cobrado_trans
 //reporteactivodisponible    getidempresa firmas listaimpuestoentreplan listafacturaapi_cobrado tributario  impuesto impuestocrear reportecomprobantecontable
 ?>

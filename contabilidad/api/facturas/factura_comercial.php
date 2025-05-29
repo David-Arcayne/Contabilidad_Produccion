@@ -273,7 +273,7 @@ $resultado12 = $nroTrans->fetch_assoc();
 $nroTransaccion = $resultado12['codigotransaccion'] + 1;
 
         $res = "";
-        $glosa = "Registro cobro comercial '$nrecibo'";
+        $glosa = "Registro cobro comercial $nrecibo";
         // $gestion = $this->getgestionactualid($ide);
         $tipotransaccion = 1; //ingreso
         $trans = "";

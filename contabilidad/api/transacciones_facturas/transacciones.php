@@ -15,9 +15,11 @@ class Transacciones extends DB{
         $res = "";
         // aqui la condicional si hay una nueva gestion
 
-         $nroTrans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE organizacion_idorganizacion=$ide AND idgestion='$gestion' ORDER BY codigotransaccion DESC LIMIT 1;");
-        $resultado12 = $nroTrans->fetch_assoc();
-        $nroTransaccion = $resultado12['codigotransaccion'] + 1;
+         $nroTransa = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE organizacion_idorganizacion='$ide' AND idgestion='$idgestion' ORDER BY codigotransaccion DESC LIMIT 1;");
+        $resultado122 = $nroTransa->fetch_assoc();
+        $nroTransaccion = $resultado122['codigotransaccion'] + 1;
+
+        // echo json_encode(array($fecha, $tipocambio, $tipotransaccion, $glosa, $empresa,$ide, $sucursal,$ufv,$dolar,$idgestion,$nroTransaccion,$resultado122['codigotransaccion']));
 
         if($tipocambio != ""){
             // EXISTE TIPO DE CAMBIO PARA LA FECHA DE HOY O SE SELECCIONARA UNA Q YA EXISTE
