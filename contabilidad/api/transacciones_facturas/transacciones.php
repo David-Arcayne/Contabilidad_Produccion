@@ -45,7 +45,9 @@ class Transacciones extends DB{
     }
     public function registrotransaccionf5($idt, $fecha, $tipocambio, $tipotransaccion, $glosa, $gestion)
     {
-
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
         $res = "";
         $writetrans = $this->dbc->query("UPDATE transacciones SET fechatransaccion='$fecha',tipodecambio='$tipocambio',glosa='$glosa',tipotransaccion_idtipotransaccion='$tipotransaccion',idgestion='$gestion' where idtransacciones='$idt'");
         if ($writetrans === TRUE) {
@@ -54,6 +56,8 @@ class Transacciones extends DB{
             $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
         }
         echo json_encode($res);
+            //  echo json_encode(array($idt, $fecha, $tipocambio, $tipotransaccion, $glosa, $gestion));
+
     }
 
     public function listatransacciones($empresa)
