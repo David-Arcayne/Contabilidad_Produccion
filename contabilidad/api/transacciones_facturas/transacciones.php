@@ -528,32 +528,56 @@ if($filtrado->num_rows > 0){
         echo json_encode($res);
     }
 
-    public function listatransacciones_comercial($empresa)
+    public function listatransacciones_comercial($empresa,$todos)
     {
         $lista = [];
         // 
         $ide = $this->getidempresa($empresa);
         $getG = $this->getgestionactualC($empresa);
         $gestion = $getG['id'];
-        $registro = $this->dbc->query("SELECT
-        t.idtransacciones,
-        t.codigotransaccion,
-        t.fechatransaccion,
-        t.glosa,
-        t.consolidar,
-        t.tipotransaccion_idtipotransaccion,
-        t.idgestion,
-        t.estado,
-        t.tipodecambio,
-        t.idasignacion_asiento
-      FROM
-        transacciones as t
-      WHERE
-        t.organizacion_idorganizacion = '$ide'
-        AND idgestion = '$gestion'
-        AND t.estado = 6
-      ORDER BY
-        t.codigotransaccion DESC;");
+        if($todos == '0'){
+            //LISTAR SOLO LOS QUE PERTENECEN A LA GESTION
+              $registro = $this->dbc->query("SELECT
+            t.idtransacciones,
+            t.codigotransaccion,
+            t.fechatransaccion,
+            t.glosa,
+            t.consolidar,
+            t.tipotransaccion_idtipotransaccion,
+            t.idgestion,
+            t.estado,
+            t.tipodecambio,
+            t.idasignacion_asiento
+        FROM
+            transacciones as t
+        WHERE
+            t.organizacion_idorganizacion = '$ide'
+            AND idgestion = '$gestion'
+            AND t.estado = 6
+        ORDER BY
+            t.codigotransaccion DESC;");
+        }else{
+            // LISTAR TODOS SIN ECSEPCION
+              $registro = $this->dbc->query("SELECT
+            t.idtransacciones,
+            t.codigotransaccion,
+            t.fechatransaccion,
+            t.glosa,
+            t.consolidar,
+            t.tipotransaccion_idtipotransaccion,
+            t.idgestion,
+            t.estado,
+            t.tipodecambio,
+            t.idasignacion_asiento
+        FROM
+            transacciones as t
+        WHERE
+            t.organizacion_idorganizacion = '$ide'
+            AND t.estado = 6
+        ORDER BY
+            t.codigotransaccion DESC;");
+        }
+      
         while ($qwe = $this->dbc->fetch($registro)) {
             $asiento_asignacion = $this->dbc->query("SELECT * FROM asignacion_asiento_operacion_modulos WHERE idasignacion_asiento_operacion_modulos='" . $qwe[9] . "'");
             $asig = $this->dbc->fetch($asiento_asignacion);

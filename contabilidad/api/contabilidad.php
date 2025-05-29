@@ -106,12 +106,13 @@ class Contabilidad extends DB
      
     
 
-    public function listadesconsolidar($idempresa) {
+    public function listadesconsolidar($idempresa,$todos) {
         $lista = [];
         $gestion = $this->getgestionactualC($idempresa);
         $idgestion = $gestion["id"];
         // Consulta SQL
-        $sql =$this->dbc->query("SELECT 
+        if($todos == '0'){
+             $sql =$this->dbc->query("SELECT 
                 d.iddesconsolidar, 
                 d.idtransaccion, 
                 MIN(t.codigotransaccion) AS desde_primero,
@@ -139,6 +140,37 @@ class Contabilidad extends DB
                 d.fecha DESC,
                 d.hora DESC;
         ");
+        }else{
+             $sql =$this->dbc->query("SELECT 
+                d.iddesconsolidar, 
+                d.idtransaccion, 
+                MIN(t.codigotransaccion) AS desde_primero,
+                MAX(t.codigotransaccion) AS desde_ultimo,
+                d.motivo, 
+                d.estado, 
+                d.hora, 
+                d.fecha, 
+                d.idusuario, 
+                d.codigo,
+                d.horaproceso,
+                d.fechaproceso, 
+                COUNT(*) AS cantidad
+            FROM 
+                desconsolidar AS d
+            INNER JOIN 
+                transacciones AS t 
+                ON t.idtransacciones = d.idtransaccion
+            WHERE 
+                md5(d.idempresa) = '$idempresa'
+            GROUP BY 
+                d.codigo
+            ORDER BY 
+                d.estado = '0' DESC,
+                d.fecha DESC,
+                d.hora DESC;
+            ");
+        }
+       
     
             // Procesar los resultados
             while ($qwe = $this->dbc->fetch($sql)) {

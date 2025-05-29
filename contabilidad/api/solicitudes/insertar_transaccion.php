@@ -81,38 +81,41 @@ public function registrar_transaccionEn_espera($idtransaccion,$estado,$hora,$fec
         
             }
 
-            public function lista_transaccionEn_espera($idempresa) {
-                $lista = [];
-                $gestion = $this->getgestionactualC($idempresa);
-        $idgestion = $gestion["id"];
+    public function lista_transaccionEn_espera($idempresa,$todos) {
+            $lista = [];
+            $gestion = $this->getgestionactualC($idempresa);
+            $idgestion = $gestion["id"];
                 // Consulta SQL
-                $sql =$this->dbc->query("SELECT * FROM transaccionEn_espera WHERE md5(idempresa) = '$idempresa' AND idgestion = '$idgestion' ORDER BY idtransaccionEn_espera DESC");
+                if($todos == '0'){
+                    $sql =$this->dbc->query("SELECT * FROM transaccionEn_espera 
+                    WHERE md5(idempresa) = '$idempresa' AND idgestion = '$idgestion' ORDER BY idtransaccionEn_espera DESC");
+                }else{
+                    $sql =$this->dbc->query("SELECT * FROM transaccionEn_espera 
+                WHERE md5(idempresa) = '$idempresa' ORDER BY idtransaccionEn_espera DESC");
+                }
             
-                    // Procesar los resultados
-                    while ($qwe = $this->dbc->fetch($sql)) {
-                       $usuario = $this->getusuario($qwe['idusuario']); // Asegúrate de que esta función retorne los campos esperados
-                        // $usuariob = isset($qwe['idusuariob']) ? $this->getusuario($qwe['idusuariob']) : null;
-                        /*"
-                            */
+                // Procesar los resultados
+                while ($qwe = $this->dbc->fetch($sql)) {
+                    $usuario = $this->getusuario($qwe['idusuario']); // Asegúrate de que esta función retorne los campos esperados
+                    // $usuariob = isset($qwe['idusuariob']) ? $this->getusuario($qwe['idusuariob']) : null;
+                    /*"
+                        */
             
-                        $lista[] = [
-                            "idtransaccionEn_espera" => $qwe['idtransaccionEn_espera'],
-                            "hora" => $qwe['hora'],
-                            "fecha" => $qwe['fecha'],
-                            "hora_proceso" => $qwe['hora_proceso'],
-                            "fecha_proceso" => $qwe['fecha_proceso'],
-                            "estado" => $qwe['estado'],
-                            "codigotransaccion" => $qwe['codigotransaccion'],
-                            "glosa" => $qwe['glosa'],
-                            "idusuario" => $qwe['idusuario'],
-                            "nombre" => $usuario['nombre'] ?? null,
-                            "apellido" => $usuario['apellido'] ?? null
+                    $lista[] = [
+                        "idtransaccionEn_espera" => $qwe['idtransaccionEn_espera'],
+                        "hora" => $qwe['hora'],
+                        "fecha" => $qwe['fecha'],
+                        "hora_proceso" => $qwe['hora_proceso'],
+                        "fecha_proceso" => $qwe['fecha_proceso'],
+                        "estado" => $qwe['estado'],
+                        "codigotransaccion" => $qwe['codigotransaccion'],
+                        "glosa" => $qwe['glosa'],
+                        "idusuario" => $qwe['idusuario'],
+                        "nombre" => $usuario['nombre'] ?? null,
+                        "apellido" => $usuario['apellido'] ?? null
                         ];
                     }
-            
-                    
-                
-            
+                        
                 // Retornar la lista en formato JSON
                 echo json_encode($lista);
     }        

@@ -4,20 +4,31 @@ session_start();
 require_once "../../db/db.php";
 class Anulacion_transaccion extends DB{
 
-    public function listar_anular_eliminar_transaccion($empresa) {
+    public function listar_anular_eliminar_transaccion($empresa,$todos) {
         $lista = [];
          $ide = $this->getidempresa($empresa);
         $gestion = $this->getgestionactualC($empresa);
         $idgestion = $gestion["id"];
         // Consulta SQL
-        $sql =$this->dbc->query("SELECT * FROM solicitud_anular_eliminar s
-INNER JOIN transacciones t ON t.idtransacciones = s.transacciones_idtransacciones
-WHERE s.idempresa = '$ide' AND t.idgestion = '$idgestion'
-ORDER BY 
-    (s.estado_solicitud = '1') DESC,
-    s.fecha DESC,
-    s.hora DESC;
+        if($todos == '0'){
+            $sql =$this->dbc->query("SELECT * FROM solicitud_anular_eliminar s
+            INNER JOIN transacciones t ON t.idtransacciones = s.transacciones_idtransacciones
+            WHERE s.idempresa = '$ide' AND t.idgestion = '$idgestion'
+            ORDER BY 
+                (s.estado_solicitud = '1') DESC,
+                s.fecha DESC,
+                s.hora DESC;
+            ");   
+        }else{
+            $sql =$this->dbc->query("SELECT * FROM solicitud_anular_eliminar s
+            INNER JOIN transacciones t ON t.idtransacciones = s.transacciones_idtransacciones
+            WHERE s.idempresa = '$ide'
+            ORDER BY 
+                (s.estado_solicitud = '1') DESC,
+                s.fecha DESC,
+                s.hora DESC;
 ");
+        }
     
             // Procesar los resultados
             while ($qwe = $this->dbc->fetch($sql)) {

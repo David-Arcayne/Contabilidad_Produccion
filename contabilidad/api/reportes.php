@@ -850,6 +850,7 @@ $totalHaber = 0;
        $detalle=[];
        $facturas=[];
        $recibos = [];
+
        $fature=$this->dbc->query("SELECT
        f.idfactura,
        f.fecha,
@@ -885,21 +886,15 @@ $totalHaber = 0;
               $factu_com=$this->dbcm->query("SELECT * FROM venta WHERE id_venta ='$qq[idfactura_comercial]'");
               $resuu = $factu_com->fetch_assoc();
 
-                if($qq[5]==2){
-                $cliente=$this->dbcm->query("SELECT c.nombre,c.nit FROM cliente AS c WHERE c.id_cliente='$qq[4]' ");
-                $cc=$this->dbcm->fetch($cliente);
+
+                $cliente1=$this->dbcm->query("SELECT c.nombre,c.nit FROM cliente AS c WHERE c.id_cliente='$resuu[cliente_id_cliente1]'");
+                $ccc=$this->dbcm->fetch($cliente1);
                 //ahi arriba and c.idempresa='".$this->emp."'
 
                 //fecha_venta   cliente_id_cliente1.nombre      nfactura        cliente_id_cliente.nit    monto_total
-                $fat=array("fecha"=>$zxc[1],"cliente"=>$cc[0],"nfactura"=>$zxc[2],"nit"=>$cc[1],"monto"=>$qq[3]);
+                $fat=array("fecha"=>$resuu['fecha_venta'],"cliente"=>$ccc['nombre'],"nfactura"=>$resuu['nfactura'],"nit"=>$ccc['nit'],"monto"=>$resuu['monto_total']);
                 array_push($facturas,$fat);
-                }else{
-                    $cliente=$this->dbcm->query("SELECT p.nombre,p.nit FROM proveedor AS p WHERE p.id_proveedor='$zxc[4]' ");
-                    $cc=$this->dbcm->fetch($cliente);
-                    //ahi arriba and c.idempresa='".$this->emp."'
-                    $fat=array("fecha"=>$zxc[1],"cliente"=>$cc[0],"nfactura"=>$zxc[2],"nit"=>$cc[1],"monto"=>$zxc[3]);
-                    array_push($facturas,$fat);
-                }
+                
             }
 
         }else{

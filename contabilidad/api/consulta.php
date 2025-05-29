@@ -266,7 +266,7 @@ $cont=new Contabilidad();
 $cont->consolidar($ver[1],$ver[2]);
 }elseif($ver[0]=="listadesconsolidar"){
 $cont=new Contabilidad();
-$cont->listadesconsolidar($ver[1]);
+$cont->listadesconsolidar($ver[1],$ver[2]);
 }elseif($ver[0]=="deleterelacionip"){
 $cont=new Contabilidad();
 $cont->deleterelacionip($ver[1]);
@@ -314,10 +314,10 @@ $cont->listaimpuestoentreplan($ver[1]);
     $cont->listafactura_cobrado_trans($ver[1]);
 }elseif($ver[0]=="lista_transaccionEn_espera"){
     $cont=new Insertar_transaccion();
-    $cont->lista_transaccionEn_espera($ver[1]);
+    $cont->lista_transaccionEn_espera($ver[1],$ver[2]);
 }elseif($ver[0]=="listar_anular_eliminar_transaccion"){
     $cont=new Anulacion_transaccion();
-    $cont->listar_anular_eliminar_transaccion($ver[1]);
+    $cont->listar_anular_eliminar_transaccion($ver[1],$ver[2]);
 }elseif($ver[0]=="listar_caja_bancos"){
     $cont=new Plandecuentas();
     $cont->listar_caja_bancos($ver[1]);
@@ -382,7 +382,7 @@ elseif($ver[0]=="listar_asiento_por_modulo"){
     $cont->listar_operacion_modulo_filtrado($ver[1]);
 }elseif($ver[0]=="listatransacciones_comercial"){
     $cont=new Transacciones();
-    $cont->listatransacciones_comercial($ver[1]);
+    $cont->listatransacciones_comercial($ver[1],$ver[2]);
 }elseif($ver[0]=="existe_empresa_modulo"){
     $cont=new Transacciones();
     $cont->existe_empresa_modulo($ver[1]);
@@ -467,7 +467,7 @@ elseif($ver[0]=="listar_facturas_cobros_sin_transaccion"){
 
 
 // asientotipo  creartipoasientodelete listaplanesempresa listaimpuestoentreplan listar_recibo_por_id_otras_cuentas listaVentas
-// milista     listafacturaapi_cobrado listar_recibo_por_caja_bancos listar_recibo_por_id_otras_cuentas_pagar caja_banco
+// milista     listafacturaapi_cobrado listar_recibo_por_caja_bancos listar_recibo_por_id_otras_cuentas_pagar caja_banco listatransacciones_comercial
 //listafactura   listatransaciones   reportedetalletransaccion  lista_cobrar_cobrado_factura listar_otras_cuentas existe_empresa_modulo
 //reporteactivodisponible    getidempresa firmas listaimpuestoentreplan listafacturaapi_cobrado tributario  impuesto impuestocrear reportecomprobantecontable
 ?>
