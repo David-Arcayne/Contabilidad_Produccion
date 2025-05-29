@@ -14,6 +14,8 @@ class Cuentaspof extends DB{
         $res = "";
         $sucursal = $this->getidsucursal($sucursal);
         $ide = $this->getidempresa($empresa);
+         $gestion = $this->getgestionactualC($empresa);
+        $idgestion = $gestion["id"];
 
         $recibo_trans = $this->dbc->query("SELECT count(*) AS cant1 FROM cuentaspof cp 
         INNER JOIN transacciones t ON t.idtransacciones=cp.transaccion 
@@ -33,7 +35,7 @@ class Cuentaspof extends DB{
         $nrecibo = $res1['cant1'] + $res2['cant2']+ $res3['cant3'] + 1;
 
         // $empresa = $this->emp; registropagarfactura nrecibo
-        $transi = $this->dbc->query("SELECT * FROM transacciones WHERE organizacion_idorganizacion='$ide' and sucursal='$sucursal' order by codigotransaccion desc Limit 1");
+        $transi = $this->dbc->query("SELECT * FROM transacciones WHERE organizacion_idorganizacion='$ide' AND idgestion='$idgestion' order by codigotransaccion desc Limit 1");
         $qq = $this->dbc->fetch($transi);
         $codigo = $qq['codigotransaccion'] + 1;
         $glosa = "Registro cobro $nrecibo";
@@ -428,6 +430,16 @@ $caja_bancos = json_decode($cajasBancos, true);
         $qwe = $this->dbc->fetch($registro);
         //$res=array("id"=>,"nombre"=>$qwe['nombre']); listapagarfactura
         return $qwe['idgestion'];
+    }
+    public function getgestionactualC($empresa)
+    {
+        $orga = $this->getidempresa($empresa); // recibe md5 de la id insert
+        $res = "";
+        $registro = $this->dbc->query("SELECT * FROM gestion WHERE idempresa='$orga' AND estado='2' LIMIT 1");
+        $qwe = $this->dbc->fetch($registro);
+
+        // Retorna un array asociativo con la información
+        return array("id" => $qwe['idgestion'], "nombre" => $qwe['nombre']);
     }
 }
 ?>

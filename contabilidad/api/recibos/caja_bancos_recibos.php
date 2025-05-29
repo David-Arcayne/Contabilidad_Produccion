@@ -731,8 +731,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
     if($tipo_filtro == '1'){ //TIPO = 1 --> INGRESO,  2-->EGRESO, 3--> AMBOS
 
-    $getPedido = $this->dbc->query("SELECT cp.idcuentaspof,cp.nrecibo,cp.fecha,cp.transaccion,cp.cliente,cp.idfactura,cp.idotras_cuentas,cp.archivo,cp.registro_desde, 
-, dc.idcaja_bancos,dc.monto,dc.idfactura
+    $getPedido = $this->dbc->query("SELECT cp.idcuentaspof,cp.nrecibo,cp.fecha,cp.transaccion,cp.cliente,cp.idfactura,cp.idotras_cuentas,cp.archivo,cp.registro_desde, dc.idcaja_bancos,dc.monto,dc.idfactura
     FROM detalle_caja_bancos_cobrar dc
     INNER JOIN cuentaspof cp ON cp.idcuentaspof = dc.idcuentaspof
     WHERE dc.idcaja_bancos = '$idcaja_bancos'

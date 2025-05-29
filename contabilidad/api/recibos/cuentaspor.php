@@ -13,6 +13,9 @@ class Cuentaspor extends DB{
         $sucursal = $this->getidsucursal($sucursal);
         $ide = $this->getidempresa($empresa);
 
+        $gestion = $this->getgestionactualC($empresa);
+        $idgestion = $gestion["id"];
+
         $recibo_trans = $this->dbc->query("SELECT count(*) AS cant1 FROM cuentaspor cp 
         INNER JOIN transacciones t ON t.idtransacciones=cp.transaccion 
         WHERE t.organizacion_idorganizacion='$ide'");
@@ -31,7 +34,7 @@ class Cuentaspor extends DB{
         $nrecibo = $res1['cant1'] + $res2['cant2']+ $res3['cant3'] + 1;
 
         // $empresa = $this->emp;
-        $transi = $this->dbc->query("SELECT * FROM transacciones WHERE organizacion_idorganizacion='$ide' AND sucursal='$sucursal' ORDER BY codigotransaccion DESC LIMIT 1");
+        $transi = $this->dbc->query("SELECT * FROM transacciones WHERE organizacion_idorganizacion='$ide' AND idgestion='$idgestion' ORDER BY codigotransaccion DESC LIMIT 1");
         $qq = $this->dbc->fetch($transi);
         $codigo = $qq['codigotransaccion'] + 1;
         $glosa = "Registro de Pago $nrecibo";
@@ -493,6 +496,17 @@ if ($factura_lista->num_rows > 0) {
 
     }
         echo json_encode($lista);
+    }
+
+    public function getgestionactualC($empresa)
+    {
+        $orga = $this->getidempresa($empresa); // recibe md5 de la id insert
+        $res = "";
+        $registro = $this->dbc->query("SELECT * FROM gestion WHERE idempresa='$orga' AND estado='2' LIMIT 1");
+        $qwe = $this->dbc->fetch($registro);
+
+        // Retorna un array asociativo con la información
+        return array("id" => $qwe['idgestion'], "nombre" => $qwe['nombre']);
     }
 }
 ?>

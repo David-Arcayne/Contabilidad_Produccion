@@ -414,7 +414,7 @@ public function listapagos_individuales($idfactura)
         $gestion = $this->getgestionactualid($ide);
         $tipotransaccion = 1; //ingreso
         $trans = "";
-        $transi = $this->dbc->query("SELECT * FROM transacciones WHERE organizacion_idorganizacion='$ide' and sucursal='$sucursal' order by codigotransaccion desc Limit 1");
+        $transi = $this->dbc->query("SELECT * FROM transacciones WHERE organizacion_idorganizacion='$ide' AND idgestion = '$gestion' order by codigotransaccion desc Limit 1");
         $qq = $this->dbc->fetch($transi);
         $codigo = $qq['codigotransaccion'] + 1;
         if ($asiento != 0) {
