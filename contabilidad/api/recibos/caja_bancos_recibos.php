@@ -1593,7 +1593,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             $res = array(
                 "idusuario" => $bb['idusuario'],
                 "nombre_usuario" => $bb['usuario_nombre'],
-                "nombre_trabajador" => $bb['nombre_trabajador']
+                "nombre_trabajador" => $bb['nombre_trabajador']." ".$bb['apellido'],
             );
             array_push($lista, $res);
         }
