@@ -40,7 +40,7 @@ public function getidgestion($md5){
         $planes=$this->dba->query("select * from planes where orden='$modulo'");
         $pla=$this->dba->fetch($planes);
         $idp=$pla['idplanes'];
-        $registro=$this->dbe->query("select nombref,cargof,numeroid from firmas where organizacion_idorganizacion='$ide' and idmodulo='$idp'");
+        $registro=$this->dbe->query("SELECT nombref,cargof,numeroid from firmas where organizacion_idorganizacion='$ide' and idmodulo='$idp'");
         
         while($qwe=$this->dbe->fetch($registro)){
             

@@ -17,6 +17,7 @@ require_once "./recibos/caja_bancos_recibos.php";
 require_once "./facturas/factura_cobros.php";
 require_once "./facturas/factura_pagos.php";
 require_once "./facturas/factura_comercial.php";
+require_once "./configuracion/firma_reporte.php";
 
 $ver=$_POST['ver'];
 $json = file_get_contents('php://input'); // Decodificar el JSON en un arreglo PHP   gestion
@@ -523,9 +524,30 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['fecha'],$_POST['monto_total'],$_POST['monto_recibo'],$_POST['transaccion'],$_POST['cajasBancos'],$_POST['asiento_modelo'],$_POST['empresa'],$_POST['sucursal'],$_POST['facturas_comercial']));
         }
+    }elseif($ver=="registrar_firma_reporte"){
+        if(isset($_POST['idusuario'],$_POST['funcion'],$_POST['tipo_reporte'],$_POST['matricula'],$_POST['empresa'])){
+            $cont=new Firma_reporte();
+            $cont->registrar_firma_reporte($_POST['idusuario'],$_POST['funcion'],$_POST['tipo_reporte'],$_POST['matricula'],$_POST['empresa']);
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idusuario'],$_POST['funcion'],$_POST['tipo_reporte'],$_POST['matricula'],$_POST['empresa']));
+        }
+    }elseif($ver=="editar_firma_reporte"){
+        if(isset($_POST['idfirma_reporte'],$_POST['idusuario'],$_POST['funcion'],$_POST['tipo_reporte'],$_POST['matricula'])){
+            $cont=new Firma_reporte();
+            $cont->editar_firma_reporte($_POST['idfirma_reporte'],$_POST['idusuario'],$_POST['funcion'],$_POST['tipo_reporte'],$_POST['matricula']);
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idfirma_reporte'],$_POST['idusuario'],$_POST['funcion'],$_POST['tipo_reporte'],$_POST['matricula']));
+        }
     }  
     
+<<<<<<< HEAD
 // registrar_factura_recibo_cobro_cajaBancos registrocobrarfactura consolidar vincula crearfacturas registroproveedor registrocobrarfactura
 // registrotransaccionf5 tributario registrar_detalle_transaccion_json registrocobrarfacturaGrupal crearfacturas registrar_factura_pagos_transaccion
+=======
+// registrar_factura_recibo_cobro_cajaBancos registrocobrarfactura consolidar vincula crearfacturas registroproveedor registrocobrarfactura 
+// registrotransaccionf5 tributario registrar_detalle_transaccion_json registrocobrarfacturaGrupal crearfacturas caja_bancos registrar_factura_pago
+>>>>>>> eb4a5eb78269d24e3abda48a6198dc15c69060a4
 }// registropagarfactura impuestocrearf5 registrar_factura desconsolidar registrar_factura_cobros_tributario registrar_factura_pagos_transaccion
 ?> 

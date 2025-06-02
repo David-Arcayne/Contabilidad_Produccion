@@ -18,6 +18,7 @@ require_once "./recibos/caja_bancos_recibos.php";
 require_once "alertas.php";
 require_once "./facturas/filtrado_facturas.php";
 require_once "./facturas/factura_comercial.php";
+require_once "./configuracion/firma_reporte.php";
 
 $ver=explode("/",$_GET['ver']); //dividiendo los "/"  ver[0],ver[1],ver[x]  listafacturaapi_pagado eliminarasiento
 if($ver[0]=="verificacion"){
@@ -463,11 +464,26 @@ elseif($ver[0]=="listar_facturas_cobros_sin_transaccion"){
 }elseif($ver[0]=="listar_factura_comercial_con_transaccion"){
     $cont=new Factura_comercial();
     $cont->listar_factura_comercial_con_transaccion($ver[1]);
+}elseif($ver[0]=="listar_firmas_todos_reportes"){
+    $cont=new Firma_reporte();
+    $cont->listar_firmas_todos_reportes($ver[1],$ver[2]);
+}elseif($ver[0]=="listar_firma_reporte"){
+    $cont=new Firma_reporte();
+    $cont->listar_firma_reporte($ver[1]);
+}elseif($ver[0]=="eliminar_firma_reporte"){
+    $cont=new Firma_reporte();
+    $cont->eliminar_firma_reporte($ver[1]);
 }
 
 
 // asientotipo  creartipoasientodelete listaplanesempresa listaimpuestoentreplan listar_recibo_por_id_otras_cuentas listaVentas listafactura listar_recibo_por_caja_bancos
+<<<<<<< HEAD
 // milista     listafacturaapi_cobrado listar_recibo_por_caja_bancos listar_recibo_por_id_otras_cuentas_pagar caja_banco listatransacciones_comercial
 //listafactura   listatransaciones   reportedetalletransaccion  lista_cobrar_cobrado_factura listar_otras_cuentas existe_empresa_modulo listafactura_cobrado_trans
 //reporteactivodisponible    getidempresa firmas listaimpuestoentreplan listafacturaapi_cobrado tributario  impuesto impuestocrear reportecomprobantecontable eliminarfactura
+=======
+// milista     listafacturaapi_cobrado listar_recibo_por_caja_bancos listar_recibo_por_id_otras_cuentas_pagar caja_banco listatransacciones_comercial firmas listar_facturas_cobros_sin_transaccion
+//listafactura   listatransaciones   reportedetalletransaccion  lista_cobrar_cobrado_factura listar_ listafactura_cobro_trans listar_usuarios
+//reporteactivodisponible    getidempresa firmas listaimpuestoentreplan listafacturaapi_cobrado tributario  impuesto impuestocrear reportecomprobantecontable
+>>>>>>> eb4a5eb78269d24e3abda48a6198dc15c69060a4
 ?>
