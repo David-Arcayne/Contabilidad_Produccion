@@ -526,6 +526,6 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     }  
     
 // registrar_factura_recibo_cobro_cajaBancos registrocobrarfactura consolidar vincula crearfacturas registroproveedor registrocobrarfactura
-// registrotransaccionf5 tributario registrar_detalle_transaccion_json registrocobrarfacturaGrupal crearfacturas
+// registrotransaccionf5 tributario registrar_detalle_transaccion_json registrocobrarfacturaGrupal crearfacturas registrar_factura_pagos_transaccion
 }// registropagarfactura impuestocrearf5 registrar_factura desconsolidar registrar_factura_cobros_tributario registrar_factura_pagos_transaccion
 ?> 

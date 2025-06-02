@@ -1052,7 +1052,7 @@ ORDER BY
     public function eliminarfactura($idfactura)
     {
         $res = "";
-        $registro = $this->dbc->query("delete from factura where idfactura='$idfactura'");
+        $registro = $this->dbc->query("DELETE FROM factura WHERE idfactura='$idfactura'");
         if ($registro === TRUE) {
             $res = array("success", "Registro Correcto");
         } else {
@@ -1060,6 +1060,7 @@ ORDER BY
         }
         echo json_encode($res);
     }
+
     public function getidempresa($md5)
     {
         $registro = $this->dbe->query("select * from organizacion where md5(idorganizacion)='$md5'");
