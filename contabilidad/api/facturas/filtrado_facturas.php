@@ -492,6 +492,84 @@ class Filtrado_facturas extends DB{
           // echo json_encode(array($caja_bancos,$factura_comas));
       }
 
+    public function busqueda_facturas_contabilidad($nfactura,$nit,$cobro_pago,$id_cliente_proveedor,$fecha,$monto,$empresa) {
+        ini_set('display_errors', 1); //,$nit,$cobro_pago,$cliente_proveedor,
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+  
+        $lista = [];
+          $idempresa = $this->getidempresa($empresa);
+//----------------------------------------------------------------------------------------------------------------
+        $where = ["idorganizacion = '$idempresa'"];
+
+        if ($nfactura != '-1') {
+            $where[] = "nfactura = '$nfactura'";
+        }
+        if ($monto != '-1') {
+            $where[] = "montofactura = '$monto'";
+        }
+        if ($fecha != '-1') {
+            $where[] = "fecha = '$fecha'";
+        }
+        if ($cobro_pago == '1') {
+            $where[] = "cobrado != '0'";
+
+        }elseif($cobro_pago == '2'){
+            $where[] = "pagado != '0'";
+        }
+        if($id_cliente_proveedor != '-1'){
+            $where[] = "proveedorcliente_idproveedorcliente = '$id_cliente_proveedor'";
+        }
+        if($nit != '-1'){
+
+            if ($cobro_pago == '1') {
+                $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE nit= '$nit'");
+                $cl = $this->dbcm->fetch($cliente);
+                // $facturas = $this->dbc->query("SELECT * FROM factura WHERE proveedorcliente_idproveedorcliente = '$cl[id_cliente]'");
+                $where[] = "proveedorcliente_idproveedorcliente = '$cl[id_cliente]'";
+            }elseif($cobro_pago == '2'){
+                $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE nit= '$nit'");
+                $prov = $this->dbcm->fetch($proveedor);
+                // $facturas = $this->dbc->query("SELECT * FROM factura WHERE proveedorcliente_idproveedorcliente = '$prov[id_proveedor]'");
+                $where[] = "proveedorcliente_idproveedorcliente = '$prov[id_proveedor]'";
+            }else{
+                
+            }
+
+        //     while ($zxc = $this->dbc->fetch($facturas)) {
+        //     $res2 = array(
+        //         "idfactura" => $zxc['idfactura'],
+        //         "fecha" => $zxc['fecha'],
+        //         "nfactura" => $zxc['nfactura'],
+        //         "montofactura" => $zxc['montofactura'],
+        //         "estado" => $zxc['estado']
+        //     );
+        //     array_push($lista, $res2);
+        //   }
+
+                // $wheree[] = "proveedorcliente_idproveedorcliente" != $id_cliente_proveedor;
+        }
+
+        $facturas = $this->dbc->query("SELECT * FROM factura WHERE " . implode(" AND ", $where));
+        //     $facturas = $this->dbc->query("SELECT * FROM factura WHERE  idorganizacion= '$idempresa'"); //TODAS LAS FACTURAS
+
+        while ($qwe = $this->dbc->fetch($facturas)) {
+            $res = array(
+                "idfactura" => $qwe['idfactura'],
+                "fecha" => $qwe['fecha'],
+                "nfactura" => $qwe['nfactura'],
+                "montofactura" => $qwe['montofactura'],
+                "estado" => $qwe['estado']
+                // "pagado" => $asd[0],
+                // "saldo" => $saldo,
+                // "forma_pago" => $qwe['forma_pago'],
+                // "archivo" => $qwe['archivo']
+            );
+  
+              array_push($lista, $res);
+          }
+          echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
     public function getidempresa($md5){
         $registro=$this->dbe->query("select * from organizacion where md5(idorganizacion)='$md5'");
         $qwe=$this->dbe->fetch($registro);

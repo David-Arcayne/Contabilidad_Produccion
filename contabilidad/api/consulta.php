@@ -473,17 +473,14 @@ elseif($ver[0]=="listar_facturas_cobros_sin_transaccion"){
 }elseif($ver[0]=="eliminar_firma_reporte"){
     $cont=new Firma_reporte();
     $cont->eliminar_firma_reporte($ver[1]);
+}elseif($ver[0]=="busqueda_facturas_contabilidad"){
+    $cont=new Filtrado_facturas();
+    $cont->busqueda_facturas_contabilidad($ver[1],$ver[2],$ver[3],$ver[4],$ver[5],$ver[6],$ver[7]);
 }
 
 
 // asientotipo  creartipoasientodelete listaplanesempresa listaimpuestoentreplan listar_recibo_por_id_otras_cuentas listaVentas listafactura listar_recibo_por_caja_bancos
-<<<<<<< HEAD
 // milista     listafacturaapi_cobrado listar_recibo_por_caja_bancos listar_recibo_por_id_otras_cuentas_pagar caja_banco listatransacciones_comercial
 //listafactura   listatransaciones   reportedetalletransaccion  lista_cobrar_cobrado_factura listar_otras_cuentas existe_empresa_modulo listafactura_cobrado_trans
 //reporteactivodisponible    getidempresa firmas listaimpuestoentreplan listafacturaapi_cobrado tributario  impuesto impuestocrear reportecomprobantecontable eliminarfactura
-=======
-// milista     listafacturaapi_cobrado listar_recibo_por_caja_bancos listar_recibo_por_id_otras_cuentas_pagar caja_banco listatransacciones_comercial firmas listar_facturas_cobros_sin_transaccion
-//listafactura   listatransaciones   reportedetalletransaccion  lista_cobrar_cobrado_factura listar_ listafactura_cobro_trans listar_usuarios
-//reporteactivodisponible    getidempresa firmas listaimpuestoentreplan listafacturaapi_cobrado tributario  impuesto impuestocrear reportecomprobantecontable
->>>>>>> eb4a5eb78269d24e3abda48a6198dc15c69060a4
 ?>

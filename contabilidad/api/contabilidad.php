@@ -718,26 +718,171 @@ WHERE md5(p.organizacion_idorganizacion)='$ide'");
         echo json_encode($res);
     }
 
-    public function crearfacturasf5($id, $fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento, $espesificacion, $cliente, $cobro, $pagar, $trans, $clasefactura, $cuenta)
+    public function crearfacturasf5($id, $fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento, $cliente,$concepto)
     {
-        //$idsucursal=$this->getidsucursal($sucursal);
+        //$idsucursal=$this->getidsucursal($sucursal); crearfacturasf5
         //$idempresa=$this->getidempresa($empresa); crearsolofacturasapi
-        $co = 0;
-        $pa = 0;
-        if ($cobro == 1 || $cobro == 2) {
-            $co = $cobro;
-        }
-        if ($pagar == 1 || $pagar == 2) {
-            $pa = $pagar;
-        }
         $res = "";
-        $registro = $this->dbc->query("update factura set fecha='$fecha',nfactura='$nfactura', nautorizacion='$nautorizacion', codigocontrol='$codigocontrol',montofactura='$monto', tasa0='$tasacero', export='$export', npoliza='$npoliza', iceiecdhotros='$ice', descuentobonificacion='$descuento',clasefactura='$clasefactura', cobrado='$co', pagado='$pa', espesificacion='$espesificacion',transacciones_idtransacciones='$trans', proveedorcliente_idproveedorcliente='$cliente',  cuenta='$cuenta' where idfactura='$id'");
+
+        $existe = $this->dbc->query("SELECT * FROM cuentaspof WHERE idfactura='$id'");
+        if($existe->num_rows > 0){
+            //NO SE PODRA EDITAR EL MONTO PORQUE YA EXISTEN RECIBOS DENTRO
+
+        }else{
+            //SI SE PODRA EDITAR TODO
+            $registro = $this->dbc->query("UPDATE factura SET fecha='$fecha',nfactura='$nfactura', nautorizacion='$nautorizacion', codigocontrol='$codigocontrol',montofactura='$monto', tasa0='$tasacero', export='$export', npoliza='$npoliza', iceiecdhotros='$ice', descuentobonificacion='$descuento',por_concepto_de='$concepto', proveedorcliente_idproveedorcliente='$cliente' WHERE idfactura='$id'");
+            if ($registro === TRUE) {
+                $res = array("success", "Registro Correcto", "crearfactura");
+            } else {
+                $res = array("danger", "No se pudo realizar el registro ");
+            }
+        }
+        
+        echo json_encode($res);
+        // echo json_encode(array($id, $fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento, $cliente,$concepto));
+    }
+
+    public function eliminarfactura($idfactura)
+    {
+        $res = "";
+        $registro = $this->dbc->query("DELETE FROM factura WHERE idfactura='$idfactura'");
         if ($registro === TRUE) {
-            $res = array("success", "Registro Correcto", "crearfactura", $trans, $clasefactura, $cuenta);
+            $res = array("success", "Registro Correcto");
         } else {
-            $res = array("danger", "No se pudo realizar el registro ");
+            $res = array("danger", "No se pudo realizar el registro");
         }
         echo json_encode($res);
+    }
+
+      public function eliminar_factura_venta_desde_transaccion($idfactura)
+    {
+        $res = "";
+        $existe = $this->dbc->query("SELECT * FROM cuentaspof WHERE idfactura='$idfactura'");
+        if($existe->num_rows > 0){
+            //NO SE PODRA ELIMINAR PORQUE EXISTEN RECIBOS DENTRO DE ESTA FACTURA
+            $res = array("danger", "No se pudo realizar el registro");
+
+        }else{
+            //SI SE ELIMINARA PORQUE ES UNA FACTURA SIN NADA DENTRO
+            $delete = $this->dbc->query("DELETE FROM factura WHERE idfactura='$idfactura'");
+        }
+
+        if ($delete === TRUE) {
+            $res = array("success", "Registro Correcto");
+        } else {
+            $res = array("danger", "No se pudo realizar el registro");
+        }
+        echo json_encode($res);
+    }
+
+    public function eliminar_factura_compra_desde_transaccion($idfactura)
+    {
+        $res = "";
+        $existe = $this->dbc->query("SELECT * FROM cuentaspor WHERE idfactura='$idfactura'");
+        if($existe->num_rows > 0){
+            //NO SE PODRA ELIMINAR PORQUE EXISTEN RECIBOS DENTRO DE ESTA FACTURA
+            $res = array("danger", "No se pudo realizar el registro");
+
+        }else{
+            //SI SE ELIMINARA PORQUE ES UNA FACTURA SIN NADA DENTRO
+            $delete = $this->dbc->query("DELETE FROM factura WHERE idfactura='$idfactura'");
+        }
+                
+        if ($delete === TRUE) {
+            $res = array("success", "Registro Correcto");
+        } else {
+            $res = array("danger", "No se pudo realizar el registro");
+        }
+        echo json_encode($res);
+    }
+
+      public function listafactura_cobro_trans($idtransaccion)
+    {
+         ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+
+        $lista = [];
+        $res = "";
+        // lista pagados y pagar
+        $factura_conta = $this->dbc->query("SELECT f.idfactura, f.fecha, f.nfactura, f.montofactura, f.clasefactura, f.cobrado, f.pagado, f.estado, f.transacciones_idtransacciones, f.proveedorcliente_idproveedorcliente, f.idorganizacion, f.registro_desde,
+        f.nautorizacion, f.codigocontrol, f.tasa0, f.export, f.npoliza, f.iceiecdhotros, f.descuentobonificacion, f.por_concepto_de
+        FROM factura  AS f WHERE transacciones_idtransacciones='$idtransaccion' AND f.clasefactura = '2' ORDER BY f.nfactura DESC");
+
+        if($factura_conta->num_rows > 0){
+            while ($qwe = $this->dbc->fetch($factura_conta)) {
+                if ($qwe['clasefactura'] == 2) {
+                    $cliente = $this->dbcm->query("select * from cliente where id_cliente='" . $qwe['proveedorcliente_idproveedorcliente'] . "'");
+                    $asd = $this->dbcm->fetch($cliente);
+                    // $res = array("id" => $qwe['idfactura'], "fecha" => $qwe['fecha'], "nfactura" => $qwe['nfactura'], "montofactura" => $qwe['montofactura'], "clasefactura" => $qwe['clasefactura'], "cobrado" => $qwe['cobrado'], "pagado" => $qwe['pagado'], "idtransaccion" => $qwe['transacciones_idtransacciones'], "idcliente_proveedor" => $qwe['proveedorcliente_idproveedorcliente'], "procli" => $asd['nombre'], "nit" => $asd['nit'],"desde" => 'contabilidad',"por_concepto_de" => $qwe['por_concepto_de'],"registro_desde" => $qwe['registro_desde']);
+                    $res = array("id" => $qwe['idfactura'], "fecha" => $qwe['fecha'], "nfactura" => $qwe['nfactura'],"nautorizacion" => $qwe['nautorizacion'], "codigocontrol" => $qwe['codigocontrol'], "montofactura" => $qwe['montofactura'],"tasacero" => $qwe['tasa0'], "export" => $qwe['export'], "npoliza" => $qwe['npoliza'], "ice" => $qwe['iceiecdhotros'], "descuentobonificacion" => $qwe['descuentobonificacion'], "clasefactura" => $qwe['clasefactura'], "cobrado" => $qwe['cobrado'], "pagado" => $qwe['pagado'],"estado" => $qwe['estado'], "idtransaccion" => $qwe['transacciones_idtransacciones'], "idcliente_proveedor" => $qwe['proveedorcliente_idproveedorcliente'], "procli" => $asd['nombre'], "nit" => $asd['nit'],"desde" => 'contabilidad',"por_concepto_de" => $qwe['por_concepto_de'],"registro_desde" => $qwe['registro_desde']);
+
+                } else {
+                    $proveedor = $this->dbcm->query("select * from proveedor where id_proveedor='" . $qwe['proveedorcliente_idproveedorcliente'] . "'");
+                    $asd = $this->dbcm->fetch($proveedor);
+                    $res = array("id" => $qwe['idfactura'], "fecha" => $qwe['fecha'], "nfactura" => $qwe['nfactura'],"nautorizacion" => $qwe['nautorizacion'], "codigocontrol" => $qwe['codigocontrol'], "montofactura" => $qwe['montofactura'],"tasacero" => $qwe['tasa0'], "export" => $qwe['export'], "npoliza" => $qwe['npoliza'], "ice" => $qwe['iceiecdhotros'], "descuentobonificacion" => $qwe['descuentobonificacion'], "clasefactura" => $qwe['clasefactura'], "cobrado" => $qwe['cobrado'], "pagado" => $qwe['pagado'],"estado" => $qwe['estado'], "idtransaccion" => $qwe['transacciones_idtransacciones'], "idcliente_proveedor" => $qwe['proveedorcliente_idproveedorcliente'], "procli" => $asd['nombre'], "nit" => $asd['nit'],"desde" => 'contabilidad',"por_concepto_de" => $qwe['por_concepto_de'],"registro_desde" => $qwe['registro_desde']);
+                //  $res = array("id" => $qwe[0], "fecha" => $qwe[1], "nfactura" => $qwe[2], "montofactura" => $qwe[5],, "clasefactura" => $qwe[11], "cobrado" => $qwe[12], "pagado" => $qwe[13], "espesificacion" => $qwe[14], "estado" => $qwe[15], "tipocompra" => $qwe[16], "idtransaccion" => $qwe[17], "idproveedor" => $qwe[18], "empresa" => $qwe[19], "cuenta" => $qwe[20], "sucursal" => $qwe[21], "procli" => $asd['nombre'], "nit" => $asd['nit'],"por_concepto_de" => $qwe['por_concepto_de'],"registro_desde" => $qwe['registro_desde']);
+                }
+                array_push($lista, $res);
+            }
+        }else{
+
+        }
+    
+//----------------------------------------------------------------------------------------------------------------------------------------
+        //SELECCIONAMOS LAS FACTURAS DE COMERCIAL QUE ESTAN RELACIONADAS EN CONTABILIDAD POR MEDIO DE LA TRANSACCION
+        $factura_conta_comer = $this->dbc->query("SELECT * FROM transaccion_factura_comercial WHERE idtransaccion = '$idtransaccion'");
+        if($factura_conta_comer->num_rows > 0){
+             $lista_fact_comer = [];
+
+            while ($www = $this->dbc->fetch($factura_conta_comer)) {
+                
+                array_push($lista_fact_comer, $www['idfactura_comercial']);
+            }
+            $array_facturas_comercial = implode(", ", $lista_fact_comer);
+            
+            //SELECCIONAMOS LAS FACTURAS DE COMERCIAL QUE PERTENECEN A UNA TRANSACCION DE CONTABILIDAD
+            $factura_comercial = $this->dbcm->query("SELECT id_venta,fecha_venta,nfactura,cliente_id_cliente1,monto_total, estado 
+            FROM venta WHERE id_venta IN ($array_facturas_comercial)");
+
+            while ($fc = $this->dbcm->fetch($factura_comercial)) {
+
+                    $trans_f = $this->dbc->query("SELECT * FROM transaccion_factura_comercial WHERE idfactura_comercial='" . $fc['id_venta'] . "'");
+                    $tf = $this->dbc->fetch($trans_f);
+
+                    $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $fc['cliente_id_cliente1'] . "'");
+                    $asd = $this->dbcm->fetch($cliente);
+                    $res = array("id" => $fc['id_venta'], "fecha" => $fc['fecha_venta'], "nfactura" => $fc['nfactura'], "montofactura" => $fc['monto_total'], "clasefactura" => 1, "cobrado" => 0, "pagado" => 0,"estado" => $fc['estado'], "idtransaccion" => $tf['idtransaccion'], "idcliente_proveedor" => $asd['id_cliente'], "procli" => $asd['nombre'], "nit" => $asd['nit'],"desde" => 'comercial',"por_concepto_de" => NULL,"registro_desde" => NULL);
+            
+                array_push($lista, $res);
+            }
+        }else{
+
+        }
+
+        echo json_encode($lista);
+    }
+    public function listafactura_pago_trans($idtransaccion) // COMPRAS
+    {
+        $lista = [];
+        $res = "";
+        // lista pagados y pagar clientes proveedor
+        $facture = $this->dbc->query("SELECT f.idfactura, f.fecha, f.nfactura, f.nautorizacion, f.codigocontrol, f.montofactura, f.tasa0, f.export, f.npoliza, f.iceiecdhotros, f.descuentobonificacion, f.clasefactura, f.cobrado, f.pagado, f.espesificacion, f.estado, f.tipocompra, f.transacciones_idtransacciones, f.proveedorcliente_idproveedorcliente, f.idorganizacion, f.cuenta, f.sucursal, f.registro_desde
+        FROM factura  AS f WHERE f.transacciones_idtransacciones='$idtransaccion' AND f.clasefactura = '1' ORDER BY f.nfactura DESC");
+        while ($qwe = $this->dbc->fetch($facture)) {
+            if ($qwe['clasefactura'] == 2) {
+                $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $qwe[18] . "'");
+                $asd = $this->dbcm->fetch($cliente);
+                $res = array("id" => $qwe[0], "fecha" => $qwe[1], "nfactura" => $qwe[2], "nautorizacion" => $qwe[3], "codigocontrol" => $qwe[4], "montofactura" => $qwe[5], "tasacero" => $qwe[6], "export" => $qwe[7], "npoliza" => $qwe[8], "ice" => $qwe[9], "descuentobonificacion" => $qwe[10], "clasefactura" => $qwe[11], "cobrado" => $qwe[12], "pagado" => $qwe[13], "espesificacion" => $qwe[14], "estado" => $qwe[15], "tipocompra" => $qwe[16], "idtransaccion" => $qwe[17], "idcliente" => $qwe[18], "empresa" => $qwe[19], "cuenta" => $qwe[20], "sucursal" => $qwe[21], "procli" => $asd['nombre'], "nit" => $asd['nit'],"por_concepto_de" => $qwe['por_concepto_de'],"registro_desde" => $qwe['registro_desde']);
+            } else {
+                $proveedor = $this->dbcm->query("select * from proveedor where id_proveedor='" . $qwe[18] . "'");
+                $asd = $this->dbcm->fetch($proveedor);
+                $res = array("id" => $qwe[0], "fecha" => $qwe[1], "nfactura" => $qwe[2], "nautorizacion" => $qwe[3], "codigocontrol" => $qwe[4], "montofactura" => $qwe[5], "tasacero" => $qwe[6], "export" => $qwe[7], "npoliza" => $qwe[8], "ice" => $qwe[9], "descuentobonificacion" => $qwe[10], "clasefactura" => $qwe[11], "cobrado" => $qwe[12], "pagado" => $qwe[13], "espesificacion" => $qwe[14], "estado" => $qwe[15], "tipocompra" => $qwe[16], "idtransaccion" => $qwe[17], "idproveedor" => $qwe[18], "empresa" => $qwe[19], "cuenta" => $qwe[20], "sucursal" => $qwe[21], "procli" => $asd['nombre'], "nit" => $asd['nit'],"por_concepto_de" => $qwe['por_concepto_de'],"registro_desde" => $qwe['registro_desde']);
+            }
+            array_push($lista, $res);
+        }
+
+        echo json_encode($lista);
     }
 
     public function crearfacturasapif5($id, $fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento, $espesificacion, $cliente, $cobro, $pagar, $trans, $clasefactura, $cuenta)
@@ -852,90 +997,6 @@ WHERE md5(p.organizacion_idorganizacion)='$ide'");
         echo json_encode($lista);
     }
 
-    public function listafactura_cobro_trans($idtransaccion)
-    {
-         ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
-
-        $lista = [];
-        $res = "";
-        // lista pagados y pagar
-        $factura_conta = $this->dbc->query("SELECT f.idfactura, f.fecha, f.nfactura, f.montofactura, f.clasefactura,f.cobrado,f.pagado, f.estado, f.transacciones_idtransacciones, f.proveedorcliente_idproveedorcliente, f.idorganizacion, f.registro_desde 
-        FROM factura  AS f WHERE transacciones_idtransacciones='$idtransaccion' AND f.clasefactura = '2' ORDER BY f.fecha ASC");
-
-        if($factura_conta->num_rows > 0){
-            while ($qwe = $this->dbc->fetch($factura_conta)) {
-                if ($qwe['clasefactura'] == 2) {
-                    $cliente = $this->dbcm->query("select * from cliente where id_cliente='" . $qwe['proveedorcliente_idproveedorcliente'] . "'");
-                    $asd = $this->dbcm->fetch($cliente);
-                    $res = array("id" => $qwe['idfactura'], "fecha" => $qwe['fecha'], "nfactura" => $qwe['nfactura'], "montofactura" => $qwe['montofactura'], "clasefactura" => $qwe['clasefactura'], "cobrado" => $qwe['cobrado'], "pagado" => $qwe['pagado'], "idtransaccion" => $qwe['transacciones_idtransacciones'], "idproveedor" => $qwe['proveedorcliente_idproveedorcliente'], "procli" => $asd['nombre'], "nit" => $asd['nit'],"desde" => 'contabilidad',"registro_desde" => $qwe['registro_desde']);
-                } else {
-                    $proveedor = $this->dbcm->query("select * from proveedor where id_proveedor='" . $qwe['proveedorcliente_idproveedorcliente'] . "'");
-                    $asd = $this->dbcm->fetch($proveedor);
-                    $res = array("id" => $qwe['idfactura'], "fecha" => $qwe['fecha'], "nfactura" => $qwe['nfactura'], "montofactura" => $qwe['montofactura'], "clasefactura" => $qwe['clasefactura'], "cobrado" => $qwe['cobrado'], "pagado" => $qwe['pagado'],"estado" => $qwe['estado'], "idtransaccion" => $qwe['transacciones_idtransacciones'], "idproveedor" => $qwe['proveedorcliente_idproveedorcliente'], "procli" => $asd['nombre'], "nit" => $asd['nit'],"desde" => 'contabilidad',"registro_desde" => $qwe['registro_desde']);
-                }
-                array_push($lista, $res);
-            }
-        }else{
-
-        }
-    
-//----------------------------------------------------------------------------------------------------------------------------------------
-        //SELECCIONAMOS LAS FACTURAS DE COMERCIAL QUE ESTAN RELACIONADAS EN CONTABILIDAD POR MEDIO DE LA TRANSACCION
-        $factura_conta_comer = $this->dbc->query("SELECT * FROM transaccion_factura_comercial WHERE idtransaccion = '$idtransaccion'");
-        if($factura_conta_comer->num_rows > 0){
-             $lista_fact_comer = [];
-
-            while ($www = $this->dbc->fetch($factura_conta_comer)) {
-                
-                array_push($lista_fact_comer, $www['idfactura_comercial']);
-            }
-            $array_facturas_comercial = implode(", ", $lista_fact_comer);
-            
-            //SELECCIONAMOS LAS FACTURAS DE COMERCIAL QUE PERTENECEN A UNA TRANSACCION DE CONTABILIDAD
-            $factura_comercial = $this->dbcm->query("SELECT id_venta,fecha_venta,nfactura,cliente_id_cliente1,monto_total, estado 
-            FROM venta WHERE id_venta IN ($array_facturas_comercial)");
-
-            while ($fc = $this->dbcm->fetch($factura_comercial)) {
-
-                    $trans_f = $this->dbc->query("SELECT * FROM transaccion_factura_comercial WHERE idfactura_comercial='" . $fc['id_venta'] . "'");
-                    $tf = $this->dbc->fetch($trans_f);
-
-                    $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $fc['cliente_id_cliente1'] . "'");
-                    $asd = $this->dbcm->fetch($cliente);
-                    $res = array("id" => $fc['id_venta'], "fecha" => $fc['fecha_venta'], "nfactura" => $fc['nfactura'], "montofactura" => $fc['monto_total'], "clasefactura" => 1, "cobrado" => 0, "pagado" => 0,"estado" => $fc['estado'], "idtransaccion" => $tf['idtransaccion'], "idcliente" => $asd['id_cliente'], "procli" => $asd['nombre'], "nit" => $asd['nit'],"desde" => 'comercial');
-            
-                array_push($lista, $res);
-            }
-        }else{
-
-        }
-
-        echo json_encode($lista);
-    }
-    public function listafactura_pago_trans($idtransaccion)
-    {
-        $lista = [];
-        $res = "";
-        // lista pagados y pagar clientes proveedor
-        $facture = $this->dbc->query("SELECT f.idfactura, f.fecha, f.nfactura, f.nautorizacion, f.codigocontrol, f.montofactura, f.tasa0, f.export, f.npoliza, f.iceiecdhotros, f.descuentobonificacion, f.clasefactura, f.cobrado, f.pagado, f.espesificacion, f.estado, f.tipocompra, f.transacciones_idtransacciones, f.proveedorcliente_idproveedorcliente, f.idorganizacion, f.cuenta, f.sucursal, f.registro_desde
-        FROM factura  AS f WHERE f.transacciones_idtransacciones='$idtransaccion' AND f.clasefactura = '1' ORDER BY f.fecha ASC");
-        while ($qwe = $this->dbc->fetch($facture)) {
-            if ($qwe['clasefactura'] == 2) {
-                $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $qwe[18] . "'");
-                $asd = $this->dbcm->fetch($cliente);
-                $res = array("id" => $qwe[0], "fecha" => $qwe[1], "nfactura" => $qwe[2], "nautorizacion" => $qwe[3], "codigocontrol" => $qwe[4], "montofactura" => $qwe[5], "tasacero" => $qwe[6], "export" => $qwe[7], "npoliza" => $qwe[8], "ice" => $qwe[9], "descuentobonificacion" => $qwe[10], "clasefactura" => $qwe[11], "cobrado" => $qwe[12], "pagado" => $qwe[13], "espesificacion" => $qwe[14], "estado" => $qwe[15], "tipocompra" => $qwe[16], "idtransaccion" => $qwe[17], "idcliente" => $qwe[18], "empresa" => $qwe[19], "cuenta" => $qwe[20], "sucursal" => $qwe[21], "procli" => $asd['nombre'], "nit" => $asd['nit'],"registro_desde" => $qwe['registro_desde']);
-            } else {
-                $proveedor = $this->dbcm->query("select * from proveedor where id_proveedor='" . $qwe[18] . "'");
-                $asd = $this->dbcm->fetch($proveedor);
-                $res = array("id" => $qwe[0], "fecha" => $qwe[1], "nfactura" => $qwe[2], "nautorizacion" => $qwe[3], "codigocontrol" => $qwe[4], "montofactura" => $qwe[5], "tasacero" => $qwe[6], "export" => $qwe[7], "npoliza" => $qwe[8], "ice" => $qwe[9], "descuentobonificacion" => $qwe[10], "clasefactura" => $qwe[11], "cobrado" => $qwe[12], "pagado" => $qwe[13], "espesificacion" => $qwe[14], "estado" => $qwe[15], "tipocompra" => $qwe[16], "idtransaccion" => $qwe[17], "idproveedor" => $qwe[18], "empresa" => $qwe[19], "cuenta" => $qwe[20], "sucursal" => $qwe[21], "procli" => $asd['nombre'], "nit" => $asd['nit'],"registro_desde" => $qwe['registro_desde']);
-            }
-            array_push($lista, $res);
-        }
-
-        echo json_encode($lista);
-    }
     public function listafacturaapi_cobrado($idempresa)
     {
         ini_set('display_errors', 1);
@@ -1049,18 +1110,7 @@ ORDER BY
 
         echo json_encode($lista);
     }
-    public function eliminarfactura($idfactura)
-    {
-        $res = "";
-        $registro = $this->dbc->query("DELETE FROM factura WHERE idfactura='$idfactura'");
-        if ($registro === TRUE) {
-            $res = array("success", "Registro Correcto");
-        } else {
-            $res = array("danger", "No se pudo realizar el registro");
-        }
-        echo json_encode($res);
-    }
-
+    
     public function getidempresa($md5)
     {
         $registro = $this->dbe->query("select * from organizacion where md5(idorganizacion)='$md5'");

@@ -72,9 +72,12 @@ $cont->registrar_factura_pagos_transaccion($_POST['idcajas_bancos'],$_POST['fech
 //echo json_encode($_POST['fechatfactura']); registroplanesf5
 
 }elseif($ver=="crearfacturasf5"){
+    if(isset($_POST['idfactura'],$_POST['fechatfactura'],$_POST['nfactura'],$_POST['nautorizacion'],$_POST['codigocontrol'],$_POST['montofactura'],$_POST['tasacero'],$_POST['export'],$_POST['npoliza'],$_POST['iceiecdhotros'],$_POST['descuentobonificacion'],$_POST['cliente'],$_POST['por_concepto_de'])){
     $cont=new Contabilidad();
-    $cont->crearfacturasf5($_POST['idfactura'],$_POST['fechatfactura'],$_POST['nfactura'],$_POST['nautorizacion'],$_POST['codigocontrol'],$_POST['montofactura'],$_POST['tasacero'],$_POST['export'],$_POST['npoliza'],$_POST['iceiecdhotros'],$_POST['descuentobonificacion'],$_POST['especificacion'],$_POST['cliente'],$_POST['cobrado'],$_POST['pagado'],$_POST['trans'],$_POST['clasefactura'],$_POST['cuenta']);
-
+    $cont->crearfacturasf5($_POST['idfactura'],$_POST['fechatfactura'],$_POST['nfactura'],$_POST['nautorizacion'],$_POST['codigocontrol'],$_POST['montofactura'],$_POST['tasacero'],$_POST['export'],$_POST['npoliza'],$_POST['iceiecdhotros'],$_POST['descuentobonificacion'],$_POST['cliente'],$_POST['por_concepto_de']);
+    }else{
+        echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idfactura'],$_POST['fechatfactura'],$_POST['nfactura'],$_POST['nautorizacion'],$_POST['codigocontrol'],$_POST['montofactura'],$_POST['tasacero'],$_POST['export'],$_POST['npoliza'],$_POST['iceiecdhotros'],$_POST['descuentobonificacion'],$_POST['cliente'],$_POST['por_concepto_de']));
+    }
 }elseif($ver=="crearfacturasapi"){
     $cont=new Contabilidad();
     $cont->crearfacturasapi($_POST['fechatfactura'],$_POST['nfactura'],$_POST['nautorizacion'],$_POST['codigocontrol'],$_POST['montofactura'],$_POST['tasacero'],$_POST['export'],$_POST['npoliza'],$_POST['iceiecdhotros'],$_POST['descuentobonificacion'],$_POST['especificacion'],$_POST['cliente'],$_POST['cobrar'],$_POST['pagar'],$_POST['trans'],$_POST['clasefactura'],$_POST['cuenta'],$_POST['empresa'],$_POST['sucursal']);
@@ -542,12 +545,7 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         }
     }  
     
-<<<<<<< HEAD
-// registrar_factura_recibo_cobro_cajaBancos registrocobrarfactura consolidar vincula crearfacturas registroproveedor registrocobrarfactura
-// registrotransaccionf5 tributario registrar_detalle_transaccion_json registrocobrarfacturaGrupal crearfacturas registrar_factura_pagos_transaccion
-=======
 // registrar_factura_recibo_cobro_cajaBancos registrocobrarfactura consolidar vincula crearfacturas registroproveedor registrocobrarfactura 
 // registrotransaccionf5 tributario registrar_detalle_transaccion_json registrocobrarfacturaGrupal crearfacturas caja_bancos registrar_factura_pago
->>>>>>> eb4a5eb78269d24e3abda48a6198dc15c69060a4
 }// registropagarfactura impuestocrearf5 registrar_factura desconsolidar registrar_factura_cobros_tributario registrar_factura_pagos_transaccion
 ?> 
