@@ -522,32 +522,77 @@ class Filtrado_facturas extends DB{
         }
         if($nit != '-1'){
 
+            $arr_client = [];
+            $arr_prov = [];
+        
+            //----------------------------------------------------------------------------
+     
             if ($cobro_pago == '1') {
                 $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE nit= '$nit'");
-                $cl = $this->dbcm->fetch($cliente);
-                // $facturas = $this->dbc->query("SELECT * FROM factura WHERE proveedorcliente_idproveedorcliente = '$cl[id_cliente]'");
-                $where[] = "proveedorcliente_idproveedorcliente = '$cl[id_cliente]'";
-            }elseif($cobro_pago == '2'){
-                $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE nit= '$nit'");
-                $prov = $this->dbcm->fetch($proveedor);
-                // $facturas = $this->dbc->query("SELECT * FROM factura WHERE proveedorcliente_idproveedorcliente = '$prov[id_proveedor]'");
-                $where[] = "proveedorcliente_idproveedorcliente = '$prov[id_proveedor]'";
-            }else{
+                if($cliente->num_rows > 0){
+                    while ($cli = $this->dbcm->fetch($cliente)) {
+                        array_push($arr_client,$cli['id_cliente']);
+                    }
+                    $client_comas = implode(",", $arr_client);
+
+                    $where[] = "proveedorcliente_idproveedorcliente IN($client_comas)";
+                }else{
+                    //NO SE ENCONTRO NINGUN NIT CON EL QUE INGRESASTE
+                    $where[] = "proveedorcliente_idproveedorcliente = '-1'";
+
+                }
                 
+            }elseif($cobro_pago == '2'){
+                
+                $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE nit= '$nit'");
+                if($proveedor->num_rows > 0){
+                    while ($prov = $this->dbcm->fetch($proveedor)) {
+                        array_push($arr_prov,$prov['id_proveedor']);
+                    }
+                    $prov_comas = implode(",", $arr_prov);
+                    $where[] = "proveedorcliente_idproveedorcliente IN($prov_comas)";
+
+                }else{
+                    //NO SE ENCONTRO NINGUN NIT CON EL QUE INGRESASTE
+                    $where[] = "proveedorcliente_idproveedorcliente = '-1'";
+                }
+            }else{
+                $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE nit= '$nit'");
+                if($cliente->num_rows > 0){
+                    while ($cli = $this->dbcm->fetch($cliente)) {
+                        array_push($arr_client,$cli['id_cliente']);
+                    }
+                    $client_comas = implode(",", $arr_client);
+                }else{
+                    //NO SE ENCONTRO NINGUN NIT CON EL QUE INGRESASTE
+                }
+                //----------------------------------------------------------------------------------
+
+                $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE nit= '$nit'");
+                if($proveedor->num_rows > 0){
+                    while ($prov = $this->dbcm->fetch($proveedor)) {
+                        array_push($arr_prov,$prov['id_proveedor']);
+                    }
+                    $prov_comas = implode(",", $arr_prov);
+                }else{
+                    //NO SE ENCONTRO NINGUN NIT CON EL QUE INGRESASTE
+                }
+                if($proveedor->num_rows > 0 && $cliente->num_rows > 0){
+                    $client_proveedor = $client_comas . "," . $prov_comas;
+                    $where[] = "proveedorcliente_idproveedorcliente IN($client_proveedor)";
+                }elseif($proveedor->num_rows > 0){
+                    //NO SE ENCONTRO NINGUN NIT CON EL QUE INGRESASTE
+                    $where[] = "proveedorcliente_idproveedorcliente IN($prov_comas)";
+                }elseif($cliente->num_rows > 0){
+                    //NO SE ENCONTRO NINGUN NIT CON EL QUE INGRESASTE
+                    $where[] = "proveedorcliente_idproveedorcliente IN($client_comas)";
+                }else{
+                    $where[] = "proveedorcliente_idproveedorcliente = '-1'";
+                   
+                }
+
             }
-
-        //     while ($zxc = $this->dbc->fetch($facturas)) {
-        //     $res2 = array(
-        //         "idfactura" => $zxc['idfactura'],
-        //         "fecha" => $zxc['fecha'],
-        //         "nfactura" => $zxc['nfactura'],
-        //         "montofactura" => $zxc['montofactura'],
-        //         "estado" => $zxc['estado']
-        //     );
-        //     array_push($lista, $res2);
-        //   }
-
-                // $wheree[] = "proveedorcliente_idproveedorcliente" != $id_cliente_proveedor;
+    
         }
 
         $facturas = $this->dbc->query("SELECT * FROM factura WHERE " . implode(" AND ", $where));
