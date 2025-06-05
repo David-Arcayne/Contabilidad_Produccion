@@ -493,9 +493,9 @@ class Filtrado_facturas extends DB{
       }
 
     public function busqueda_facturas_contabilidad($nfactura,$nit,$cobro_pago,$id_cliente_proveedor,$fecha,$monto,$empresa) {
-        ini_set('display_errors', 1); //,$nit,$cobro_pago,$cliente_proveedor,
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+        // ini_set('display_errors', 1); //,$nit,$cobro_pago,$cliente_proveedor,
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
   
         $lista = [];
           $idempresa = $this->getidempresa($empresa);
@@ -599,12 +599,266 @@ class Filtrado_facturas extends DB{
         //     $facturas = $this->dbc->query("SELECT * FROM factura WHERE  idorganizacion= '$idempresa'"); //TODAS LAS FACTURAS
 
         while ($qwe = $this->dbc->fetch($facturas)) {
+         $transa = $this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones = '$qwe[transacciones_idtransacciones]'");
+        $nro_trans = $transa->fetch_assoc();
+
+            $res = array(
+                "idfactura" => $qwe['idfactura'],
+                "fecha" => $qwe['fecha'],
+                "nfactura" => $qwe['nfactura'],
+                "montofactura" => $qwe['montofactura'],
+                "estado" => $qwe['estado'],
+                "nro_transaccion" => $nro_trans['codigotransaccion']
+                // "pagado" => $asd[0],
+                // "saldo" => $saldo,
+                // "forma_pago" => $qwe['forma_pago'],
+                // "archivo" => $qwe['archivo']
+            );
+  
+              array_push($lista, $res);
+          }
+          echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
+
+       public function busqueda_facturas_comercial($nfactura,$nit,$id_cliente_proveedor,$fecha,$monto,$empresa) {
+        ini_set('display_errors', 1); //,$nit,$cobro_pago,$cliente_proveedor,
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+  
+        $lista = [];
+          $idempresa = $this->getidempresa($empresa);
+//----------------------------------------------------------------------------------------------------------------
+        $where = ["c.idempresa = '$idempresa'"];
+
+        if ($nfactura != '-1') {
+            $where[] = "nfactura = '$nfactura'";
+        }
+        if ($monto != '-1') {
+            $where[] = "monto_total = '$monto'";
+        }
+        if ($fecha != '-1') {
+            $where[] = "fecha_venta = '$fecha'";
+        }
+        // if ($cobro_pago == '1') { // por el momento solo funcionara esto en comercial
+        //     $where[] = "cobrado != '0'";
+
+        // }elseif($cobro_pago == '2'){
+        //     $where[] = "pagado != '0'";
+        // }
+        if($id_cliente_proveedor != '-1'){
+            $where[] = "cliente_id_cliente1 = '$id_cliente_proveedor'";
+        }
+        if($nit != '-1'){
+
+            $arr_client = [];
+            $arr_prov = [];
+        
+            //----------------------------------------------------------------------------
+     
+            if ($cobro_pago == '1') {
+                $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE nit= '$nit'");
+                if($cliente->num_rows > 0){
+                    while ($cli = $this->dbcm->fetch($cliente)) {
+                        array_push($arr_client,$cli['id_cliente']);
+                    }
+                    $client_comas = implode(",", $arr_client);
+
+                    $where[] = "proveedorcliente_idproveedorcliente IN($client_comas)";
+                }else{
+                    //NO SE ENCONTRO NINGUN NIT CON EL QUE INGRESASTE
+                    $where[] = "proveedorcliente_idproveedorcliente = '-1'";
+
+                }
+                
+            }elseif($cobro_pago == '2'){
+                
+                $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE nit= '$nit'");
+                if($proveedor->num_rows > 0){
+                    while ($prov = $this->dbcm->fetch($proveedor)) {
+                        array_push($arr_prov,$prov['id_proveedor']);
+                    }
+                    $prov_comas = implode(",", $arr_prov);
+                    $where[] = "proveedorcliente_idproveedorcliente IN($prov_comas)";
+
+                }else{
+                    //NO SE ENCONTRO NINGUN NIT CON EL QUE INGRESASTE
+                    $where[] = "proveedorcliente_idproveedorcliente = '-1'";
+                }
+            }else{
+                $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE nit= '$nit'");
+                if($cliente->num_rows > 0){
+                    while ($cli = $this->dbcm->fetch($cliente)) {
+                        array_push($arr_client,$cli['id_cliente']);
+                    }
+                    $client_comas = implode(",", $arr_client);
+                }else{
+                    //NO SE ENCONTRO NINGUN NIT CON EL QUE INGRESASTE
+                }
+                //----------------------------------------------------------------------------------
+
+                $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE nit= '$nit'");
+                if($proveedor->num_rows > 0){
+                    while ($prov = $this->dbcm->fetch($proveedor)) {
+                        array_push($arr_prov,$prov['id_proveedor']);
+                    }
+                    $prov_comas = implode(",", $arr_prov);
+                }else{
+                    //NO SE ENCONTRO NINGUN NIT CON EL QUE INGRESASTE
+                }
+                if($proveedor->num_rows > 0 && $cliente->num_rows > 0){
+                    $client_proveedor = $client_comas . "," . $prov_comas;
+                    $where[] = "proveedorcliente_idproveedorcliente IN($client_proveedor)";
+                }elseif($proveedor->num_rows > 0){
+                    //NO SE ENCONTRO NINGUN NIT CON EL QUE INGRESASTE
+                    $where[] = "proveedorcliente_idproveedorcliente IN($prov_comas)";
+                }elseif($cliente->num_rows > 0){
+                    //NO SE ENCONTRO NINGUN NIT CON EL QUE INGRESASTE
+                    $where[] = "proveedorcliente_idproveedorcliente IN($client_comas)";
+                }else{
+                    $where[] = "proveedorcliente_idproveedorcliente = '-1'";
+                   
+                }
+
+            }
+    
+        }
+
+        $facturas = $this->dbcm->query("SELECT * FROM venta v
+        INNER JOIN cliente_id_cliente1 c ON c.id_cliente = v.cliente_id_cliente1
+        WHERE " . implode(" AND ", $where));
+        //     $facturas = $this->dbc->query("SELECT * FROM factura WHERE  idorganizacion= '$idempresa'"); //TODAS LAS FACTURAS
+
+        while ($qwe = $this->dbc->fetch($facturas)) {
             $res = array(
                 "idfactura" => $qwe['idfactura'],
                 "fecha" => $qwe['fecha'],
                 "nfactura" => $qwe['nfactura'],
                 "montofactura" => $qwe['montofactura'],
                 "estado" => $qwe['estado']
+                // "pagado" => $asd[0],
+                // "saldo" => $saldo,
+                // "forma_pago" => $qwe['forma_pago'],
+                // "archivo" => $qwe['archivo']
+            );
+  
+              array_push($lista, $res);
+          }
+          echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
+
+    public function busqueda_documentos_contabilidad($nro_otras_cuentas,$nit,$cobro_pago,$id_cliente_proveedor,$fecha,$precio,$empresa) {
+        ini_set('display_errors', 1); //,$nit,$cobro_pago,$cliente_proveedor,
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+  
+        $lista = [];
+          $idempresa = $this->getidempresa($empresa);
+//----------------------------------------------------------------------------------------------------------------
+        $where = ["idempresa = '$idempresa'"];
+
+        if ($nro_otras_cuentas != '-1') {
+            $where[] = "nro_otras_cuentas = '$nro_otras_cuentas'";
+        }
+        if ($precio != '-1') {
+            $where[] = "precio = '$precio'";
+        }
+        if ($fecha != '-1') {
+            $where[] = "fecha = '$fecha'";
+        }
+        if ($cobro_pago == '1') {
+            $where[] = "cobrado != '0'";
+
+        }elseif($cobro_pago == '2'){
+            $where[] = "pagado != '0'";
+        }
+        if($id_cliente_proveedor != '-1'){
+            $where[] = "id_cliente_proveedor = '$id_cliente_proveedor'";
+        }
+        if($nit != '-1'){
+
+            $arr_client = [];
+            $arr_prov = [];
+        
+            //----------------------------------------------------------------------------
+     
+            if ($cobro_pago == '1') {
+                $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE nit= '$nit'");
+                if($cliente->num_rows > 0){
+                    while ($cli = $this->dbcm->fetch($cliente)) {
+                        array_push($arr_client,$cli['id_cliente']);
+                    }
+                    $client_comas = implode(",", $arr_client);
+
+                    $where[] = "id_cliente_proveedor IN($client_comas)";
+                }else{
+                    //NO SE ENCONTRO NINGUN NIT CON EL QUE INGRESASTE
+                    $where[] = "id_cliente_proveedor = '-1'";
+
+                }
+                
+            }elseif($cobro_pago == '2'){
+                
+                $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE nit= '$nit'");
+                if($proveedor->num_rows > 0){
+                    while ($prov = $this->dbcm->fetch($proveedor)) {
+                        array_push($arr_prov,$prov['id_proveedor']);
+                    }
+                    $prov_comas = implode(",", $arr_prov);
+                    $where[] = "id_cliente_proveedor IN($prov_comas)";
+
+                }else{
+                    //NO SE ENCONTRO NINGUN NIT CON EL QUE INGRESASTE
+                    $where[] = "id_cliente_proveedor = '-1'";
+                }
+            }else{
+                $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE nit= '$nit'");
+                if($cliente->num_rows > 0){
+                    while ($cli = $this->dbcm->fetch($cliente)) {
+                        array_push($arr_client,$cli['id_cliente']);
+                    }
+                    $client_comas = implode(",", $arr_client);
+                }else{
+                    //NO SE ENCONTRO NINGUN NIT CON EL QUE INGRESASTE
+                }
+                //----------------------------------------------------------------------------------
+
+                $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE nit= '$nit'");
+                if($proveedor->num_rows > 0){
+                    while ($prov = $this->dbcm->fetch($proveedor)) {
+                        array_push($arr_prov,$prov['id_proveedor']);
+                    }
+                    $prov_comas = implode(",", $arr_prov);
+                }else{
+                    //NO SE ENCONTRO NINGUN NIT CON EL QUE INGRESASTE
+                }
+                if($proveedor->num_rows > 0 && $cliente->num_rows > 0){
+                    $client_proveedor = $client_comas . "," . $prov_comas;
+                    $where[] = "id_cliente_proveedor IN($client_proveedor)";
+                }elseif($proveedor->num_rows > 0){
+                    //NO SE ENCONTRO NINGUN NIT CON EL QUE INGRESASTE
+                    $where[] = "id_cliente_proveedor IN($prov_comas)";
+                }elseif($cliente->num_rows > 0){
+                    //NO SE ENCONTRO NINGUN NIT CON EL QUE INGRESASTE
+                    $where[] = "id_cliente_proveedor IN($client_comas)";
+                }else{
+                    $where[] = "id_cliente_proveedor = '-1'";
+                   
+                }
+
+            }
+    
+        }
+
+        $otras_cuentas = $this->dbc->query("SELECT * FROM otras_cuentas WHERE " . implode(" AND ", $where));
+        //     $facturas = $this->dbc->query("SELECT * FROM factura WHERE  idorganizacion= '$idempresa'"); //TODAS LAS FACTURAS
+
+        while ($qwe = $this->dbc->fetch($otras_cuentas)) {
+            $res = array(
+                "idotras_cuentas" => $qwe['idotras_cuentas'],
+                "fecha" => $qwe['fecha'],
+                "nro_otras_cuentas" => $qwe['nro_otras_cuentas'],
+                "precio" => $qwe['precio'],
+                "estado" => '1'
                 // "pagado" => $asd[0],
                 // "saldo" => $saldo,
                 // "forma_pago" => $qwe['forma_pago'],

@@ -476,6 +476,9 @@ elseif($ver[0]=="listar_facturas_cobros_sin_transaccion"){
 }elseif($ver[0]=="busqueda_facturas_contabilidad"){
     $cont=new Filtrado_facturas();
     $cont->busqueda_facturas_contabilidad($ver[1],$ver[2],$ver[3],$ver[4],$ver[5],$ver[6],$ver[7]);
+}elseif($ver[0]=="busqueda_documentos_contabilidad"){
+    $cont=new Filtrado_facturas();
+    $cont->busqueda_documentos_contabilidad($ver[1],$ver[2],$ver[3],$ver[4],$ver[5],$ver[6],$ver[7]);
 }
 
 
