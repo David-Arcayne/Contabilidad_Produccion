@@ -19,6 +19,7 @@ require_once "alertas.php";
 require_once "./facturas/filtrado_facturas.php";
 require_once "./facturas/factura_comercial.php";
 require_once "./configuracion/firma_reporte.php";
+require_once "./configuracion/reporte_confi.php";
 
 $ver=explode("/",$_GET['ver']); //dividiendo los "/"  ver[0],ver[1],ver[x]  listafacturaapi_pagado eliminarasiento
 if($ver[0]=="verificacion"){
@@ -479,11 +480,17 @@ elseif($ver[0]=="listar_facturas_cobros_sin_transaccion"){
 }elseif($ver[0]=="busqueda_documentos_contabilidad"){
     $cont=new Filtrado_facturas();
     $cont->busqueda_documentos_contabilidad($ver[1],$ver[2],$ver[3],$ver[4],$ver[5],$ver[6],$ver[7]);
+}elseif($ver[0]=="filtro_por_nivel"){
+    $cont=new Reporte_confi();
+    $cont->filtro_por_nivel($ver[1],$ver[2],$ver[3]);
+}elseif($ver[0]=="listar_configuracion_reporte"){
+    $cont=new Reporte_confi();
+    $cont->listar_configuracion_reporte($ver[1]);
 }
 
 
 // asientotipo  creartipoasientodelete listaplanesempresa listaimpuestoentreplan listar_recibo_por_id_otras_cuentas listaVentas listafactura listar_recibo_por_caja_bancos
-// milista     listafacturaapi_cobrado listar_recibo_por_caja_bancos listar_recibo_por_id_otras_cuentas_pagar caja_banco listatransacciones_comercial
+// milista     listafacturaapi_cobrado listar_recibo_por_caja_bancos listar_recibo_por_id_otras_cuentas_pagar caja_banco listatransacciones_comercial alerta
 //listafactura   listatransaciones   reportedetalletransaccion  lista_cobrar_cobrado_factura listar_otras_cuentas existe_empresa_modulo listafactura_cobrado_trans
 //reporteactivodisponible    getidempresa firmas listaimpuestoentreplan listafacturaapi_cobrado tributario  impuesto impuestocrear reportecomprobantecontable eliminarfactura
 ?>

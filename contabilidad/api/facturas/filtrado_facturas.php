@@ -747,9 +747,9 @@ class Filtrado_facturas extends DB{
     }
 
     public function busqueda_documentos_contabilidad($nro_otras_cuentas,$nit,$cobro_pago,$id_cliente_proveedor,$fecha,$precio,$empresa) {
-        ini_set('display_errors', 1); //,$nit,$cobro_pago,$cliente_proveedor,
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+        // ini_set('display_errors', 1); //,$nit,$cobro_pago,$cliente_proveedor,
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
   
         $lista = [];
           $idempresa = $this->getidempresa($empresa);
@@ -853,12 +853,17 @@ class Filtrado_facturas extends DB{
         //     $facturas = $this->dbc->query("SELECT * FROM factura WHERE  idorganizacion= '$idempresa'"); //TODAS LAS FACTURAS
 
         while ($qwe = $this->dbc->fetch($otras_cuentas)) {
+
+        $transa = $this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones = '$qwe[transacciones_idtransacciones]'");
+        $nro_trans = $transa->fetch_assoc();
+
             $res = array(
                 "idotras_cuentas" => $qwe['idotras_cuentas'],
                 "fecha" => $qwe['fecha'],
                 "nro_otras_cuentas" => $qwe['nro_otras_cuentas'],
                 "precio" => $qwe['precio'],
-                "estado" => '1'
+                "estado" => '1',
+                "nro_transaccion" => $nro_trans['codigotransaccion']
                 // "pagado" => $asd[0],
                 // "saldo" => $saldo,
                 // "forma_pago" => $qwe['forma_pago'],

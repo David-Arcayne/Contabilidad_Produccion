@@ -4,8 +4,17 @@ session_start();
 require_once "../../db/db.php";
 class Alertas extends DB{
     
-public function alerta_desconsolidacion($empresa) {
+    public function getidgestion($md5){
+        $registro=$this->dbc->query("select * from gestion where md5(idempresa)='$md5' and estado='2'");
+        $qwe=$this->dbc->fetch($registro);
+        return $qwe['idgestion'];
+
+    }
+
+    public function alerta_desconsolidacion($empresa) {
         $lista = [];
+
+        $gestion=$this->getidgestion($empresa);
 
         // Consulta SQL
         $sql =$this->dbc->query("SELECT 
@@ -28,7 +37,7 @@ public function alerta_desconsolidacion($empresa) {
                 transacciones AS t 
                 ON t.idtransacciones = d.idtransaccion
             WHERE 
-                md5(d.idempresa) = '$empresa'
+            md5(idempresa) = '$empresa' AND t.idgestion = '$gestion'
             GROUP BY 
                 d.codigo
             ORDER BY 
@@ -59,9 +68,9 @@ public function alerta_desconsolidacion($empresa) {
 
     public function alerta_transaccionEn_espera($idempresa) {
         $lista = [];
-        
+        $gestion=$this->getidgestion($idempresa);
         // Consulta SQL
-        $sql =$this->dbc->query("SELECT COUNT(*) AS cantidad FROM transaccionEn_espera WHERE md5(idempresa) = '$idempresa' AND estado = '0'");
+        $sql =$this->dbc->query("SELECT COUNT(*) AS cantidad FROM transaccionEn_espera WHERE md5(idempresa) = '$idempresa' AND estado = '0' AND  idgestion = '$gestion'");
         $resultado = $sql->fetch_assoc();       
     
         $res = array(
@@ -73,10 +82,16 @@ public function alerta_desconsolidacion($empresa) {
         echo json_encode($lista);
 }   
 public function alerta_anular_eliminar_transaccion($idempresa) {
+      ini_set('display_errors', 1); //,$nit,$cobro_pago,$cliente_proveedor,
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+
     $lista = [];
-    
+    $gestion=$this->getidgestion($idempresa);
     // Consulta SQL
-    $sql =$this->dbc->query("SELECT COUNT(*) AS cantidad FROM solicitud_anular_eliminar WHERE md5(idempresa) = '$idempresa' AND estado_solicitud = '1'");
+    $sql =$this->dbc->query("SELECT COUNT(*) AS cantidad FROM solicitud_anular_eliminar s
+    INNER JOIN transacciones t ON t.idtransacciones = s.transacciones_idtransacciones
+    WHERE md5(s.idempresa) = '$idempresa' AND s.estado_solicitud = '1' AND t.idgestion = '$gestion'");
     $resultado = $sql->fetch_assoc();       
 
     $res = array(
@@ -90,9 +105,10 @@ public function alerta_anular_eliminar_transaccion($idempresa) {
 
 public function alerta_transacciones_comercial($idempresa) {
     $lista = [];
-    
+    $gestion=$this->getidgestion($idempresa);
+
     // Consulta SQL
-    $sql =$this->dbc->query("SELECT COUNT(*) AS cantidad FROM transacciones WHERE md5(organizacion_idorganizacion) = '$idempresa' AND estado = '6'");
+    $sql =$this->dbc->query("SELECT COUNT(*) AS cantidad FROM transacciones WHERE md5(organizacion_idorganizacion) = '$idempresa' AND estado = '6' AND idgestion = '$gestion'");
     $resultado = $sql->fetch_assoc();       
 
     $res = array(
