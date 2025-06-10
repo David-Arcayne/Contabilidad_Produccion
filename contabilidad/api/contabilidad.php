@@ -609,18 +609,24 @@ WHERE md5(p.organizacion_idorganizacion)='$ide'");
         $ide = $this->getidempresa($empresa);
         $res = "";
         $codigo = "CON-" . date("Ymdhi");
-
-         $consulta = $this->dbcm->query("SELECT COUNT(*) AS total FROM proveedor WHERE nit = '$nit' AND idempresa = '$ide'");
-        $resultado = $consulta->fetch_assoc();
-        $totalRegistros = $resultado['total'];
-
-        if($totalRegistros > 0){
-            $res = array("danger", "No se pudo registrar");
-
-        }else{
+        if($nit == 0){
         $registro = $this->dbcm->query("insert into proveedor(id_proveedor,nombre,codigo,nit,detalle,direccion,telefono,mobil,email,web,pais,ciudad,zona,contacto,id_empresa)values(NULL,'$nombre','$codigo','$nit','$detalle','$direccion','$telefono','$mobil','0','0','$pais','$ciudad','$zona','0','$ide')");
-        
+        }else{
+
+            $consulta = $this->dbcm->query("SELECT COUNT(*) AS total FROM proveedor WHERE nit = '$nit' AND idempresa = '$ide'");
+            $resultado = $consulta->fetch_assoc();
+            $totalRegistros = $resultado['total'];
+
+            if($totalRegistros > 0){
+                $res = array("danger", "No se pudo registrar");
+
+            }else{
+            $registro = $this->dbcm->query("insert into proveedor(id_proveedor,nombre,codigo,nit,detalle,direccion,telefono,mobil,email,web,pais,ciudad,zona,contacto,id_empresa)values(NULL,'$nombre','$codigo','$nit','$detalle','$direccion','$telefono','$mobil','0','0','$pais','$ciudad','$zona','0','$ide')");
+            
+            }
+
         }
+         
         if ($registro === TRUE) {
             $res = array("success", "Se registro correctamente", "registroproveedor");
         } else {
@@ -842,17 +848,29 @@ WHERE md5(p.organizacion_idorganizacion)='$ide'");
             $array_facturas_comercial = implode(", ", $lista_fact_comer);
             
             //SELECCIONAMOS LAS FACTURAS DE COMERCIAL QUE PERTENECEN A UNA TRANSACCION DE CONTABILIDAD
-            $factura_comercial = $this->dbcm->query("SELECT id_venta,fecha_venta,nfactura,cliente_id_cliente1,monto_total, estado 
+            $factura_comercial = $this->dbcm->query("SELECT id_venta,fecha_venta,nfactura,cliente_id_cliente1,monto_total, estado,tipo_pago 
             FROM venta WHERE id_venta IN ($array_facturas_comercial)");
 
             while ($fc = $this->dbcm->fetch($factura_comercial)) {
 
+                if($fc['tipo_pago'] == 'contado'){
+                    $estado_factura = 'cobrado';
+                }else{
+                    $estado_cobro = $this->dbcm->query("SELECT *
+                    FROM estado_cobro WHERE venta_id_venta = '$fc[id_venta]'");
+                    $resu_cobro = $estado_cobro->fetch_assoc();
+                        if($resu_cobro['saldo'] == 0){
+                            $estado_factura = 'cobrado';
+                        }else{
+                            $estado_factura = 'por cobrar';
+                        }
+                }
                     $trans_f = $this->dbc->query("SELECT * FROM transaccion_factura_comercial WHERE idfactura_comercial='" . $fc['id_venta'] . "'");
                     $tf = $this->dbc->fetch($trans_f);
 
                     $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $fc['cliente_id_cliente1'] . "'");
                     $asd = $this->dbcm->fetch($cliente);
-                    $res = array("id" => $fc['id_venta'], "fecha" => $fc['fecha_venta'], "nfactura" => $fc['nfactura'], "montofactura" => $fc['monto_total'], "clasefactura" => 1, "cobrado" => 0, "pagado" => 0,"estado" => $fc['estado'], "idtransaccion" => $tf['idtransaccion'], "idcliente_proveedor" => $asd['id_cliente'], "procli" => $asd['nombre'], "nit" => $asd['nit'],"desde" => 'comercial',"por_concepto_de" => NULL,"registro_desde" => NULL);
+                    $res = array("id" => $fc['id_venta'], "fecha" => $fc['fecha_venta'], "nfactura" => $fc['nfactura'], "montofactura" => $fc['monto_total'], "clasefactura" => 1, "cobrado" => 0, "pagado" => 0,"estado" => $estado_factura, "idtransaccion" => $tf['idtransaccion'], "idcliente_proveedor" => $asd['id_cliente'], "procli" => $asd['nombre'], "nit" => $asd['nit'],"desde" => 'comercial',"por_concepto_de" => NULL,"registro_desde" => NULL);
             
                 array_push($lista, $res);
             }
