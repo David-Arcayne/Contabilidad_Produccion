@@ -193,8 +193,8 @@ class Caja_bancos_recibos extends DB{
 
         $nroRecibo = $res1['cant1'] + $res2['cant2']+ $res3['cant3'] + 1;
 
-        $cl = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='$cliente'");
-        $clientSelect = $cl->fetch_assoc();
+        $cl = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='$cliente'");
+        $proveedor_select = $cl->fetch_assoc();
 
         if($trans == "" && $asiento == ""){
             // se crea factura sin transaccion asignada
@@ -204,7 +204,7 @@ class Caja_bancos_recibos extends DB{
             $idfact = $this->dbc->insert_id;
 
             $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$trans','0',NULL,'$registro_desde')");
+            VALUES('$nroRecibo','$fecha','lugar por defecto','varios clientes','$proveedor_select[nombre]','$proveedor_select[nit]','$monto','$idfact','0','$trans','0',NULL,'$registro_desde')");
 
             $idrecibo = $this->dbc->insert_id;
         }elseif($trans > 0 && $asiento == 0){
@@ -214,7 +214,7 @@ class Caja_bancos_recibos extends DB{
             $idfact = $this->dbc->insert_id;
 
             $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$trans','0',NULL,'$registro_desde')");
+            VALUES('$nroRecibo','$fecha','lugar por defecto','varios clientes','$proveedor_select[nombre]','$proveedor_select[nit]','$monto','$idfact','0','$trans','0',NULL,'$registro_desde')");
 
             $idrecibo = $this->dbc->insert_id;
         }else{
@@ -258,7 +258,7 @@ class Caja_bancos_recibos extends DB{
         $idfact = $this->dbc->insert_id;
 
         $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$idtrans','0',NULL,'$registro_desde')");
+            VALUES('$nroRecibo','$fecha','lugar por defecto','varios clientes','$proveedor_select[nombre]','$proveedor_select[nit]','$monto','$idfact','0','$idtrans','0',NULL,'$registro_desde')");
 
         $idrecibo = $this->dbc->insert_id;
         }
@@ -501,7 +501,7 @@ class Caja_bancos_recibos extends DB{
 
         $nroRecibo = $res1['cant1'] + $res2['cant2']+ $res3['cant3'] + 1;
 
-        $cl = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='$cliente'");
+        $cl = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='$cliente'");
         $clientSelect = $cl->fetch_assoc();
 //NUNCA ENTRA A ESTA CONDICION
 
