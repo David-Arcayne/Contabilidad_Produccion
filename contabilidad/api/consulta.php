@@ -486,6 +486,15 @@ elseif($ver[0]=="listar_facturas_cobros_sin_transaccion"){
 }elseif($ver[0]=="listar_configuracion_reporte"){
     $cont=new Reporte_confi();
     $cont->listar_configuracion_reporte($ver[1]);
+}elseif($ver[0]=="reporte_balance_general"){
+    $cont=new Reporte_confi();
+    $cont->reporte_balance_general($ver[1],$ver[2],$ver[3]);
+}elseif($ver[0]=="listar_vinculacion_depreciacion"){
+    $cont=new Reporte_confi();
+    $cont->listar_vinculacion_depreciacion($ver[1]);
+}elseif($ver[0]=="eliminar_vinculacion_depreciacion"){
+    $cont=new Reporte_confi();
+    $cont->eliminar_vinculacion_depreciacion($ver[1]);
 }
 
 

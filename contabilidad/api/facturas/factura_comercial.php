@@ -394,9 +394,9 @@ $nroTransaccion = $resultado12['codigotransaccion'] + 1;
 
       public function listar_factura_comercial_con_transaccion($idmd5)
     {
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
         // $idempresa = $this->verificar->verificarIDEMPRESAMD5($idmd5);
         $idempresa = $this->getidempresa($idmd5);
         $lista = [];
@@ -450,7 +450,9 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
  $i = 0;
         while ($qwe = $this->dbcm->fetch($clien)) {
                     
-            $trans_fact_aux = $this->dbc->query("SELECT * FROM transaccion_factura_comercial WHERE idfactura_comercial = '$listaFactura[$i]'");
+            // $trans_fact_aux = $this->dbc->query("SELECT * FROM transaccion_factura_comercial WHERE idfactura_comercial = '$listaFactura[$i]'");
+            $trans_fact_aux = $this->dbc->query("SELECT * FROM transaccion_factura_comercial WHERE idfactura_comercial = '$qwe[0]'");
+
             $trans_id = $trans_fact_aux->fetch_assoc();
 
             $transaccion = $this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones = '$trans_id[idtransaccion]'");

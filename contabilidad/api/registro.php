@@ -552,6 +552,14 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idplandecuenta'],$_POST['reporte'],$_POST['nombre_cuenta_superior'],$_POST['nivel_registrado'],$_POST['empresa']));
         }
+    }elseif($ver=="registrar_vinculacion_depreciacion"){
+        if(isset($_POST['idcuenta'],$_POST['idcuenta_depreciacion'],$_POST['empresa'])){
+            $cont=new Reporte_confi();
+            $cont->registrar_vinculacion_depreciacion($_POST['idcuenta'],$_POST['idcuenta_depreciacion'],$_POST['empresa']);
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idcuenta'],$_POST['idcuenta_depreciacion'],$_POST['empresa']));
+        }
     }  
     
 // registrar_factura_recibo_cobro_cajaBancos registrocobrarfactura consolidar vincula crearfacturas registroproveedor registrocobrarfactura 

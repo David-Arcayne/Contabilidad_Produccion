@@ -1052,7 +1052,7 @@ if($filtrado->num_rows > 0){
             // Verificar si hay resultados
             $respu = "false";
 
-            // Agregar la respuesta al array
+            // Agregar la respuesta al array 
             $lista[] = ["respuesta" => $respu,"idgestion" => '0'];
         }
        
