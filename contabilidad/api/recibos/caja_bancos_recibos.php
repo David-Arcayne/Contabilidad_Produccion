@@ -1650,7 +1650,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         echo json_encode($res);
     }
 
-    public function editar_caja_bancos_facturas($idrecibo,$tipo_documento,$fecha,$monto,$por_concepto_de,$cliente_prov){
+    public function editar_caja_bancos_facturas($idrecibo,$nfactura,$tipo_documento,$fecha,$monto,$por_concepto_de,$cliente_prov){
         $res="";
         //tipo_documento = 1,2 facturas --> cobrar- pagar
         if($tipo_documento == 1){//COBRAR   
@@ -1676,7 +1676,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
                 $edicion_recibo=$this->dbc->query("UPDATE cuentaspof SET fecha='$fecha',monto='$monto' WHERE idcuentaspof='$idrecibo'");
 
-                $edicion_factura=$this->dbc->query("UPDATE factura SET fecha='$fecha',montofactura='$monto',por_concepto_de='$por_concepto_de',proveedorcliente_idproveedorcliente='$cliente_prov' WHERE idfactura='$resu[idfactura]'");
+                $edicion_factura=$this->dbc->query("UPDATE factura SET nfactura = '$nfactura',fecha='$fecha',montofactura='$monto',por_concepto_de='$por_concepto_de',proveedorcliente_idproveedorcliente='$cliente_prov' WHERE idfactura='$resu[idfactura]'");
 
             }
         }else{ //PAGAR  2
@@ -1703,7 +1703,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
                 $edicion_recibo=$this->dbc->query("UPDATE cuentaspor SET fecha='$fecha',monto='$monto' WHERE idcuentaspor='$idrecibo'");
 
-                $edicion_factura=$this->dbc->query("UPDATE factura SET fecha='$fecha',montofactura='$monto',por_concepto_de='$por_concepto_de',proveedorcliente_idproveedorcliente='$cliente_prov' WHERE idfactura='$resu[idfactura]'");
+                $edicion_factura=$this->dbc->query("UPDATE factura SET nfactura = '$nfactura',fecha='$fecha',montofactura='$monto',por_concepto_de='$por_concepto_de',proveedorcliente_idproveedorcliente='$cliente_prov' WHERE idfactura='$resu[idfactura]'");
 
             }
         }
@@ -1716,7 +1716,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         echo json_encode($res);
     }
 
-    public function editar_caja_bancos_otras_cuentas($idrecibo,$tipo_documento,$fecha,$tipo,$precio,$concepto,$cliente_prov){
+    public function editar_caja_bancos_otras_cuentas($idrecibo,$nro_documento,$tipo_documento,$fecha,$tipo,$precio,$concepto,$cliente_prov){
        
         $res="";
         //tipo_documento = 1,2 facturas --> cobrar- pagar
@@ -1743,7 +1743,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
                 $edicion_recibo=$this->dbc->query("UPDATE cuentaspof SET fecha='$fecha',monto='$precio' WHERE idcuentaspof='$idrecibo'");
 
-                $edicion_factura=$this->dbc->query("UPDATE otras_cuentas SET fecha='$fecha',precio='$precio',concepto='$concepto',idtipo='$tipo',id_cliente_proveedor='$cliente_prov' WHERE idotras_cuentas='$resu[idotras_cuentas]'");
+                $edicion_factura=$this->dbc->query("UPDATE otras_cuentas SET nro_otras_cuentas='$nro_documento', fecha='$fecha',precio='$precio',concepto='$concepto',idtipo='$tipo',id_cliente_proveedor='$cliente_prov' WHERE idotras_cuentas='$resu[idotras_cuentas]'");
 
             }
         }else{ //PAGAR  2
@@ -1768,7 +1768,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                 }
                 $edicion_recibo=$this->dbc->query("UPDATE cuentaspor SET fecha='$fecha',monto='$precio' WHERE idcuentaspor='$idrecibo'");
 
-                $edicion_factura=$this->dbc->query("UPDATE otras_cuentas SET fecha='$fecha',precio='$precio',concepto='$concepto',idtipo='$tipo',id_cliente_proveedor='$cliente_prov' WHERE idotras_cuentas='$resu[idotras_cuentas]'");
+                $edicion_factura=$this->dbc->query("UPDATE otras_cuentas SET nro_otras_cuentas='$nro_documento', fecha='$fecha',precio='$precio',concepto='$concepto',idtipo='$tipo',id_cliente_proveedor='$cliente_prov' WHERE idotras_cuentas='$resu[idotras_cuentas]'");
 
             }
         }
