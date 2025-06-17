@@ -736,7 +736,7 @@ while ($qwe = $this->dbc->fetch($registro)) {
 
         while ($qwe = $this->dbc->fetch($getPedido)) {
 
-            $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='" . $qwe[5] . "'");
+            $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='" . $qwe['id_cliente_proveedor'] . "'");
             $pro = $this->dbcm->fetch($proveedor);
 
             $cobras = $this->dbc->query("SELECT SUM(monto) FROM cuentaspor WHERE idotras_cuentas='$qwe[0]'"); //173

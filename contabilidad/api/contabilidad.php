@@ -613,7 +613,7 @@ WHERE md5(p.organizacion_idorganizacion)='$ide'");
         $registro = $this->dbcm->query("insert into proveedor(id_proveedor,nombre,codigo,nit,detalle,direccion,telefono,mobil,email,web,pais,ciudad,zona,contacto,id_empresa)values(NULL,'$nombre','$codigo','$nit','$detalle','$direccion','$telefono','$mobil','0','0','$pais','$ciudad','$zona','0','$ide')");
         }else{
 
-            $consulta = $this->dbcm->query("SELECT COUNT(*) AS total FROM proveedor WHERE nit = '$nit' AND idempresa = '$ide'");
+            $consulta = $this->dbcm->query("SELECT COUNT(*) AS total FROM proveedor WHERE nit = '$nit' AND id_empresa = '$ide'");
             $resultado = $consulta->fetch_assoc();
             $totalRegistros = $resultado['total'];
 

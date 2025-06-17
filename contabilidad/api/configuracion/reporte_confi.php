@@ -169,7 +169,7 @@ class Reporte_confi extends DB{
             $cuenta = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe2[idplandecuenta]'");// ACTIVO, PASIVO, PATRIMONIO
             $nombre_cuenta = $cuenta->fetch_assoc();
             if($qwe2['grupo'] == '1'){
-        
+        // preguntar si la cuenta en la q estamos es activo fijo
                 $nivel_reporte = $this->dbc->query("SELECT nivel_registrado FROM configuracion_reporte WHERE grupo = '$qwe2[grupo]' AND idempresa='$idempresa' ORDER BY nivel_registrado DESC LIMIT 1");//
                 $nivel_reg = $nivel_reporte->fetch_assoc();
                 if($nivel_reg['nivel_registrado'] == '3'){
