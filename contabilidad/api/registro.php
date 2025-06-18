@@ -18,7 +18,7 @@ require_once "./facturas/factura_cobros.php";
 require_once "./facturas/factura_pagos.php";
 require_once "./facturas/factura_comercial.php";
 require_once "./configuracion/firma_reporte.php";
-// require_once "./configuracion/reporte_confi.php";
+require_once "./configuracion/reporte_confi.php";
 
 $ver=$_POST['ver'];
 $json = file_get_contents('php://input'); // Decodificar el JSON en un arreglo PHP   gestion

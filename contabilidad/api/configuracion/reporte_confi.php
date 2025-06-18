@@ -88,9 +88,9 @@ class Reporte_confi extends DB{
     }
 
     public function listar_configuracion_reporte($empresa) {
-           ini_set('display_errors', 1); //,$nit,$cobro_pago,$cliente_proveedor,
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+        //    ini_set('display_errors', 1); 
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
         $lista = [];
         $idempresa = $this->getidempresa($empresa);
     
@@ -116,6 +116,7 @@ class Reporte_confi extends DB{
                 "idconfiguracion_reporte" => $qwe2['idconfiguracion_reporte'],
                 "idplandecuenta" => $nombre_cuenta['idplandecuenta'],
                 "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
+                "es_activo_fijo" => $qwe2['es_activo_fijo'],
                 "nivel_2" => [] //activo
                 // "nivel_3" => $qwe['nombre'],// 
                 // "estado" => $qwe['estado']
@@ -129,6 +130,7 @@ class Reporte_confi extends DB{
                 "idconfiguracion_reporte" => $qwe3['idconfiguracion_reporte'],
                 "idplandecuenta" => $nombre_cuenta2['idplandecuenta'],
                 "nombre_nivel_2" => $nombre_cuenta2['nombreplan'],
+                "es_activo_fijo" => $qwe3['es_activo_fijo'],
                 "nivel_3" => [] //activo
                 // "nivel_3" => $qwe['nombre'],// 
                 // "estado" => $qwe['estado']
@@ -142,6 +144,7 @@ class Reporte_confi extends DB{
                     "idconfiguracion_reporte" => $qwe4['idconfiguracion_reporte'],
                     "idplandecuenta" => $nombre_cuenta3['idplandecuenta'],   
                     "nombre_nivel_3" => $nombre_cuenta3['nombreplan'],
+                    "es_activo_fijo" => $qwe4['es_activo_fijo'],
                     "nivel_4" => [] //activo
                     );
                     $get_nivel_5 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta3[nombreplan]' AND reporte = '$qwe[reporte]' AND idempresa='$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
@@ -153,6 +156,7 @@ class Reporte_confi extends DB{
                         "idconfiguracion_reporte" => $qwe5['idconfiguracion_reporte'],
                         "idplandecuenta" => $nombre_cuenta4['idplandecuenta'],    
                         "nombre_nivel_4" => $nombre_cuenta4['nombreplan'],
+                        "es_activo_fijo" => $qwe5['es_activo_fijo'],
                         "nivel_5" => [] //activo
                         );
                         array_push($res4['nivel_4'], $res5); 
@@ -170,7 +174,7 @@ class Reporte_confi extends DB{
     }
     
     public function reporte_balance_general($fecha_ini,$fecha_fin,$empresa) {
-           ini_set('display_errors', 1); //,$nit,$cobro_pago,$cliente_proveedor,
+           ini_set('display_errors', 1); 
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
         $lista = [];
@@ -225,14 +229,15 @@ class Reporte_confi extends DB{
 
                          if($qwe4['es_calculable'] == 'si'){ // ES CALCULABLE
 
-                            if($qwe4['es_activo_fijo'] == 'si'){
+                            if($qwe4['es_activo_fijo'] == 'si'){ //ES ACTIVO FIJO
                               $get_fijo = $this->dbc->query("SELECT * from vinculacion_cuenta_depreciacion where idcuenta = '$qwe4[idplandecuenta]' AND idempresa='$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
-                              $fijo = $get_fijo->fetch_assoc();
+                              if($get_fijo->num_rows > 0){
+                                $fijo = $get_fijo->fetch_assoc();
 
                                 $suma_cuentas_A = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total FROM transacciones t
                                 INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
                                 INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
-                                where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$nombre_cuenta3[idplandecuenta]'
+                                where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$qwe4[idplandecuenta]'
                                 AND t.estado NOT IN (4, 5, 6) AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
 
                                 $valor_A = $suma_cuentas_A->fetch_assoc();
@@ -245,7 +250,7 @@ class Reporte_confi extends DB{
 
                                 $valor_B = $suma_cuentas_depreciacion->fetch_assoc();
 
-                                $diferencia = $valor_A - $valor_B;
+                                $diferencia = $valor_A['total'] - $valor_B['total'];
 
                                 $suma_nivel_3 = $suma_nivel_3 + $diferencia;
                                 $res4 = array(
@@ -256,7 +261,26 @@ class Reporte_confi extends DB{
                                 "valor_restado" => $diferencia,
                                 "nivel_4" => [] //activo   
                                 );
-                                array_push($res3['nivel_3'], $res4); 
+                                array_push($res3['nivel_3'], $res4);
+                              }else{
+                                $suma_cuentas_depreciacion = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total FROM transacciones t
+                                INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
+                                INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
+                                where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$qwe4[idplandecuenta]'
+                                AND t.estado NOT IN (4, 5, 6) AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
+
+                                $valor_B = $suma_cuentas_depreciacion->fetch_assoc();
+
+                                $res4 = array(
+                                "idconfiguracion_reporte" => $qwe4['idconfiguracion_reporte'],
+                                "idplandecuenta" => $nombre_cuenta3['idplandecuenta'],    
+                                "nombre_nivel_3" => $nombre_cuenta3['nombreplan'],
+                                "valor" => $valor_B['total'],
+                                // "valor_restado" => $diferencia,
+                                "nivel_4" => [] //activo   
+                                );
+                                array_push($res3['nivel_3'], $res4);
+                              } 
 
                             }else{
                                 $suma_cuentas = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total FROM transacciones t
@@ -473,7 +497,12 @@ class Reporte_confi extends DB{
         } else {
             // Insertar el nuevo registro
             $registroProveedor = $this->dbc->query("INSERT INTO vinculacion_cuenta_depreciacion(idcuenta,idcuenta_depreciacion,idgestion,idempresa) VALUES ('$idcuenta','$iddepreciacion','$idgestion','$idempresa')");
-            if ($registroProveedor === TRUE) {                                                                                                                                                                
+            if ($registroProveedor === TRUE) {            
+                $get_confi = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE idplandecuenta = '$idcuenta' AND idempresa = '$idempresa'");
+                $confi_aux = $get_confi->fetch_assoc();
+
+                $registro_confi = $this->dbc->query("INSERT INTO configuracion_reporte(idplandecuenta,reporte,nombre_cuenta_superior,nivel_registrado,grupo,es_calculable,es_activo_fijo,idempresa) VALUES ('$iddepreciacion','$confi_aux[reporte]','$confi_aux[nombre_cuenta_superior]','$confi_aux[nivel_registrado]','$confi_aux[grupo]','$confi_aux[es_calculable]','$confi_aux[es_activo_fijo]','$idempresa')");
+                                                                                                                                                                   
                 $res = array("success", "Registro exitoso","registroCaracteristicas");
             } else {
                 $res = array("danger", "No se pudo registrar");
