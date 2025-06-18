@@ -482,7 +482,7 @@ elseif($ver[0]=="listar_facturas_cobros_sin_transaccion"){
     $cont->busqueda_documentos_contabilidad($ver[1],$ver[2],$ver[3],$ver[4],$ver[5],$ver[6],$ver[7]);
 }elseif($ver[0]=="filtro_por_nivel"){
     $cont=new Reporte_confi();
-    $cont->filtro_por_nivel($ver[1],$ver[2],$ver[3]);
+    $cont->filtro_por_nivel($ver[1],$ver[2],$ver[3],$ver[4]);
 }elseif($ver[0]=="listar_configuracion_reporte"){
     $cont=new Reporte_confi();
     $cont->listar_configuracion_reporte($ver[1]);

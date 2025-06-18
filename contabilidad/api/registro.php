@@ -545,24 +545,24 @@ if($data['ver'] == "asignar_asiento_A_factura") {
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idfirma_reporte'],$_POST['idusuario'],$_POST['funcion'],$_POST['tipo_reporte'],$_POST['matricula']));
         }
     }
-    // elseif($ver=="registrar_configuracion_reporte"){
-    //     if(isset($_POST['idplandecuenta'],$_POST['reporte'],$_POST['nombre_cuenta_superior'],$_POST['nivel_registrado'],$_POST['empresa'])){
-    //         $cont=new Reporte_confi();
-    //         $cont->registrar_configuracion_reporte($_POST['idplandecuenta'],$_POST['reporte'],$_POST['nombre_cuenta_superior'],$_POST['nivel_registrado'],$_POST['empresa']);
-    //     }
-    //     else{
-    //         echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idplandecuenta'],$_POST['reporte'],$_POST['nombre_cuenta_superior'],$_POST['nivel_registrado'],$_POST['empresa']));
-    //     }
-    // }
-    // elseif($ver=="registrar_vinculacion_depreciacion"){
-    //     if(isset($_POST['idcuenta'],$_POST['idcuenta_depreciacion'],$_POST['empresa'])){
-    //         $cont=new Reporte_confi();
-    //         $cont->registrar_vinculacion_depreciacion($_POST['idcuenta'],$_POST['idcuenta_depreciacion'],$_POST['empresa']);
-    //     }
-    //     else{
-    //         echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idcuenta'],$_POST['idcuenta_depreciacion'],$_POST['empresa']));
-    //     }
-    // }  
+    elseif($ver=="registrar_configuracion_reporte"){
+        if(isset($_POST['idplandecuenta'],$_POST['reporte'],$_POST['nombre_cuenta_superior'],$_POST['nivel_registrado'],$_POST['grupo'],$_POST['es_calculable'],$_POST['es_activo_fijo'],$_POST['empresa'])){
+            $cont=new Reporte_confi();
+            $cont->registrar_configuracion_reporte($_POST['idplandecuenta'],$_POST['reporte'],$_POST['nombre_cuenta_superior'],$_POST['nivel_registrado'],$_POST['grupo'],$_POST['es_calculable'],$_POST['es_activo_fijo'],$_POST['empresa']);
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idplandecuenta'],$_POST['reporte'],$_POST['nombre_cuenta_superior'],$_POST['nivel_registrado'],$_POST['grupo'],$_POST['es_calculable'],$_POST['es_activo_fijo'],$_POST['empresa']));
+        }
+    }
+    elseif($ver=="registrar_vinculacion_depreciacion"){
+        if(isset($_POST['idcuenta'],$_POST['idcuenta_depreciacion'],$_POST['empresa'])){
+            $cont=new Reporte_confi();
+            $cont->registrar_vinculacion_depreciacion($_POST['idcuenta'],$_POST['idcuenta_depreciacion'],$_POST['empresa']);
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idcuenta'],$_POST['idcuenta_depreciacion'],$_POST['empresa']));
+        }
+    }  
     
 //  vincula crearfacturas registroproveedor registrocobrarfactura editar_caja_bancos_facturas
 //  registrocobrarfacturaGrupal crearfacturas caja_bancos registrar_factura_pago
