@@ -562,6 +562,14 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idcuenta'],$_POST['idcuenta_depreciacion'],$_POST['empresa']));
         }
+    }elseif($ver=="editar_configuracion_reporte"){
+        if(isset($_POST['idconfiguracion_reporte'],$_POST['idplandecuenta'],$_POST['empresa'])){
+            $cont=new Reporte_confi();
+            $cont->editar_configuracion_reporte($_POST['idconfiguracion_reporte'],$_POST['idplandecuenta'],$_POST['empresa']);
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idconfiguracion_reporte'],$_POST['idplandecuenta'],$_POST['empresa']));
+        }
     }  
     
 //  vincula crearfacturas registroproveedor registrocobrarfactura editar_caja_bancos_facturas
