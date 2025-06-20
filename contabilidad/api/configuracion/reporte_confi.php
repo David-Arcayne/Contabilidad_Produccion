@@ -724,6 +724,7 @@ class Reporte_confi extends DB{
         echo json_encode($res);
     }
     public function eliminar_configuracion_reporte($id){
+        
             // $consulta3 = $this->dbc->query("SELECT * FROM vinculacion_cuenta_depreciacion WHERE idvinculacion_cuenta_depreciacion = '$id'");
             // $resultado3 = $consulta3->fetch_assoc();
 
