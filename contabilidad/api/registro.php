@@ -18,7 +18,7 @@ require_once "./facturas/factura_cobros.php";
 require_once "./facturas/factura_pagos.php";
 require_once "./facturas/factura_comercial.php";
 require_once "./configuracion/firma_reporte.php";
-// require_once "./configuracion/reporte_confi.php";
+require_once "./configuracion/reporte_confi.php";
 
 $ver=$_POST['ver'];
 $json = file_get_contents('php://input'); // Decodificar el JSON en un arreglo PHP   gestion
@@ -561,6 +561,14 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         }
         else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idcuenta'],$_POST['idcuenta_depreciacion'],$_POST['empresa']));
+        }
+    }elseif($ver=="editar_configuracion_reporte"){
+        if(isset($_POST['idconfiguracion_reporte'],$_POST['idplandecuenta'],$_POST['empresa'])){
+            $cont=new Reporte_confi();
+            $cont->editar_configuracion_reporte($_POST['idconfiguracion_reporte'],$_POST['idplandecuenta'],$_POST['empresa']);
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idconfiguracion_reporte'],$_POST['idplandecuenta'],$_POST['empresa']));
         }
     }  
     
