@@ -492,7 +492,7 @@ class Filtrado_facturas extends DB{
           // echo json_encode(array($caja_bancos,$factura_comas));
       }
 
-    public function busqueda_facturas_contabilidad($nfactura,$nit,$cobro_pago,$id_cliente_proveedor,$fecha,$monto,$empresa) {
+    public function busqueda_facturas_contabilidad($nfactura,$nit,$cobro_pago,$id_cliente_proveedor,$fecha,$monto,$idgestion,$empresa) {
         // ini_set('display_errors', 1); //,$nit,$cobro_pago,$cliente_proveedor,
         // ini_set('display_startup_errors', 1);
         // error_reporting(E_ALL);
@@ -597,26 +597,60 @@ class Filtrado_facturas extends DB{
 
         $facturas = $this->dbc->query("SELECT * FROM factura WHERE " . implode(" AND ", $where));
         //     $facturas = $this->dbc->query("SELECT * FROM factura WHERE  idorganizacion= '$idempresa'"); //TODAS LAS FACTURAS
+        if($idgestion == '-1'){ //LISTARA DE TODAS LAS GESTIONES
+            while ($qwe = $this->dbc->fetch($facturas)) {
 
-        while ($qwe = $this->dbc->fetch($facturas)) {
-         $transa = $this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones = '$qwe[transacciones_idtransacciones]'");
-        $nro_trans = $transa->fetch_assoc();
-
-            $res = array(
+            $transa = $this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones = '$qwe[transacciones_idtransacciones]'");
+            $transaccion = $transa->fetch_assoc();
+                if($qwe['clasefactura'] == '1'){ //PAGADO --PROVEEDOR
+                    $proveedor2 = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor = '$qwe[proveedorcliente_idproveedorcliente]'");
+                    $prov_client_2 = $proveedor2->fetch_assoc();
+                }else{//COBRADO -- CLIENTE
+                    $cliente2 = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente = '$qwe[proveedorcliente_idproveedorcliente]'");
+                    $prov_client_2 = $cliente2->fetch_assoc();
+                }
+                 $res = array(
                 "idfactura" => $qwe['idfactura'],
                 "fecha" => $qwe['fecha'],
                 "nfactura" => $qwe['nfactura'],
                 "montofactura" => $qwe['montofactura'],
                 "estado" => $qwe['estado'],
-                "nro_transaccion" => $nro_trans['codigotransaccion']
-                // "pagado" => $asd[0],
-                // "saldo" => $saldo,
-                // "forma_pago" => $qwe['forma_pago'],
-                // "archivo" => $qwe['archivo']
+                "razon_social" => $prov_client_2['nombre'],
+                "nro_transaccion" => $transaccion['codigotransaccion']
+            );
+            array_push($lista, $res);
+          }
+        }else{ //LISTARA SOLO DE LA GESTION QUE PUSISTE
+            while ($qwe = $this->dbc->fetch($facturas)) {
+            $transa = $this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones = '$qwe[transacciones_idtransacciones]'");
+            $transaccion = $transa->fetch_assoc();
+
+                if($qwe['clasefactura'] == '1'){ //PAGADO --PROVEEDOR
+                    $proveedor2 = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor = '$qwe[proveedorcliente_idproveedorcliente]'");
+                    $prov_client_2 = $proveedor2->fetch_assoc();
+                }else{//COBRADO -- CLIENTE
+                    $cliente2 = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente = '$qwe[proveedorcliente_idproveedorcliente]'");
+                    $prov_client_2 = $cliente2->fetch_assoc();
+                }
+
+            if($transaccion['idgestion'] == $idgestion){
+                 $res = array(
+                "idfactura" => $qwe['idfactura'],
+                "fecha" => $qwe['fecha'],
+                "nfactura" => $qwe['nfactura'],
+                "montofactura" => $qwe['montofactura'],
+                "estado" => $qwe['estado'],
+                "razon_social" => $prov_client_2['nombre'],
+                "nro_transaccion" => $transaccion['codigotransaccion']
             );
   
               array_push($lista, $res);
+            }else{ 
+                // no se mostrara nada solo saltara
+            }
+           
           }
+        }
           echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
 
@@ -746,7 +780,7 @@ class Filtrado_facturas extends DB{
           echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
 
-    public function busqueda_documentos_contabilidad($nro_otras_cuentas,$nit,$cobro_pago,$id_cliente_proveedor,$fecha,$precio,$empresa) {
+    public function busqueda_documentos_contabilidad($nro_otras_cuentas,$nit,$cobro_pago,$id_cliente_proveedor,$fecha,$precio,$idgestion,$empresa) {
         // ini_set('display_errors', 1); //,$nit,$cobro_pago,$cliente_proveedor,
         // ini_set('display_startup_errors', 1);
         // error_reporting(E_ALL);
@@ -851,11 +885,19 @@ class Filtrado_facturas extends DB{
 
         $otras_cuentas = $this->dbc->query("SELECT * FROM otras_cuentas WHERE " . implode(" AND ", $where));
         //     $facturas = $this->dbc->query("SELECT * FROM factura WHERE  idorganizacion= '$idempresa'"); //TODAS LAS FACTURAS
+        if($idgestion == '-1'){ // LISTARA DE TODAS LAS GESTIONES
+            while ($qwe = $this->dbc->fetch($otras_cuentas)) {
 
-        while ($qwe = $this->dbc->fetch($otras_cuentas)) {
+            $transa = $this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones = '$qwe[transacciones_idtransacciones]'");
+            $transaccion = $transa->fetch_assoc();
 
-        $transa = $this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones = '$qwe[transacciones_idtransacciones]'");
-        $nro_trans = $transa->fetch_assoc();
+                if($qwe['clase_otras_cuentas'] == '1'){ //PAGADO --PROVEEDOR
+                    $proveedor2 = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor = '$qwe[id_cliente_proveedor]'");
+                    $prov_client_2 = $proveedor2->fetch_assoc();
+                }else{//COBRADO -- CLIENTE
+                    $cliente2 = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente = '$qwe[id_cliente_proveedor]'");
+                    $prov_client_2 = $cliente2->fetch_assoc();
+                }
 
             $res = array(
                 "idotras_cuentas" => $qwe['idotras_cuentas'],
@@ -863,15 +905,59 @@ class Filtrado_facturas extends DB{
                 "nro_otras_cuentas" => $qwe['nro_otras_cuentas'],
                 "precio" => $qwe['precio'],
                 "estado" => '1',
-                "nro_transaccion" => $nro_trans['codigotransaccion']
-                // "pagado" => $asd[0],
-                // "saldo" => $saldo,
-                // "forma_pago" => $qwe['forma_pago'],
-                // "archivo" => $qwe['archivo']
+                "razon_social" => $prov_client_2['nombre'],
+                "nro_transaccion" => $transaccion['codigotransaccion']
             );
   
               array_push($lista, $res);
           }
+        }else{
+            while ($qwe = $this->dbc->fetch($otras_cuentas)) {
+
+            $transa = $this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones = '$qwe[transacciones_idtransacciones]'");
+            $transaccion = $transa->fetch_assoc();
+
+                if($qwe['clase_otras_cuentas'] == '1'){ //PAGADO --PROVEEDOR
+                    $proveedor2 = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor = '$qwe[id_cliente_proveedor]'");
+                    $prov_client_2 = $proveedor2->fetch_assoc();
+                }else{//COBRADO -- CLIENTE
+                    $cliente2 = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente = '$qwe[id_cliente_proveedor]'");
+                    $prov_client_2 = $cliente2->fetch_assoc();
+                }
+
+                if($transaccion['idgestion'] == $idgestion){ // SE LISTARA SOLO LOS DE UNA GESTION EN ESPECIFICO
+                     $res = array(
+                        "idotras_cuentas" => $qwe['idotras_cuentas'],
+                        "fecha" => $qwe['fecha'],
+                        "nro_otras_cuentas" => $qwe['nro_otras_cuentas'],
+                        "precio" => $qwe['precio'],
+                        "estado" => '1',
+                        "razon_social" => $prov_client_2['nombre'],
+                        "nro_transaccion" => $transaccion['codigotransaccion']
+                    );
+        
+                    array_push($lista, $res);
+                }else{//NO PASARA NADA
+
+                }
+          }
+        }
+        // while ($qwe = $this->dbc->fetch($otras_cuentas)) {
+
+        // $transa = $this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones = '$qwe[transacciones_idtransacciones]'");
+        // $transaccion = $transa->fetch_assoc();
+
+        //     $res = array(
+        //         "idotras_cuentas" => $qwe['idotras_cuentas'],
+        //         "fecha" => $qwe['fecha'],
+        //         "nro_otras_cuentas" => $qwe['nro_otras_cuentas'],
+        //         "precio" => $qwe['precio'],
+        //         "estado" => '1',
+        //         "nro_transaccion" => $transaccion['codigotransaccion']
+        //     );
+  
+        //       array_push($lista, $res);
+        //   }
           echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
     public function getidempresa($md5){

@@ -476,10 +476,10 @@ elseif($ver[0]=="listar_facturas_cobros_sin_transaccion"){
     $cont->eliminar_firma_reporte($ver[1]);
 }elseif($ver[0]=="busqueda_facturas_contabilidad"){
     $cont=new Filtrado_facturas();
-    $cont->busqueda_facturas_contabilidad($ver[1],$ver[2],$ver[3],$ver[4],$ver[5],$ver[6],$ver[7]);
+    $cont->busqueda_facturas_contabilidad($ver[1],$ver[2],$ver[3],$ver[4],$ver[5],$ver[6],$ver[7],$ver[8]);
 }elseif($ver[0]=="busqueda_documentos_contabilidad"){
     $cont=new Filtrado_facturas();
-    $cont->busqueda_documentos_contabilidad($ver[1],$ver[2],$ver[3],$ver[4],$ver[5],$ver[6],$ver[7]);
+    $cont->busqueda_documentos_contabilidad($ver[1],$ver[2],$ver[3],$ver[4],$ver[5],$ver[6],$ver[7],$ver[8]);
 }elseif($ver[0]=="filtro_por_nivel"){
     $cont=new Reporte_confi();
     $cont->filtro_por_nivel($ver[1],$ver[2],$ver[3],$ver[4]);
