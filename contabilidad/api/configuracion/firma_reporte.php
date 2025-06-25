@@ -3,7 +3,7 @@ require_once "../../db/db.php";
 // require_once "../configuracion/empresa.php";
 
 class Firma_reporte extends DB{
-    public function registrar_firma_reporte($idusuario,$funcion,$tipo_reporte,$matricula,$empresa){
+    public function registrar_firma_reporte($idtrabajador,$funcion,$tipo_reporte,$matricula,$empresa){
         // $idempresa = Empresa::getidempresa($empresa);
         $idempresa = $this->getidempresa($empresa);
         // $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM divisa WHERE nombre = '$nombre' AND idempresa = '$idempresa'");
@@ -14,7 +14,7 @@ class Firma_reporte extends DB{
             $res = array("danger", "El registro ya existe","Error");
         } else {
             // Insertar el nuevo registro
-            $registroProveedor = $this->dbc->query("INSERT INTO firma_reporte(idusuario,funcion,tipo_reporte,matricula,idempresa) VALUES ('$idusuario','$funcion','$tipo_reporte','$matricula','$idempresa')");
+            $registroProveedor = $this->dbc->query("INSERT INTO firma_reporte(idtrabajador,funcion,tipo_reporte,matricula,idempresa) VALUES ('$idtrabajador','$funcion','$tipo_reporte','$matricula','$idempresa')");
             if ($registroProveedor === TRUE) {                                                                                                                                                                
                 $res = array("success", "Registro exitoso","registroCaracteristicas");
             } else {
@@ -34,7 +34,7 @@ class Firma_reporte extends DB{
         $idempresa = $this->getidempresa($empresa);
     
         // Preparar la consulta
-        $firma_reporte = $this->dbc->query("SELECT * FROM firma_reporte 
+        $firma_reporte = $this->dbc->query("SELECT * FROM firma_reporte
         WHERE idempresa = '$idempresa'");
     
         while ($qwe = $this->dbc->fetch($firma_reporte)) {
@@ -42,17 +42,29 @@ class Firma_reporte extends DB{
             // $usuario = $this->dbrh->query("SELECT * FROM usuario u
             // WHERE idusuario = '$qwe[idusuario]'");
 
-            $usuario_trabajador=$this->dbrh->query("SELECT u.nombre AS usuario_nombre, t.nombre AS nombre_trabajador, t.apellido, t.ci 
-            FROM usuario AS u 
-            INNER JOIN trabajador AS t ON t.idtrabajador = u.trabajador_idtrabajador
-            WHERE u.idusuario = '$qwe[idusuario]'");
+            // $usuario_trabajador=$this->dbrh->query("SELECT u.nombre AS usuario_nombre, t.nombre AS nombre_trabajador, t.apellido, t.ci,t.idtrabajador 
+            // FROM usuario AS u 
+            // INNER JOIN trabajador AS t ON t.idtrabajador = u.trabajador_idtrabajador
+            // WHERE u.idusuario = '$qwe[idusuario]'");
 
+        $usuario_trabajador=$this->dbrh->query("SELECT 
+                t.idtrabajador,
+                t.nombre AS nombre_trabajador,
+                t.apellido,
+                t.ci,
+                u.idusuario,
+                u.nombre AS usuario_nombre
+            FROM trabajador AS t
+            LEFT JOIN usuario AS u 
+                ON u.trabajador_idtrabajador = t.idtrabajador 
+                AND t.idtrabajador = '$qwe[idtrabajador]'");
             $traba = $usuario_trabajador->fetch_assoc();
 
             // $datos_usuario = $usuario->fetch_assoc();
             $res = array( // nombre   apellido   ci   cargo
                 "idfirma_reporte" => $qwe['idfirma_reporte'],
-                "idusuario" => $qwe['idusuario'],
+                "idtrabajador" => $qwe['idtrabajador'],
+                "idusuario" => $traba['idusuario'],
                 "usuario_nombre" => $traba['usuario_nombre'],
                 "nombre_trabajador" => $traba['nombre_trabajador']." ".$traba['apellido'],
                 "funcion" => $qwe['funcion'], 
@@ -78,7 +90,7 @@ class Firma_reporte extends DB{
             $usuario = $this->dbrh->query("SELECT * FROM usuario u 
             INNER JOIN trabajador t ON t.idtrabajador = u.trabajador_idtrabajador
             INNER JOIN cargos c ON c.idcargos = t.cargos_idcargos
-            WHERE u.idusuario = '$qwe[idusuario]'");
+            WHERE t.idtrabajador = '$qwe[idtrabajador]'");
 
             $datos_usuario = $usuario->fetch_assoc();
 
@@ -112,7 +124,7 @@ class Firma_reporte extends DB{
         echo json_encode($lista);
     }
     
-    public function editar_firma_reporte($id,$idusuario,$funcion,$tipo_reporte,$matricula) {
+    public function editar_firma_reporte($id,$idtrabajador,$funcion,$tipo_reporte,$matricula) {
         // $idempresa = $this->getidempresa($empresa);
 
         // $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM divisa WHERE nombre = '$nombre' AND idempresa = '$idempresa' AND iddivisa != '$id'");
@@ -124,7 +136,7 @@ class Firma_reporte extends DB{
         }else {
             // Insertar el nuevo registro
             $registroListaCompra = $this->dbc->query("UPDATE firma_reporte
-                                    SET idusuario = '$idusuario',
+                                    SET idtrabajador = '$idtrabajador',
                                     funcion = '$funcion',
                                     tipo_reporte = '$tipo_reporte',
                                     matricula = '$matricula'
