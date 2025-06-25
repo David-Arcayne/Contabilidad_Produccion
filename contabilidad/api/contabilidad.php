@@ -29,6 +29,8 @@ class Contabilidad extends DB
         $res = [];
         $usuario = $this->getidusuario($idusuario);
         $empresa = $this->getidempresa($idempresa);
+        $gestion = $this->getgestionactualC($idempresa);
+        $idgestion = $gestion["id"];
         $codigo = date("Ymd") . rand(100, 1000);
         
         try {
@@ -42,6 +44,7 @@ class Contabilidad extends DB
                 WHERE t.codigotransaccion >= '$nTrainicio' 
                   AND t.codigotransaccion <= '$nTrafinal' 
                   AND t.organizacion_idorganizacion = '$empresa'
+                  AND t.idgestion = '$idgestion'
             ");
 
             $se_solicitara = 0;
@@ -209,17 +212,22 @@ class Contabilidad extends DB
         echo json_encode($lista);
     }
          
-
+//DESCONSOLIDACION INDIVIDUAL
     public function cambiarestadoconsolidado($grupo,$estado,$fecha,$hora,$idusuario){
 //actualizar esto:
 
-        $res="";
+        $res=""; // ESTADO = 1 ES ACEPTADO, 2 ES DENEGADO
         $registro=$this->dbc->query("UPDATE desconsolidar SET estado='$estado',fechaproceso='$fecha',horaproceso='$hora' WHERE codigo='$grupo'");
         //consolidar es 2 y desconsolidar es 1
         if($estado==1){
             $desconsolidar=$this->dbc->query("SELECT * FROM desconsolidar WHERE codigo='$grupo'");
             while($qwe=$this->dbc->fetch($desconsolidar)){
                 $descTRan=$this->dbc->query("UPDATE transacciones SET consolidar='$estado', estado='1'  WHERE idtransacciones='$qwe[idtransaccion]'");
+            }
+        }else{
+            $desconsolidar=$this->dbc->query("SELECT * FROM desconsolidar WHERE codigo='$grupo'");
+            while($qwe=$this->dbc->fetch($desconsolidar)){
+                $descTRan=$this->dbc->query("UPDATE transacciones SET estado='1' WHERE idtransacciones='$qwe[idtransaccion]'");
             }
         }
         if($registro===TRUE){

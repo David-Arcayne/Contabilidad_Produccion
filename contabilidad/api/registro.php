@@ -529,20 +529,20 @@ if($data['ver'] == "asignar_asiento_A_factura") {
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['fecha'],$_POST['monto_total'],$_POST['monto_recibo'],$_POST['transaccion'],$_POST['cajasBancos'],$_POST['asiento_modelo'],$_POST['empresa'],$_POST['sucursal'],$_POST['facturas_comercial']));
         }
     }elseif($ver=="registrar_firma_reporte"){
-        if(isset($_POST['idusuario'],$_POST['funcion'],$_POST['tipo_reporte'],$_POST['matricula'],$_POST['empresa'])){
+        if(isset($_POST['idtrabajador'],$_POST['funcion'],$_POST['tipo_reporte'],$_POST['matricula'],$_POST['empresa'])){
             $cont=new Firma_reporte();
-            $cont->registrar_firma_reporte($_POST['idusuario'],$_POST['funcion'],$_POST['tipo_reporte'],$_POST['matricula'],$_POST['empresa']);
+            $cont->registrar_firma_reporte($_POST['idtrabajador'],$_POST['funcion'],$_POST['tipo_reporte'],$_POST['matricula'],$_POST['empresa']);
         }
         else{
-            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idusuario'],$_POST['funcion'],$_POST['tipo_reporte'],$_POST['matricula'],$_POST['empresa']));
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idtrabajador'],$_POST['funcion'],$_POST['tipo_reporte'],$_POST['matricula'],$_POST['empresa']));
         }
     }elseif($ver=="editar_firma_reporte"){
-        if(isset($_POST['idfirma_reporte'],$_POST['idusuario'],$_POST['funcion'],$_POST['tipo_reporte'],$_POST['matricula'])){
+        if(isset($_POST['idfirma_reporte'],$_POST['idtrabajador'],$_POST['funcion'],$_POST['tipo_reporte'],$_POST['matricula'])){
             $cont=new Firma_reporte();
-            $cont->editar_firma_reporte($_POST['idfirma_reporte'],$_POST['idusuario'],$_POST['funcion'],$_POST['tipo_reporte'],$_POST['matricula']);
+            $cont->editar_firma_reporte($_POST['idfirma_reporte'],$_POST['idtrabajador'],$_POST['funcion'],$_POST['tipo_reporte'],$_POST['matricula']);
         }
         else{
-            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idfirma_reporte'],$_POST['idusuario'],$_POST['funcion'],$_POST['tipo_reporte'],$_POST['matricula']));
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idfirma_reporte'],$_POST['idtrabajador'],$_POST['funcion'],$_POST['tipo_reporte'],$_POST['matricula']));
         }
     }
     elseif($ver=="registrar_configuracion_reporte"){

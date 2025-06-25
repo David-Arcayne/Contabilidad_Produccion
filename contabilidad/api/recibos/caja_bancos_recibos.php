@@ -1582,16 +1582,29 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         // $qwe=$this->dbrh->fetch($registro);
         // $registro2=$this->dbrh->query("SELECT * FROM usuario WHERE idusuario = '$qwe[idusuario]'");
 
-        
+        $lista_trabajador=$this->dbrh->query("SELECT 
+                t.idtrabajador,
+                t.nombre AS nombre_trabajador,
+                t.apellido,
+                t.ci,
+                u.idusuario,
+                u.nombre AS usuario_nombre
+            FROM trabajador AS t
+            LEFT JOIN usuario AS u 
+                ON u.trabajador_idtrabajador = t.idtrabajador 
+                AND u.idempresa = '$ide';
+            ");
 
-        $registro2=$this->dbrh->query("SELECT u.idusuario,u.nombre AS usuario_nombre, t.nombre AS nombre_trabajador, t.apellido, t.ci 
-            FROM usuario AS u 
-            INNER JOIN trabajador AS t ON t.idtrabajador = u.trabajador_idtrabajador
-            WHERE u.idempresa = '$ide'");
-        while ($bb = $this->dbc->fetch($registro2)) {
+        // $registro2=$this->dbrh->query("SELECT u.idusuario,u.nombre AS usuario_nombre, t.nombre AS nombre_trabajador, t.apellido, t.ci 
+        //     FROM usuario AS u 
+        //     INNER JOIN trabajador AS t ON t.idtrabajador = u.trabajador_idtrabajador
+        //     WHERE u.idempresa = '$ide'");
+
+        while ($bb = $this->dbc->fetch($lista_trabajador)) {
 
             $res = array(
                 "idusuario" => $bb['idusuario'],
+                "idtrabajador" => $bb['idtrabajador'],
                 "nombre_usuario" => $bb['usuario_nombre'],
                 "nombre_trabajador" => $bb['nombre_trabajador']." ".$bb['apellido'],
             );
