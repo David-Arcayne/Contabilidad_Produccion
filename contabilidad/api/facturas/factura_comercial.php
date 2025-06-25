@@ -240,9 +240,9 @@ class Factura_comercial extends DB{
         $caja_bancos = json_decode($idcaja_bancos, true);
         $facturas = json_decode($data, true);
 
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
     
         // echo json_encode(array($fecha,$monto,$idtransaccion,$idcaja_bancos,$idasientotipo,$idempresa,$idsucursal,$data,$caja_bancos,$facturas));
 
