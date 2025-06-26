@@ -235,6 +235,72 @@ class Factura_comercial extends DB{
         echo json_encode($lista);
     }
     
+    public function listar_factura_comercial_comprobante($idmd5)
+    {
+        // $idempresa = $this->verificar->verificarIDEMPRESAMD5($idmd5);
+        $idempresa = $this->getidempresa($idmd5);
+        $lista = [];
+
+        $listaFactura = [];
+        $trans_fact = $this->dbc->query("SELECT idfactura_comercial FROM transaccion_factura_comercial WHERE idempresa = '$idempresa'");
+        while ($zxc = $this->dbc->fetch($trans_fact)) {
+            // $listaFactura = $zxc['idfactura_comercial'];
+            array_push($listaFactura,$zxc['idfactura_comercial']);
+        }
+
+        $facturas = implode(", ", $listaFactura);
+
+        $clien = $this->dbcm->query("SELECT v.id_venta, a.nombre, v.fecha_venta, c.nombre , c.nombrecomercial, c.ciudad, v.tipo_venta, v.tipo_pago, v.monto_total, v.nfactura, v.descuento, pa.almacen_id_almacen, v.cliente_id_cliente1, s.nombre, v.estado, ca.canal, vf.cuf, vf.fechaEmission, vf.shortLink, vf.urlSin,ec.estado as estado_cobro,ec.saldo FROM venta v 
+        LEFT JOIN cliente c ON v.cliente_id_cliente1=c.id_cliente
+        LEFT JOIN detalle_venta dv ON v.id_venta=dv.venta_id_venta
+        LEFT JOIN sucursal s ON v.idsucursal=s.id_sucursal
+        LEFT JOIN productos_almacen pa ON dv.productos_almacen_id_productos_almacen=pa.id_productos_almacen
+        LEFT JOIN almacen a ON pa.almacen_id_almacen=a.id_almacen
+        LEFT JOIN canalventa ca ON v.idcanal=ca.idcanalventa
+        LEFT JOIN ventas_facturadas vf ON v.id_venta=vf.venta_id_venta
+        LEFT JOIN estado_cobro ec ON ec.venta_id_venta = v.id_venta
+        WHERE c.idempresa = '$idempresa' AND v.id_venta NOT IN ($facturas) AND v.tipo_venta ='0'
+        GROUP BY v.id_venta
+        ORDER BY v.fecha_venta DESC, v.id_venta DESC");
+        while ($qwe = $this->dbcm->fetch($clien)) {
+            $res = array("id" => $qwe[0], "almacen" => $qwe[1], "fechaventa" => $qwe[2], "cliente" => $qwe[3], "nombrecomercial" => $qwe[4], "ciudad" => $qwe[5], "tipoventa" => $qwe[6], "tipopago" => $qwe[7], "montototal" => $qwe[8], "nfactura" => $qwe[9], "descuento" => $qwe[10], "idalmacen" => $qwe[11], "idcliente" => $qwe[12], "sucursal" => $qwe[13], "estado" => $qwe[14], "canal" => $qwe[15], "cuf" => $qwe[16], "fechaemision" => $qwe[17], "shortlink" => $qwe[18], "urlsin" => $qwe[19],"estado_cobro" => $qwe[20],"saldo" => $qwe[21]);
+            array_push($lista, $res);
+        }
+        echo json_encode($lista);
+    }
+    public function listar_factura_comercial_anuladas($idmd5)
+    {
+        // $idempresa = $this->verificar->verificarIDEMPRESAMD5($idmd5);
+        $idempresa = $this->getidempresa($idmd5);
+        $lista = [];
+
+        $listaFactura = [];
+        $trans_fact = $this->dbc->query("SELECT idfactura_comercial FROM transaccion_factura_comercial WHERE idempresa = '$idempresa'");
+        while ($zxc = $this->dbc->fetch($trans_fact)) {
+            // $listaFactura = $zxc['idfactura_comercial'];
+            array_push($listaFactura,$zxc['idfactura_comercial']);
+        }
+
+        $facturas = implode(", ", $listaFactura);
+
+        $clien = $this->dbcm->query("SELECT v.id_venta, a.nombre, v.fecha_venta, c.nombre , c.nombrecomercial, c.ciudad, v.tipo_venta, v.tipo_pago, v.monto_total, v.nfactura, v.descuento, pa.almacen_id_almacen, v.cliente_id_cliente1, s.nombre, v.estado, ca.canal, vf.cuf, vf.fechaEmission, vf.shortLink, vf.urlSin,ec.estado as estado_cobro,ec.saldo FROM venta v 
+        LEFT JOIN cliente c ON v.cliente_id_cliente1=c.id_cliente
+        LEFT JOIN detalle_venta dv ON v.id_venta=dv.venta_id_venta
+        LEFT JOIN sucursal s ON v.idsucursal=s.id_sucursal
+        LEFT JOIN productos_almacen pa ON dv.productos_almacen_id_productos_almacen=pa.id_productos_almacen
+        LEFT JOIN almacen a ON pa.almacen_id_almacen=a.id_almacen
+        LEFT JOIN canalventa ca ON v.idcanal=ca.idcanalventa
+        LEFT JOIN ventas_facturadas vf ON v.id_venta=vf.venta_id_venta
+        LEFT JOIN estado_cobro ec ON ec.venta_id_venta = v.id_venta
+        WHERE c.idempresa = '$idempresa' AND v.id_venta NOT IN ($facturas) AND ec.estado ='4'
+        GROUP BY v.id_venta
+        ORDER BY v.fecha_venta DESC, v.id_venta DESC");
+        while ($qwe = $this->dbcm->fetch($clien)) {
+            $res = array("id" => $qwe[0], "almacen" => $qwe[1], "fechaventa" => $qwe[2], "cliente" => $qwe[3], "nombrecomercial" => $qwe[4], "ciudad" => $qwe[5], "tipoventa" => $qwe[6], "tipopago" => $qwe[7], "montototal" => $qwe[8], "nfactura" => $qwe[9], "descuento" => $qwe[10], "idalmacen" => $qwe[11], "idcliente" => $qwe[12], "sucursal" => $qwe[13], "estado" => $qwe[14], "canal" => $qwe[15], "cuf" => $qwe[16], "fechaemision" => $qwe[17], "shortlink" => $qwe[18], "urlsin" => $qwe[19],"estado_cobro" => $qwe[20],"saldo" => $qwe[21]);
+            array_push($lista, $res);
+        }
+        echo json_encode($lista);
+    }
       public function cobro_asignacion_factura_comercial($fecha,$monto_total,$monto_recibo,$idtransaccion,$idcaja_bancos,$idasientotipo,$idempresa,$idsucursal,$data)
     {  
         $caja_bancos = json_decode($idcaja_bancos, true);

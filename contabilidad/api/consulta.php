@@ -495,6 +495,12 @@ elseif($ver[0]=="listar_facturas_cobros_sin_transaccion"){
 }elseif($ver[0]=="reporte_balance_general_hasta"){
     $cont=new Reporte_confi();
     $cont->reporte_balance_general_hasta($ver[1],$ver[2]);
+}elseif($ver[0]=="listar_factura_comercial_comprobante"){
+    $cont=new Factura_comercial();
+    $cont->listar_factura_comercial_comprobante($ver[1]);
+}elseif($ver[0]=="listar_factura_comercial_anuladas"){
+    $cont=new Factura_comercial();
+    $cont->listar_factura_comercial_anuladas($ver[1]);
 }
 
 
