@@ -1530,10 +1530,10 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         return $qwe['idgestion'];
     }
 
-    public function registrar_caja_bancos_usuarios($idcaja_bancos,$idusuario,$funcion,$permiso_registrar,$empresa){
+    public function registrar_caja_bancos_usuarios($idcaja_bancos,$idtrabajador,$funcion,$permiso_registrar,$empresa){
         // $idempresa = Empresa::getidempresa($empresa);
         $idempresa = $this->getidempresa($empresa);
-        $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM caja_banco_usuarios WHERE idcaja_bancos = '$idcaja_bancos' AND idusuario = '$idusuario'");
+        $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM caja_banco_usuarios WHERE idcaja_bancos = '$idcaja_bancos' AND idtrabajador = '$idtrabajador'");
         $resultado = $consulta->fetch_assoc();
         $totalRegistros = $resultado['total'];
 
@@ -1541,7 +1541,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             $res = array("danger", "El registro ya existe","Error");
         } else {
             // Insertar el nuevo registro
-            $registroProveedor = $this->dbc->query("INSERT INTO caja_banco_usuarios(idcaja_bancos,idusuario,funcion,permiso_registrar,idempresa) VALUES ('$idcaja_bancos','$idusuario','$funcion','$permiso_registrar','$idempresa')");
+            $registroProveedor = $this->dbc->query("INSERT INTO caja_banco_usuarios(idcaja_bancos,idtrabajador,funcion,permiso_registrar,idempresa) VALUES ('$idcaja_bancos','$idtrabajador','$funcion','$permiso_registrar','$idempresa')");
             if ($registroProveedor === TRUE) {                                                                                                                                                                
                 $res = array("success", "Registro exitoso","registroCaracteristicas");
             } else {
@@ -1552,10 +1552,10 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         
     }
 
-     public function editar_caja_bancos_usuarios($idcaja_banco_usuario,$idcaja_bancos,$idusuario,$funcion,$permiso_registrar,$empresa){
+     public function editar_caja_bancos_usuarios($idcaja_banco_usuario,$idcaja_bancos,$idtrabajador,$funcion,$permiso_registrar,$empresa){
         // $idempresa = Empresa::getidempresa($empresa);
         $idempresa = $this->getidempresa($empresa);
-        $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM caja_banco_usuarios WHERE idcaja_bancos = '$idcaja_bancos' AND idusuario = '$idusuario' AND idcaja_banco_usuarios != '$idcaja_banco_usuario'");
+        $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM caja_banco_usuarios WHERE idcaja_bancos = '$idcaja_bancos' AND idtrabajador = '$idtrabajador' AND idcaja_banco_usuarios != '$idcaja_banco_usuario'");
         $resultado = $consulta->fetch_assoc();
         $totalRegistros = $resultado['total'];
 
@@ -1564,7 +1564,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         } else {
             // Insertar el nuevo registro
             $registroProveedor = $this->dbc->query("UPDATE caja_banco_usuarios 
-            SET idusuario = '$idusuario',funcion = '$funcion',permiso_registrar = '$permiso_registrar' WHERE idcaja_banco_usuarios = '$idcaja_banco_usuario'");
+            SET idtrabajador = '$idtrabajador',funcion = '$funcion',permiso_registrar = '$permiso_registrar' WHERE idcaja_banco_usuarios = '$idcaja_banco_usuario'");
             if ($registroProveedor === TRUE) {                                                                                                                                                                
                 $res = array("success", "Registro exitoso","registroCaracteristicas");
             } else {
@@ -1588,6 +1588,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                 t.apellido,
                 t.ci,
                 u.idusuario,
+                u.idempresa,
                 u.nombre AS usuario_nombre
             FROM trabajador AS t
             LEFT JOIN usuario AS u 
@@ -1606,6 +1607,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                 "idusuario" => $bb['idusuario'],
                 "idtrabajador" => $bb['idtrabajador'],
                 "nombre_usuario" => $bb['usuario_nombre'],
+                // "idempresa" => $bb['idempresa'],
                 "nombre_trabajador" => $bb['nombre_trabajador']." ".$bb['apellido'],
             );
             array_push($lista, $res);
@@ -1622,19 +1624,24 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
         while ($bb = $this->dbc->fetch($registro2)) {
 
-            $trabajador=$this->dbrh->query("SELECT u.nombre AS usuario_nombre, t.nombre AS nombre_trabajador, t.apellido, t.ci 
+            // $trabajador=$this->dbrh->query("SELECT u.nombre AS usuario_nombre, t.nombre AS nombre_trabajador, t.apellido, t.ci 
+            // FROM usuario AS u 
+            // INNER JOIN trabajador AS t ON t.idtrabajador = u.trabajador_idtrabajador
+            // WHERE u.idusuario = '$bb[idusuario]'");
+        $trabajador=$this->dbrh->query("SELECT u.nombre AS usuario_nombre, t.nombre AS nombre_trabajador,t.idtrabajador, t.apellido, t.ci 
             FROM usuario AS u 
             INNER JOIN trabajador AS t ON t.idtrabajador = u.trabajador_idtrabajador
-            WHERE u.idusuario = '$bb[idusuario]'");
-
+            WHERE t.idtrabajador = '$bb[idtrabajador]'");
             $traba = $trabajador->fetch_assoc();
             
-            $registro3=$this->dbrh->query("SELECT * FROM usuario WHERE idusuario = '$bb[idusuario]'");
-            $usuario = $registro3->fetch_assoc();
+            $registro3=$this->dbrh->query("SELECT * FROM usuario WHERE trabajador_idtrabajador = '$bb[idtrabajador]'");
+            if($registro3->num_rows > 0){
+                $usuario = $registro3->fetch_assoc();
             $res = array(
                 "idcaja_banco_usuarios" => $bb['idcaja_banco_usuarios'],
                 "idcaja_bancos" => $bb['idcaja_bancos'],
-                "idusuario" => $bb['idusuario'],
+                "idusuario" => $usuario['idusuario'],
+                "idtrabajador" => $bb['idtrabajador'],
                 "nombre_usuario" => $usuario['nombre'],
                 "nombre_trabajador" => $traba['nombre_trabajador']." ".$traba['apellido'],
                 "ci" => $traba['ci'],
@@ -1642,6 +1649,21 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                 "permiso_registrar" => $bb['permiso_registrar']
                 
             );
+            }else{
+                $res = array(
+                "idcaja_banco_usuarios" => $bb['idcaja_banco_usuarios'],
+                "idcaja_bancos" => $bb['idcaja_bancos'],
+                "idusuario" => NULL,
+                "idtrabajador" => $bb['idtrabajador'],
+                "nombre_usuario" => NULL,
+                "nombre_trabajador" => $traba['nombre_trabajador']." ".$traba['apellido'],
+                "ci" => $traba['ci'],
+                "funcion" => $bb['funcion'],
+                "permiso_registrar" => $bb['permiso_registrar']
+                
+            );
+            }
+            
             array_push($lista, $res);
         }
         // $qwe=$this->dbrh->fetch($registro2);
@@ -1808,10 +1830,13 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         
         while ($bb = $this->dbc->fetch($caja_bancos_usuarios)) {
 
-            if($idusuario == $bb['idusuario']){
+
+            $registro3=$this->dbrh->query("SELECT * FROM usuario WHERE trabajador_idtrabajador = '$bb[idtrabajador]'");
+            $usuario = $registro3->fetch_assoc();
+            if($idusuario == $usuario['idusuario']){
 
                 $res = array(
-                "idusuario" => $bb['idusuario'],
+                "idusuario" => $usuario['idusuario'],
                 "funcion" => $bb['funcion'],
                 "permiso_registrar" => $bb['permiso_registrar']    
                 );

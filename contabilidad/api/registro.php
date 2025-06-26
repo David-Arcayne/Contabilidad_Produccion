@@ -449,12 +449,12 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         $cont=new Documento_cobro();
         $cont->asignar_asiento_A_otras_cuentas($data);
     }elseif($ver=="registrar_caja_bancos_usuarios"){
-        if(isset($_POST['idcaja_bancos'],$_POST['idusuario'],$_POST['funcion'],$_POST['permiso_registrar'],$_POST['empresa'])){
+        if(isset($_POST['idcaja_bancos'],$_POST['idtrabajador'],$_POST['funcion'],$_POST['permiso_registrar'],$_POST['empresa'])){
             $cont=new Caja_bancos_recibos();
-            $cont->registrar_caja_bancos_usuarios($_POST['idcaja_bancos'],$_POST['idusuario'],$_POST['funcion'],$_POST['permiso_registrar'],$_POST['empresa']);
+            $cont->registrar_caja_bancos_usuarios($_POST['idcaja_bancos'],$_POST['idtrabajador'],$_POST['funcion'],$_POST['permiso_registrar'],$_POST['empresa']);
         }
         else{
-            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idcaja_bancos'],$_POST['idusuario'],$_POST['funcion'],$_POST['permiso_registrar'],$_POST['empresa']));
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idcaja_bancos'],$_POST['idtrabajador'],$_POST['funcion'],$_POST['permiso_registrar'],$_POST['empresa']));
         }
     }elseif($ver=="registrar_detalle_transaccion_json"){
         if(isset($_POST['idtransaccion'],$_POST['datos_json'],$_POST['empresa'],$_POST['sucursal'])){
@@ -505,12 +505,12 @@ if($data['ver'] == "asignar_asiento_A_factura") {
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['fecha'],$_POST['idgestion_anterior'],$_POST['empresa'],$_POST['sucursal']));
         }
     }elseif($ver=="editar_caja_bancos_usuarios"){
-        if(isset($_POST['idcaja_banco_usuario'],$_POST['idcaja_bancos'],$_POST['idusuario'],$_POST['funcion'],$_POST['permiso_registrar'],$_POST['empresa'])){
+        if(isset($_POST['idcaja_banco_usuario'],$_POST['idcaja_bancos'],$_POST['idtrabajador'],$_POST['funcion'],$_POST['permiso_registrar'],$_POST['empresa'])){
             $cont=new Caja_bancos_recibos();
-            $cont->editar_caja_bancos_usuarios($_POST['idcaja_banco_usuario'],$_POST['idcaja_bancos'],$_POST['idusuario'],$_POST['funcion'],$_POST['permiso_registrar'],$_POST['empresa']);
+            $cont->editar_caja_bancos_usuarios($_POST['idcaja_banco_usuario'],$_POST['idcaja_bancos'],$_POST['idtrabajador'],$_POST['funcion'],$_POST['permiso_registrar'],$_POST['empresa']);
         }
         else{
-            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idcaja_banco_usuario'],$_POST['idcaja_bancos'],$_POST['idusuario'],$_POST['funcion'],$_POST['permiso_registrar'],$_POST['empresa']));
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idcaja_banco_usuario'],$_POST['idcaja_bancos'],$_POST['idtrabajador'],$_POST['funcion'],$_POST['permiso_registrar'],$_POST['empresa']));
         }
     }elseif($ver=="consolidacion_multiple"){
         if(isset($_POST['transacciones'])){

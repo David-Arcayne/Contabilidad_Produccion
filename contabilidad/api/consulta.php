@@ -498,8 +498,8 @@ elseif($ver[0]=="listar_facturas_cobros_sin_transaccion"){
 }
 
 
-// asientotipo  creartipoasientodelete listaplanesempresa listaimpuestoentreplan listar_recibo_por_id_otras_cuentas listaVentas listafactura listar_recibo_por_caja_bancos listar_firma_reporte
-// milista     listafacturaapi_cobrado listar_recibo_por_caja_bancos listar_recibo_por_id_otras_cuentas_pagar caja_banco listatransacciones_comercial alerta reportebalancegeneral
-//listafactura   listatransaciones   reportedetalletransaccion  lista_cobrar_cobrado_factura listar_otras_cuentas existe_empresa_modulo listafactura_cobrado_trans listar_usuarios
-//reporteactivodisponible    getidempresa firmas listaimpuestoentreplan listafacturaapi_cobrado tributario  impuesto impuestocrear reportecomprobantecontable eliminarfactura
+//  listar_recibo_por_caja_bancos listar_firma_reporte
+//  caja_banco listatransacciones_comercial alerta reportebalancegeneral
+//listaf   re listar_otras_cuentas existe_empresa_modulo listafactura_cobrado_trans listar_usuarios
+//report reportecomprobantecontable eliminarfactura listar_caja_bancos_usuarios listar_usuarios listar_caja_bancos_por_usuario
 ?>

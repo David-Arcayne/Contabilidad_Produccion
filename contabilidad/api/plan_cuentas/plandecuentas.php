@@ -218,8 +218,14 @@ class Plandecuentas extends DB{
         $lista = [];
         $idempresa = $this->getidempresa($empresa);
         $idusuario = $this->getidusuario($usuario);
+        // $registro3=$this->dbrh->query("SELECT * FROM usuario WHERE trabajador_idtrabajador = '$bb[idtrabajador]'");
 
-        $usuario_caja = $this->dbc->query("SELECT * FROM caja_banco_usuarios WHERE idusuario ='$idusuario' AND idempresa = '$idempresa'");
+    $trabajador=$this->dbrh->query("SELECT u.nombre AS usuario_nombre, t.nombre AS nombre_trabajador,t.idtrabajador, t.apellido, t.ci 
+            FROM usuario AS u 
+            INNER JOIN trabajador AS t ON t.idtrabajador = u.trabajador_idtrabajador
+            WHERE u.idusuario = '$idusuario'");
+            $traba = $trabajador->fetch_assoc();
+        $usuario_caja = $this->dbc->query("SELECT * FROM caja_banco_usuarios WHERE idtrabajador ='$traba[idtrabajador]' AND idempresa = '$idempresa'");
 
         // $listado1 = $this->dbc->query("SELECT * FROM caja_bancos WHERE idempresa ='$idempresa'");
 
