@@ -1582,35 +1582,43 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         // $qwe=$this->dbrh->fetch($registro);
         // $registro2=$this->dbrh->query("SELECT * FROM usuario WHERE idusuario = '$qwe[idusuario]'");
 
-        $lista_trabajador=$this->dbrh->query("SELECT 
-                t.idtrabajador,
-                t.nombre AS nombre_trabajador,
-                t.apellido,
-                t.ci,
-                u.idusuario,
-                u.idempresa,
-                u.nombre AS usuario_nombre
-            FROM trabajador AS t
-            LEFT JOIN usuario AS u 
-                ON u.trabajador_idtrabajador = t.idtrabajador 
-                AND u.idempresa = '$ide';
-            ");
+        // $lista_trabajador=$this->dbrh->query("SELECT 
+        //         t.idtrabajador,
+        //         t.nombre AS nombre_trabajador,
+        //         t.apellido,
+        //         t.ci,
+        //         u.idusuario,
+        //         u.idempresa,
+        //         u.nombre AS usuario_nombre
+        //     FROM trabajador AS t
+        //     LEFT JOIN usuario AS u 
+        //         ON u.trabajador_idtrabajador = t.idtrabajador 
+        //         AND u.idempresa = '$ide';
+        //     ");
 
-        // $registro2=$this->dbrh->query("SELECT u.idusuario,u.nombre AS usuario_nombre, t.nombre AS nombre_trabajador, t.apellido, t.ci 
-        //     FROM usuario AS u 
-        //     INNER JOIN trabajador AS t ON t.idtrabajador = u.trabajador_idtrabajador
-        //     WHERE u.idempresa = '$ide'");
+        $lista_trabajador=$this->dbrh->query("SELECT t.idtrabajador,t.nombre as nombre_trabajador,t.apellido, t.ci,a.sucursal_idsucursal FROM trabajador t
+        INNER JOIN cargos c on c.idcargos = t.cargos_idcargos
+        INNER JOIN areas a on a.idareas = c.areas_idareas");
 
         while ($bb = $this->dbc->fetch($lista_trabajador)) {
-
-            $res = array(
-                "idusuario" => $bb['idusuario'],
-                "idtrabajador" => $bb['idtrabajador'],
-                "nombre_usuario" => $bb['usuario_nombre'],
-                "idempresa" => $bb['idempresa'],
-                "nombre_trabajador" => $bb['nombre_trabajador']." ".$bb['apellido'],
-            );
-            array_push($lista, $res);
+            $lista_sucursal=$this->dbe->query("SELECT * FROM sucursalcontable WHERE idsucursalcontable = '$bb[sucursal_idsucursal]'");
+            $sucur = $lista_sucursal->fetch_assoc();
+            if($sucur['idorganizacion'] == $ide){
+                 $lista_usuario=$this->dbrh->query("SELECT * FROM usuario WHERE trabajador_idtrabajador = '$bb[idtrabajador]'");
+                 $usuario = $lista_usuario->fetch_assoc();
+                //  if(){}
+                $res = array(
+                                "idusuario" => $usuario['idusuario'],
+                                "idtrabajador" => $bb['idtrabajador'],
+                                "nombre_usuario" => $usuario['nombre'],
+                                "idempresa" => $sucur['idorganizacion'],
+                                "nombre_trabajador" => $bb['nombre_trabajador']." ".$bb['apellido'],
+                            );
+                    array_push($lista, $res);
+            }else{
+                //no se añadira trabajador porq no es de la empresa q queremos
+            }
+            
         }
         // $qwe=$this->dbrh->fetch($registro2);
         // return $qwe['idusuario'];

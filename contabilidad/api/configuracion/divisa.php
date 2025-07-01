@@ -1,6 +1,6 @@
 <?php
 require_once "../../db/db.php";
-// require_once "../configuracion/empresa.php";
+// require_once "../configuracion/empresa.php"; ini_set
 
 class Divisa extends DB{
     public function registrar_divisa($simbolo,$nombre,$estado,$empresa){

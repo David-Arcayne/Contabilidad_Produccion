@@ -6,7 +6,7 @@ class Asiento extends DB{
         // $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM divisa WHERE nombre = '$nombre' AND idempresa = '$idempresa'");
         // $resultado = $consulta->fetch_assoc();
         // $totalRegistros = $resultado['total'];
-
+//ini_set
         if (0 > 0) {
             $res = array("danger", "El registro ya existe","Error");
         } else {

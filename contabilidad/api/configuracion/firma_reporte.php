@@ -4,6 +4,9 @@ require_once "../../db/db.php";
 
 class Firma_reporte extends DB{
     public function registrar_firma_reporte($idtrabajador,$funcion,$tipo_reporte,$matricula,$empresa){
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
         // $idempresa = Empresa::getidempresa($empresa);
         $idempresa = $this->getidempresa($empresa);
         // $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM divisa WHERE nombre = '$nombre' AND idempresa = '$idempresa'");
@@ -47,17 +50,24 @@ class Firma_reporte extends DB{
             // INNER JOIN trabajador AS t ON t.idtrabajador = u.trabajador_idtrabajador
             // WHERE u.idusuario = '$qwe[idusuario]'");
 
-        $usuario_trabajador=$this->dbrh->query("SELECT 
-                t.idtrabajador,
-                t.nombre AS nombre_trabajador,
-                t.apellido,
-                t.ci,
-                u.idusuario,
-                u.nombre AS usuario_nombre
-            FROM trabajador AS t
-            LEFT JOIN usuario AS u 
-                ON u.trabajador_idtrabajador = t.idtrabajador 
-                AND t.idtrabajador = '$qwe[idtrabajador]'");
+        // $usuario_trabajador=$this->dbrh->query("SELECT 
+        //         t.idtrabajador,
+        //         t.nombre AS nombre_trabajador,
+        //         t.apellido,
+        //         t.ci,
+        //         u.idusuario,
+        //         u.idempresa,
+        //         u.nombre AS usuario_nombre
+        //     FROM trabajador AS t
+        //     LEFT JOIN usuario AS u 
+        //         ON u.trabajador_idtrabajador = t.idtrabajador 
+        //         AND t.idtrabajador = '$qwe[idtrabajador]'
+        //         -- AND u.idempresa = '$idempresa'
+        //         ");
+        $usuario_trabajador=$this->dbrh->query("SELECT t.idtrabajador,t.nombre as nombre_trabajador,t.apellido, t.ci,a.sucursal_idsucursal FROM trabajador t
+        INNER JOIN cargos c on c.idcargos = t.cargos_idcargos
+        INNER JOIN areas a on a.idareas = c.areas_idareas
+        WHERE t.idtrabajador = '$qwe[idtrabajador]'");
             $traba = $usuario_trabajador->fetch_assoc();
 
             // $datos_usuario = $usuario->fetch_assoc();
@@ -69,7 +79,8 @@ class Firma_reporte extends DB{
                 "nombre_trabajador" => $traba['nombre_trabajador']." ".$traba['apellido'],
                 "funcion" => $qwe['funcion'], 
                 "tipo_reporte" => $qwe['tipo_reporte'],
-                "matricula" => $qwe['matricula']
+                "matricula" => $qwe['matricula'],
+                "idempresa" => $traba['idempresa']
             );
             array_push($lista, $res);
         }
