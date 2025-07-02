@@ -501,6 +501,12 @@ elseif($ver[0]=="listar_facturas_cobros_sin_transaccion"){
 }elseif($ver[0]=="listar_factura_comercial_anuladas"){
     $cont=new Factura_comercial();
     $cont->listar_factura_comercial_anuladas($ver[1]);
+}elseif($ver[0]=="listar__tipo_reportes"){
+    $cont=new Reporte_confi();
+    $cont->listar__tipo_reportes($ver[1]);
+}elseif($ver[0]=="eliminar__tipo_reportes"){
+    $cont=new Reporte_confi();
+    $cont->eliminar__tipo_reportes($ver[1]);
 }
 
 

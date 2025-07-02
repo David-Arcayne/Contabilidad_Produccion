@@ -3,6 +3,67 @@ require_once "../../db/db.php";
 // require_once "../configuracion/empresa.php";
 
 class Reporte_confi extends DB{
+
+    public function registrar__tipo_reportes($nombre, $descripcion, $tipo_reporte, $empresa) {
+        $idempresa = $this->getidempresa($empresa);
+
+        // Insertar el nuevo registro
+        $registro = $this->dbc->query("INSERT INTO tipo_reportes(nombre, descripcion, tipo_reporte, idempresa) VALUES ('$nombre', '$descripcion', '$tipo_reporte', '$idempresa')");
+        if ($registro === TRUE) {                                                                                                                                                                
+            $res = array("success", "Registro exitoso","rp_registrar_reporte");
+        } else {
+            $res = array("danger", "No se pudo registrar", $nombre);
+        }
+        echo json_encode($res);
+    }
+
+ public function listar__tipo_reportes($empresa) {
+    $idempresa = $this->getidempresa($empresa);
+        $lista = [];
+        $registro = $this->dbc->query("SELECT * FROM tipo_reportes WHERE idempresa='$idempresa'");
+    
+        while ($row = $this->dbc->fetch($registro)) {
+            $lista[] = [
+                "idtipo_reportes" => $row['idtipo_reportes'],
+                "nombre"=>$row['nombre'],
+                "descripcion" => $row['descripcion'],
+                "tipo_reporte" => $row['tipo_reporte']
+            ];
+        }
+    
+        echo json_encode($lista, JSON_PRETTY_PRINT);
+    }
+    
+    public function editar__tipo_reportes($idplantilla_reporte, $nombre, $descripcion, $tipo_reporte) {
+        $editar = $this->dbc->query(
+            "UPDATE pr_plantilla_reporte 
+                SET nombre='$nombre', descripcion='$descripcion', tipo_reporte='$tipo_reporte' 
+            WHERE idplantilla_reporte = '$idplantilla_reporte'"
+        );
+        if ($editar === TRUE) {
+            $res = array("success", "se edito exitosamente","rp_editar_reporte");
+        } else {
+            $res = array("danger", "No se pudo editar");
+        }
+        echo json_encode($res);
+    }
+
+    public function eliminar_tipo_reportes($idplantilla_reporte) {
+
+        $eliminar = $this->dbc->query("DELETE FROM pr_plantilla_reporte WHERE idplantilla_reporte = '$idplantilla_reporte'");
+        if ($eliminar === TRUE) {                                                                                                                                                    
+            $res = array("success", "se elimino exitosamente","rp_eliminar_reporte");
+        } else {
+            $res = array("danger", "No se pudo eliminar");
+        }
+        echo json_encode($res);
+    }
+
+
+
+
+
+    //-----------------------------------------------------------------------------
     public function registrar_configuracion_reporte($idplandecuenta,$reporte,$nombre_cuenta_superior,$nivel,$grupo,$es_calculable,$es_activo_fijo,$empresa){
         // $idempresa = Empresa::getidempresa($empresa);
         $idempresa = $this->getidempresa($empresa);
