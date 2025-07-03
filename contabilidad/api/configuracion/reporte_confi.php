@@ -4,7 +4,7 @@ require_once "../../db/db.php";
 
 class Reporte_confi extends DB{
 
-    public function registrar__tipo_reportes($nombre, $descripcion, $tipo_reporte, $empresa) {
+    public function registrar_tipo_reportes($nombre, $descripcion, $tipo_reporte, $empresa) {
         $idempresa = $this->getidempresa($empresa);
 
         // Insertar el nuevo registro
@@ -17,7 +17,7 @@ class Reporte_confi extends DB{
         echo json_encode($res);
     }
 
- public function listar__tipo_reportes($empresa) {
+ public function listar_tipo_reportes($empresa) {
     $idempresa = $this->getidempresa($empresa);
         $lista = [];
         $registro = $this->dbc->query("SELECT * FROM tipo_reportes WHERE idempresa='$idempresa'");
@@ -34,11 +34,11 @@ class Reporte_confi extends DB{
         echo json_encode($lista, JSON_PRETTY_PRINT);
     }
     
-    public function editar__tipo_reportes($idplantilla_reporte, $nombre, $descripcion, $tipo_reporte) {
+    public function editar_tipo_reportes($idtipo_reportes, $nombre, $descripcion, $tipo_reporte) {
         $editar = $this->dbc->query(
-            "UPDATE pr_plantilla_reporte 
+            "UPDATE tipo_reportes 
                 SET nombre='$nombre', descripcion='$descripcion', tipo_reporte='$tipo_reporte' 
-            WHERE idplantilla_reporte = '$idplantilla_reporte'"
+            WHERE idtipo_reportes = '$idtipo_reportes'"
         );
         if ($editar === TRUE) {
             $res = array("success", "se edito exitosamente","rp_editar_reporte");
@@ -48,9 +48,9 @@ class Reporte_confi extends DB{
         echo json_encode($res);
     }
 
-    public function eliminar_tipo_reportes($idplantilla_reporte) {
+    public function eliminar_tipo_reportes($idtipo_reportes) {
 
-        $eliminar = $this->dbc->query("DELETE FROM pr_plantilla_reporte WHERE idplantilla_reporte = '$idplantilla_reporte'");
+        $eliminar = $this->dbc->query("DELETE FROM tipo_reportes WHERE idtipo_reportes = '$idtipo_reportes'");
         if ($eliminar === TRUE) {                                                                                                                                                    
             $res = array("success", "se elimino exitosamente","rp_eliminar_reporte");
         } else {

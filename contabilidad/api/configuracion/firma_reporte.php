@@ -98,16 +98,22 @@ class Firma_reporte extends DB{
     
         while ($qwe = $this->dbc->fetch($firma_reporte)) {
 
-            $usuario = $this->dbrh->query("SELECT * FROM usuario u 
-            INNER JOIN trabajador t ON t.idtrabajador = u.trabajador_idtrabajador
-            INNER JOIN cargos c ON c.idcargos = t.cargos_idcargos
-            WHERE t.idtrabajador = '$qwe[idtrabajador]'");
+            // $usuario = $this->dbrh->query("SELECT * FROM usuario u 
+            // INNER JOIN trabajador t ON t.idtrabajador = u.trabajador_idtrabajador
+            // INNER JOIN cargos c ON c.idcargos = t.cargos_idcargos
+            // WHERE t.idtrabajador = '$qwe[idtrabajador]'");
 
-            $datos_usuario = $usuario->fetch_assoc();
+            // $datos_usuario = $usuario->fetch_assoc();
+
+        $usuario_trabajador=$this->dbrh->query("SELECT t.idtrabajador,t.nombre as nombre_trabajador,t.apellido, t.ci,a.sucursal_idsucursal FROM trabajador t
+        INNER JOIN cargos c on c.idcargos = t.cargos_idcargos
+        INNER JOIN areas a on a.idareas = c.areas_idareas
+        WHERE t.idtrabajador = '$qwe[idtrabajador]'");
+            $datos_usuario = $usuario_trabajador->fetch_assoc();
 
             $res = array( // nombre   apellido   ci   cargo
-                "idusuario" => $datos_usuario['idusuario'],
-                "nombre" => $datos_usuario['nombre'], 
+                // "idusuario" => $datos_usuario['idusuario'],
+                "nombre" => $datos_usuario['nombre_trabajador'], 
                 "apellido" => $datos_usuario['apellido'],
                 "ci" => $datos_usuario['ci'],
                 "matricula" => $qwe['matricula'],

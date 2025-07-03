@@ -20,6 +20,7 @@ require_once "./facturas/filtrado_facturas.php";
 require_once "./facturas/factura_comercial.php";
 require_once "./configuracion/firma_reporte.php";
 require_once "./configuracion/reporte_confi.php";
+require_once "./configuracion/rp_plantilla_reporte.php";
 
 $ver=explode("/",$_GET['ver']); //dividiendo los "/"  ver[0],ver[1],ver[x]  listafacturaapi_pagado eliminarasiento tipo
 if($ver[0]=="verificacion"){
@@ -501,14 +502,30 @@ elseif($ver[0]=="listar_facturas_cobros_sin_transaccion"){
 }elseif($ver[0]=="listar_factura_comercial_anuladas"){
     $cont=new Factura_comercial();
     $cont->listar_factura_comercial_anuladas($ver[1]);
-}elseif($ver[0]=="listar__tipo_reportes"){
+}elseif($ver[0]=="listar_tipo_reportes"){
     $cont=new Reporte_confi();
-    $cont->listar__tipo_reportes($ver[1]);
-}elseif($ver[0]=="eliminar__tipo_reportes"){
+    $cont->listar_tipo_reportes($ver[1]);
+}elseif($ver[0]=="eliminar_tipo_reportes"){
     $cont=new Reporte_confi();
-    $cont->eliminar__tipo_reportes($ver[1]);
+    $cont->eliminar_tipo_reportes($ver[1]);
 }
 
+elseif($ver[0]=="rp_listar_plantilla"){
+    $cont=new PlantillaReporte();
+    $cont->listar_plantilla($ver[1], $ver[2]);
+}elseif($ver[0]=="rp_listar_plantilla_normal"){
+    $cont=new PlantillaReporte();
+    $cont->listar_plantilla_normal($ver[1], $ver[2]);
+}elseif($ver[0]=="rp_filtro_plantilla_por_nivel"){
+    $cont=new PlantillaReporte();
+    $cont->filtro_plantilla_por_nivel($ver[1], $ver[2],  $ver[3]);
+}elseif($ver[0]=="rp_eliminar_plantilla"){
+    $cont=new PlantillaReporte();
+    $cont->eliminar_plantilla($ver[1], $ver[2], $ver[3], $ver[4], $ver[5]);
+}elseif($ver[0]=="rp_obtener_datos_reporte"){
+    $cont=new PlantillaReporte();
+    $cont->obtener_datos_reporte($ver[1], $ver[2], $ver[3], $ver[4]);
+}
 
 //  listar_recibo_por_caja_bancos listar_firma_reporte
 //  caja_banco listatransacciones_comercial alerta reportebalancegeneral

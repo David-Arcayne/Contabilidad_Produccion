@@ -19,6 +19,7 @@ require_once "./facturas/factura_pagos.php";
 require_once "./facturas/factura_comercial.php";
 require_once "./configuracion/firma_reporte.php";
 require_once "./configuracion/reporte_confi.php";
+require_once "./configuracion/rp_plantilla_reporte.php";
 
 $ver=$_POST['ver'];
 $json = file_get_contents('php://input'); // Decodificar el JSON en un arreglo PHP   gestion
@@ -570,8 +571,41 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idconfiguracion_reporte'],$_POST['idplandecuenta'],$_POST['empresa']));
         }
-    }  
-    
+    }elseif($ver=="registrar_tipo_reportes"){
+        if(isset($_POST['nombre'],$_POST['descripcion'],$_POST['tipo_reporte'],$_POST['empresa'])){
+            $cont=new Reporte_confi();
+            $cont->registrar_tipo_reportes($_POST['nombre'],$_POST['descripcion'],$_POST['tipo_reporte'],$_POST['empresa']);
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['nombre'],$_POST['descripcion'],$_POST['tipo_reporte'],$_POST['empresa']));
+        }
+    }elseif($ver=="editar_tipo_reportes"){
+        if(isset($_POST['idtipo_reportes'],$_POST['nombre'],$_POST['descripcion'],$_POST['tipo_reporte'])){
+            $cont=new Reporte_confi();
+            $cont->editar_tipo_reportes($_POST['idtipo_reportes'],$_POST['nombre'],$_POST['descripcion'],$_POST['tipo_reporte']);
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idtipo_reportes'],$_POST['nombre'],$_POST['descripcion'],$_POST['tipo_reporte']));
+        }  
+    }
+
+    elseif($ver=="rp_registrar_plantilla"){
+        if((isset($_POST['idplandecuenta']) || isset($_POST['nombre_personalizado'])) && isset($_POST['idplantilla_reporte'],$_POST['idplantilla_padre'],$_POST['tipo_operacion'],$_POST['nivel'],$_POST['orden'],$_POST['idempresa'])){
+            $cont=new PlantillaReporte();
+            $cont->registrar_plantilla($_POST['idplantilla_reporte'],$_POST['idplantilla_padre'],$_POST['idplandecuenta']??NULL,$_POST['nombre_personalizado']??NULL,$_POST['tipo_operacion'],$_POST['nivel'],$_POST['orden'],$_POST['disponible_para_otro_reporte']??NULL,$_POST['idempresa']);
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",($_POST['idplandecuenta'] ?? $_POST['nombre_personalizado']),$_POST['idplantilla_reporte'],$_POST['idplantilla_padre'],$_POST['tipo_operacion'],$_POST['nivel'],$_POST['orden'],$_POST['idempresa']));
+        }
+    }elseif($ver=="rp_editar_plantilla"){
+        if((isset($_POST['idplandecuenta']) || isset($_POST['nombre_personalizado'])) && isset($_POST['idplantilla'],$_POST['tipo_operacion'],$_POST['orden'],$_POST['idplantilla_padre'],$_POST['nivel'],$_POST['idempresa'])){
+            $cont=new PlantillaReporte();
+            $cont->editar_plantilla($_POST['idplantilla'],$_POST['idplandecuenta']??NULL,$_POST['nombre_personalizado']??NULL,$_POST['tipo_operacion'],$_POST['orden'],$_POST['idplantilla_padre'],$_POST['nivel'],$_POST['disponible_para_otro_reporte']??NULL,$_POST['idempresa']);
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",($_POST['idplandecuenta'] ?? $_POST['nombre_personalizado']),$_POST['idplantilla'],$_POST['tipo_operacion'],$_POST['orden'],$_POST['idplantilla_padre'],$_POST['nivel'],$_POST['disponible_para_otro_reporte'],$_POST['idempresa']));
+        }
+    }
 //  vincula crearfacturas registroproveedor registrocobrarfactura editar_caja_bancos_facturas
 //  registrocobrarfacturaGrupal crearfacturas caja_bancos registrar_factura_pago
 }// registropagarfactura impuestocrearf5 registrar_factura desconsolidar registrar_factura_pagos_transaccion proveedor registrar_factura_recibo_pago_cajaBancos
