@@ -339,14 +339,29 @@ class Transacciones extends DB{
 if($filtrado->num_rows > 0){
     $resultado = $filtrado->fetch_assoc();
 
-    if($debe_aux == 0 && $haber_aux > 0){
-        $resp = (100 * $haber_aux)/$resultado['porciento'];
-    }elseif($debe_aux > 0 && $haber_aux == 0){
-        $resp = (100 * $debe_aux)/$resultado['porciento'];
+    // if($debe_aux == 0 && $haber_aux > 0){
+    //     $resp = (100 * $haber_aux)/$resultado['porciento'];
+    // }elseif($debe_aux > 0 && $haber_aux == 0){
+    //     $resp = (100 * $debe_aux)/$resultado['porciento'];
 
-    }else{
+    // }else{
+    //     $resp = 0;
+    // }
+    if (!empty($resultado['porciento']) && $resultado['porciento'] != 0) {
+        if ($debe_aux == 0 && $haber_aux > 0) {
+            $resp = (100 * $haber_aux) / $resultado['porciento'];
+        } elseif ($debe_aux > 0 && $haber_aux == 0) {
+            $resp = (100 * $debe_aux) / $resultado['porciento'];
+        } else {
+            $resp = 0;
+        }
+    } else {
+        // Puedes manejar la situación de manera segura
         $resp = 0;
+        // Incluso podrías registrar un mensaje de error si lo necesitas
+        // error_log("Porciento no definido o igual a cero en transacción ID: $trans");
     }
+
 }else{
     $resp = 0;
 }
