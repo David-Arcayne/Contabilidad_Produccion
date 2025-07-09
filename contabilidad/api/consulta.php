@@ -525,6 +525,9 @@ elseif($ver[0]=="rp_listar_plantilla"){
 }elseif($ver[0]=="rp_obtener_datos_reporte"){
     $cont=new PlantillaReporte();
     $cont->obtener_datos_reporte($ver[1], $ver[2], $ver[3], $ver[4]);
+}elseif($ver[0]=="reporte_balance_general_actualizado"){
+    $cont=new Reporte_confi();
+    $cont->reporte_balance_general_actualizado($ver[1],$ver[2],$ver[3]);
 }
 
 //  listar_recibo_por_caja_bancos listar_firma_reporte

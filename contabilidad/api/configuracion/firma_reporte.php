@@ -78,6 +78,7 @@ class Firma_reporte extends DB{
                 "usuario_nombre" => $traba['usuario_nombre'],
                 "nombre_trabajador" => $traba['nombre_trabajador']." ".$traba['apellido'],
                 "funcion" => $qwe['funcion'], 
+                "ci" => $traba['ci'], 
                 "tipo_reporte" => $qwe['tipo_reporte'],
                 "matricula" => $qwe['matricula'],
                 "idempresa" => $traba['idempresa']

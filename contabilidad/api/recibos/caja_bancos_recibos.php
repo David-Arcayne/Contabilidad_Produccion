@@ -1613,6 +1613,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                                 "nombre_usuario" => $usuario['nombre'],
                                 "idempresa" => $sucur['idorganizacion'],
                                 "nombre_trabajador" => $bb['nombre_trabajador']." ".$bb['apellido'],
+                                "ci" => $bb['ci'],
                             );
                     array_push($lista, $res);
             }else{

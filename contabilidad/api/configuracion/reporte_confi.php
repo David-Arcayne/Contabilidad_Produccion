@@ -157,7 +157,7 @@ class Reporte_confi extends DB{
     
         // Preparar la consulta
         // $getPedido = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE nivel_registrado = '1' AND idempresa = '$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
-        $getPedido = $this->dbc->query("SELECT DISTINCT(reporte) FROM configuracion_reporte WHERE idempresa='$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
+        $getPedido = $this->dbc->query("SELECT DISTINCT(reporte) FROM configuracion_reporte WHERE idempresa='$idempresa' AND reporte = 'balance_general'");// ACTIVO, PASIVO, PATRIMONIO
 
         while ($qwe = $this->dbc->fetch($getPedido)) {
             $res = array(
@@ -176,8 +176,10 @@ class Reporte_confi extends DB{
             $res2 = array(
                 "idconfiguracion_reporte" => $qwe2['idconfiguracion_reporte'],
                 "idplandecuenta" => $nombre_cuenta['idplandecuenta'],
+                "codigo" => $nombre_cuenta['numero'],
                 "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
                 "es_activo_fijo" => $qwe2['es_activo_fijo'],
+                "es_calculable" => $qwe2['es_calculable'],
                 "nivel_2" => [] //activo
                 // "nivel_3" => $qwe['nombre'],// 
                 // "estado" => $qwe['estado']
@@ -190,8 +192,10 @@ class Reporte_confi extends DB{
                 $res3 = array(
                 "idconfiguracion_reporte" => $qwe3['idconfiguracion_reporte'],
                 "idplandecuenta" => $nombre_cuenta2['idplandecuenta'],
+                "codigo" => $nombre_cuenta2['numero'],
                 "nombre_nivel_2" => $nombre_cuenta2['nombreplan'],
                 "es_activo_fijo" => $qwe3['es_activo_fijo'],
+                "es_calculable" => $qwe3['es_calculable'],
                 "nivel_3" => [] //activo
                 // "nivel_3" => $qwe['nombre'],// 
                 // "estado" => $qwe['estado']
@@ -204,8 +208,10 @@ class Reporte_confi extends DB{
                     $res4 = array(
                     "idconfiguracion_reporte" => $qwe4['idconfiguracion_reporte'],
                     "idplandecuenta" => $nombre_cuenta3['idplandecuenta'],   
+                    "codigo" => $nombre_cuenta3['numero'],
                     "nombre_nivel_3" => $nombre_cuenta3['nombreplan'],
                     "es_activo_fijo" => $qwe4['es_activo_fijo'],
+                    "es_calculable" => $qwe4['es_calculable'],
                     "nivel_4" => [] //activo
                     );
                     $get_nivel_5 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta3[nombreplan]' AND reporte = '$qwe[reporte]' AND idempresa='$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
@@ -216,8 +222,10 @@ class Reporte_confi extends DB{
                         $res5 = array(
                         "idconfiguracion_reporte" => $qwe5['idconfiguracion_reporte'],
                         "idplandecuenta" => $nombre_cuenta4['idplandecuenta'],    
+                        "codigo" => $nombre_cuenta4['numero'],
                         "nombre_nivel_4" => $nombre_cuenta4['nombreplan'],
                         "es_activo_fijo" => $qwe5['es_activo_fijo'],
+                        "es_calculable" => $qwe5['es_calculable'],
                         "nivel_5" => [] //activo
                         );
                 //----------------------------------------------------------------------------
@@ -228,9 +236,11 @@ class Reporte_confi extends DB{
 
                         $res6 = array(
                         "idconfiguracion_reporte" => $qwe6['idconfiguracion_reporte'],
-                        "idplandecuenta" => $nombre_cuenta5['idplandecuenta'],    
+                        "idplandecuenta" => $nombre_cuenta5['idplandecuenta'], 
+                        "codigo" => $nombre_cuenta5['numero'],   
                         "nombre_nivel_5" => $nombre_cuenta5['nombreplan'],
                         "es_activo_fijo" => $qwe6['es_activo_fijo'],
+                        "es_calculable" => $qwe6['es_calculable'],
                         "nivel_5" => [] //activo
                         );
                         
@@ -251,7 +261,7 @@ class Reporte_confi extends DB{
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
     
-    public function reporte_balance_general($fecha_ini,$fecha_fin,$empresa) {
+    public function reporte_balance_general_actualizado($fecha_ini,$fecha_fin,$empresa) {
            ini_set('display_errors', 1); 
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
@@ -730,7 +740,7 @@ class Reporte_confi extends DB{
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
 
-    public function editar_configuracion_reporte($id,$idplandecuenta,$empresa) {
+    public function editar_configuracion_reporte($id,$idplandecuenta,$es_activo_fijo,$es_calculable,$empresa) {
         $idempresa = $this->getidempresa($empresa);
         
         $confi = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE idconfiguracion_reporte = '$id'");
@@ -771,7 +781,9 @@ class Reporte_confi extends DB{
             }else{
                 //EDITAR SOLO EN LA TABLA CONFI_REPORT
                 $update_confi = $this->dbc->query("UPDATE configuracion_reporte
-                                    SET idplandecuenta = '$idplandecuenta'
+                                    SET idplandecuenta = '$idplandecuenta',
+                                    es_activo_fijo = '$es_activo_fijo',
+                                    es_calculable = '$es_calculable'
                                     WHERE idconfiguracion_reporte = '$id';");
             }
             // Insertar el nuevo registro
@@ -1153,6 +1165,538 @@ class Reporte_confi extends DB{
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
 
+
+        public function reporte_balance_general($fecha_ini,$fecha_fin,$empresa) {
+           ini_set('display_errors', 1); 
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+        $lista = [];
+        $idempresa = $this->getidempresa($empresa);
+        $gestion = $this->getidgestion($empresa);
+
+        $lista =[];
+        $get_nivel_2 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '' AND reporte ='balance_general' AND idempresa='$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
+        $total_pasivo_patrimonio = 0;
+        while ($qwe2 = $this->dbc->fetch($get_nivel_2)) {
+            $cuenta = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe2[idplandecuenta]'");// ACTIVO, PASIVO, PATRIMONIO
+            $nombre_cuenta = $cuenta->fetch_assoc();
+            if($qwe2['grupo'] == '1'){
+        // preguntar si la cuenta en la q estamos es activo fijo
+                $nivel_reporte = $this->dbc->query("SELECT nivel_registrado FROM configuracion_reporte WHERE grupo = '$qwe2[grupo]' AND idempresa='$idempresa' ORDER BY nivel_registrado DESC LIMIT 1");//
+                $nivel_reg = $nivel_reporte->fetch_assoc();
+
+            //    if($nivel_reg['nivel_registrado'] == '4'){
+
+                    $res2 = array(
+                    "idconfiguracion_reporte" => $qwe2['idconfiguracion_reporte'],
+                    "idplandecuenta" => $nombre_cuenta['idplandecuenta'],
+                    "codigo" => $nombre_cuenta['numero'],
+                    "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
+                    "suma_nivel_2" => 0,
+                    "nivel_2" => [] //activo
+                    );
+                $suma_nivel_2 = 0;
+                $get_nivel_3 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta[nombreplan]' AND idempresa='$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
+                while ($qwe3 = $this->dbc->fetch($get_nivel_3)) {
+                    // ACTIVO_CIRCULANTE, ACTIVO_FIJO
+                    // if($qwe3['es_activo_fijo'] == '1'){ // TRUE
+
+                    // }else{
+
+                    // }
+                    
+                    $cuenta2 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe3[idplandecuenta]'");// ACTIVO_CIRCULANTE, ACTIVO_FIJO, OTROS ACTIVOS
+                    $nombre_cuenta2 = $cuenta2->fetch_assoc();
+                    $res3 = array(
+                    "idconfiguracion_reporte" => $qwe3['idconfiguracion_reporte'],
+                    "idplandecuenta" => $nombre_cuenta2['idplandecuenta'],
+                    "codigo" => $nombre_cuenta2['numero'],
+                    "nombre_nivel_2" => $nombre_cuenta2['nombreplan'],
+                    "suma_nivel_3" => 0,
+                    "nivel_3" => [] //activo
+                    );
+                    $suma_nivel_3 = 0;
+                    $get_nivel_4 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta2[nombreplan]' AND idempresa='$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
+                    while ($qwe4 = $this->dbc->fetch($get_nivel_4)) {
+                        // Activo_disponible, exigible, Acciones telefonicas
+                        $cuenta3 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe4[idplandecuenta]'");// Activo_disponible, exigible
+                        $nombre_cuenta3 = $cuenta3->fetch_assoc();
+
+                         if($qwe4['es_calculable'] == 'si'){ // ES CALCULABLE
+                            //ESTO ES NIVEL 3
+                            if($qwe4['es_activo_fijo'] == 'si'){ //ES ACTIVO FIJO
+                              $get_fijo = $this->dbc->query("SELECT * from vinculacion_cuenta_depreciacion where idcuenta = '$qwe4[idplandecuenta]' AND idempresa='$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
+                              if($get_fijo->num_rows > 0){
+                                $fijo = $get_fijo->fetch_assoc();
+
+                                $suma_cuentas_A = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total FROM transacciones t
+                                INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
+                                INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
+                                where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$qwe4[idplandecuenta]'
+                                AND t.estado NOT IN (4, 5, 6) AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
+
+                                $valor_A = $suma_cuentas_A->fetch_assoc();
+
+                                $suma_cuentas_depreciacion = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total FROM transacciones t
+                                INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
+                                INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
+                                where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$fijo[idcuenta_depreciacion]'
+                                AND t.estado NOT IN (4, 5, 6) AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
+
+                                $valor_B = $suma_cuentas_depreciacion->fetch_assoc();
+
+                                $diferencia = $valor_A['total'] - $valor_B['total'];
+
+                                $suma_nivel_3 = $suma_nivel_3 + $diferencia;
+                                $res4 = array(
+                                "idconfiguracion_reporte" => $qwe4['idconfiguracion_reporte'],
+                                "idplandecuenta" => $nombre_cuenta3['idplandecuenta'],   
+                                "codigo" => $nombre_cuenta3['numero'], 
+                                "nombre_nivel_3" => $nombre_cuenta3['nombreplan'],
+                                "valor" => $valor_A['total'],
+                                "valor_restado" => $diferencia,
+                                "nivel_4" => [] //activo   
+                                );
+                                array_push($res3['nivel_3'], $res4);
+                              }else{
+                                $suma_cuentas_depreciacion = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total FROM transacciones t
+                                INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
+                                INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
+                                where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$qwe4[idplandecuenta]'
+                                AND t.estado NOT IN (4, 5, 6) AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
+
+                                $valor_B = $suma_cuentas_depreciacion->fetch_assoc();
+
+                                $res4 = array(
+                                "idconfiguracion_reporte" => $qwe4['idconfiguracion_reporte'],
+                                "idplandecuenta" => $nombre_cuenta3['idplandecuenta'],  
+                                "codigo" => $nombre_cuenta3['numero'],  
+                                "nombre_nivel_3" => $nombre_cuenta3['nombreplan'],
+                                "valor" => $valor_B['total'],
+                                // "valor_restado" => $diferencia,
+                                "nivel_4" => [] //activo   
+                                );
+                                array_push($res3['nivel_3'], $res4);
+                              } 
+
+                            }else{
+                                $suma_cuentas = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total FROM transacciones t
+                                INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
+                                INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
+                                where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$nombre_cuenta3[idplandecuenta]'
+                                AND t.estado NOT IN (4, 5, 6) AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
+
+                                $valor = $suma_cuentas->fetch_assoc();
+                                $suma_nivel_3 = $suma_nivel_3 + $valor['total'];
+                                $res4 = array(
+                                "idconfiguracion_reporte" => $qwe4['idconfiguracion_reporte'],
+                                "idplandecuenta" => $nombre_cuenta3['idplandecuenta'], 
+                                "codigo" => $nombre_cuenta3['numero'],   
+                                "nombre_nivel_3" => $nombre_cuenta3['nombreplan'],
+                                "valor" => $valor['total'],
+                                "nivel_4" => [] //activo   
+                                );
+                                array_push($res3['nivel_3'], $res4); 
+                            }
+
+                         }else{ //NO ES CALCULABLE
+
+                             $res4 = array(
+                        "idconfiguracion_reporte" => $qwe4['idconfiguracion_reporte'],
+                        "idplandecuenta" => $nombre_cuenta3['idplandecuenta'],  
+                        "codigo" => $nombre_cuenta3['numero'], 
+                        "nombre_nivel_3" => $nombre_cuenta3['nombreplan'],
+                        "suma_nivel_4" => 0,
+                        "nivel_4" => [] //activo
+                        );
+                        $get_nivel_5 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta3[nombreplan]' AND idempresa='$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
+                        $suma_nivel_4 = 0;
+                        $suma_nivel_5 = 0;
+                        while ($qwe5 = $this->dbc->fetch($get_nivel_5)) {
+                            $cuenta4 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe5[idplandecuenta]'");// caja_general, banco
+                            $nombre_cuenta4 = $cuenta4->fetch_assoc();
+
+                            // $suma_nivel_5 = 0;
+
+                            if($qwe5['es_calculable'] == 'si'){ // ES CALCULABLE
+                            $suma_cuentas = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total FROM transacciones t
+                            INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
+                            INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
+                            where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$nombre_cuenta4[idplandecuenta]'
+                            AND t.estado NOT IN (4, 5, 6) AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
+
+                            $valor = $suma_cuentas->fetch_assoc();
+                            $suma_nivel_4 = $suma_nivel_4 + $valor['total'];
+                            $res5 = array(
+                            "idconfiguracion_reporte" => $qwe5['idconfiguracion_reporte'],
+                            "idplandecuenta" => $nombre_cuenta4['idplandecuenta'], 
+                            "codigo" => $nombre_cuenta4['numero'],   
+                            "nombre_nivel_4" => $nombre_cuenta4['nombreplan'],
+                            "valor" => $valor['total'],
+                            "suma_nivel_5" => 0,
+                            "nivel_5" => [] //activo   
+                            );
+                            array_push($res4['nivel_4'], $res5); 
+
+                            }else{ // NO ES CALCULABLE
+                         $res5 = array(
+                        "idconfiguracion_reporte" => $qwe5['idconfiguracion_reporte'],
+                        "idplandecuenta" => $nombre_cuenta4['idplandecuenta'],  
+                        "codigo" => $nombre_cuenta4['numero'], 
+                        "nombre_nivel_4" => $nombre_cuenta4['nombreplan'],
+                        "valor" => 0,
+                        "suma_nivel_5" => 0,
+                        "nivel_5" => [] //activo
+                        );
+                        $get_nivel_6 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta4[nombreplan]' AND idempresa='$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
+                        // $suma_nivel_5 = 0;
+                        while ($qwe6 = $this->dbc->fetch($get_nivel_6)) { //esto ya es nivel 5 = CALCULABLE
+                            $cuenta5 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe6[idplandecuenta]'");// caja_general, banco
+                            $nombre_cuenta5 = $cuenta5->fetch_assoc();
+                            $suma_cuentas2 = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total FROM transacciones t
+                                INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
+                                INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
+                                where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$nombre_cuenta5[idplandecuenta]'
+                                AND t.estado NOT IN (4, 5, 6) AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
+
+                                $valor2 = $suma_cuentas2->fetch_assoc();
+                                $suma_nivel_5 = $suma_nivel_5 + $valor2['total'];
+                                $res6 = array(
+                                "idconfiguracion_reporte" => $qwe6['idconfiguracion_reporte'],
+                                "idplandecuenta" => $nombre_cuenta5['idplandecuenta'], 
+                                "codigo" => $nombre_cuenta5['numero'],   
+                                "nombre_nivel_5" => $nombre_cuenta5['nombreplan'],
+                                "valor" => $valor2['total'],
+                                "nivel_6" => [] //activo   
+                                );
+                                array_push($res5['nivel_5'], $res6); 
+                                // $res4['suma_nivel_5'] = $suma_nivel_5;
+                        }
+            $res5['suma_nivel_5'] = $suma_nivel_5;
+            $res5['valor'] = $suma_nivel_5;
+                            array_push($res4['nivel_4'], $res5); 
+
+                        } // AQUI TERMINA EL NO ES CALCULABLE
+                        // $res4['suma_nivel_4'] = $suma_nivel_4 + $suma_nivel_5;
+                        // $suma_nivel_3 = $suma_nivel_3 + $res4['suma_nivel_4'];
+                        // array_push($res3['nivel_3'], $res4); 
+                         }
+                         $res4['suma_nivel_4'] = $suma_nivel_4 + $suma_nivel_5;
+                        $suma_nivel_3 = $suma_nivel_3 + $res4['suma_nivel_4'];
+                array_push($res3['nivel_3'], $res4); 
+                        
+                    }
+                        // $res3['suma_nivel_3'] = $suma_nivel_3;
+                        // $suma_nivel_2 = $suma_nivel_2 + $res3['suma_nivel_3'];
+
+                        // array_push($res2['nivel_2'], $res3); 
+                    }
+                     $res3['suma_nivel_3'] = $suma_nivel_3;
+                        $suma_nivel_2 = $suma_nivel_2 + $res3['suma_nivel_3'];
+        array_push($res2['nivel_2'], $res3); 
+                    // $res2['suma_nivel_2'] = $suma_nivel_2;
+                }
+    $res2['suma_nivel_2'] = $suma_nivel_2;
+                // }
+//                 elseif($nivel_reg['nivel_registrado'] == '5'){//--------------------------------------------------------------------------------------
+// //-.---------------------------------------------------------------------------------------------------------------
+//                     $res2 = array(
+//                     "idconfiguracion_reporte" => $qwe2['idconfiguracion_reporte'],
+//                     "idplandecuenta" => $nombre_cuenta['idplandecuenta'],
+//                     "codigo" => $nombre_cuenta['numero'],
+//                     "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
+//                     "suma_nivel_2" => 0,
+//                     "nivel_2" => [] //activo
+//                     );
+//                 $suma_nivel_2 = 0;
+//                 $get_nivel_3 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta[nombreplan]' AND idempresa='$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
+//                 while ($qwe3 = $this->dbc->fetch($get_nivel_3)) {
+//                     // ACTIVO_CIRCULANTE, ACTIVO_FIJO
+//                     // if($qwe3['es_activo_fijo'] == '1'){ // TRUE
+
+//                     // }else{
+
+//                     // }
+                    
+//                     $cuenta2 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe3[idplandecuenta]'");// ACTIVO_CIRCULANTE, ACTIVO_FIJO, OTROS ACTIVOS
+//                     $nombre_cuenta2 = $cuenta2->fetch_assoc();
+//                     $res3 = array(
+//                     "idconfiguracion_reporte" => $qwe3['idconfiguracion_reporte'],
+//                     "idplandecuenta" => $nombre_cuenta2['idplandecuenta'],
+//                     "codigo" => $nombre_cuenta2['numero'],
+//                     "nombre_nivel_2" => $nombre_cuenta2['nombreplan'],
+//                     "suma_nivel_3" => 0,
+//                     "nivel_3" => [] //activo
+//                     );
+//                     $suma_nivel_3 = 0;
+//                     $get_nivel_4 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta2[nombreplan]' AND idempresa='$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
+//                     while ($qwe4 = $this->dbc->fetch($get_nivel_4)) {
+//                         // Activo_disponible, exigible, Acciones telefonicas
+//                         $cuenta3 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe4[idplandecuenta]'");// Activo_disponible, exigible
+//                         $nombre_cuenta3 = $cuenta3->fetch_assoc();
+
+//                          if($qwe4['es_calculable'] == 'si'){ // ES CALCULABLE
+
+//                             if($qwe4['es_activo_fijo'] == 'si'){ //ES ACTIVO FIJO
+//                               $get_fijo = $this->dbc->query("SELECT * from vinculacion_cuenta_depreciacion where idcuenta = '$qwe4[idplandecuenta]' AND idempresa='$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
+//                               if($get_fijo->num_rows > 0){
+//                                 $fijo = $get_fijo->fetch_assoc();
+
+//                                 $suma_cuentas_A = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total FROM transacciones t
+//                                 INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
+//                                 INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
+//                                 where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$qwe4[idplandecuenta]'
+//                                 AND t.estado NOT IN (4, 5, 6) AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
+
+//                                 $valor_A = $suma_cuentas_A->fetch_assoc();
+
+//                                 $suma_cuentas_depreciacion = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total FROM transacciones t
+//                                 INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
+//                                 INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
+//                                 where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$fijo[idcuenta_depreciacion]'
+//                                 AND t.estado NOT IN (4, 5, 6) AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
+
+//                                 $valor_B = $suma_cuentas_depreciacion->fetch_assoc();
+
+//                                 $diferencia = $valor_A['total'] - $valor_B['total'];
+
+//                                 $suma_nivel_3 = $suma_nivel_3 + $diferencia;
+//                                 $res4 = array(
+//                                 "idconfiguracion_reporte" => $qwe4['idconfiguracion_reporte'],
+//                                 "idplandecuenta" => $nombre_cuenta3['idplandecuenta'],   
+//                                 "codigo" => $nombre_cuenta3['numero'], 
+//                                 "nombre_nivel_3" => $nombre_cuenta3['nombreplan'],
+//                                 "valor" => $valor_A['total'],
+//                                 "valor_restado" => $diferencia,
+//                                 "nivel_4" => [] //activo   
+//                                 );
+//                                 array_push($res3['nivel_3'], $res4);
+//                               }else{
+//                                 $suma_cuentas_depreciacion = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total FROM transacciones t
+//                                 INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
+//                                 INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
+//                                 where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$qwe4[idplandecuenta]'
+//                                 AND t.estado NOT IN (4, 5, 6) AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
+
+//                                 $valor_B = $suma_cuentas_depreciacion->fetch_assoc();
+
+//                                 $res4 = array(
+//                                 "idconfiguracion_reporte" => $qwe4['idconfiguracion_reporte'],
+//                                 "idplandecuenta" => $nombre_cuenta3['idplandecuenta'],  
+//                                 "codigo" => $nombre_cuenta3['numero'],  
+//                                 "nombre_nivel_3" => $nombre_cuenta3['nombreplan'],
+//                                 "valor" => $valor_B['total'],
+//                                 // "valor_restado" => $diferencia,
+//                                 "nivel_4" => [] //activo   
+//                                 );
+//                                 array_push($res3['nivel_3'], $res4);
+//                               } 
+
+//                             }else{ // ES CALCULABLE PERO NO ES ACTIVO FIJO
+//                                 $suma_cuentas = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total FROM transacciones t
+//                                 INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
+//                                 INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
+//                                 where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$nombre_cuenta3[idplandecuenta]'
+//                                 AND t.estado NOT IN (4, 5, 6) AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
+
+//                                 $valor = $suma_cuentas->fetch_assoc();
+//                                 $suma_nivel_3 = $suma_nivel_3 + $valor['total'];
+//                                 $res4 = array(
+//                                 "idconfiguracion_reporte" => $qwe4['idconfiguracion_reporte'],
+//                                 "idplandecuenta" => $nombre_cuenta3['idplandecuenta'], 
+//                                 "codigo" => $nombre_cuenta3['numero'],   
+//                                 "nombre_nivel_3" => $nombre_cuenta3['nombreplan'],
+//                                 "valor" => $valor['total'],
+//                                 "nivel_4" => [] //activo   
+//                                 );
+//                                 array_push($res3['nivel_3'], $res4); 
+//                             }
+
+//                          }else{ //NO ES CALCULABLE
+
+//                              $res4 = array(
+//                         "idconfiguracion_reporte" => $qwe4['idconfiguracion_reporte'],
+//                         "idplandecuenta" => $nombre_cuenta3['idplandecuenta'],  
+//                         "codigo" => $nombre_cuenta3['numero'], 
+//                         "nombre_nivel_3" => $nombre_cuenta3['nombreplan'],
+//                         "suma_nivel_4" => 0,
+//                         "nivel_4" => [] //activo
+//                         );
+//                         $get_nivel_5 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta3[nombreplan]' AND idempresa='$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
+//                         $suma_nivel_4 = 0;
+//                         while ($qwe5 = $this->dbc->fetch($get_nivel_5)) {// ULTIMO TITULO
+//                             $cuenta4 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe5[idplandecuenta]'");// caja_general, banco
+//                             $nombre_cuenta4 = $cuenta4->fetch_assoc();
+                            
+//                             $res5 = array(
+//                             "idconfiguracion_reporte" => $qwe5['idconfiguracion_reporte'],
+//                             "idplandecuenta" => $nombre_cuenta4['idplandecuenta'],  
+//                             "codigo" => $nombre_cuenta4['numero'], 
+//                             "nombre_nivel_4" => $nombre_cuenta4['nombreplan'],
+//                             "suma_nivel_5" => 0,
+//                             "nivel_5" => [] //activo
+//                             );
+//                             $suma_nivel_5 = 0;
+//                             $get_nivel_6 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta4[nombreplan]' AND idempresa='$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
+//                             while ($qwe6 = $this->dbc->fetch($get_nivel_6)) {
+//                             $cuenta5 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe6[idplandecuenta]'");// caja_general, banco
+//                             $nombre_cuenta5 = $cuenta5->fetch_assoc();
+//                             // if(es_calculable){
+
+//                             // }else{
+
+//                             // }
+//                             $suma_cuentas = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total FROM transacciones t
+//                             INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
+//                             INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
+//                             where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$nombre_cuenta5[idplandecuenta]'
+//                             AND t.estado NOT IN (4, 5, 6) AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
+
+//                             $valor = $suma_cuentas->fetch_assoc();
+//                             $suma_nivel_5 = $suma_nivel_5 + $valor['total'];
+//                             $res6 = array(
+//                             "idconfiguracion_reporte" => $qwe6['idconfiguracion_reporte'],
+//                             "idplandecuenta" => $nombre_cuenta5['idplandecuenta'], 
+//                             "codigo" => $nombre_cuenta5['numero'],   
+//                             "nombre_nivel_5" => $nombre_cuenta5['nombreplan'],
+//                             "valor" => $valor['total'],
+//                             "nivel_6" => [] //activo   
+//                             );
+//                             array_push($res5['nivel_5'], $res6); 
+//                         }
+//                         $res5['suma_nivel_5'] = $suma_nivel_5;
+//                         $suma_nivel_4 = $suma_nivel_4 + $res5['suma_nivel_5'];
+//                         array_push($res4['nivel_4'], $res5); 
+//                         }
+                    
+//                         $res4['suma_nivel_4'] = $suma_nivel_4;
+//                         $suma_nivel_3 = $suma_nivel_3 + $res4['suma_nivel_4'];
+//                         array_push($res3['nivel_3'], $res4); 
+//                          }
+                        
+//                     }
+//                         $res3['suma_nivel_3'] = $suma_nivel_3;
+//                         $suma_nivel_2 = $suma_nivel_2 + $res3['suma_nivel_3'];
+//                         array_push($res2['nivel_2'], $res3); 
+//                     }
+//                     $res2['suma_nivel_2'] = $suma_nivel_2;
+// //----------------------------------------------------------------------------------------------------------------
+//                 }
+                
+
+            }elseif($qwe2['grupo'] == '2'){ //PASIVO
+
+                $nivel_reporte = $this->dbc->query("SELECT nivel_registrado FROM configuracion_reporte WHERE grupo = '$qwe2[grupo]' AND idempresa='$idempresa' ORDER BY nivel_registrado DESC LIMIT 1");//
+                $nivel_reg = $nivel_reporte->fetch_assoc();
+                if($nivel_reg['nivel_registrado'] == '3'){
+                    $res2 = array(
+                    "idconfiguracion_reporte" => $qwe2['idconfiguracion_reporte'],
+                    "idplandecuenta" => $nombre_cuenta['idplandecuenta'],
+                    "codigo" => $nombre_cuenta['numero'],
+                    "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
+                    "suma_nivel_2" => 0,
+                    "total_pasi_pati" => 0,
+                    "nivel_2" => [] //activo
+                    );
+                $suma_nivel_2 = 0;
+                $get_nivel_3 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta[nombreplan]' AND idempresa='$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
+                while ($qwe3 = $this->dbc->fetch($get_nivel_3)) {
+                    $cuenta2 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe3[idplandecuenta]'");// ACTIVO_CIRCULANTE, ACTIVO_FIJO
+                    $nombre_cuenta2 = $cuenta2->fetch_assoc();
+                    $res3 = array(
+                    "idconfiguracion_reporte" => $qwe3['idconfiguracion_reporte'],
+                    "idplandecuenta" => $nombre_cuenta2['idplandecuenta'],
+                    "codigo" => $nombre_cuenta2['numero'],
+                    "nombre_nivel_2" => $nombre_cuenta2['nombreplan'],
+                    "suma_nivel_3" => 0,
+                    "nivel_3" => [] //activo
+                    );
+                    $suma_nivel_3 = 0;
+                    $get_nivel_4 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta2[nombreplan]' AND idempresa='$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
+                    while ($qwe4 = $this->dbc->fetch($get_nivel_4)) {
+                        $cuenta3 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe4[idplandecuenta]'");// Activo_disponible, exigible
+                        $nombre_cuenta3 = $cuenta3->fetch_assoc();
+
+                            $suma_cuentas = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(haber) - SUM(debe) AS total FROM transacciones t
+                            INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
+                            INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
+                            where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$nombre_cuenta3[idplandecuenta]'
+                            AND t.estado NOT IN (4, 5, 6) AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
+
+                            $valor = $suma_cuentas->fetch_assoc();
+                            $suma_nivel_3 = $suma_nivel_3 + $valor['total'];
+                        $res4 = array(
+                        "idconfiguracion_reporte" => $qwe4['idconfiguracion_reporte'],
+                        "idplandecuenta" => $nombre_cuenta3['idplandecuenta'],   
+                        "codigo" => $nombre_cuenta3['numero'], 
+                        "nombre_nivel_3" => $nombre_cuenta3['nombreplan'],
+                        "valor" => $valor['total'],
+                        "nivel_4" => [] //activo
+                        );
+                     
+                        array_push($res3['nivel_3'], $res4); 
+                    }
+                    $res3['suma_nivel_3'] = $suma_nivel_3;
+                    // $suma_nivel_3 = $suma_nivel_3 + $res3['suma_nivel_3'];
+                    $suma_nivel_2 = $suma_nivel_2 + $res3['suma_nivel_3'];
+                    array_push($res2['nivel_2'], $res3); 
+
+                    }
+                    $res2['suma_nivel_2'] = $suma_nivel_2;
+                }
+                $total_pasivo_patrimonio = $total_pasivo_patrimonio + $suma_nivel_2;
+                $res2['total_pasi_pati'] = $total_pasivo_patrimonio;
+                
+            }elseif($qwe2['grupo'] == '3'){ //PATRIMONIO
+                $nivel_reporte = $this->dbc->query("SELECT nivel_registrado FROM configuracion_reporte WHERE grupo = '$qwe2[grupo]' AND idempresa='$idempresa' ORDER BY nivel_registrado DESC LIMIT 1");//
+                $nivel_reg = $nivel_reporte->fetch_assoc();
+                if($nivel_reg['nivel_registrado'] == '2'){
+                    $res2 = array(
+                    "idconfiguracion_reporte" => $qwe2['idconfiguracion_reporte'],
+                    "idplandecuenta" => $nombre_cuenta['idplandecuenta'],
+                    "codigo" => $nombre_cuenta['numero'],
+                    "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
+                    "suma_nivel_2" => 0,
+                    "total_pasi_pati" => 0,
+                    "nivel_2" => [] //activo
+                    );
+                $suma_nivel_2 = 0;
+                $get_nivel_3 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta[nombreplan]' AND idempresa='$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
+                while ($qwe3 = $this->dbc->fetch($get_nivel_3)) {
+                    $cuenta2 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe3[idplandecuenta]'");// ACTIVO_CIRCULANTE, ACTIVO_FIJO
+                    $nombre_cuenta2 = $cuenta2->fetch_assoc();
+
+                    $suma_cuentas = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total FROM transacciones t
+                            INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
+                            INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
+                            where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$nombre_cuenta2[idplandecuenta]'
+                            AND t.estado NOT IN (4, 5, 6) AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
+
+                            $valor = $suma_cuentas->fetch_assoc();
+                            $suma_nivel_2 = $suma_nivel_2 + $valor['total'];
+
+                    $res3 = array(
+                    "idconfiguracion_reporte" => $qwe3['idconfiguracion_reporte'],
+                    "idplandecuenta" => $nombre_cuenta2['idplandecuenta'],
+                    "codigo" => $nombre_cuenta2['numero'],
+                    "nombre_nivel_2" => $nombre_cuenta2['nombreplan'],
+                    "valor" => $valor['total'],
+                    "nivel_3" => [] //activo
+                    );
+
+                    array_push($res2['nivel_2'], $res3); 
+                    }
+                    $res2['suma_nivel_2'] = $suma_nivel_2;
+                }
+                $total_pasivo_patrimonio = $total_pasivo_patrimonio + $suma_nivel_2;
+                $res2['total_pasi_pati'] = $total_pasivo_patrimonio;
+            }
+           array_push($lista, $res2); 
+        }     
+        
+        // array_push($lista, $res2);
+        echo json_encode($lista, JSON_NUMERIC_CHECK);  
+}
     public function getidempresa($md5)
     {
         $registro = $this->dbe->query("select * from organizacion where md5(idorganizacion)='$md5'");
@@ -1174,5 +1718,6 @@ class Reporte_confi extends DB{
     //     //$res=array("id"=>,"nombre"=>$qwe['nombre']); listapagarfactura
     //     return $qwe['idgestion'];
     // }
+
 }
 ?>
