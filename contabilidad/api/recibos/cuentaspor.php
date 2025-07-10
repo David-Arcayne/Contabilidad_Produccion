@@ -41,7 +41,7 @@ class Cuentaspor extends DB{
         $gestion = $this->getgestionactualid($ide);
         $tipotransaccion = 2; //ingreso
 
-        if ($asiento != 0) {
+        if ($asiento != "" && $idtransaccion == "") {
         $insertrans = $this->dbc->query("INSERT INTO `transacciones` (`idtransacciones`, `codigotransaccion`, `fechatransaccion`, `tipodecambio`, `ndocumento`, `glosa`, `consolidar`,`estado`, `tipotransaccion_idtipotransaccion`, `organizacion_idorganizacion`, `sucursal`, `idgestion`) VALUES (NULL, '$codigo', '$fecha', '1', '0', '$glosa', '1','1', '$tipotransaccion', '$ide', '$sucursal', '$gestion');");
         //nuevat transaccion
         $transis = $this->dbc->query("select * from transacciones where codigotransaccion='$codigo' and  organizacion_idorganizacion='$ide' order by idtransacciones desc Limit 1");
@@ -71,6 +71,8 @@ class Cuentaspor extends DB{
 
             $orden = $orden + 1;
         }
+    }elseif($idtransaccion == "" && $asiento == "") {
+            $trans = 0;
     }else{
         $trans = $idtransaccion;
     }

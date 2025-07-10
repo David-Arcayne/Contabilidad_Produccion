@@ -514,7 +514,8 @@ $nroTransaccion = $resultado12['codigotransaccion'] + 1;
 
         $facturas = implode(", ", $listaFactura);
 
-        $clien = $this->dbcm->query("SELECT 
+        if (!empty($facturas)) {
+            $clien = $this->dbcm->query("SELECT 
     v.id_venta, 
     MAX(a.nombre) AS nombre_almacen, 
     v.fecha_venta, 
@@ -550,6 +551,44 @@ WHERE v.id_venta IN ($facturas)
 GROUP BY v.id_venta 
 ORDER BY v.fecha_venta DESC, v.id_venta DESC;
 ");
+        }else{
+            $clien = $this->dbcm->query("SELECT 
+    v.id_venta, 
+    MAX(a.nombre) AS nombre_almacen, 
+    v.fecha_venta, 
+    MAX(c.nombre) AS nombre_cliente, 
+    MAX(c.nombrecomercial) AS nombre_comercial, 
+    MAX(c.ciudad) AS ciudad, 
+    v.tipo_venta, 
+    v.tipo_pago, 
+    v.monto_total, 
+    v.nfactura, 
+    v.descuento, 
+    MAX(pa.almacen_id_almacen) AS almacen_id, 
+    v.cliente_id_cliente1, 
+    MAX(s.nombre) AS nombre_sucursal, 
+    v.estado, 
+    MAX(ca.canal) AS canal_venta, 
+    MAX(vf.cuf) AS cuf, 
+    MAX(vf.fechaEmission) AS fecha_emision, 
+    MAX(vf.shortLink) AS enlace_corto, 
+    MAX(vf.urlSin) AS url_sin, 
+    MAX(ec.estado) AS estado_cobro, 
+    MAX(ec.saldo) AS saldo
+FROM venta v  
+    LEFT JOIN cliente c ON v.cliente_id_cliente1 = c.id_cliente 
+    LEFT JOIN detalle_venta dv ON v.id_venta = dv.venta_id_venta 
+    LEFT JOIN sucursal s ON v.idsucursal = s.id_sucursal 
+    LEFT JOIN productos_almacen pa ON dv.productos_almacen_id_productos_almacen = pa.id_productos_almacen 
+    LEFT JOIN almacen a ON pa.almacen_id_almacen = a.id_almacen 
+    LEFT JOIN canalventa ca ON v.idcanal = ca.idcanalventa 
+    LEFT JOIN ventas_facturadas vf ON v.id_venta = vf.venta_id_venta 
+    LEFT JOIN estado_cobro ec ON ec.venta_id_venta = v.id_venta 
+ WHERE v.id_venta IN (NULL)
+GROUP BY v.id_venta 
+ORDER BY v.fecha_venta DESC, v.id_venta DESC;
+");
+        }
 
  $i = 0;
         while ($qwe = $this->dbcm->fetch($clien)) {
