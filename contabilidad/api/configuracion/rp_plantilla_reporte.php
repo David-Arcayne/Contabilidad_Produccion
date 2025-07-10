@@ -527,9 +527,9 @@ class PlantillaReporte extends DB{
     }
 
     public function reporte_estado_resultados($fecha_ini,$fecha_fin,$empresa) {
-        //    ini_set('display_errors', 1); //$fecha_ini,$fecha_fin,
-        // ini_set('display_startup_errors', 1);
-        // error_reporting(E_ALL);
+           ini_set('display_errors', 1); //$fecha_ini,$fecha_fin,
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
         // $lista = [];
         $idempresa = $this->get_id_empresa($empresa);
         // $gestion = $this->getidgestion($empresa);
@@ -541,11 +541,11 @@ $gestion = $this->get_id_gestion($empresa);
 
             $pl_padre = $this->dbc->query("SELECT * from agrupacion_plantilla where idplantilla_padre = '$pl1[idplantilla_padre]'");// HIJOS DE LAS PLANTILLAS AGRUPADORAS
         while ($pl2 = $this->dbc->fetch($pl_padre)) {
-
+        
             $pr_consu2 = $this->dbc->query("SELECT * from pr_plantilla where idplantilla = '$pl2[idplantilla_hijo]' AND idempresa = '$idempresa'");// VENTAS->NOMBRE
             $pr_indi2 = $pr_consu2->fetch_assoc();
 
-            $pla_cuen = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$pl2[idplandecuenta]' AND idempresa = '$idempresa'");// VENTAS->NOMBRE
+            $pla_cuen = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$pr_indi2[idplandecuenta]'");// VENTAS->NOMBRE
             $nombre_cuen = $pla_cuen->fetch_assoc();
             if($pr_indi2['nombre_personalizado'] == NULL){
                 $nombre_cuenta = $nombre_cuen['nombreplan'];
@@ -563,7 +563,8 @@ $gestion = $this->get_id_gestion($empresa);
              $pr_consu = $this->dbc->query("SELECT * from pr_plantilla where idplantilla_padre = '$pl2[idplantilla_hijo]' AND idempresa = '$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
             // $pr_indi = $pr_consu->fetch_assoc();
             $suma_nivel_2 = 0;
-            while ($pl3 = $this->dbc->fetch($pr_consu)) { //CALCULABLES
+            if($pl2['monto'] == 0){
+                while ($pl3 = $this->dbc->fetch($pr_consu)) { //CALCULABLES
 
                 $plan_cuenta = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$pl3[idplandecuenta]'");// caja_general, banco
                 $nombre_cuenta = $plan_cuenta->fetch_assoc();
@@ -586,6 +587,16 @@ $gestion = $this->get_id_gestion($empresa);
                     // "nivel_3" => [] //activo
                     );
                array_push($res['nivel_2'], $res2);     
+            }
+            $res['suma_nivel_2'] = $suma_nivel_2;
+            }else{
+                $suma_nivel_2 = $pl2['monto'];
+                $res['suma_nivel_2'] = $suma_nivel_2;
+            }
+            if($pl2['tipo_operacion'] == 'sumar'){
+                //SE SUMARA
+            }else{
+                //SE RESTARA
             }
             
             array_push($lista, $res);

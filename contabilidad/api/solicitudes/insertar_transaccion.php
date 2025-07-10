@@ -40,7 +40,7 @@ public function registrar_transaccionEn_espera($idtransaccion,$estado,$hora,$fec
                     $cod = $resultado['codigotransaccion'];
                     $idempresa = $resultado['idempresa'];
                     $transEditar=$this->dbc->query("SELECT * FROM transacciones 
-                    WHERE codigotransaccion >= '$cod' AND organizacion_idorganizacion = '$idempresa'");
+                    WHERE codigotransaccion >= '$cod' AND organizacion_idorganizacion = '$idempresa' AND idgestion = '$resultado[idgestion]'");
                     $cod =$cod+1;
                     while($qwe2=$this->dbc->fetch($transEditar)){
                         $descTRan=$this->dbc->query("UPDATE transacciones SET codigotransaccion = '$cod' 
