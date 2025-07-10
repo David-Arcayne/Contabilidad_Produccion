@@ -531,10 +531,13 @@ elseif($ver[0]=="rp_listar_plantilla"){
 }elseif($ver[0]=="listar_agrupacion_plantilla"){
     $cont=new PlantillaReporte();
     $cont->listar_agrupacion_plantilla($ver[1]);
+}elseif($ver[0]=="reporte_estado_resultados"){
+    $cont=new PlantillaReporte();
+    $cont->reporte_estado_resultados($ver[1],$ver[2],$ver[3]);
 }
 
 //  listar_recibo_por_caja_bancos listar_firma_reporte
-//  caja_banco listatransacciones_comercial alerta reportebalancegeneral
+//  caja_banco listatransacciones_comercial alerta reportebalancegeneral listafacturaapi_pagado
 //listaf   re listar_otras_cuentas existe_empresa_modulo listafactura_cobrado_trans listar_usuarios
 //report reportecomprobantecontable eliminarfactura listar_caja_bancos_usuarios listar_usuarios listar_caja_bancos_por_usuario
 ?>

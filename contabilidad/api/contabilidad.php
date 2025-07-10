@@ -1082,9 +1082,9 @@ ORDER BY
 
     public function listafacturaapi_pagado($idempresa)
     {
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
         $lista = [];
         $res = "";
         $facture = $this->dbc->query("SELECT
@@ -1119,7 +1119,8 @@ WHERE
   AND f.pagado != '0'
 ORDER BY
   f.fecha ASC");
-        while ($qwe = $this->dbc->fetch($facture)) {
+  if($facture->num_rows > 0){
+    while ($qwe = $this->dbc->fetch($facture)) {
             if ($qwe['clasefactura'] == 2) {
                 $cliente = $this->dbcm->query("select * from cliente where id_cliente='" . $qwe['proveedorcliente_idproveedorcliente'] . "'");
                 $asd = $this->dbcm->fetch($cliente);
@@ -1133,7 +1134,9 @@ ORDER BY
             }
             array_push($lista, $res);
         }
-
+  }else{
+    $lista = [];
+  }
         echo json_encode($lista);
     }
     
