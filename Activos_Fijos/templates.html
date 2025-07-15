@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+    <template id="barra-inferior">
+        <div id="main" class="row row-cols-1 row-cols-md-1 g-0"></div>
+
+        <nav class="navbar fixed-bottom navbar-expand-md rounded-5 bg-dock">
+            <div class="container-fluid">
+
+                <div class="dropup-center dropup">
+                    <a data-bs-toggle="offcanvas" href="#offcanvasExample" role="button"
+                        aria-controls="offcanvasExample">
+                        <img src="../assetsy/img/icon.png" class="rounded-3" width="30">
+                    </a>
+                </div>
+
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav auto-scroll mx-auto">
+                    </ul>
+                    <!-- Botón de cierre -->
+                </div>
+                <div class="dropup-center dropup mx-1">
+                    <a href="../dashboard" class="btn btn-danger" id="closeBtn"><i
+                        class="bi bi-grid-1x2-fill fs-6"></i></a>
+                </div>
+            </div>
+        </nav>
+        <div class="offcanvas offcanvas-start bg-dock" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+            <div class="offcanvas-header text-center">
+                <h6 class="offcanvas-title d-flex align-items-center ml-2" id="offcanvasExampleLabel">
+                    <img src="../assetsy/img/icon.png" class="" width="40">
+                    <div class="flex-grow-1 ml-2 usuario text-center text-white">
+                        No tiene creado los datos del perfil
+                        <small class="d-block cargo">Texto adicional centrado</small>
+                    </div>
+                </h6>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <div class="accordion menu" id="accordionExample">
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="nombre-opcion">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingOne">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                    Almacénes
+                </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne"
+                data-bs-parent="#accordionExample">
+                <ul class="list-group">
+
+                </ul>
+            </div>
+        </div>
+    </template>
+
+    <template id="opcion">
+        <a class="list-group-item list-group-item-action">Asignar user</a>
+        <!--<li><a class="dropdown-item options" data-value="">Submenu Item 1</a></li>-->
+    </template>
+
+    <template id="targetas">
+        <div class="p-2 d-block custom-size-card">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">Registro de Almacenes</h6>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-link refrescar">
+                            <i class="bi bi-arrow-clockwise"></i>
+                        </button>
+                        <button type="button" class="btn btn-link minimizar">
+                            <i class="bi bi-dash-lg"></i>
+                        </button>
+                        <button type="button" class="btn btn-link cerrar">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row primario">
+                        <div id="contenedor-formulario" class="col-md-12 text-start"></div>
+                        <div id="contenedor-cabecera" class="col-md-12 text-start"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="iconos">
+        <li class="nav-item">
+            <a class="nav-link" data-value="">
+            </a>
+        </li>
+    </template>
+
+    <template id="formulario">
+        <div class="collapse dataform" id="collapseExample">
+            <div class="container-sm text-center">
+                <form id="">
+                    <div class="row row-cols-1 row-cols-md-1 g-2"></div>
+                </form>
+            </div>
+        </div>
+    </template>
+
+    <template id="input">
+        <div class="text-start">
+            <div class="mb-3">
+                <label class="form-label" for=""></label>
+                <input type="" name="" id="" class="form-control" placeholder="">
+            </div>
+        </div>
+    </template>
+
+    <template id="select">
+        <div class="col-4 col-md-4 text-start">
+            <div class="mb-3">
+                <label class="form-label" for=""></label>
+                <select name="" id="" class="form-select"></select>
+            </div>
+        </div>
+    </template>
+
+    <template id="botones-form">
+        <div class="col-md-12 text-center">
+            <button class="btn btn-primary submit" type="submit">Registrar</button>
+            <button class="btn btn-danger reset" type="reset">Cancelar</button>
+        </div>
+    </template>
+
+    <template id="cabecera-targeta">
+        <div class="row table-topper align-items-center">
+            <div class="col-12 col-sm-5 col-md-4 text-start" style="margin: 0px;padding: 5px 15px;">
+                
+                <button class="btn btn-primary new" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                    <i class="bi bi-plus-circle"></i>&nbsp;
+                  </button>
+            </div>
+            <div class="col-12 col-sm-5 col-md-2 text-start" style="margin: 0px;padding: 5px 15px;">
+
+            </div>
+            <div class="col-12 col-sm-7 col-md-6 text-end" style="margin: 0px;padding: 5px 15px;">
+                <div class="input-group">
+                    <input class="form-control" type="text" placeholder="Search" aria-label="Search"
+                        aria-describedby="button-addon2" id="" autocomplete="off" /><span class="input-group-text"
+                        id="basic-addon1"><i class="bi bi-search"></i></span>
+                </div>
+            </div>
+        </div>
+        
+        
+            
+          
+          
+    </template>
+
+    <template id="tabla-formulario">
+        <div class="table-responsive">
+            <table class="table table-light table-bordered table-hover text-center">
+                <thead class="thead-dark">
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </template>
+</body>
+
+</html>

@@ -1,0 +1,209 @@
+.inner-div {
+    background-color: #00000050;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+}
+
+.floating-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #ffffff;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+
+/* menu activos fijos */
+.sidebar-nav {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.sidebar-nav li {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.sidebar-nav .nav-item {
+    margin-bottom: 10px;
+}
+
+.sidebar-nav .nav-heading {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #899bbd;
+    font-weight: 600;
+    margin: 10px 0 5px 15px;
+}
+
+.sidebar-nav .nav-link {
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+    font-weight: 600;
+    color: #F8B739;
+    transition: 0.3;
+    background: #1e22256c;
+    padding: 10px 15px;
+    border-radius: 10px;
+}
+
+.sidebar-nav .nav-link i {
+    font-size: 16px;
+    margin-right: 10px;
+    color: #F8B739;
+}
+
+.sidebar-nav .nav-link.collapsed {
+    color: #fff;
+    background: rgba(48, 54, 59, 0);
+    font-weight: 400;
+}
+
+.sidebar-nav .nav-link.collapsed i {
+    color: #b6bac2;
+}
+
+.sidebar-nav .nav-link:hover {
+    color: #F8B739;
+    background: #1e22256c;
+    font-weight: 700;
+}
+
+.sidebar-nav .nav-link:hover i {
+    color: #F8B739;
+}
+
+.sidebar-nav .nav-link .bi-chevron-down {
+    margin-right: 0;
+    transition: transform 0.2s ease-in-out;
+}
+
+.sidebar-nav .nav-link:not(.collapsed) .bi-chevron-down {
+    transform: rotate(180deg);
+}
+
+.sidebar-nav .nav-content {
+    padding: 0 0 0 0;
+    margin: 5px 0 0 0;
+    list-style: none;
+    background-color: #1e22256c;
+    border-radius: 10px;
+}
+
+.sidebar-nav .nav-content a {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 300;
+    color: #fff;
+    transition: 0.3;
+    padding: 10px 0 10px 40px;
+    transition: 0.3s;
+}
+
+.sidebar-nav .nav-content a i {
+    font-size: 6px;
+    margin-right: 8px;
+    line-height: 0;
+    border-radius: 50%;
+}
+
+.sidebar-nav .nav-content a:hover,
+.sidebar-nav .nav-content a.active {
+    color: #F8B739;
+    font-weight: 700;
+}
+
+.sidebar-nav .nav-content a.active i {
+    background-color: #F8B739;
+}
+/* Fin menu */
+
+.shadow-af-primary {
+    border-color:#86b7fe;
+    outline:0;
+    box-shadow:0 0 0 .25rem rgba(13,110,253,.25)
+}
+
+.af-slz-auto {
+    width: 180px !important;
+    min-width: 20px !important;
+    max-width: 200px;
+}
+  
+.input-group:has(> select.af-slz-auto ) {
+    flex-wrap: nowrap;
+}
+
+.af-table-yellow {
+    --bs-table-bg: #fff9c3;
+}
+.af-table-orange {
+    --bs-table-bg: #ffecaf;
+}
+
+.af-btn-orange {
+    --bs-btn-color: #000;
+    --bs-btn-bg: #ffa000;
+    --bs-btn-border-color: #ffa000;
+    --bs-btn-hover-color: #000;
+    --bs-btn-hover-bg: #ffb32c;
+    --bs-btn-hover-border-color: #ffa720;
+    --bs-btn-focus-shadow-rgb: 255, 160, 0;
+    --bs-btn-active-color: #000;
+    --bs-btn-active-bg: #ffb839;
+    --bs-btn-active-border-color: #ffa720;
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    --bs-btn-disabled-color: #000;
+    --bs-btn-disabled-bg: #ffa000;
+    --bs-btn-disabled-border-color: #ffa000;
+}
+
+.af-spinner-container {
+    position: relative;
+}
+
+.af-spinner-overlay {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.8);
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Reset básico para Vista Previa*/
+.af-seccion, .af-seccion * {
+    all: revert; 
+}
+
+.reportaf * {
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+.reportaf {
+    font-family: Arial, sans-serif;
+    font-size: 11px !important;
+}
+
+.reportaf p {
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+}
+/* Fin reset básico */

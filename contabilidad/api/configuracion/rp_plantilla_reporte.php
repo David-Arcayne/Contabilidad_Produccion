@@ -535,6 +535,9 @@ class PlantillaReporte extends DB{
         // $gestion = $this->getidgestion($empresa);
 $gestion = $this->get_id_gestion($empresa);
         $lista =[];
+        // $plantilla_lista = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla_reporte = '1' 
+        // AND idempresa = '$idempresa' AND tipo_operacion != 'calculable' ORDER BY orden ASC");// PLANTILLAS PRINCIPALES
+
         $get_nivel_2 = $this->dbc->query("SELECT DISTINCT(idplantilla_padre) FROM agrupacion_plantilla WHERE idempresa = '$idempresa'");// PLANTILLAS AGRUPADORAS
         $total_pasivo_patrimonio = 0;
         while ($pl1 = $this->dbc->fetch($get_nivel_2)) {
@@ -606,6 +609,102 @@ $gestion = $this->get_id_gestion($empresa);
         //    array_push($lista, $res2); 
         }     
         // array_push($lista, $res2);
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
+
+    public function reporte_estado_resultados_actualizado($fecha_ini,$fecha_fin,$empresa) {
+           ini_set('display_errors', 1); //$fecha_ini,$fecha_fin,
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+        // $lista = [];
+        $idempresa = $this->get_id_empresa($empresa);
+        // $gestion = $this->getidgestion($empresa);
+$gestion = $this->get_id_gestion($empresa);
+        $lista_aux_buscador = [];
+        $lista =[];
+        $plantilla_lista = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla_reporte = '1' 
+        AND idempresa = '$idempresa' AND tipo_operacion != 'calculable' ORDER BY orden ASC");// PLANTILLAS PRINCIPALES
+        while ($pl_list = $this->dbc->fetch($plantilla_lista)) {
+            if($pl_list['nombre_personalizado'] == NULL){
+                $pla_cuen = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$pl_list[idplandecuenta]'");// VENTAS->NOMBRE
+                $nombre_cuen = $pla_cuen->fetch_assoc();
+                $nombre_cuenta = $nombre_cuen['nombreplan'];
+            }else{
+                $nombre_cuenta = $pl_list['nombre_personalizado'];
+            }
+            $res = array(
+                    // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
+                    "idplantilla" => $pl_list['idplantilla'],
+                    "nombre_personalizado" => $nombre_cuenta,
+                    "tipo_operacion" => $pl_list['tipo_operacion'],
+                    "suma_nivel_2" => 0,
+                    "nivel_2" => [] //activo
+                    );
+
+            $pl_padre = $this->dbc->query("SELECT * from agrupacion_plantilla where idplantilla_padre = '$pl_list[idplantilla]'");// VENTAS->NOMBRE
+            // $es_plant_agrup = $pl_padre->num_rows > 0;
+            $pl_padre_calcu = $this->dbc->query("SELECT * from pr_plantilla where idplantilla_padre = '$pl_list[idplantilla]'");// VENTAS->NOMBRE
+            // $es_plant_calc = $pl_padre_calcu->num_rows > 0;
+            if($pl_padre->num_rows > 0){ //SI ES UNA PLANTILLA AGRUPADORA  (utilidad bruta en ventas)
+                $sum_rest = 0;
+                // $lista_aux_buscador[] = $res;
+                // array_push($lista_aux_buscador,$res);
+                while ($buscarId = $this->dbc->fetch($pl_padre)) { // 2agrupados
+                    foreach ($lista as $item) {
+                        if ($item['idplantilla'] === $buscarId['idplantilla_hijo']) {
+                            //agarro si es suma o resta y agarro su valor 
+                            if($buscarId['tipo_operacion'] == 'sumar'){
+                                $sum_rest = $sum_rest + $item['suma_nivel_2'];
+                            }elseif($buscarId['tipo_operacion'] == 'restar'){
+                                $sum_rest = $sum_rest - $item['suma_nivel_2'];
+                            }
+                            // $item['suma_nivel_2'];
+                            // $encontrado = true;
+                            break;
+                        }else{
+                            //seguir buscando
+                        }
+                    }
+                }
+                $res['suma_nivel_2'] = $sum_rest;
+            }elseif($pl_padre_calcu->num_rows > 0){ //ES UNA PLANTILLA CON HIJOS CALCULABLES  (VENTAS)
+
+                $suma_nivel_2 = 0;
+                while ($aux_calculable = $this->dbc->fetch($pl_padre_calcu)) { //CALCULABLES
+
+                $plan_cuenta = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$aux_calculable[idplandecuenta]'");// caja_general, banco
+                $nombre_cuenta = $plan_cuenta->fetch_assoc();
+
+                $suma_cuentas2 = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total FROM transacciones t
+                                INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
+                                INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
+                                where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$aux_calculable[idplandecuenta]'
+                                AND t.estado NOT IN (4, 5, 6) AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
+
+                $valor2 = $suma_cuentas2->fetch_assoc();
+                $suma_nivel_2 = $suma_nivel_2 + $valor2['total'];
+                
+                $res2 = array(
+                        // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
+                        "idplandecuenta" => $nombre_cuenta['idplandecuenta'],
+                        "codigo" => $nombre_cuenta['numero'],
+                        "nombre_cuenta" => $nombre_cuenta['nombreplan'],
+                        // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
+                        "valor" => $valor2['total'],
+                        // "nivel_3" => [] //activo
+                        );
+                array_push($res['nivel_2'], $res2);     
+                }
+                $res['suma_nivel_2'] = $suma_nivel_2;
+            }else{ //ES UNA PLANTILLA SIN OPERACION (COSTO_PRODUCCION)
+                
+                $agru = $this->dbc->query("SELECT * from agrupacion_plantilla where idplantilla_hijo = '$pl_list[idplantilla]'");// HIJOS DE LAS PLANTILLAS AGRUPADORAS
+                $agru_aux = $agru->fetch_assoc();
+                $res['suma_nivel_2'] = $agru_aux['monto']; //esto en caso de que el monto siempre sea mayor a cero
+            }
+            array_push($lista, $res);  
+            $lista_aux_buscador = [];        
+        }
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
 }

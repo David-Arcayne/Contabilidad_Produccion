@@ -534,6 +534,9 @@ elseif($ver[0]=="rp_listar_plantilla"){
 }elseif($ver[0]=="reporte_estado_resultados"){
     $cont=new PlantillaReporte();
     $cont->reporte_estado_resultados($ver[1],$ver[2],$ver[3]);
+}elseif($ver[0]=="reporte_estado_resultados_actualizado"){
+    $cont=new PlantillaReporte();
+    $cont->reporte_estado_resultados_actualizado($ver[1],$ver[2],$ver[3]);
 }
 
 //  listar_recibo_por_caja_bancos listar_firma_reporte

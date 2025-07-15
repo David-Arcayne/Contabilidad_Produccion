@@ -1,0 +1,242 @@
+.clearfix:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+a {
+    color: #5d6975;
+    text-decoration: underline;
+}
+
+body {
+    position: relative;
+    /* width: 21cm;  
+    height: 29.7cm;  */
+    margin: 0 auto;
+    color: #001028;
+    background: #ffffff;
+    /* font-family: "Times New Roman", Times, serif; */
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+}
+
+header {
+    padding: 10px 0;
+    margin-bottom: 10px;
+}
+
+#logo {
+    text-align: right;
+    margin-bottom: 10px;
+    /* border: 2px solid #5D6975; */
+}
+
+/* h1 {
+    border-bottom: 1px solid  #5D6975;
+    color: #5D6975;
+    font-size: 2.4em;
+    font-weight: normal;
+    line-height: 1.4em;
+    margin: 0 0 20px 0;
+    text-align: center;
+    text-transform: uppercase;
+  } */
+
+.project {
+    float: left;
+    width: 47%;
+}
+.project .small-text {
+    color: #5d6975;
+    text-align: right;
+    width: 52px;
+    margin-right: 10px;
+    display: inline-block;
+    font-size: 0.8em;
+}
+
+.company {
+    text-align: right;
+    float: right;
+    width: 45%;
+}
+
+.project div,
+.company div {
+    white-space: nowrap;
+}
+
+.company.txt-left {
+    text-align: left ;
+}
+
+table.t-info {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin-bottom: 20px;
+    border-top: 1px solid #c1ced9;
+    border-bottom: 1px solid #c1ced9;
+    margin: 0;
+}
+
+table.t-info tr:nth-child(2n-1) td {
+    background: #f5f5f5;
+}
+
+table th,
+table td {
+    text-align: center;
+}
+
+table.t-info th {
+    padding: 5px 5px;
+    color: #5d6975;
+    border-bottom: 1px solid #c1ced9;
+    /* white-space: nowrap; */
+    font-weight: normal;
+}
+
+table .left {
+    text-align: left;
+}
+table.middle {
+    vertical-align: middle;
+}
+
+table.t-info td {
+    padding: 10px 5px;
+    text-align: right;
+    vertical-align: bottom;
+}
+
+table td.center {
+    text-align: center;
+}
+table td.left {
+    text-align: left;
+}
+table td.left-top {
+    vertical-align: top;
+}
+
+table td.unit,
+table td.qty,
+table td.total {
+    font-size: 1.2em;
+}
+
+table td.grand {
+    border-top: 1px solid #5d6975;
+}
+
+#notices .notice {
+    color: #5d6975;
+    font-size: 1.2em;
+}
+
+footer {
+    color: #5d6975;
+    width: 100%;
+    height: 30px;
+    position: absolute;
+    bottom: 0;
+    border-top: 1px solid #c1ced9;
+    padding: 8px 0;
+    text-align: center;
+}
+
+/* -------------------- */
+.title {
+    /* border-bottom: 1px solid  #5D6975; */
+    color: #4b545e;
+    font-weight: normal;
+    margin: 0 0 20px 0;
+    text-align: center;
+}
+.title h1.border {
+    border-bottom: 1px solid #5d6975;
+}
+.title h1 {
+    font-size: 2em;
+    font-weight: normal;
+    margin: 0;
+    text-transform: uppercase;
+}
+.title p {
+    padding: 0;
+    margin: 0;
+    font-weight: bold;
+}
+
+table.t-depr {
+    border-top: 1px solid #3b3b3b;
+
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin-bottom: 20px;
+    margin: 0;
+}
+/* table.t-depr tr:nth-child(2n-1) td.cell{
+    background: #F5F5F5;
+  } */
+table.t-depr th {
+    padding: 5px 2px;
+    /* color: #5D6975; */
+    /* font-weight: normal; */
+    background: #c4c3c3 !important;
+}
+
+table.t-depr td {
+    padding: 5px 5px;
+    text-align: right;
+    vertical-align: bottom;
+}
+
+table thead.uppercase th {
+    text-transform: uppercase;
+}
+
+table.t-depr td,
+table.t-depr th {
+    border-bottom: 1px solid #3b3b3b;
+    border-right: 1px solid #3b3b3b;
+}
+table.t-depr tr td:nth-child(1),
+table.t-depr tr th:nth-child(1) {
+    border-left: 1px solid #3b3b3b;
+}
+
+table.t-depr td.void {
+    padding: 4px;
+    border: 0;
+    border-bottom: 1px solid #3b3b3b;
+}
+table.t-depr td.nw {
+    width: 350px;
+    /* white-space: nowrap; */
+}
+
+.category {
+    background: #c4c3c3 !important;
+}
+.category th {
+    text-align: right;
+    vertical-align: bottom;
+    text-transform: uppercase;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.semi-bold {
+    color: gray;
+}
+
+.al-right {
+    text-align: right;
+
+}

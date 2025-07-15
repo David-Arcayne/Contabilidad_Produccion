@@ -1,0 +1,15 @@
+Hola.
+Por favor les pido todo su codigo que van a subir que este bien documentado.
+
+si va a tener su funcion o clase u objeto , por favor que mencione su utilidad.
+ejemplo.
+
+//esta funcion llama a otra funcion para saber su apellido
+function(nombre){
+
+getapellido(nombre);
+}
+
+asi mismo las librerias que se usara durante la produccion.
+
+Disfruten escribiendo su codigo.
