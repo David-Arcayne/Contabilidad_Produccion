@@ -82,7 +82,7 @@ class PlantillaReporte extends DB{
     {
         $filtro_padre = is_null($idpadre) ? "p.idplantilla_padre IS NULL" : "p.idplantilla_padre = $idpadre";
 
-        $sql = "SELECT p.idplantilla, p.idplantilla_padre, p.idplandecuenta, p.nombre_personalizado, p.tipo_operacion, p.nivel, p.orden, p.disponible_para_otro_reporte, pc.nombreplan
+        $sql = "SELECT p.idplantilla, p.idplantilla_padre, p.idplandecuenta, p.nombre_personalizado, p.tipo_operacion, p.nivel, p.orden, p.disponible_para_otro_reporte, pc.nombreplan,pc.numero
             FROM pr_plantilla p
             LEFT JOIN plandecuenta pc ON pc.idplandecuenta = p.idplandecuenta
             WHERE p.idplantilla_reporte = $idreporte
@@ -106,6 +106,7 @@ class PlantillaReporte extends DB{
             if ($row['idplandecuenta'] !== null) {
                 $nodo['idplandecuenta'] = $row['idplandecuenta'];
                 $nodo['nombreplan'] = $row['nombreplan'];
+                $nodo['codigo'] = $row['numero'];
             } else {
                 $nodo['nombre_personalizado'] =  $row['nombre_personalizado'];
             }
@@ -706,6 +707,40 @@ $gestion = $this->get_id_gestion($empresa);
             $lista_aux_buscador = [];        
         }
         echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
+    public function editar_otras_operaciones($idagrupacion_plantilla, $idplantilla_hijo, $operacion, $monto)
+    {
+        // $id_empresa = $this->get_id_empresa($idempresa);
+
+        // $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM agrupacion_plantilla WHERE idplantilla_hijo = '$idplantilla_hijo' AND idempresa = '$idempresa' AND iddivisa != '$id'");
+        // $resultado = $consulta->fetch_assoc();
+        // $totalRegistros = $resultado['total'];
+
+        // Actualizar el registro
+        $stmt_update = $this->dbc->query("UPDATE agrupacion_plantilla SET idplantilla_hijo = '$idplantilla_hijo', tipo_operacion = '$operacion', monto = '$monto' WHERE idagrupacion_plantilla = '$idagrupacion_plantilla'");
+
+        if ($stmt_update === TRUE) {                                                                                                                                                                
+                $res = array("success", "Edición exitosa","editarCaracteristicas");
+            } else {
+                $res = array("danger", "No se pudo editar");
+            }
+
+        echo json_encode($res);    
+    }
+    public function eliminar_otras_operaciones($idagrupacion_plantilla){
+
+            if (0 > 0) {
+                $res = array("danger", "No se puede eliminar porque hay registros en proveedor_has_material","eliminar_proveedor");
+            } else {
+                // Insertar el nuevo registro
+                $delete = $this->dbc->query("DELETE FROM agrupacion_plantilla WHERE idagrupacion_plantilla = '$idagrupacion_plantilla'");
+                if ($delete === TRUE) {                                                                                                                                                    
+                    $res = array("success", "se elimino exitosamente","eliminarCaracteristica");
+                } else {
+                    $res = array("danger", "No se pudo registrar");
+                }
+            }
+            echo json_encode($res);
     }
 }
 ?>

@@ -310,13 +310,13 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     }
 }elseif($ver == "registrar_otras_cuentas"){
 
-    if(isset($_POST['idtransaccion'],$_POST['asiento'],$_POST['fecha'],$_POST['lugar'],$_POST['id_cliente_proveedor'],$_POST['clase_otras_cuentas'],$_POST['pagado'],$_POST['cobrado'],$_POST['nro_tributario'],$_POST['contacto'],$_POST['nro_doc_identidad'],$_POST['idtipo'],$_POST['concepto'],$_POST['condiciones'],$_POST['observaciones'],$_POST['precio'],$_POST['forma_pago'],$_POST['empresa'],$_POST['sucursal'],$_FILES['archivo'])){
+    if(isset($_POST['fecha'],$_POST['lugar'],$_POST['id_cliente_proveedor'],$_POST['clase_otras_cuentas'],$_POST['pagado'],$_POST['cobrado'],$_POST['nro_tributario'],$_POST['contacto'],$_POST['nro_doc_identidad'],$_POST['idtipo'],$_POST['concepto'],$_POST['condiciones'],$_POST['observaciones'],$_POST['precio'],$_POST['forma_pago'],$_POST['fecha_venci'],$_POST['empresa'],$_POST['sucursal'],$_FILES['archivo'])){
         // decode echo json_encode(array("danger", "Faltan parámetros en la solicitud", $_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$facturas));
         $cont=new Documento_cobro();
-        $cont->registrar_otras_cuentas($_POST['idtransaccion'],$_POST['asiento'],$_POST['fecha'],$_POST['lugar'],$_POST['id_cliente_proveedor'],$_POST['clase_otras_cuentas'],$_POST['pagado'],$_POST['cobrado'],$_POST['nro_tributario'],$_POST['contacto'],$_POST['nro_doc_identidad'],$_POST['idtipo'],$_POST['concepto'],$_POST['condiciones'],$_POST['observaciones'],$_POST['precio'],$_POST['forma_pago'],$_POST['empresa'],$_POST['sucursal'],$_FILES['archivo']);
+        $cont->registrar_otras_cuentas($_POST['fecha'],$_POST['lugar'],$_POST['id_cliente_proveedor'],$_POST['clase_otras_cuentas'],$_POST['pagado'],$_POST['cobrado'],$_POST['nro_tributario'],$_POST['contacto'],$_POST['nro_doc_identidad'],$_POST['idtipo'],$_POST['concepto'],$_POST['condiciones'],$_POST['observaciones'],$_POST['precio'],$_POST['forma_pago'],$_POST['fecha_venci'],$_POST['empresa'],$_POST['sucursal'],$_FILES['archivo']);
     }
     else{
-        echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idtransaccion'],$_POST['asiento'],$_POST['fecha'],$_POST['lugar'],$_POST['id_cliente_proveedor'],$_POST['clase_otras_cuentas'],$_POST['pagado'],$_POST['cobrado'],$_POST['nro_tributario'],$_POST['contacto'],$_POST['nro_doc_identidad'],$_POST['idtipo'],$_POST['concepto'],$_POST['condiciones'],$_POST['observaciones'],$_POST['precio'],$_POST['forma_pago'],$_POST['empresa'],$_POST['sucursal'],$_FILES['archivo']));
+        echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['fecha'],$_POST['lugar'],$_POST['id_cliente_proveedor'],$_POST['clase_otras_cuentas'],$_POST['pagado'],$_POST['cobrado'],$_POST['nro_tributario'],$_POST['contacto'],$_POST['nro_doc_identidad'],$_POST['idtipo'],$_POST['concepto'],$_POST['condiciones'],$_POST['observaciones'],$_POST['precio'],$_POST['forma_pago'],$_POST['fecha_venci'],$_POST['empresa'],$_POST['sucursal'],$_FILES['archivo']));
     }
 }elseif($ver == "editar_otras_cuentas"){
 
@@ -612,6 +612,14 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         }
         else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idplantilla_padre'],$_POST['idplantilla_hijo'],$_POST['tipo_operacion'],$_POST['monto'],$_POST['idempresa']));
+        }  
+    }elseif($ver=="editar_otras_operaciones"){
+        if(isset($_POST['idagrupacion_plantilla'],$_POST['idplantilla_hijo'],$_POST['tipo_operacion'],$_POST['monto'])){
+            $cont=new PlantillaReporte();
+            $cont->editar_otras_operaciones($_POST['idagrupacion_plantilla'],$_POST['idplantilla_hijo'],$_POST['tipo_operacion'],$_POST['monto']);
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idagrupacion_plantilla'],$_POST['idplantilla_hijo'],$_POST['tipo_operacion'],$_POST['monto']));
         }  
     }
 //  vincula crearfacturas registroproveedor registrocobrarfactura editar_caja_bancos_facturas
