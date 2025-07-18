@@ -1,0 +1,57 @@
+{
+    "EstadosProductos": [
+      {
+        "tipo_estado": "Líquido",
+        "descripcion": "Aceites, Jugos, Productos químicos"
+      },
+      {
+        "tipo_estado": "Sólido",
+        "descripcion": "Alimentos, Metales, Objetos, terminados"
+      },
+      {
+        "tipo_estado": "Gaseoso",
+        "descripcion": "Oxígeno, Dióxido de carbono, Aerosoles"
+      },
+      {
+        "tipo_estado": "Semisólido o masa",
+        "descripcion": "Cremas, Pastas, Mezclas alimenticias"
+      },
+      {
+        "tipo_estado": "Nuevo",
+        "descripcion": "Productos recién fabricados o sin uso previo"
+      },
+      {
+        "tipo_estado": "Usado",
+        "descripcion": "Productos de segunda mano en buen estado"
+      },
+      {
+        "tipo_estado": "Reacondicionado",
+        "descripcion": "Productos usados con reparaciones para mejorar su condición"
+      },
+      {
+        "tipo_estado": "Desechado",
+        "descripcion": "Productos dañados o que ya no cumplen su función"
+      },
+      {
+        "tipo_estado": "Reciclado",
+        "descripcion": "Productos reutilizados y adaptados para nuevos usos"
+      },
+      {
+        "tipo_estado": "Perecedero",
+        "descripcion": "Alimentos frescos, Productos con corta vida útil"
+      },
+      {
+        "tipo_estado": "No perecedero",
+        "descripcion": "Enlatados, Productos secos, Electrónicos"
+      },
+      {
+        "tipo_estado": "Obsoleto",
+        "descripcion": "Productos tecnológicos o modas pasadas"
+      },
+      {
+        "tipo_estado": "Biodegradable",
+        "descripcion": "Productos que pueden descomponerse naturalmente"
+      }
+    ]
+  }
+  

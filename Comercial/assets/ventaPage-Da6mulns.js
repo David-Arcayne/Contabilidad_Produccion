@@ -1,0 +1,1 @@
+import{_ as e}from"./_plugin-vue_export-helper-DlAUqK2U.js";import{ak as t,af as a}from"./index-nJ-Wgcif.js";const c={},o={class:"q-pa-md"};function r(s,n){return a(),t("div",o)}const m=e(c,[["render",r]]);export{m as default};

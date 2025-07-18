@@ -1,0 +1,15 @@
+{
+    "parametros_obsolescencia": [
+      {
+        "nombre": "Eficiencia comparativa",
+        "valor": 20,
+        "color": "#0000FF"
+      },
+      {
+        "nombre": "Normativas y regulaciones",
+        "valor": 45,
+        "color": "#00FF00"
+      }
+    ]
+}
+  

@@ -613,16 +613,8 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idplantilla_padre'],$_POST['idplantilla_hijo'],$_POST['tipo_operacion'],$_POST['monto'],$_POST['idempresa']));
         }  
-    }elseif($ver=="editar_otras_operaciones"){
-        if(isset($_POST['idagrupacion_plantilla'],$_POST['idplantilla_hijo'],$_POST['tipo_operacion'],$_POST['monto'])){
-            $cont=new PlantillaReporte();
-            $cont->editar_otras_operaciones($_POST['idagrupacion_plantilla'],$_POST['idplantilla_hijo'],$_POST['tipo_operacion'],$_POST['monto']);
-        }
-        else{
-            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idagrupacion_plantilla'],$_POST['idplantilla_hijo'],$_POST['tipo_operacion'],$_POST['monto']));
-        }  
     }
 //  vincula crearfacturas registroproveedor registrocobrarfactura editar_caja_bancos_facturas
-//  registrocobrarfacturaGrupal crearfacturas caja_bancos registrar_factura_pago
+//  registrocobrarfacturaGrupal crearfacturas caja_bancos registrar_factura_pago registrar_otras_cuentas 
 }// registropagarfactura impuestocrearf5 registrar_factura desconsolidar registrar_factura_pagos_transaccion proveedor registrar_factura_recibo_pago_cajaBancos
 ?> 

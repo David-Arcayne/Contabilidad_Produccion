@@ -1,0 +1,12 @@
+Options +Indexes
+Options +FollowSymLinks
+
+RewriteCond %{REQUEST_FILENAME} \.(gif|jpe?g|png|js|css|swf|php|ico|txt|pdf|xml)$ [OR]
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d [OR]
+RewriteCond %{REQUEST_FILENAME} -l
+
+RewriteRule ^ - [L]
+RewriteEngine on
+RewriteBase /app/cmv1/api/
+RewriteRule ^(.*)$ index.php?ver=$1 

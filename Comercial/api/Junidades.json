@@ -1,0 +1,45 @@
+{
+    "unidades": [
+      {
+        "nombre": "L",
+        "descripcion": "Litros"
+      },
+      {
+        "nombre": "g",
+        "descripcion": "Gramos"
+      },
+      {
+        "nombre": "kg",
+        "descripcion": "Kilogramos"
+      },
+      {
+        "nombre": "cm",
+        "descripcion": "Centímetros"
+      },
+      {
+        "nombre": "m",
+        "descripcion": "Metros"
+      },
+      {
+        "nombre": "unidad",
+        "descripcion": "Piezas"
+      },
+      {
+        "nombre": "pack",
+        "descripcion": "Paquetes"
+      },
+      {
+        "nombre": "dz",
+        "descripcion": "Docenas"
+      },
+      {
+        "nombre": "box",
+        "descripcion": "Cajas"
+      },
+      {
+        "nombre": "roll",
+        "descripcion": "Rollos"
+      }
+    ]
+  }
+  

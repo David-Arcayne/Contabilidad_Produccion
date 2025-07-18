@@ -1,0 +1,29 @@
+{
+    "caracteristicas_productos": [
+      {
+        "nombre_medida": "Nacional",
+        "descripcion": "Fabricado dentro del país, con materias primas locales."
+      },
+      {
+        "nombre_medida": "Importado",
+        "descripcion": "Traído desde otro país, sujeto a impuestos y regulaciones aduaneras."
+      },
+      {
+        "nombre_medida": "Artesanal",
+        "descripcion": "Hecho a mano con técnicas tradicionales."
+      },
+      {
+        "nombre_medida": "Industrial",
+        "descripcion": "Producido en masa mediante procesos automatizados."
+      },
+      {
+        "nombre_medida": "Personalizado",
+        "descripcion": "Adaptado a las necesidades específicas del cliente."
+      },
+      {
+        "nombre_medida": "Ecológico",
+        "descripcion": "Fabricado con materiales sostenibles y menor impacto ambiental."
+      }
+    ]
+  }
+  

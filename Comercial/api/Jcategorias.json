@@ -1,0 +1,62 @@
+{
+  "categorias": [
+    {
+      "id": 1,
+      "nombre": "Alimentos y Bebidas",
+      "descripcion": "Productos comestibles y bebidas para consumo humano",
+      "subcategorias": [
+        {
+          "nombre": "Alimentos frescos",
+          "descripcion": "Frutas, verduras, carnes, pescados"
+        },
+        {
+          "nombre": "Alimentos procesados",
+          "descripcion": "Conservas, embutidos, enlatados"
+        },
+        {
+          "nombre": "Panadería y repostería",
+          "descripcion": "Panes, pasteles, galletas"
+        },
+        {
+          "nombre": "Lácteos y derivados",
+          "descripcion": "Leche, yogur, quesos"
+        },
+        {
+          "nombre": "Bebidas alcohólicas",
+          "descripcion": "Cervezas, vinos, licores"
+        },
+        {
+          "nombre": "Bebidas no alcohólicas",
+          "descripcion": "Jugos, refrescos, agua, té"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "nombre": "Tecnología y Electrónica",
+      "descripcion": "Dispositivos electrónicos y equipos tecnológicos",
+      "subcategorias": [
+        {
+          "nombre": "Computadoras y accesorios",
+          "descripcion": "Laptops, teclados, ratones"
+        },
+        {
+          "nombre": "Dispositivos móviles",
+          "descripcion": "Celulares, tablets, smartwatches"
+        },
+        {
+          "nombre": "Electrodomésticos",
+          "descripcion": "Refrigeradores, lavadoras, microondas"
+        },
+        {
+          "nombre": "Audio y video",
+          "descripcion": "Televisores, parlantes, auriculares"
+        },
+        {
+          "nombre": "Fotografía y video",
+          "descripcion": "Cámaras, drones, accesorios"
+        }
+      ]
+    }
+  ]
+}

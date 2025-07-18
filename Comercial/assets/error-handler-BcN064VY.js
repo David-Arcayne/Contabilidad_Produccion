@@ -1,0 +1,1 @@
+import{N as a}from"./index-DSCA4nPx.js";const s=({app:e})=>{e.config.errorHandler=(r,t,o)=>{console.error("Error global:",r,o),a.create({type:"negative",message:"Ocurrió un error inesperado",caption:r.message,timeout:5e3})}};export{s as default};

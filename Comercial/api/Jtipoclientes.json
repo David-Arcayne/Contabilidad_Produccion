@@ -1,0 +1,17 @@
+{
+  "tipos_clientes": [
+    {
+      "tipo": "Clientes mayoristas",
+      "descripcion": "Compran grandes volúmenes para distribución."
+    },
+    {
+      "tipo": "Clientes minoristas",
+      "descripcion": "Compran productos en pequeñas cantidades."
+    },
+    {
+      "tipo": "Clientes ocasionales",
+      "descripcion": "Compran solo en ocasiones especiales."
+    }
+  ]
+}
+  
