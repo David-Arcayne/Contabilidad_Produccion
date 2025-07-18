@@ -1637,12 +1637,11 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             // FROM usuario AS u 
             // INNER JOIN trabajador AS t ON t.idtrabajador = u.trabajador_idtrabajador
             // WHERE u.idusuario = '$bb[idusuario]'");
-        $trabajador=$this->dbrh->query("SELECT u.nombre AS usuario_nombre, t.nombre AS nombre_trabajador,t.idtrabajador, t.apellido, t.ci 
-            FROM usuario AS u 
-            INNER JOIN trabajador AS t ON t.idtrabajador = u.trabajador_idtrabajador
-            WHERE t.idtrabajador = '$bb[idtrabajador]'");
-            $traba = $trabajador->fetch_assoc();
             
+        $trabajador=$this->dbrh->query("SELECT * FROM trabajador
+        WHERE idtrabajador = '$bb[idtrabajador]'");
+        $traba = $trabajador->fetch_assoc();
+
             $registro3=$this->dbrh->query("SELECT * FROM usuario WHERE trabajador_idtrabajador = '$bb[idtrabajador]'");
             if($registro3->num_rows > 0){
                 $usuario = $registro3->fetch_assoc();
