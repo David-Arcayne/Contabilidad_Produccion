@@ -1067,7 +1067,7 @@ $totalHaber = 0;
             detalletransaccion AS d
           WHERE
             d.idplandecuenta = '$plan'
-            AND d.transacciones_idtransacciones='$qwe[3]' ");
+            AND d.transacciones_idtransacciones='$qwe[3]'");
             while($asd=$this->dbc->fetch($detallet)){
                 $res=array("debe"=>$asd[1],"haber"=>$asd[2]);
                 array_push($detalle,$res);
@@ -1775,7 +1775,7 @@ if ($pcuentas->num_rows > 0) {
         echo json_encode($lista); 
        }
   //reportedetallefpt reporteactivodiaponibledos reportedetalletransaccion estado consolidar reporteactivoypasivo resultados reportecomprobantecontable                
-//reportecomprobantecontable reporteactivodisponible reportedetalletransaccion mayorcuentacontable reportecomprobantecontable firmas reporteactivoypasivo reportebalancegeneral
+//re mayorcuentacontable reportecomprobantecontable firmas reporteactivoypasivo reportebalancegeneral mayor
 
 }
 

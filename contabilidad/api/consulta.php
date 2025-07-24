@@ -540,10 +540,27 @@ elseif($ver[0]=="rp_listar_plantilla"){
 }elseif($ver[0]=="eliminar_otras_operaciones"){
     $cont=new PlantillaReporte();
     $cont->eliminar_otras_operaciones($ver[1]);
+}elseif($ver[0]=="listar_otras_cuentas_cobrar_select"){
+    $cont=new Documento_cobro();
+    $cont->listar_otras_cuentas_cobrar_select($ver[1]);
+}elseif($ver[0]=="listar_otras_cuentas_pagar_select"){
+    $cont=new Documento_cobro();
+    $cont->listar_otras_cuentas_pagar_select($ver[1]);
+}elseif($ver[0]=="lista_cobrar_cobrado_factura_select"){
+    $cont=new Contabilidad();
+    $cont->lista_cobrar_cobrado_factura_select($ver[1]);
+}elseif($ver[0]=="lista_pagar_pagado_factura_select"){
+    $cont=new Contabilidad();
+    $cont->lista_pagar_pagado_factura_select($ver[1]);
+}elseif($ver[0]=="listar_monto_factura_cajas"){
+    $cont=new Caja_bancos_recibos();
+    $cont->listar_monto_factura_cajas($ver[1],$ver[2]);
+}elseif($ver[0]=="listar_datos_contrataciones_cajas"){
+    $cont=new Caja_bancos_recibos();
+    $cont->listar_datos_contrataciones_cajas($ver[1],$ver[2]);
 }
-
 //  listar_recibo_por_caja_bancos listar_firma_reporte
-//  caja_banco listatransacciones_comercial alerta reportebalancegeneral listafacturaapi_pagado
-//listaf   re listar_otras_cuentas existe_empresa_modulo listafactura_cobrado_trans listar_usuarios
+//  caja_banco listatransacciones_comercial alerta reportebalancegeneral listafacturaapi_pagado lista_cobrar_cobrado_factura
+//listaf   re listar_otras_cuentas existe_empresa_modulo listafactura_cobrado_trans listar_usuarios 
 //report reportecomprobantecontable eliminarfactura listar_caja_bancos_usuarios listar_usuarios listar_caja_bancos_por_usuario
 ?>

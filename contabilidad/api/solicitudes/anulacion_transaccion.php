@@ -191,12 +191,13 @@ public function registrar_anular_eliminar_activar_transaccion($idtransaccion,$mo
                  $resElimi = $eliminado->fetch_assoc();
                  $codig = $resElimi['codigotransaccion'];
                  $idempresa = $resElimi['organizacion_idorganizacion'];
+                 $idgestion = $resElimi['idgestion'];
 
                 $delete_transaccion=$this->dbc->query("DELETE FROM transacciones
                     WHERE idtransacciones = '$idtransaccion'");  
                 // -----------------------------------------------------------------------------
                 $transs=$this->dbc->query("SELECT * FROM transacciones 
-                    WHERE codigotransaccion > '$codig' AND organizacion_idorganizacion = '$idempresa'");
+                    WHERE codigotransaccion > '$codig' AND organizacion_idorganizacion = '$idempresa' AND idgestion = '$idgestion'");
                     $aux=0;
                     if ($transs->num_rows === 0){
                         // $res = array("success", "Se Elimino correctamente");

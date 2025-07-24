@@ -451,8 +451,8 @@ while ($qwe = $this->dbc->fetch($registro)) {
         // $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idempresa = '$idempresa' ORDER BY idotras_cuentas DESC");
 
                $getPedido = $this->dbc->query("SELECT *
-                    FROM otras_cuentas oc,transacciones t
-                    WHERE oc.clase_otras_cuentas='2' AND oc.idempresa='$idempresa' AND oc.transacciones_idtransacciones=t.idtransacciones ORDER BY oc.idotras_cuentas DESC");
+                    FROM otras_cuentas oc
+                    WHERE oc.clase_otras_cuentas='2' AND oc.idempresa='$idempresa' ORDER BY oc.idotras_cuentas DESC");
 
         while ($qwe = $this->dbc->fetch($getPedido)) {
 
@@ -802,8 +802,8 @@ while ($qwe = $this->dbc->fetch($registro)) {
         // $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idempresa = '$idempresa' ORDER BY idotras_cuentas DESC");
 
                $getPedido = $this->dbc->query("SELECT *
-                    FROM otras_cuentas oc,transacciones t
-                    WHERE oc.clase_otras_cuentas='1' AND oc.idempresa='$idempresa' AND oc.transacciones_idtransacciones=t.idtransacciones ORDER BY oc.idotras_cuentas DESC");
+                    FROM otras_cuentas oc
+                    WHERE oc.clase_otras_cuentas='1' AND oc.idempresa='$idempresa' ORDER BY oc.idotras_cuentas DESC");
 
         while ($qwe = $this->dbc->fetch($getPedido)) {
 
@@ -925,6 +925,87 @@ while ($qwe = $this->dbc->fetch($registro)) {
         echo json_encode($res);
     }
 
+    public function listar_otras_cuentas_cobrar_select($empresa) {
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+        $lista = [];
+        $idempresa = $this->getidempresa($empresa);
+    
+        // Preparar la consulta
+        // $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idempresa = '$idempresa' ORDER BY idotras_cuentas DESC");
+
+               $getPedido = $this->dbc->query("SELECT *
+                    FROM otras_cuentas oc
+                    WHERE oc.clase_otras_cuentas='2' AND oc.idempresa='$idempresa' ORDER BY oc.idotras_cuentas DESC");
+
+        while ($qwe = $this->dbc->fetch($getPedido)) {
+
+            $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='$qwe[id_cliente_proveedor]'");
+            $cl = $this->dbcm->fetch($cliente);
+
+            $cobras = $this->dbc->query("SELECT SUM(monto) FROM cuentaspof WHERE idotras_cuentas='$qwe[0]'"); //173
+                    $asd = $this->dbc->fetch($cobras);
+                    $saldo = $qwe['precio'] - $asd[0];
+
+            if($saldo != 0){
+                $res = array(
+                "idotras_cuentas" => $qwe['idotras_cuentas'],
+                "fecha" => $qwe['fecha'],
+                "nro_otras_cuentas" => $qwe['nro_otras_cuentas'],
+                "saldo" => $saldo,
+                "nombrep" => $cl['nombre']
+                );
+                array_push($lista, $res);
+            }else{
+
+            }
+            // array_push($lista, $res);
+        }
+    
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
+
+    public function listar_otras_cuentas_pagar_select($empresa) {
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+        $lista = [];
+        $idempresa = $this->getidempresa($empresa);
+    
+        // Preparar la consulta
+        // $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idempresa = '$idempresa' ORDER BY idotras_cuentas DESC");
+
+               $getPedido = $this->dbc->query("SELECT *
+                    FROM otras_cuentas oc
+                    WHERE oc.clase_otras_cuentas='1' AND oc.idempresa='$idempresa' ORDER BY oc.idotras_cuentas DESC");
+
+        while ($qwe = $this->dbc->fetch($getPedido)) {
+
+            $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='$qwe[id_cliente_proveedor]'");
+            $prov = $this->dbcm->fetch($proveedor);
+
+            $cobras = $this->dbc->query("SELECT SUM(monto) FROM cuentaspor WHERE idotras_cuentas='$qwe[0]'"); //173
+                    $asd = $this->dbc->fetch($cobras);
+                    $saldo = $qwe['precio'] - $asd[0];
+
+            if($saldo != '0'){
+                $res = array(
+                "idotras_cuentas" => $qwe['idotras_cuentas'],
+                "fecha" => $qwe['fecha'],
+                "nro_otras_cuentas" => $qwe['nro_otras_cuentas'],
+                "saldo" => $saldo,
+                "nombrep" => $prov['nombre']
+                );
+                array_push($lista, $res);
+            }else{
+
+            }
+            // array_push($lista, $res);
+        }
+    
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
     public function getidempresa($md5)
     {
         $registro = $this->dbe->query("select * from organizacion where md5(idorganizacion)='$md5'");

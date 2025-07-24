@@ -1950,6 +1950,147 @@ WHERE
         }
         echo json_encode($res);
     }
+
+    public function lista_cobrar_cobrado_factura_select($sucursal)
+    {
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+        //cobrar
+        $lista = [];
+        $cf = 2;
+        $idsucursal = $this->getidsucursal($sucursal);
+        $registro = $this->dbc->query("SELECT f.idfactura,f.fecha,f.nfactura,t.codigotransaccion, f.montofactura,f.proveedorcliente_idproveedorcliente,f.transacciones_idtransacciones,f.cuenta,f.cobrado,f.por_concepto_de
+         FROM factura f,transacciones t
+         WHERE f.clasefactura='$cf' AND f.sucursal='$idsucursal' AND f.transacciones_idtransacciones=t.idtransacciones ORDER BY f.idfactura DESC");
+        while ($qwe = $this->dbc->fetch($registro)) {
+
+            // CONSULTA PARA SABER SI HAY INDIVIDUALES
+            $hay_indi = $this->dbc->query("SELECT COUNT(*) AS hay_individual FROM cuentaspof WHERE idfactura='$qwe[0]'");
+            $resultado = $hay_indi->fetch_assoc();
+            $hayIndividuales = $resultado['hay_individual'];
+
+            // CONSULTA PARA SABER SI HAY GRUPALES
+            $hay_grup = $this->dbc->query("SELECT COUNT(*) AS hay_grupal FROM cuentascobrar_grupal WHERE idfactura='$qwe[0]'");
+            $resultado2 = $hay_grup->fetch_assoc();
+            $hayGrupales = $resultado2['hay_grupal'];
+            // $asd = $this->dbc->fetch($cobras);
+            $proveedor = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $qwe[5] . "'");
+            $pro = $this->dbcm->fetch($proveedor);
+            if($hayIndividuales > 0){
+                if($hayGrupales > 0){
+                    // hay grupales e individuales
+
+                }else{
+                    //hay solo individuales
+                    
+                    $cobras = $this->dbc->query("SELECT SUM(monto) FROM cuentaspof WHERE idfactura='$qwe[0]'"); //173
+                    $asd = $this->dbc->fetch($cobras);
+                    $saldo = $qwe[4] - $asd[0];
+
+                    $formateado = number_format($saldo, 2); 
+                    if($formateado != 0){
+                        $res = array("id" => $qwe[0], "fecha" => $qwe[1], "numero" => $qwe[2], "codigo" => $qwe[3], "idproveedor" => $qwe[5], "nombrep" => $pro['nombre'], "monto" => $qwe[4], "pagado" => $asd[0], "saldo" => $saldo, "transaccion" => $qwe[6], "cuenta" => $qwe[7],"por_concepto_de" => $qwe['por_concepto_de']);
+                        array_push($lista, $res);
+                    }else{
+
+                    }
+                    
+                }//listapagos
+            }elseif($hayGrupales > 0){
+                //hay solo grupales 
+
+            }
+            elseif($qwe[8] == 2){
+                //FACTURAS Q NO TIENEN NINGUN RECIBO pero si estan pagados
+                $nombrep = isset($pro['nombre']) ? $pro['nombre'] : 'Desconocido';
+            
+            }
+            else{
+                //FACTURAS Q NO TIENEN NINGUN RECIBO
+            
+            $res = array("id" => $qwe[0], "fecha" => $qwe[1], "numero" => $qwe[2],
+             "codigo" => $qwe[3], "idproveedor" => $qwe[5], "nombrep" => $pro['nombre'],
+              "monto" => $qwe[4], "pagado" => 0, "saldo" => $qwe[4], "transaccion" => $qwe[6],
+               "cuenta" => $qwe[7],"por_concepto_de" => $qwe['por_concepto_de']);
+            array_push($lista, $res);
+            
+        }
+        
+    }
+    echo json_encode($lista);
+}
+
+    public function lista_pagar_pagado_factura_select($sucursal)
+    {
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+        //cobrar
+        $lista = [];
+        $cf = 1;
+        $idsucursal = $this->getidsucursal($sucursal);
+        $registro = $this->dbc->query("SELECT f.idfactura,f.fecha,f.nfactura,t.codigotransaccion, f.montofactura,f.proveedorcliente_idproveedorcliente,f.transacciones_idtransacciones,f.cuenta,f.cobrado,f.por_concepto_de
+         FROM factura f,transacciones t
+         WHERE f.clasefactura='$cf' AND f.sucursal='$idsucursal' AND f.transacciones_idtransacciones=t.idtransacciones ORDER BY f.idfactura DESC");
+        while ($qwe = $this->dbc->fetch($registro)) {
+
+            // CONSULTA PARA SABER SI HAY INDIVIDUALES
+            $hay_indi = $this->dbc->query("SELECT COUNT(*) AS hay_individual FROM cuentaspor WHERE idfactura='$qwe[0]'");
+            $resultado = $hay_indi->fetch_assoc();
+            $hayIndividuales = $resultado['hay_individual'];
+
+            // CONSULTA PARA SABER SI HAY GRUPALES
+            $hay_grup = $this->dbc->query("SELECT COUNT(*) AS hay_grupal FROM cuentaspagar_grupal WHERE idfactura='$qwe[0]'");
+            $resultado2 = $hay_grup->fetch_assoc();
+            $hayGrupales = $resultado2['hay_grupal'];
+            // $asd = $this->dbc->fetch($cobras);
+            $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='" . $qwe[5] . "'");
+            $pro = $this->dbcm->fetch($proveedor);
+            if($hayIndividuales > 0){
+                if($hayGrupales > 0){
+                    // hay grupales e individuales
+
+                }else{
+                    //hay solo individuales
+                    
+                    $cobras = $this->dbc->query("SELECT SUM(monto) FROM cuentaspor WHERE idfactura='$qwe[0]'"); //173
+                    $asd = $this->dbc->fetch($cobras);
+                    $saldo = $qwe[4] - $asd[0];
+
+                    $formateado = number_format($saldo, 2); 
+                    if($formateado != 0){
+                        $res = array("id" => $qwe[0], "fecha" => $qwe[1], "numero" => $qwe[2], "codigo" => $qwe[3], "idproveedor" => $qwe[5], "nombrep" => $pro['nombre'], "monto" => $qwe[4], "pagado" => $asd[0], "saldo" => $saldo, "transaccion" => $qwe[6], "cuenta" => $qwe[7],"por_concepto_de" => $qwe['por_concepto_de']);
+                        array_push($lista, $res);
+                    }else{
+
+                    }
+                    
+                }//listapagos
+            }elseif($hayGrupales > 0){
+                //hay solo grupales 
+
+            }
+            elseif($qwe[8] == 2){
+                //FACTURAS Q NO TIENEN NINGUN RECIBO pero si estan pagados
+                $nombrep = isset($pro['nombre']) ? $pro['nombre'] : 'Desconocido';
+            
+            }
+            else{
+                //FACTURAS Q NO TIENEN NINGUN RECIBO
+            
+            $res = array("id" => $qwe[0], "fecha" => $qwe[1], "numero" => $qwe[2],
+             "codigo" => $qwe[3], "idproveedor" => $qwe[5], "nombrep" => $pro['nombre'],
+              "monto" => $qwe[4], "pagado" => 0, "saldo" => $qwe[4], "transaccion" => $qwe[6],
+               "cuenta" => $qwe[7],"por_concepto_de" => $qwe['por_concepto_de']);
+            array_push($lista, $res);
+            
+        }
+        
+    }
+    echo json_encode($lista);
+}
+
     //listafactura listafactura_pagado registrocobrarfactura registrorelacionip lista_cobrar_cobrado_factura listaimpuestoentreplan getgestionactualid
 }//eliminarcobrados listapagos  listaimpuestoentreplan lista_plan_cuenta_no_vinculada lista_cobrar_cobrado_factura row cambiarestadoconsolidado crearfacturas
 //registrardesconsolidar crearfactura   registropagarfactura listaclientes  listafacturaapi_cobrado listafacturaapi_pagado registrar_factura_cobros_tributario
