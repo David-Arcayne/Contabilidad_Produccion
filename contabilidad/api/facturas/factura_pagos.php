@@ -285,4 +285,17 @@ class Factura_pagos extends DB{
         }
         echo json_encode($res);
     }
+
+    public function anular_factura_transaccion_pago($idfactura)
+    {
+        $res = "";
+        $edit_fact = $this->dbc->query("UPDATE factura SET estado = '2' WHERE idfactura='$idfactura'");
+        if ($edit_fact === TRUE) {
+            $edit_recibo = $this->dbc->query("UPDATE cuentaspor SET estado = '2' WHERE idfactura='$idfactura'");
+            $res = array("success", "Registro Correcto");
+        } else {
+            $res = array("danger", "No se pudo realizar el registro");
+        }
+        echo json_encode($res);
+    }
 }

@@ -731,7 +731,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
     if($tipo_filtro == '1'){ //TIPO = 1 --> INGRESO,  2-->EGRESO, 3--> AMBOS
 
-    $getPedido = $this->dbc->query("SELECT cp.idcuentaspof,cp.nrecibo,cp.fecha,cp.transaccion,cp.cliente,cp.idfactura,cp.idotras_cuentas,cp.archivo,cp.registro_desde, dc.idcaja_bancos,dc.monto,dc.idfactura
+    $getPedido = $this->dbc->query("SELECT cp.idcuentaspof,cp.nrecibo,cp.lugar,cp.persona,cp.ci,cp.fecha,cp.transaccion,cp.cliente,cp.idfactura,cp.idotras_cuentas,cp.archivo,cp.registro_desde, dc.idcaja_bancos,dc.monto,dc.idfactura
     FROM detalle_caja_bancos_cobrar dc
     INNER JOIN cuentaspof cp ON cp.idcuentaspof = dc.idcuentaspof
     WHERE dc.idcaja_bancos = '$idcaja_bancos'
@@ -818,6 +818,9 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         "fecha" => $qwe['fecha'],
                         "idrecibo" => $qwe['idcuentaspof'],
                         "nrecibo" => $qwe['nrecibo'],
+                        "lugar" => $qwe['lugar'],
+                        "persona" => $qwe['persona'],
+                        "ci" => $qwe['ci'],
                         "nro_documento" => "$oc[nro_otras_cuentas]",
                         "por_concepto_de" => "$oc[concepto]",
                         "idtipo" => "$oc[idtipo]",
@@ -846,6 +849,9 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                     "fecha" => $qwe['fecha'],
                     "idrecibo" => $qwe['idcuentaspof'],
                     "nrecibo" => $qwe['nrecibo'],
+                    "lugar" => $qwe['lugar'],
+                    "persona" => $qwe['persona'],
+                    "ci" => $qwe['ci'],
                     "nro_documento" => "$oc[nro_otras_cuentas]",
                     "por_concepto_de" => "$oc[concepto]",
                     "idtipo" => "$oc[idtipo]",
@@ -891,6 +897,9 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         "idrecibo" => $qwe['idcuentaspof'],
                         "fecha" => $qwe['fecha'],
                         "nrecibo" => $qwe['nrecibo'],
+                        "lugar" => $qwe['lugar'],
+                        "persona" => $qwe['persona'],
+                        "ci" => $qwe['ci'],
                         "nro_documento" => "$fact[nfactura]",
                         "por_concepto_de" => "$fact[por_concepto_de]",
                         "codigotransaccion" => $tr['codigotransaccion'],
@@ -918,6 +927,9 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                     "idrecibo" => $qwe['idcuentaspof'],
                     "fecha" => $qwe['fecha'],
                     "nrecibo" => $qwe['nrecibo'],
+                    "lugar" => $qwe['lugar'],
+                    "persona" => $qwe['persona'],
+                    "ci" => $qwe['ci'],
                     "nro_documento" => "$fact[nfactura]",
                     "codigotransaccion" => $tr['codigotransaccion'],
                     "id_cliente" => $cl['id_cliente'],
@@ -954,7 +966,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 //         ini_set('display_startup_errors', 1);
 //         error_reporting(E_ALL);
 
-        $getPedido = $this->dbc->query("SELECT cp.idcuentaspor,cp.nrecibo,cp.fecha,cp.transaccion,cp.cliente,cp.idfactura,cp.idotras_cuentas,cp.archivo, dc.idcaja_bancos,dc.monto,dc.idfactura
+        $getPedido = $this->dbc->query("SELECT cp.idcuentaspor,cp.nrecibo,cp.lugar,cp.persona,cp.ci,cp.fecha,cp.transaccion,cp.cliente,cp.idfactura,cp.idotras_cuentas,cp.archivo, dc.idcaja_bancos,dc.monto,dc.idfactura
         FROM detalle_caja_bancos_pagar dc
         INNER JOIN cuentaspor cp ON cp.idcuentaspor = dc.idcuentaspor
         WHERE dc.idcaja_bancos = '$idcaja_bancos'
@@ -1041,6 +1053,9 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "idrecibo" => $qwe['idcuentaspor'],
                             "fecha" => $qwe['fecha'],
                             "nrecibo" => $qwe['nrecibo'],
+                            "lugar" => $qwe['lugar'],
+                            "persona" => $qwe['persona'],
+                            "ci" => $qwe['ci'],
                             "nro_documento" => "$oc[nro_otras_cuentas]",
                             "por_concepto_de" => "$oc[concepto]",
                             "idtipo" => "$oc[idtipo]",
@@ -1069,6 +1084,9 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         "idrecibo" => $qwe['idcuentaspor'],
                         "fecha" => $qwe['fecha'],
                         "nrecibo" => $qwe['nrecibo'],
+                        "lugar" => $qwe['lugar'],
+                        "persona" => $qwe['persona'],
+                        "ci" => $qwe['ci'],
                         "nro_documento" => "$oc[nro_otras_cuentas]",
                         "idtipo" => "$oc[idtipo]",
                         "codigotransaccion" => $tr['codigotransaccion'],
@@ -1112,6 +1130,9 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "idrecibo" => $qwe['idcuentaspor'],
                             "fecha" => $qwe['fecha'],
                             "nrecibo" => $qwe['nrecibo'],
+                            "lugar" => $qwe['lugar'],
+                            "persona" => $qwe['persona'],
+                            "ci" => $qwe['ci'],
                             "nro_documento" => "$fact[nfactura]",
                             "por_concepto_de" => $fact['por_concepto_de'],
                             "codigotransaccion" => $tr['codigotransaccion'],
@@ -1138,6 +1159,9 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         "tipo_documento" => 2,
                         "idrecibo" => $qwe['idcuentaspor'],
                         "nrecibo" => $qwe['nrecibo'],
+                        "lugar" => $qwe['lugar'],
+                        "persona" => $qwe['persona'],
+                        "ci" => $qwe['ci'],
                         "nro_documento" => "$fact[nfactura]",
                         "por_concepto_de" => "$fact[por_concepto_de]",
                         "codigotransaccion" => $tr['codigotransaccion'],
@@ -1177,7 +1201,10 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         // error_reporting(E_ALL);
         $getPedido = $this->dbc->query("SELECT 
             cp.idcuentaspor AS id_cuenta,
-            cp.nrecibo, 
+            cp.nrecibo,
+            cp.lugar,
+            cp.persona,
+            cp.ci, 
             cp.fecha, 
             cp.transaccion, 
             cp.cliente, 
@@ -1198,7 +1225,10 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
         SELECT 
             cp.idcuentaspof AS id_cuenta,
-            cp.nrecibo, 
+            cp.nrecibo,
+            cp.lugar,
+            cp.persona,
+            cp.ci,  
             cp.fecha,
             cp.transaccion, 
             cp.cliente, 
@@ -1401,6 +1431,9 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "tipo_documento" => 3,
                             "idrecibo" => $qwe['id_cuenta'],
                             "nrecibo" => $qwe['nrecibo'],
+                            "lugar" => $qwe['lugar'],
+                            "persona" => $qwe['persona'],
+                            "ci" => $qwe['ci'],
                             "nro_documento" => "$oc[nro_otras_cuentas]",
                             "por_concepto_de" => "$oc[concepto]",
                             "idtipo" => "$oc[idtipo]",
@@ -1428,6 +1461,9 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "tipo_documento" => 1,
                             "idrecibo" => $qwe['id_cuenta'],
                             "nrecibo" => $qwe['nrecibo'],
+                            "lugar" => $qwe['lugar'],
+                            "persona" => $qwe['persona'],
+                            "ci" => $qwe['ci'],
                             "nro_documento" => $factu,
                             "por_concepto_de" => $fact['por_concepto_de'],
                             "codigotransaccion" => $tr['codigotransaccion'],
@@ -1456,6 +1492,9 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "tipo_documento" => 4,
                             "idrecibo" => $qwe['id_cuenta'],
                             "nrecibo" => $qwe['nrecibo'],
+                            "lugar" => $qwe['lugar'],
+                            "persona" => $qwe['persona'],
+                            "ci" => $qwe['ci'],
                             "nro_documento" => "$oc[nro_otras_cuentas]",
                             "por_concepto_de" => "$oc[concepto]",
                             "idtipo" => "$oc[idtipo]",
@@ -1483,6 +1522,9 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "tipo_documento" => 2,
                             "idrecibo" => $qwe['id_cuenta'],
                             "nrecibo" => $qwe['nrecibo'],
+                            "lugar" => $qwe['lugar'],
+                            "persona" => $qwe['persona'],
+                            "ci" => $qwe['ci'],
                             "nro_documento" => $factu,
                             "por_concepto_de" => $fact['por_concepto_de'],
                             "codigotransaccion" => $tr['codigotransaccion'],
@@ -2486,6 +2528,23 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
 
+    public function editar_recibo_caja_bancos($idrecibo,$lugar,$persona,$ci,$fecha){
+
+        if (0 > 0) {
+            $res = array("danger", "El registro ya existe","Error");
+        } else {
+            // Insertar el nuevo registro
+            $registroProveedor = $this->dbc->query("UPDATE cuentaspof 
+            SET lugar = '$lugar',persona = '$persona',ci = '$ci',fecha = '$fecha' WHERE idcuentaspof = '$idrecibo'");
+            if ($registroProveedor === TRUE) {                                                                                                                                                                
+                $res = array("success", "Registro exitoso","registroCaracteristicas");
+            } else {
+                $res = array("danger", "No se pudo registrar");
+            }
+        }
+        echo json_encode($res);
+        
+    }
     public function getidusuario($md5){
         $registro=$this->dbrh->query("select * from usuario where md5(idusuario)='$md5'");
         $qwe=$this->dbrh->fetch($registro);

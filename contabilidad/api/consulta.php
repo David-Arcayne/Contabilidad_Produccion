@@ -559,7 +559,7 @@ elseif($ver[0]=="rp_listar_plantilla"){
     $cont=new Caja_bancos_recibos();
     $cont->listar_datos_contrataciones_cajas($ver[1],$ver[2]);
 }
-//  listar_recibo_por_caja_bancos listar_firma_reporte
+//  listar_recibo_por_caja_bancos listar_firma_reporte eliminarfactura
 //  caja_banco listatransacciones_comercial alerta reportebalancegeneral listafacturaapi_pagado lista_cobrar_cobrado_factura
 //listaf   re listar_otras_cuentas existe_empresa_modulo listafactura_cobrado_trans listar_usuarios 
 //report reportecomprobantecontable eliminarfactura listar_caja_bancos_usuarios listar_usuarios listar_caja_bancos_por_usuario

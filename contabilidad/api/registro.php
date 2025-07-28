@@ -649,8 +649,17 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idotras_cuentas'],$_POST['fecha'],$_POST['lugar'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['trans'],$_POST['idcaja_bancos'],$_FILES['archivo'],$_POST['registro_desde'],$_POST['sucursal'],$_POST['empresa']));
         }  
+    }elseif($ver=="editar_recibo_caja_bancos"){
+        if(isset($_POST['idrecibo'],$_POST['lugar'],$_POST['persona'],$_POST['ci'],$_POST['fecha'])){
+            $cont=new Caja_bancos_recibos();
+            $cont->editar_recibo_caja_bancos($_POST['idrecibo'],$_POST['lugar'],$_POST['persona'],$_POST['ci'],$_POST['fecha']);
+        }
+        // $idfact,$fecha,$lugar,$persona, $ci,$monto, $asiento,$trans,$idcaja_bancos,$archivo,$registro_desde,$empresa
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idrecibo'],$_POST['lugar'],$_POST['persona'],$_POST['ci'],$_POST['fecha']));
+        }  
     }
-//  vincula crearfacturas registroproveedor registrocobrarfactura editar_caja_bancos_facturas -- 
+//  vincula crearfacturas registroproveedor registrocobrarfactura editar_caja_bancos_facturas -- crearfacturasf5
 //  registrocobrarfacturaGrupal crearfacturas caja_bancos registrar_factura_pago registrar_otras_cuentas 
 }// registropagarfactura impuestocrearf5 registrar_factura desconsolidar registrar_factura_pagos_transaccion proveedor registrar_factura_recibo_pago_cajaBancos
 ?> 
