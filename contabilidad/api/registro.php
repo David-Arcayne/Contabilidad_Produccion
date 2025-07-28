@@ -20,6 +20,7 @@ require_once "./facturas/factura_comercial.php";
 require_once "./configuracion/firma_reporte.php";
 require_once "./configuracion/reporte_confi.php";
 require_once "./configuracion/rp_plantilla_reporte.php";
+require_once "./otras_cuentas/forma_pago.php";
 
 $ver=$_POST['ver'];
 $json = file_get_contents('php://input'); // Decodificar el JSON en un arreglo PHP   gestion
@@ -657,6 +658,24 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         // $idfact,$fecha,$lugar,$persona, $ci,$monto, $asiento,$trans,$idcaja_bancos,$archivo,$registro_desde,$empresa
         else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idrecibo'],$_POST['lugar'],$_POST['persona'],$_POST['ci'],$_POST['fecha']));
+        }  
+    }elseif($ver=="registrar_forma_pago"){
+        if(isset($_POST['nombre'],$_POST['descripcion'],$_POST['empresa'])){
+            $cont=new Forma_pago();
+            $cont->registrar_forma_pago($_POST['nombre'],$_POST['descripcion'],$_POST['empresa']);
+        }
+        // $idfact,$fecha,$lugar,$persona, $ci,$monto, $asiento,$trans,$idcaja_bancos,$archivo,$registro_desde,$empresa
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['nombre'],$_POST['descripcion'],$_POST['empresa']));
+        }  
+    }elseif($ver=="editar_forma_pago"){
+        if(isset($_POST['idforma_pago'],$_POST['nombre'],$_POST['descripcion'],$_POST['empresa'])){
+            $cont=new Forma_pago();
+            $cont->editar_forma_pago($_POST['idforma_pago'],$_POST['nombre'],$_POST['descripcion'],$_POST['empresa']);
+        }
+        // $idfact,$fecha,$lugar,$persona, $ci,$monto, $asiento,$trans,$idcaja_bancos,$archivo,$registro_desde,$empresa
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idforma_pago'],$_POST['nombre'],$_POST['descripcion'],$_POST['empresa']));
         }  
     }
 //  vincula crearfacturas registroproveedor registrocobrarfactura editar_caja_bancos_facturas -- crearfacturasf5

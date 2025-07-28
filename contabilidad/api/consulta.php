@@ -21,6 +21,7 @@ require_once "./facturas/factura_comercial.php";
 require_once "./configuracion/firma_reporte.php";
 require_once "./configuracion/reporte_confi.php";
 require_once "./configuracion/rp_plantilla_reporte.php";
+require_once "./otras_cuentas/forma_pago.php";
 
 $ver=explode("/",$_GET['ver']); //dividiendo los "/"  ver[0],ver[1],ver[x]  listafacturaapi_pagado eliminarasiento tipo
 if($ver[0]=="verificacion"){
@@ -558,6 +559,12 @@ elseif($ver[0]=="rp_listar_plantilla"){
 }elseif($ver[0]=="listar_datos_contrataciones_cajas"){
     $cont=new Caja_bancos_recibos();
     $cont->listar_datos_contrataciones_cajas($ver[1],$ver[2]);
+}elseif($ver[0]=="listar_forma_pago"){
+    $cont=new Forma_pago();
+    $cont->listar_forma_pago($ver[1]);
+}elseif($ver[0]=="eliminar_forma_pago"){
+    $cont=new Forma_pago();
+    $cont->eliminar_forma_pago($ver[1]);
 }
 //  listar_recibo_por_caja_bancos listar_firma_reporte eliminarfactura
 //  caja_banco listatransacciones_comercial alerta reportebalancegeneral listafacturaapi_pagado lista_cobrar_cobrado_factura
