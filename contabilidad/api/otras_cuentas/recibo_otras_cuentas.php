@@ -375,9 +375,9 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
     }
 
     public function listar_recibo_otras_cuentas_pagar($idotras_cuentas) {
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
 
         $lista = [];
         // $idempresa = $this->getidempresa($empresa);
