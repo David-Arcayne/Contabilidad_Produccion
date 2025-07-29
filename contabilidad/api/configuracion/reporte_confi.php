@@ -796,51 +796,69 @@ class Reporte_confi extends DB{
         }
         echo json_encode($res);
     }
-    public function eliminar_configuracion_reporte($id){
+    // public function eliminar_configuracion_reporte($id){
         
-            // $consulta3 = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE idconfiguracion_reporte = '$id'");
-            // $resultado3 = $consulta3->fetch_assoc();
+    //         // $consulta3 = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE idconfiguracion_reporte = '$id'");
+    //         // $resultado3 = $consulta3->fetch_assoc();
 
-            // $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM configuracion_reporte WHERE idplandecuenta = '$resultado3[idcuenta]' AND idempresa = '$resultado3[idempresa]'");
-            // $resultado33 = $consulta->fetch_assoc(); 
+    //         // $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM configuracion_reporte WHERE idplandecuenta = '$resultado3[idcuenta]' AND idempresa = '$resultado3[idempresa]'");
+    //         // $resultado33 = $consulta->fetch_assoc(); 
 
-            if (0 > 0) {
-                    $res = array("danger", "No se puede eliminar porque hay registros en proveedor_has_material","eliminar_proveedor");
-            } else {
-                    // Insertar el nuevo registro
-                    $registroProveedor = $this->dbc->query("DELETE FROM configuracion_reporte WHERE idconfiguracion_reporte = '$id'");
-                    if ($registroProveedor === TRUE) {                                                                                                                                                    
-                        $res = array("success", "se elimino exitosamente","eliminarCaracteristica");
-                    } else {
-                        $res = array("danger", "No se pudo registrar");
-                    }
-                }
-                echo json_encode($res);
-    }
-    public function eliminar_configuracion_reporte_activo_fijo($id){
+    //         if (0 > 0) {
+    //                 $res = array("danger", "No se puede eliminar porque hay registros en proveedor_has_material","eliminar_proveedor");
+    //         } else {
+    //                 // Insertar el nuevo registro
+    //                 $registroProveedor = $this->dbc->query("DELETE FROM configuracion_reporte WHERE idconfiguracion_reporte = '$id'");
+    //                 if ($registroProveedor === TRUE) {                                                                                                                                                    
+    //                     $res = array("success", "se elimino exitosamente","eliminarCaracteristica");
+    //                 } else {
+    //                     $res = array("danger", "No se pudo registrar");
+    //                 }
+    //             }
+    //             echo json_encode($res);
+    // }
+    public function eliminar_configuracion_reporte($id){
         
             $consulta3 = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE idconfiguracion_reporte = '$id'");
             $resultado3 = $consulta3->fetch_assoc();
 
-            $consulta_vinculacion = $this->dbc->query("SELECT * FROM vinculacion_cuenta_depreciacion WHERE idcuenta = '$resultado3[idplandecuenta]' OR idcuenta_depreciacion = '$resultado3[idplandecuenta]' AND idempresa = '$resultado3[idempresa]'");
-            if($consulta_vinculacion->num_rows > 0){
+            // $consulta_vinculacion = $this->dbc->query("SELECT * FROM vinculacion_cuenta_depreciacion WHERE idcuenta = '$resultado3[idplandecuenta]' OR idcuenta_depreciacion = '$resultado3[idplandecuenta]' AND idempresa = '$resultado3[idempresa]'");
+           
+           $existe_en_vinculacion = $this->dbc->query("SELECT *,
+                    CASE 
+                        WHEN idcuenta = '$resultado3[idplandecuenta]' THEN 'idcuenta'
+                        WHEN idcuenta_depreciacion = '$resultado3[idplandecuenta]' THEN 'idcuenta_depreciacion'
+                    END AS columna_encontrada
+                FROM vinculacion_cuenta_depreciacion
+                WHERE idcuenta = '$resultado3[idplandecuenta]' 
+                OR idcuenta_depreciacion = '$resultado3[idplandecuenta]'
+                ");
+           
+            if($existe_en_vinculacion->num_rows > 0){
+                $resultado33 = $existe_en_vinculacion->fetch_assoc(); 
+                if($resultado33['columna_encontrada'] == 'idcuenta'){
+                    //SE ELIMINARA LA CUENTA PRINCIPAL Y SU VINCULACION
+                    // $consulta3 = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE idplandecuenta = '$id'");
 
+                    $delete_confi = $this->dbc->query("DELETE FROM configuracion_reporte WHERE idconfiguracion_reporte = '$id'");
+                    $delete_confi2 = $this->dbc->query("DELETE FROM configuracion_reporte WHERE idplandecuenta = '$resultado33[idcuenta_depreciacion]'");
+   
+                    $delete_vincu = $this->dbc->query("DELETE FROM vinculacion_cuenta_depreciacion WHERE idvinculacion_cuenta_depreciacion = '$resultado33[idvinculacion_cuenta_depreciacion]'");
+                }else{
+                    // SOLO SE ELIMINARA 2 REGISTROS, OSEA EL REGISTRO DE CONFIGURACION_REPORTE Y DE LA TABLA VINCULACION
+                    $delete_confi = $this->dbc->query("DELETE FROM configuracion_reporte WHERE idconfiguracion_reporte = '$id'");
+                    $delete_vincu = $this->dbc->query("DELETE FROM vinculacion_cuenta_depreciacion WHERE idvinculacion_cuenta_depreciacion = '$resultado33[idvinculacion_cuenta_depreciacion]'");
+                }   
             }else{
-
+                $delete_confi = $this->dbc->query("DELETE FROM configuracion_reporte WHERE idconfiguracion_reporte = '$id'");
             }
-            // $resultado33 = $consulta_vinculacion->fetch_assoc(); 
 
-            if (0 > 0) {
-                    $res = array("danger", "No se puede eliminar porque hay registros en proveedor_has_material","eliminar_proveedor");
+            if ($delete_confi === TRUE) {                                                                                                                                                    
+                $res = array("success", "se elimino exitosamente","eliminarCaracteristica");
             } else {
-                    // Insertar el nuevo registro
-                    $registroProveedor = $this->dbc->query("DELETE FROM configuracion_reporte WHERE idconfiguracion_reporte = '$id'");
-                    if ($registroProveedor === TRUE) {                                                                                                                                                    
-                        $res = array("success", "se elimino exitosamente","eliminarCaracteristica");
-                    } else {
-                        $res = array("danger", "No se pudo registrar");
-                    }
-                }
+                $res = array("danger", "No se pudo registrar");
+            }
+
                 echo json_encode($res);
     }
     public function registrar_vinculacion_depreciacion($idcuenta,$iddepreciacion,$empresa){

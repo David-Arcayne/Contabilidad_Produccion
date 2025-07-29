@@ -623,9 +623,13 @@ $gestion = $this->get_id_gestion($empresa);
 $gestion = $this->get_id_gestion($empresa);
         $lista_aux_buscador = [];
         $lista =[];
-        $plantilla_lista = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla_reporte = '1' 
+        $tipo_report = $this->dbc->query("SELECT * FROM tipo_reportes WHERE idempresa = '$idempresa' AND tipo_reporte = 'estado_resultado'");
+        $id_pl_reporte = $tipo_report->fetch_assoc();
+
+        $plantilla_lista = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla_reporte = '$id_pl_reporte[idtipo_reportes]' 
         AND idempresa = '$idempresa' AND tipo_operacion != 'calculable' ORDER BY orden ASC");// PLANTILLAS PRINCIPALES
-        while ($pl_list = $this->dbc->fetch($plantilla_lista)) {
+       
+       while ($pl_list = $this->dbc->fetch($plantilla_lista)) {
             if($pl_list['nombre_personalizado'] == NULL){
                 $pla_cuen = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$pl_list[idplandecuenta]'");// VENTAS->NOMBRE
                 $nombre_cuen = $pla_cuen->fetch_assoc();
