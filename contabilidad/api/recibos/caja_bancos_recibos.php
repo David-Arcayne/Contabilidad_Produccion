@@ -2202,7 +2202,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
     }
 
-    public function registrar_recibo_cobro_cajaBancos_en_otras_cuentas($idotras_cuentas,$fecha,$lugar,$persona, $ci,$precio, $asiento,$trans,$idcaja_bancos,$archivo,$registro_desde,$sucursal,$empresa)
+    public function registrar_recibo_cobro_cajaBancos_en_otras_cuentas($nro_recibo,$idotras_cuentas,$fecha,$lugar,$persona, $ci,$precio, $asiento,$trans,$idcaja_bancos,$archivo,$registro_desde,$client_prov,$concepto,$sucursal,$empresa)
     {                                             
         //idtransaccion, asiento,fecha, id_cliente_proveedor, concepto, precio, idtipo
         // echo json_encode(array($fecha,$coc,$cobro, $pagar,$trans, $cliente,$asiento,$concepto,$precio,$idtipo,$empresa,$sucursal,$idcaja_bancos));
@@ -2236,21 +2236,44 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
         // NUNCA ENTRA A ESTA CONDICION
 
-        if($idotras_cuentas == ""){
-            $id_otras_cuentas_aux = -1;
+        if($idotras_cuentas == ""){ 
+            $contrato_general = $this->dbc->query("SELECT * FROM otras_cuentas 
+            WHERE cobrado = '-1' AND pagado = '-1' AND idempresa = '$idempresa'");
+            
+            if($contrato_general->num_rows > 0){ // SI EXISTE CONTRATO GENERAL
+                $cg = $contrato_general->fetch_assoc();
+                $id_otras_cuentas_aux = $cg['idotras_cuentas'];
+            }else{ // NO EXISTE CONTRATO GENERAL ENTONCES LO CREAREMOS
+
+                $reg_otrs_cuentas = $this->dbc->query("INSERT INTO otras_cuentas(fecha,pagado,cobrado,idempresa,registro_desde) 
+                VALUES ('$fecha','-1','-1','$idempresa',$registro_desde)");
+        
+                $id_otras_cuentas_aux = $this->dbc->insert_id;
+            }
+            
         }else{
             $id_otras_cuentas_aux = $idotras_cuentas;
         }
-        
+
         if($trans == "" && $asiento == ""){
             // se crea factura sin transaccion asignada
             //$trans = 0
+
+            $nuevo_recibo = $this->dbc->query("INSERT INTO recibo(nro_recibo,fecha,lugar,cliente_proveedor,persona,ci,monto,cobrado,pagado,idotras_cuentas,transaccion,concepto,archivo,registro_desde,idempresa)
+            VALUES('$nro_recibo','$fecha','$lugar','$client_prov','$persona','$ci','$precio','1','0','$id_otras_cuentas_aux','0','$concepto',NULL,'$registro_desde','$idempresa')");
+
+            $idrecibo_nuevo = $this->dbc->insert_id;
 
             $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
             VALUES('$nroRecibo','$fecha','$lugar','varios clientes','$persona','$ci','$precio','0','$id_otras_cuentas_aux','0','0',NULL,'$registro_desde')");
 
             $idrecibo = $this->dbc->insert_id;
         }elseif($trans > 0 && $asiento == 0){
+
+            $nuevo_recibo = $this->dbc->query("INSERT INTO recibo(nro_recibo,fecha,lugar,cliente_proveedor,persona,ci,monto,cobrado,pagado,idotras_cuentas,transaccion,concepto,archivo,registro_desde,idempresa)
+            VALUES('$nro_recibo','$fecha','$lugar','$client_prov','$persona','$ci','$precio','1','0','$id_otras_cuentas_aux','$trans','$concepto',NULL,'$registro_desde','$idempresa')");
+
+            $idrecibo_nuevo = $this->dbc->insert_id;
 
             $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
             VALUES('$nroRecibo','$fecha','$lugar','varios clientes','$persona','$ci','$precio','0','$id_otras_cuentas_aux','$trans','0',NULL,'$registro_desde')");
@@ -2292,6 +2315,11 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             $orden = $orden + 1;
         }
 //------------------------------------------------------------------------------
+
+        $nuevo_recibo = $this->dbc->query("INSERT INTO recibo(nro_recibo,fecha,lugar,cliente_proveedor,persona,ci,monto,cobrado,pagado,idotras_cuentas,transaccion,concepto,archivo,registro_desde,idempresa)
+            VALUES('$nro_recibo','$fecha','$lugar','$client_prov','$persona','$ci','$precio','1','0','$id_otras_cuentas_aux','$idtrans','$concepto',NULL,'$registro_desde','$idempresa')");
+
+        $idrecibo_nuevo = $this->dbc->insert_id;
 
         $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
             VALUES('$nroRecibo','$fecha','$lugar','$persona','$ci','$precio','0','$id_otras_cuentas_aux','$idtrans','0',NULL,'$registro_desde')");
@@ -2322,7 +2350,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             if(move_uploaded_file($archivo_tmp, $ruta_destino)){
                  //registrar pago, preguntar guardar la anterior transaccion o la nueva
             $registropago2 = $this->dbc->query("UPDATE cuentaspof SET archivo = '$unique_name' WHERE idcuentaspof = '$idrecibo'");
-    
+            $update_recibo = $this->dbc->query("UPDATE recibo SET archivo = '$unique_name' WHERE idrecibo = '$idrecibo_nuevo'");
             }else{
                 $res = array("danger", "No se movio el archivo a la carpeta");
             }
@@ -2334,22 +2362,17 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         $crear_detalle_cajaBancos = $this->dbc->query("INSERT INTO detalle_caja_bancos_cobrar(idcaja_bancos,monto,idcuentaspof,idfactura,idotras_cuentas)
         VALUES('$idcaja_bancos','$precio','$idrecibo','0','$id_otras_cuentas_aux')");
 
-        if($id_otras_cuentas_aux == '-1'){
-            // NO EDITARA NADA PORQ NO EXISTE idotras_cuentas para editar
-        }else{
-            $update_fact = $this->dbc->query("UPDATE otras_cuentas SET cobrado = '2' WHERE idotras_cuentas = '$idotras_cuentas'");
-        }
+            if ($crearRecibo === TRUE) {
+                $res = array("success", "Registro Correcto", "crearfactura");
+            } else {
+                $res = array("danger", "No se pudo realizar el registro ");
+            }
 
-        if ($crearRecibo === TRUE) {
-            $res = array("success", "Registro Correcto", "crearfactura");
-        } else {
-            $res = array("danger", "No se pudo realizar el registro ");
-        }
         echo json_encode($res);
 
     }
 
-     public function registrar_recibo_pago_cajaBancos_en_otras_cuentas($idotras_cuentas,$fecha,$lugar,$persona, $ci,$precio, $asiento,$trans,$idcaja_bancos,$archivo,$registro_desde,$sucursal,$empresa)
+     public function registrar_recibo_pago_cajaBancos_en_otras_cuentas($nro_recibo,$idotras_cuentas,$fecha,$lugar,$persona, $ci,$precio, $asiento,$trans,$idcaja_bancos,$archivo,$registro_desde,$client_prov,$concepto,$sucursal,$empresa)
     {                                             
         //idtransaccion, asiento,fecha, id_cliente_proveedor, concepto, precio, idtipo
         // echo json_encode(array($fecha,$coc,$cobro, $pagar,$trans, $cliente,$asiento,$concepto,$precio,$idtipo,$empresa,$sucursal,$idcaja_bancos));
@@ -2383,8 +2406,21 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
         // NUNCA ENTRA A ESTA CONDICION
 
-        if($idotras_cuentas == ""){
-            $id_otras_cuentas_aux = -1;
+        if($idotras_cuentas == ""){ 
+            $contrato_general = $this->dbc->query("SELECT * FROM otras_cuentas 
+            WHERE cobrado = '-1' AND pagado = '-1' AND idempresa = '$idempresa'");
+            
+            if($contrato_general->num_rows > 0){ // SI EXISTE CONTRATO GENERAL
+                $cg = $contrato_general->fetch_assoc();
+                $id_otras_cuentas_aux = $cg['idotras_cuentas'];
+            }else{ // NO EXISTE CONTRATO GENERAL ENTONCES LO CREAREMOS
+
+                $reg_otrs_cuentas = $this->dbc->query("INSERT INTO otras_cuentas(fecha,pagado,cobrado,idempresa,registro_desde) 
+                VALUES ('$fecha','-1','-1','$idempresa','$registro_desde')");
+        
+                $id_otras_cuentas_aux = $this->dbc->insert_id;
+            }
+            
         }else{
             $id_otras_cuentas_aux = $idotras_cuentas;
         }
@@ -2393,11 +2429,21 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             // se crea factura sin transaccion asignada
             //$trans = 0
 
+            $nuevo_recibo = $this->dbc->query("INSERT INTO recibo(nro_recibo,fecha,lugar,cliente_proveedor,persona,ci,monto,cobrado,pagado,idotras_cuentas,transaccion,concepto,archivo,registro_desde,idempresa)
+            VALUES('$nro_recibo','$fecha','$lugar','$client_prov','$persona','$ci','$precio','0','1','$id_otras_cuentas_aux','0','$concepto',NULL,'$registro_desde','$idempresa')");
+
+            $idrecibo_nuevo = $this->dbc->insert_id;
+
             $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
             VALUES('$nroRecibo','$fecha','$lugar','varios clientes','$persona','$ci','$precio','0','$id_otras_cuentas_aux','0','0',NULL,'$registro_desde')");
 
             $idrecibo = $this->dbc->insert_id;
         }elseif($trans > 0 && $asiento == 0){
+
+            $nuevo_recibo = $this->dbc->query("INSERT INTO recibo(nro_recibo,fecha,lugar,cliente_proveedor,persona,ci,monto,cobrado,pagado,idotras_cuentas,transaccion,concepto,archivo,registro_desde,idempresa)
+            VALUES('$nro_recibo','$fecha','$lugar','$client_prov','$persona','$ci','$precio','0','1','$id_otras_cuentas_aux','$trans','$concepto',NULL,'$registro_desde','$idempresa')");
+
+            $idrecibo_nuevo = $this->dbc->insert_id;
 
             $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
             VALUES('$nroRecibo','$fecha','$lugar','varios clientes','$persona','$ci','$precio','0','$id_otras_cuentas_aux','$trans','0',NULL,'$registro_desde')");
@@ -2440,6 +2486,11 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         }
 //------------------------------------------------------------------------------
 
+        $nuevo_recibo = $this->dbc->query("INSERT INTO recibo(nro_recibo,fecha,lugar,cliente_proveedor,persona,ci,monto,cobrado,pagado,idotras_cuentas,transaccion,concepto,archivo,registro_desde,idempresa)
+            VALUES('$nro_recibo','$fecha','$lugar','$client_prov','$persona','$ci','$precio','0','1','$id_otras_cuentas_aux','$idtrans','$concepto',NULL,'$registro_desde','$idempresa')");
+
+        $idrecibo_nuevo = $this->dbc->insert_id;
+
         $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
             VALUES('$nroRecibo','$fecha','$lugar','$persona','$ci','$precio','0','$id_otras_cuentas_aux','$idtrans','0',NULL,'$registro_desde')");
 
@@ -2469,7 +2520,8 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             if(move_uploaded_file($archivo_tmp, $ruta_destino)){
                  //registrar pago, preguntar guardar la anterior transaccion o la nueva
             $registropago2 = $this->dbc->query("UPDATE cuentaspor SET archivo = '$unique_name' WHERE idcuentaspor = '$idrecibo'");
-    
+            $update_recibo = $this->dbc->query("UPDATE recibo SET archivo = '$unique_name' WHERE idrecibo = '$idrecibo_nuevo'");
+
             }else{
                 $res = array("danger", "No se movio el archivo a la carpeta");
             }
@@ -2481,17 +2533,12 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         $crear_detalle_cajaBancos = $this->dbc->query("INSERT INTO detalle_caja_bancos_pagar(idcaja_bancos,monto,idcuentaspor,idfactura,idotras_cuentas)
         VALUES('$idcaja_bancos','$precio','$idrecibo','0','$id_otras_cuentas_aux')");
 
-        if($id_otras_cuentas_aux == '-1'){
-            // NO EDITARA NADA PORQ NO EXISTE idotras_cuentas para editar
-        }else{
-            $update_fact = $this->dbc->query("UPDATE otras_cuentas SET pagado = '2' WHERE idotras_cuentas = '$id_otras_cuentas_aux'"); 
-        }
-
             if ($crearRecibo === TRUE) {
                 $res = array("success", "Registro Correcto", "crearfactura");
             } else {
                 $res = array("danger", "No se pudo realizar el registro ");
             }
+   
         echo json_encode($res);
 
     }

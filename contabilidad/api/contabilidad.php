@@ -893,7 +893,7 @@ WHERE md5(p.organizacion_idorganizacion)='$ide'");
         $lista = [];
         $res = "";
         // lista pagados y pagar clientes proveedor
-        $facture = $this->dbc->query("SELECT f.idfactura, f.fecha, f.nfactura, f.nautorizacion, f.codigocontrol, f.montofactura, f.tasa0, f.export, f.npoliza, f.iceiecdhotros, f.descuentobonificacion, f.clasefactura, f.cobrado, f.pagado, f.espesificacion, f.estado, f.tipocompra, f.transacciones_idtransacciones, f.proveedorcliente_idproveedorcliente, f.idorganizacion, f.cuenta, f.sucursal, f.registro_desde
+        $facture = $this->dbc->query("SELECT f.idfactura, f.fecha, f.nfactura, f.nautorizacion, f.codigocontrol, f.montofactura, f.tasa0, f.export, f.npoliza, f.iceiecdhotros, f.descuentobonificacion, f.clasefactura, f.cobrado, f.pagado, f.espesificacion, f.estado, f.tipocompra, f.transacciones_idtransacciones, f.proveedorcliente_idproveedorcliente, f.idorganizacion, f.cuenta, f.sucursal,f.por_concepto_de, f.registro_desde
         FROM factura  AS f WHERE f.transacciones_idtransacciones='$idtransaccion' AND f.clasefactura = '1' ORDER BY f.nfactura DESC");
         while ($qwe = $this->dbc->fetch($facture)) {
             if ($qwe['clasefactura'] == 2) {

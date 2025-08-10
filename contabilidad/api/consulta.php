@@ -567,9 +567,13 @@ elseif($ver[0]=="listar_otras_cuentas_cobrar_select"){
 }elseif($ver[0]=="eliminar_forma_pago"){
     $cont=new Forma_pago();
     $cont->eliminar_forma_pago($ver[1]);
+}elseif($ver[0]=="listar_factura_otras_cuentas"){
+    $cont=new Recibo_otras_cuentas();
+    $cont->listar_factura_otras_cuentas($ver[1]);
 }
-//  listar_recibo_por_caja_bancos listar_firma_reporte eliminarfactura listar_recibo_otras_cuentas
+
+//  listar_recibo_por_caja_bancos listar_firma_reporte eliminarfactura listar_recibo_otras_cuentas listafactura_pago_trans listar_datos_contrataciones_cajas
 //  caja_banco listatransacciones_comercial alerta reportebalancegeneral listafacturaapi_pagado lista_cobrar_cobrado_factura
-//listaf   re listar_otras_cuentas existe_empresa_modulo listafactura_cobrado_trans listar_usuarios 
+//listaf   re listar_otras_cuentas existe_empresa_modulo listafactura_cobrado_trans listar_usuarios  listafactura_pago_trans
 //report reportecomprobantecontable eliminarfactura listar_caja_bancos_usuarios listar_usuarios listar_caja_bancos_por_usuario
 ?>

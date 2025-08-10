@@ -18,12 +18,12 @@ class Documento_cobro extends DB{ //          idtransaccion, asiento,fecha, id_c
         $nro_otras_cuentas = $resultado['total'] + 1;
 
 
-        $cl = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='$id_cliente_proveedor'");
-        $clientSelect = $cl->fetch_assoc();
+        // $cl = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='$id_cliente_proveedor'");
+        // $clientSelect = $cl->fetch_assoc();
 
             // se crea factura sin transaccion asignada
             //$trans = 0
-            $registro = $this->dbc->query("INSERT INTO otras_cuentas(fecha,nro_otras_cuentas,lugar,id_cliente_proveedor,clase_otras_cuentas,pagado,cobrado,nro_tributario,contacto,nro_doc_identidad,idtipo,transacciones_idtransacciones,concepto,condiciones,observaciones,precio,forma_pago,idempresa) 
+            $registro = $this->dbc->query("INSERT INTO otras_cuentas(fecha,nro_otras_cuentas,lugar,id_cliente_proveedor,clase_otras_cuentas,pagado,cobrado,nro_tributario,contacto,nro_doc_identidad,idtipo,concepto,condiciones,observaciones,precio,forma_pago,fecha_venci,idempresa) 
             VALUES ('$fecha','$nro_otras_cuentas','$lugar','$id_cliente_proveedor','$coc','$pagado','$cobrado','$nro_tributario','$contacto','$nro_doc_identidad','$idtipo','$concepto','$condiciones','$observaciones','$precio','$forma_pago','$fecha_venci','$idempresa')");
         
         $idotras_cuentas = $this->dbc->insert_id;
