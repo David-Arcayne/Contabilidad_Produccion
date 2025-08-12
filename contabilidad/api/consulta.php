@@ -20,7 +20,7 @@ require_once "./facturas/filtrado_facturas.php";
 require_once "./facturas/factura_comercial.php";
 require_once "./configuracion/firma_reporte.php";
 require_once "./configuracion/reporte_confi.php";
-// require_once "./configuracion/rp_plantilla_reporte.php";
+require_once "./configuracion/rp_plantilla_reporte.php";
 require_once "./otras_cuentas/forma_pago.php";
 
 $ver=explode("/",$_GET['ver']); //dividiendo los "/"  ver[0],ver[1],ver[x]  listafacturaapi_pagado eliminarasiento tipo
@@ -511,37 +511,37 @@ elseif($ver[0]=="listar_facturas_cobros_sin_transaccion"){
     $cont->eliminar_tipo_reportes($ver[1]);
 }
 
-// elseif($ver[0]=="rp_listar_plantilla"){
-//     $cont=new PlantillaReporte();
-//     $cont->listar_plantilla($ver[1], $ver[2]);
-// }elseif($ver[0]=="rp_listar_plantilla_normal"){
-//     $cont=new PlantillaReporte();
-//     $cont->listar_plantilla_normal($ver[1], $ver[2]);
-// }elseif($ver[0]=="rp_filtro_plantilla_por_nivel"){
-//     $cont=new PlantillaReporte();
-//     $cont->filtro_plantilla_por_nivel($ver[1], $ver[2],  $ver[3]);
-// }elseif($ver[0]=="rp_eliminar_plantilla"){
-//     $cont=new PlantillaReporte();
-//     $cont->eliminar_plantilla($ver[1], $ver[2], $ver[3], $ver[4], $ver[5]);
-// }elseif($ver[0]=="rp_obtener_datos_reporte"){
-//     $cont=new PlantillaReporte();
-//     $cont->obtener_datos_reporte($ver[1], $ver[2], $ver[3], $ver[4]);
-// }elseif($ver[0]=="reporte_balance_general_actualizado"){
-//     $cont=new Reporte_confi();
-//     $cont->reporte_balance_general_actualizado($ver[1],$ver[2],$ver[3]);
-// }elseif($ver[0]=="listar_agrupacion_plantilla"){
-//     $cont=new PlantillaReporte();
-//     $cont->listar_agrupacion_plantilla($ver[1]);
-// }elseif($ver[0]=="reporte_estado_resultados"){
-//     $cont=new PlantillaReporte();
-//     $cont->reporte_estado_resultados($ver[1],$ver[2],$ver[3]);
-// }elseif($ver[0]=="reporte_estado_resultados_actualizado"){
-//     $cont=new PlantillaReporte();
-//     $cont->reporte_estado_resultados_actualizado($ver[1],$ver[2],$ver[3]);
-// }elseif($ver[0]=="eliminar_otras_operaciones"){
-//     $cont=new PlantillaReporte();
-//     $cont->eliminar_otras_operaciones($ver[1]);
-// }
+elseif($ver[0]=="rp_listar_plantilla"){
+    $cont=new PlantillaReporte();
+    $cont->listar_plantilla($ver[1], $ver[2]);
+}elseif($ver[0]=="rp_listar_plantilla_normal"){
+    $cont=new PlantillaReporte();
+    $cont->listar_plantilla_normal($ver[1], $ver[2]);
+}elseif($ver[0]=="rp_filtro_plantilla_por_nivel"){
+    $cont=new PlantillaReporte();
+    $cont->filtro_plantilla_por_nivel($ver[1], $ver[2],  $ver[3]);
+}elseif($ver[0]=="rp_eliminar_plantilla"){
+    $cont=new PlantillaReporte();
+    $cont->eliminar_plantilla($ver[1], $ver[2], $ver[3], $ver[4], $ver[5]);
+}elseif($ver[0]=="rp_obtener_datos_reporte"){
+    $cont=new PlantillaReporte();
+    $cont->obtener_datos_reporte($ver[1], $ver[2], $ver[3], $ver[4]);
+}elseif($ver[0]=="reporte_balance_general_actualizado"){
+    $cont=new Reporte_confi();
+    $cont->reporte_balance_general_actualizado($ver[1],$ver[2],$ver[3]);
+}elseif($ver[0]=="listar_agrupacion_plantilla"){
+    $cont=new PlantillaReporte();
+    $cont->listar_agrupacion_plantilla($ver[1]);
+}elseif($ver[0]=="reporte_estado_resultados"){
+    $cont=new PlantillaReporte();
+    $cont->reporte_estado_resultados($ver[1],$ver[2],$ver[3]);
+}elseif($ver[0]=="reporte_estado_resultados_actualizado"){
+    $cont=new PlantillaReporte();
+    $cont->reporte_estado_resultados_actualizado($ver[1],$ver[2],$ver[3]);
+}elseif($ver[0]=="eliminar_otras_operaciones"){
+    $cont=new PlantillaReporte();
+    $cont->eliminar_otras_operaciones($ver[1]);
+}
 
 elseif($ver[0]=="listar_otras_cuentas_cobrar_select"){
     $cont=new Documento_cobro();
@@ -570,10 +570,16 @@ elseif($ver[0]=="listar_otras_cuentas_cobrar_select"){
 }elseif($ver[0]=="listar_factura_otras_cuentas"){
     $cont=new Recibo_otras_cuentas();
     $cont->listar_factura_otras_cuentas($ver[1]);
+}elseif($ver[0]=="listar_otras_cuentas_cobrar_vencidas"){
+    $cont=new Documento_cobro();
+    $cont->listar_otras_cuentas_cobrar_vencidas($ver[1]);
+}elseif($ver[0]=="listar_otras_cuentas_pagar_vencidas"){
+    $cont=new Documento_cobro();
+    $cont->listar_otras_cuentas_pagar_vencidas($ver[1]);
 }
 
-//  listar_recibo_por_caja_bancos listar_firma_reporte eliminarfactura listar_recibo_otras_cuentas listafactura_pago_trans listar_datos_contrataciones_cajas
-//  caja_banco listatransacciones_comercial alerta reportebalancegeneral listafacturaapi_pagado lista_cobrar_cobrado_factura
+//  listar_recibo_otras_cuentas listafactura_pago_trans listar_datos_contrataciones_cajas listar_recibo_otras_cuentas listar_factura_otras_cuentas
+//  caja_banco listatransacciones_comercial alerta reportebalancegeneral listafacturaapi_pagado lista_cobrar_cobrado_factura  listar_recibo_otras_cuentas 
 //listaf   re listar_otras_cuentas existe_empresa_modulo listafactura_cobrado_trans listar_usuarios  listafactura_pago_trans
 //report reportecomprobantecontable eliminarfactura listar_caja_bancos_usuarios listar_usuarios listar_caja_bancos_por_usuario
 ?>

@@ -48,7 +48,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
 
             $idrecibo_nuevo = $this->dbc->insert_id;
 
-            $registropago2 = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspor,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
+            $registropago2 = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
         VALUES(NULL,'$nrecibo','$fecha','$lugar','0','$persona','$ci','$monto','0','$idotras_cuentas','0','0',NULL)");
 
             $idrecibo = $this->dbc->insert_id;
@@ -60,7 +60,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
 
             $idrecibo_nuevo = $this->dbc->insert_id;
 
-            $registropago2 = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspor,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
+            $registropago2 = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
         VALUES(NULL,'$nrecibo','$fecha','$lugar','0','$persona','$ci','$monto','0','$idotras_cuentas','$idtransaccion','0',NULL)");
 
             $idrecibo = $this->dbc->insert_id;
@@ -101,7 +101,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
 
             $idrecibo_nuevo = $this->dbc->insert_id;
 
-            $registropago2 = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspor,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
+            $registropago2 = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
             VALUES(NULL,'$nrecibo','$fecha','$lugar','0','$persona','$ci','$monto','0','$idotras_cuentas','$trans','0',NULL)");
 
             $idrecibo = $this->dbc->insert_id;
@@ -114,34 +114,12 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
 
             }else{
                  foreach($caja_bancos as $cajaBanco){
-                $registropago3 = $this->dbc->query("INSERT INTO detalle_caja_bancos_cobrar(idcaja_bancos,monto,idcuentaspor,idfactura,idotras_cuentas)
+                $registropago3 = $this->dbc->query("INSERT INTO detalle_caja_bancos_cobrar(idcaja_bancos,monto,idcuentaspof,idfactura,idotras_cuentas)
                 VALUES('$cajaBanco[id]','$cajaBanco[monto]','$idrecibo','0','$idotras_cuentas')");
                 }
 
             }
-
-
-
-            // $registropago = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspor,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
-            // VALUES(NULL,'$nrecibo','$fecha','$lugar','0','$persona','$ci','$monto','0','$idotras_cuentas','$trans','0',NULL)");
-
-        // if ($registropago === TRUE) {
-
-        //     $idcuentaspor = $this->dbc->insert_id;
-        //     if($idcaja_bancos == ""){
-
-        //     }else{
-        //           foreach($caja_bancos as $cajaBanco){
-        //         $registropago3 = $this->dbc->query("INSERT INTO detalle_caja_bancos_cobrar(idcaja_bancos,monto,idcuentaspor,idfactura,idotras_cuentas)
-        //         VALUES('$cajaBanco[id]','$cajaBanco[monto]','$idcuentaspor','0','$idotras_cuentas')");
-        //     }
-
-        //     }
-          
-        //     $res = array("success", "Registro Realizado", "registrocobrarfactura");
-        // } else {
-        //     $res = array("danger", "No se pudo realizar el registrooo",$nrecibo,$fecha,$idcliente,$persona,$ci,$monto,$idfactura,$trans,$idcuenta);
-        // }
+            $res = array("success", "Registro Realizado", "registrocobrarfactura");
         }else{
          // Manejar la carga del archivo
         $archivo_nombre = "";
@@ -160,39 +138,21 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
         if(move_uploaded_file($archivo_tmp, $ruta_destino)){
              //registrar pago, preguntar guardar la anterior transaccion o la nueva
         
-        $registropago2 = $this->dbc->query("UPDATE cuentaspof SET archivo = '$unique_name' WHERE idcuentaspor = '$idrecibo'");
+        $registropago2 = $this->dbc->query("UPDATE cuentaspof SET archivo = '$unique_name' WHERE idcuentaspof = '$idrecibo'");
             $update_recibo = $this->dbc->query("UPDATE recibo SET archivo = '$unique_name' WHERE idrecibo = '$idrecibo_nuevo'");
         
             if($idcaja_bancos == ""){
 
             }else{
                  foreach($caja_bancos as $cajaBanco){
-                $registropago3 = $this->dbc->query("INSERT INTO detalle_caja_bancos_cobrar(idcaja_bancos,monto,idcuentaspor,idfactura,idotras_cuentas)
+                $registropago3 = $this->dbc->query("INSERT INTO detalle_caja_bancos_cobrar(idcaja_bancos,monto,idcuentaspof,idfactura,idotras_cuentas)
                 VALUES('$cajaBanco[id]','$cajaBanco[monto]','$idrecibo','0','$idotras_cuentas')");
             }
 
             }
 
-             // $registropago2 = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspor,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
-        // VALUES(NULL,'$nrecibo','$fecha','$lugar','0','$persona','$ci','$monto','0','$idotras_cuentas','$trans','0','$unique_name')");
+            $res = array("success", "Registro Realizado", "registrocobrarfactura");
 
-        
-        // if ($registropago2 === TRUE) {
-        //     $idcuentaspor = $this->dbc->insert_id;
-        //     if($idcaja_bancos == ""){
-
-        //     }else{
-        //           foreach($caja_bancos as $cajaBanco){
-        //         $registropago3 = $this->dbc->query("INSERT INTO detalle_caja_bancos_cobrar(idcaja_bancos,monto,idcuentaspor,idfactura,idotras_cuentas)
-        //         VALUES('$cajaBanco[id]','$cajaBanco[monto]','$idcuentaspor','0','$idotras_cuentas')");
-        //     }
-
-        //     }
-    
-        //     $res = array("success", "Registro Realizado", "registrocobrarfactura");
-        // } else {
-        //     $res = array("danger", "No se pudo realizar el registro");
-        // }
         }else{
             $res = array("danger", "No se movio el archivo a la carpeta");
         }
@@ -219,7 +179,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
 
         if(empty($archivo['name'])){
 
-            $update = $this->dbc->query("UPDATE cuentaspof SET nrecibo='$nrecibo',fecha='$fecha',persona='$persona',ci='$ci' WHERE idcuentaspor='$idrecibo'");
+            $update = $this->dbc->query("UPDATE cuentaspof SET nrecibo='$nrecibo',fecha='$fecha',persona='$persona',ci='$ci' WHERE idcuentaspof='$idrecibo'");
 
             if ($update === TRUE) {
                 $res = array("success", "Registro Realizado", "registrocobrarfactura",$idrecibo,$fecha, $nrecibo, $persona, $ci,$archivo);
@@ -243,7 +203,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
         }
         if(move_uploaded_file($archivo_tmp, $ruta_destino)){
              //registrar pago, preguntar guardar la anterior transaccion o la nueva
-        $updateArch = $this->dbc->query("UPDATE cuentaspof SET nrecibo='$nrecibo',fecha='$fecha',persona='$persona',ci='$ci',archivo='$unique_name' WHERE idcuentaspor='$idrecibo'");
+        $updateArch = $this->dbc->query("UPDATE cuentaspof SET nrecibo='$nrecibo',fecha='$fecha',persona='$persona',ci='$ci',archivo='$unique_name' WHERE idcuentaspof='$idrecibo'");
 
         if ($updateArch === TRUE) {
             $res = array("success", "Edicion Realizada", "registrocobrarfactura");
@@ -261,7 +221,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
         // $idempresa = $this->getidempresa($empresa);
     
         // Preparar la consulta
-      $listado = $this->dbc->query("SELECT c.idcuentaspor,c.nrecibo,c.fecha,c.monto,c.persona,c.ci,c.transaccion,c.archivo,c.lugar FROM cuentaspof as c WHERE c.idotras_cuentas='$idotras_cuentas'");
+      $listado = $this->dbc->query("SELECT c.idcuentaspof,c.nrecibo,c.fecha,c.monto,c.persona,c.ci,c.transaccion,c.archivo,c.lugar FROM cuentaspof as c WHERE c.idotras_cuentas='$idotras_cuentas'");
      while ($qwe = $this->dbc->fetch($listado)) {
 
         $trans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE idtransacciones='$qwe[transaccion]'");
@@ -404,7 +364,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
 
             }
 
-            // $res = array("success", "Registro Realizado", "registrocobrarfactura");
+             $res = array("success", "Registro Realizado", "registrocobrarfactura");
 
         }else{
          // Manejar la carga del archivo
@@ -436,7 +396,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
 
             }
     
-            // $res = array("success", "Registro Realizado", "registrocobrarfactura");
+             $res = array("success", "Registro Realizado", "registrocobrarfactura");
        
         }else{
             $res = array("danger", "No se movio el archivo a la carpeta");
@@ -578,7 +538,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
                 //NO REGISTRARA CAJA_BANCOS PORQ EL USUARIO NO TIENE NINGUN CAJA_BANCO
             }else{ //SI TIENE CAJA_BANCOS ENTONCES REGISTRAMOS
                 foreach($caja_bancos as $cajaBanco){
-                $regis_caja_banco = $this->dbc->query("INSERT INTO detalle_caja_bancos_cobrar(idcaja_bancos,monto,idcuentaspor,idfactura,idotras_cuentas)
+                $regis_caja_banco = $this->dbc->query("INSERT INTO detalle_caja_bancos_cobrar(idcaja_bancos,monto,idcuentaspof,idfactura,idotras_cuentas)
                 VALUES('$cajaBanco[id]','$cajaBanco[monto]','$idrecibo','$idfact','0')");
             }
             }
@@ -762,10 +722,18 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
       $listado = $this->dbc->query("SELECT * FROM factura WHERE idotras_cuentas='$idotras_cuentas'");
      while ($qwe = $this->dbc->fetch($listado)) {
     
-        // $trans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE idtransacciones='$qwe[transaccion]'");
-        // $idtr = $trans->fetch_assoc();
+        $trans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE idtransacciones='$qwe[transacciones_idtransacciones]'");
+        $idtr = $trans->fetch_assoc();
 
-         $res = array("idfactura" => $qwe['idfactura'], "fecha" => $qwe['fecha'], "nfactura" => $qwe['nfactura'], "montofactura" => $qwe['montofactura']);
+        if($qwe['clasefactura'] == '1'){ //PAGO --> PROVEEDOR
+            $cl = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='$qwe[proveedorcliente_idproveedorcliente]'");
+            $clientSelect = $cl->fetch_assoc();
+        }else{
+            $cl = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='$qwe[proveedorcliente_idproveedorcliente]'");
+            $clientSelect = $cl->fetch_assoc();
+        }
+
+         $res = array("idfactura" => $qwe['idfactura'], "fecha" => $qwe['fecha'], "nfactura" => $qwe['nfactura'], "montofactura" => $qwe['montofactura'],"codigotransaccion" => $idtr['codigotransaccion'],"por_concepto_de" => $qwe['por_concepto_de'],"prov_client" => $clientSelect['nombre']);
          array_push($lista, $res);
      }
     
@@ -789,7 +757,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
         $res = "";
         $registro = $this->dbc->query("select * from gestion where idempresa='$empresa' and estado='2' Limit 1");
         $qwe = $this->dbc->fetch($registro);
-        //$res=array("id"=>,"nombre"=>$qwe['nombre']); listar_recibo_otras_cuentas
+        //$res=array("id"=>,"nombre"=>$qwe['nombre']); listar_recibo_otras_cuentas cliente
         return $qwe['idgestion'];
     }
 }

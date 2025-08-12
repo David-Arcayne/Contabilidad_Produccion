@@ -686,6 +686,6 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     $cont->registrar_factura_pago_otras_cuentas($_POST['por_concepto_de'],$_POST['fecha'],$_POST['nfactura'],$_POST['nautorizacion'],$_POST['codigocontrol'],$_POST['montofactura'],$_POST['tasacero'],$_POST['export'],$_POST['npoliza'],$_POST['iceiecdhotros'],$_POST['descuentobonificacion'],$_POST['clasefactura'],$_POST['cobrado'],$_POST['pagado'],$_POST['idotras_cuentas'],$_POST['especificacion'],$_POST['trans'],$_POST['cliente'],$_POST['empresa'],$_POST['cuenta'],$_POST['sucursal'],$_POST['asiento'],$_POST['idcajas_bancos']);
     }
 //  vincula crearfacturas registroproveedor registrocobrarfactura editar_caja_bancos_facturas -- crearfacturasf5
-//  registrocobrarfacturaGrupal crearfacturas caja_bancos registrar_factura_pago registrar_otras_cuentas 
+//  registrocobrarfacturaGrupal crearfacturas caja_bancos registrar_factura_pago registrar_otras_cuentas registrar_recibo_otras_cuentas
 }// registropagarfactura impuestocrearf5 registrar_factura desconsolidar registrar_factura_pagos_transaccion proveedor registrar_factura_recibo_pago_cajaBancos
 ?> 

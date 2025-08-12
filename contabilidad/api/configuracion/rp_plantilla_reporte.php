@@ -240,6 +240,35 @@ class PlantillaReporte extends DB{
         echo json_encode(["success", "Edición y reordenamiento exitoso", "rp_editar_plantilla"]);
     }
 
+    public function editar_plantilla_completo($idplantilla, $idplandecuenta, $nombre_personalizado, $tipo_operacion, $orden, $idplantilla_padre, $nivel, $disponible_para_otro_reporte, $empresa) {
+        $idempresa = $this->get_id_empresa($empresa);
+
+        $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM pr_plantilla WHERE idplantilla_padre = '$idplantilla'");
+        $resultado = $consulta->fetch_assoc();
+        $existe_plantilla = $resultado['total'];
+
+
+        $consulta2 = $this->dbc->query("SELECT COUNT(*) AS total FROM agrupacion_plantilla WHERE idplantilla_padre = '$idplantilla'");
+        $resultado2 = $consulta2->fetch_assoc();
+        $existe_agrupacion = $resultado2['total'];
+
+        if()//tipo operacion es diferente de lo q ya existe en la base de datos  entonces ir abajo
+        if ($existe_plantilla > 0 || $existe_agrupacion > 0) { // EL REGISTRO TIENE DEPENDENCIAS
+            $res = array("danger", "El registro no puede editarse","editarCaracteristicas");
+        }else {
+            // Insertar el nuevo registro
+            $registroListaCompra = $this->dbc->query("UPDATE divisa
+                                    SET simbolo = '$simbolo',
+                                    nombre = '$nombre'
+                                    WHERE iddivisa = '$id';");
+            if ($registroListaCompra === TRUE) {                                                                                                                                                                
+                $res = array("success", "Edición exitosa","editarCaracteristicas");
+            } else {
+                $res = array("danger", "No se pudo editar",$id,$nombre,$empresa);
+            }
+        }
+        echo json_encode($res);
+    }
     public function eliminar_plantilla($idplantilla, $idplantilla_padre, $nivel, $idplantilla_reporte, $idempresa)
     {
         $id_empresa = $this->get_id_empresa($idempresa);
@@ -736,7 +765,7 @@ $gestion = $this->get_id_gestion($empresa);
             if (0 > 0) {
                 $res = array("danger", "No se puede eliminar porque hay registros en proveedor_has_material","eliminar_proveedor");
             } else {
-                // Insertar el nuevo registro
+                // Insertar el nuevo registro 
                 $delete = $this->dbc->query("DELETE FROM agrupacion_plantilla WHERE idagrupacion_plantilla = '$idagrupacion_plantilla'");
                 if ($delete === TRUE) {                                                                                                                                                    
                     $res = array("success", "se elimino exitosamente","eliminarCaracteristica");
