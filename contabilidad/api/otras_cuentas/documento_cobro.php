@@ -361,11 +361,14 @@ while ($qwe = $this->dbc->fetch($registro)) {
 
     if ($factura_lista->num_rows > 0) {
         while ($factu = $this->dbc->fetch($factura_lista)) {
-            $factura= $this->dbc->query("SELECT * FROM otras_cuentas WHERE idotras_cuentas = '$factu[idotras_cuentas]'");
+            // $factura= $this->dbc->query("SELECT * FROM otras_cuentas WHERE idotras_cuentas = '$factu[idotras_cuentas]'");
+            // $ft = $factura->fetch_assoc();
+
+            $factura= $this->dbc->query("SELECT * FROM recibo WHERE idotras_cuentas = '$factu[idotras_cuentas]'");
             $ft = $factura->fetch_assoc();
 
             // if($ft['cobrado'] != 0){
-                $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $ft['id_cliente_proveedor'] . "'");
+                $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $ft['cliente_proveedor'] . "'");
                 $cl = $cliente->fetch_assoc();
             // }else{
             //     $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='" . $ft['proveedorcliente_idproveedorcliente'] . "'");
@@ -379,12 +382,13 @@ while ($qwe = $this->dbc->fetch($registro)) {
                 "fecha" => $recib['fecha'],
                 "persona" => $recib['persona'],
                 "idotras_cuentas" => $ft['idotras_cuentas'],
-                "fecha_oc" => $ft['fecha'],
-                "nro_otras_cuentas" => $ft['nro_otras_cuentas'],
-                "nombre" => $cl['nombre'],
-                "direccion" => $cl['direccion'],
-                "nit" => $cl['nit'],
-                "concepto" => $ft['concepto']
+                "fecha_oc" => $ft['fecha'], // recibo
+                "nro_recibo" => $ft['nro_recibo'], // nro recibo
+                "nombre" => $cl['nombre'], // rec
+                "direccion" => $cl['direccion'], // rec
+                "nit" => $cl['nit'], // rec
+                //nombre del q registra
+                "concepto" => $ft['concepto'] // concepto del recibo
             
             );
 
@@ -410,7 +414,10 @@ while ($qwe = $this->dbc->fetch($registro)) {
             array_push($res['caja_bancos'], $detalle_caja_bancos);
         }
     }else{
-          $factura= $this->dbc->query("SELECT * FROM otras_cuentas WHERE idotras_cuentas = '$recib[idotras_cuentas]'");
+        //   $factura= $this->dbc->query("SELECT * FROM otras_cuentas WHERE idotras_cuentas = '$recib[idotras_cuentas]'");
+        // $ft = $factura->fetch_assoc();
+
+        $factura= $this->dbc->query("SELECT * FROM recibo WHERE idotras_cuentas = '$recib[idotras_cuentas]'");
         $ft = $factura->fetch_assoc();
 
         $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $ft['id_cliente_proveedor'] . "'");

@@ -216,18 +216,39 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
     }
         echo json_encode($res);
     }
+    // public function listar_recibo_otras_cuentas($idotras_cuentas) {
+    //     $lista = [];
+    //     // $idempresa = $this->getidempresa($empresa);
+    
+    //     // Preparar la consulta
+    //   $listado = $this->dbc->query("SELECT c.idcuentaspof,c.nrecibo,c.fecha,c.monto,c.persona,c.ci,c.transaccion,c.archivo,c.lugar FROM cuentaspof as c WHERE c.idotras_cuentas='$idotras_cuentas'");
+    //  while ($qwe = $this->dbc->fetch($listado)) {
+
+    //     $trans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE idtransacciones='$qwe[transaccion]'");
+    //     $idtr = $trans->fetch_assoc();
+
+    //      $res = array("id" => $qwe[0], "recibo" => $qwe[1], "fecha" => $qwe[2], "monto" => $qwe[3], "persona" => $qwe[4], "ci" => $qwe[5],"transaccion" => $qwe[6], "codigotransaccion" => $idtr['codigotransaccion'],"nombre_archivo" => $qwe[7],"lugar" => $qwe[8]);
+    //      array_push($lista, $res);
+    //  }
+    
+    //     echo json_encode($lista, JSON_NUMERIC_CHECK); 
+    // }
     public function listar_recibo_otras_cuentas($idotras_cuentas) {
         $lista = [];
-        // $idempresa = $this->getidempresa($empresa);
+        // $idempresa = $this->getidempresa($empresa); 
     
         // Preparar la consulta
-      $listado = $this->dbc->query("SELECT c.idcuentaspof,c.nrecibo,c.fecha,c.monto,c.persona,c.ci,c.transaccion,c.archivo,c.lugar FROM cuentaspof as c WHERE c.idotras_cuentas='$idotras_cuentas'");
+      $listado = $this->dbc->query("SELECT c.idrecibo,c.nro_recibo,c.fecha,c.monto,c.persona,c.ci,c.transaccion,c.archivo,c.lugar FROM recibo as c WHERE c.idotras_cuentas='$idotras_cuentas'");
      while ($qwe = $this->dbc->fetch($listado)) {
 
         $trans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE idtransacciones='$qwe[transaccion]'");
         $idtr = $trans->fetch_assoc();
 
-         $res = array("id" => $qwe[0], "recibo" => $qwe[1], "fecha" => $qwe[2], "monto" => $qwe[3], "persona" => $qwe[4], "ci" => $qwe[5],"transaccion" => $qwe[6], "codigotransaccion" => $idtr['codigotransaccion'],"nombre_archivo" => $qwe[7],"lugar" => $qwe[8]);
+         $res = array("id" => $qwe[0], "recibo" => $qwe[1],
+          "fecha" => $qwe[2], "monto" => $qwe[3], "persona" => $qwe[4],
+           "ci" => $qwe[5],"transaccion" => $qwe[6],
+            "codigotransaccion" => $idtr['codigotransaccion'],
+            "nombre_archivo" => $qwe[7],"lugar" => $qwe[8]);
          array_push($lista, $res);
      }
     
@@ -689,22 +710,44 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
         echo json_encode($res);
     }
 
-    public function listar_recibo_otras_cuentas_pagar($idotras_cuentas) {
-        // ini_set('display_errors', 1);
-        // ini_set('display_startup_errors', 1);
-        // error_reporting(E_ALL);
+    // public function listar_recibo_otras_cuentas_pagar($idotras_cuentas) {
+    //     // ini_set('display_errors', 1);
+    //     // ini_set('display_startup_errors', 1);
+    //     // error_reporting(E_ALL);
 
+    //     $lista = [];
+    //     // $idempresa = $this->getidempresa($empresa);
+    
+    //     // Preparar la consulta
+    //   $listado = $this->dbc->query("SELECT c.idcuentaspor,c.nrecibo,c.fecha,c.monto,c.persona,c.ci,c.transaccion,c.archivo,c.lugar FROM cuentaspor as c WHERE c.idotras_cuentas='$idotras_cuentas'");
+    //  while ($qwe = $this->dbc->fetch($listado)) {
+    
+    //     $trans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE idtransacciones='$qwe[transaccion]'");
+    //     $idtr = $trans->fetch_assoc();
+
+    //      $res = array("id" => $qwe[0], "recibo" => $qwe[1], "fecha" => $qwe[2], "monto" => $qwe[3], "persona" => $qwe[4], "ci" => $qwe[5],"transaccion" => $qwe[6], "codigotransaccion" => $idtr['codigotransaccion'],"nombre_archivo" => $qwe[7],"lugar" => $qwe[8]);
+    //      array_push($lista, $res);
+    //  }
+    
+    //     echo json_encode($lista, JSON_NUMERIC_CHECK);
+    // }
+
+    public function listar_recibo_otras_cuentas_pagar($idotras_cuentas) {
         $lista = [];
-        // $idempresa = $this->getidempresa($empresa);
+        // $idempresa = $this->getidempresa($empresa); 
     
         // Preparar la consulta
-      $listado = $this->dbc->query("SELECT c.idcuentaspor,c.nrecibo,c.fecha,c.monto,c.persona,c.ci,c.transaccion,c.archivo,c.lugar FROM cuentaspor as c WHERE c.idotras_cuentas='$idotras_cuentas'");
+      $listado = $this->dbc->query("SELECT c.idrecibo,c.nro_recibo,c.fecha,c.monto,c.persona,c.ci,c.transaccion,c.archivo,c.lugar FROM recibo as c WHERE c.idotras_cuentas='$idotras_cuentas'");
      while ($qwe = $this->dbc->fetch($listado)) {
-    
+
         $trans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE idtransacciones='$qwe[transaccion]'");
         $idtr = $trans->fetch_assoc();
 
-         $res = array("id" => $qwe[0], "recibo" => $qwe[1], "fecha" => $qwe[2], "monto" => $qwe[3], "persona" => $qwe[4], "ci" => $qwe[5],"transaccion" => $qwe[6], "codigotransaccion" => $idtr['codigotransaccion'],"nombre_archivo" => $qwe[7],"lugar" => $qwe[8]);
+         $res = array("id" => $qwe[0], "recibo" => $qwe[1],
+          "fecha" => $qwe[2], "monto" => $qwe[3], "persona" => $qwe[4],
+           "ci" => $qwe[5],"transaccion" => $qwe[6],
+            "codigotransaccion" => $idtr['codigotransaccion'],
+            "nombre_archivo" => $qwe[7],"lugar" => $qwe[8]);
          array_push($lista, $res);
      }
     
@@ -739,6 +782,89 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
     
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
+
+    public function listar_comprobantes_cobros($empresa) {
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
+
+        $lista = [];
+        $idempresa = $this->getidempresa($empresa);
+    
+        // Preparar la consulta
+        $getPedido = $this->dbc->query("SELECT * FROM cuentaspof WHERE idcuentaspof IN (715,716,718,745)");
+    
+        while ($qwe = $this->dbc->fetch($getPedido)) {
+            $res = array(
+                "lugar" => $qwe['lugar'],
+                "persona" => $qwe['persona'],
+                "ci" => $qwe['ci'],
+                "fecha" => $qwe['fecha'],
+                "monto" => $qwe['monto'],
+                "registro_desde" => $qwe['registro_desde'],
+                "transaccion" => $qwe['transaccion'],
+                "cobrado" => $qwe['cobrado'],
+                "pagado" => $qwe['pagado'],
+                "idotras_cuentas" => $qwe['idotras_cuentas'],
+                "nro_otras_cuentas" => $qwe['nro_otras_cuentas'],
+                "id_cliente_proveedor" => $qwe['id_cliente_proveedor'],
+                "concepto" => $qwe['concepto'],
+                "idempresa" => $qwe['idempresa'],
+            );
+            array_push($lista, $res);
+        }
+    
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
+
+    public function listar_comprobantes_pagos($empresa) {
+        //  ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
+        $lista = [];
+        $idempresa = $this->getidempresa($empresa);
+    
+        // Preparar la consulta
+        $getPedido = $this->dbc->query("select * from cuentaspor where idcuentaspor in (1020,1021,1045)");
+    
+        while ($qwe = $this->dbc->fetch($getPedido)) {
+            $res = array(
+                "lugar" => $qwe['lugar'],
+                "persona" => $qwe['persona'],
+                "ci" => $qwe['ci'],
+                "fecha" => $qwe['fecha'],
+                "monto" => $qwe['monto'],
+                "registro_desde" => $qwe['registro_desde'],
+                "transaccion" => $qwe['transaccion'],
+                "cobrado" => $qwe['cobrado'],
+                "pagado" => $qwe['pagado'],
+                "idotras_cuentas" => $qwe['idotras_cuentas'],
+                "nro_otras_cuentas" => $qwe['nro_otras_cuentas'],
+                "id_cliente_proveedor" => $qwe['id_cliente_proveedor'],
+                "concepto" => $qwe['concepto'],
+                "idempresa" => $qwe['idempresa'],
+            );
+            array_push($lista, $res);
+        }
+    
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
+
+    public function registrar_recibo_comprobantes_clonacion($nro_recibo,$fecha,$lugar,$cliente,$persona,$ci,$monto,$cobrado,$pagado,$idotras_cuentas,$transaccion,$concepto,$registro_desde,$idempresa){
+        // $idempresa = Empresa::getidempresa($empresa);
+            // Insertar el nuevo registro
+            $registroProveedor = $this->dbc->query("INSERT INTO recibo(nro_recibo,fecha,lugar,cliente_proveedor,persona,ci,monto,cobrado,pagado,idotras_cuentas,transaccion,concepto,archivo,registro_desde,idempresa) 
+            VALUES ('$nro_recibo','$fecha','$lugar','$cliente','$persona','$ci','$monto','$cobrado','$pagado','$idotras_cuentas','$transaccion','$concepto','NULL','$registro_desde','$idempresa')");
+            if ($registroProveedor === TRUE) {                                                                                                                                                                
+                $res = array("success", "Registro exitoso","registroCaracteristicas");
+            } else {
+                $res = array("danger", "No se pudo registrar");
+            }
+        
+        echo json_encode($res);
+        
+    }
+
     public function getidempresa($md5)
     {
         $registro = $this->dbe->query("select * from organizacion where md5(idorganizacion)='$md5'");

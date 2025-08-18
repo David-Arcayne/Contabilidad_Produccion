@@ -131,9 +131,9 @@ class Filtrado_facturas extends DB{
         // $idempresa = $this->getidempresa($empresa);
                   // echo json_encode(array($cobrado,$idcaja_bancos,$empresa));
                   
-                  ini_set('display_errors', 1);
-                  ini_set('display_startup_errors', 1);
-                  error_reporting(E_ALL);
+                //   ini_set('display_errors', 1);
+                //   ini_set('display_startup_errors', 1);
+                //   error_reporting(E_ALL);
   
   
           $lista = [];

@@ -26,6 +26,8 @@ class Transacciones extends DB{
             $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
         VALUE(NULL,'$nroTransaccion','$fecha','$tipocambio','$ndocumento','$glosa','1','1','$tipotransaccion','$ide','$idsucursal','$idgestion')");
 
+        $idtransaccion = $this->dbc->insert_id;
+
         }else{
             //HAY Q CREAR TIPO DE CAMBIO 
             $registro_tipoCambio = $this->dbc->query("INSERT INTO tipodecambio(dolar,ufv,fecha,idorganizacion)
@@ -36,10 +38,14 @@ class Transacciones extends DB{
         $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
         VALUE(NULL,'$nroTransaccion','$fecha','$idtipo_cambio','$ndocumento','$glosa','1','1','$tipotransaccion','$ide','$idsucursal','$idgestion')");
 
+        $idtransaccion = $this->dbc->insert_id;
         }
        
         if ($writetrans === TRUE) {
-            $res = array("success", "Se Registro Correctamente", "registrotransaccion");
+            $tt = $this->dbc->query("SELECT * FROM tipotransaccion WHERE idtipotransaccion='" . $tipotransaccion . "'");
+            $asd = $this->dbc->fetch($tt);
+
+            $res = array("success", "Se Registro Correctamente", "registrotransaccion",$idtransaccion,$nroTransaccion,$fecha,$glosa,'1',$asd['nombre'],$tipotransaccion,$idgestion,'1', $tipocambio);
         } else {
             $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
         }

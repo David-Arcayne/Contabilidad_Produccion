@@ -684,8 +684,11 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     }elseif($ver=="registrar_factura_pago_otras_cuentas"){
     $cont=new Recibo_otras_cuentas();
     $cont->registrar_factura_pago_otras_cuentas($_POST['por_concepto_de'],$_POST['fecha'],$_POST['nfactura'],$_POST['nautorizacion'],$_POST['codigocontrol'],$_POST['montofactura'],$_POST['tasacero'],$_POST['export'],$_POST['npoliza'],$_POST['iceiecdhotros'],$_POST['descuentobonificacion'],$_POST['clasefactura'],$_POST['cobrado'],$_POST['pagado'],$_POST['idotras_cuentas'],$_POST['especificacion'],$_POST['trans'],$_POST['cliente'],$_POST['empresa'],$_POST['cuenta'],$_POST['sucursal'],$_POST['asiento'],$_POST['idcajas_bancos']);
+    }elseif($ver=="registrar_recibo_comprobantes_clonacion"){
+    $cont=new Recibo_otras_cuentas();
+    $cont->registrar_recibo_comprobantes_clonacion($_POST['nro_recibo'],$_POST['fecha'],$_POST['lugar'],$_POST['cliente_proveedor'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['cobrado'],$_POST['pagado'],$_POST['idotras_cuentas'],$_POST['transaccion'],$_POST['concepto'],$_POST['registro_desde'],$_POST['idempresa']);
     }
-//  vincula crearfacturas registroproveedor registrocobrarfactura editar_caja_bancos_facturas -- crearfacturasf5
-//  registrocobrarfacturaGrupal crearfacturas caja_bancos registrar_factura_pago registrar_otras_cuentas registrar_recibo_otras_cuentas
+//  vincula crearfacturas registroproveedor registrocobrarfactura editar_caja_bancos_facturas -- crearfacturasf5 registrar_factura_cobro registrar_factura_cobro_otras_cuentas --> aumentar usuario
+//  registrocobrarfacturaGrupal crearfacturas caja_bancos registrar_factura_pago registrar_otras_cuentas registrar_recibo_otras_cuentas--> aumentar usuario creartransaccion
 }// registropagarfactura impuestocrearf5 registrar_factura desconsolidar registrar_factura_pagos_transaccion proveedor registrar_factura_recibo_pago_cajaBancos
 ?> 
