@@ -257,10 +257,12 @@ class PlantillaReporte extends DB{
             $res = array("danger", "El registro no puede editarse","editarCaracteristicas");
         }else {
             // Insertar el nuevo registro
-            $registroListaCompra = $this->dbc->query("UPDATE divisa
-                                    SET simbolo = '$simbolo',
-                                    nombre = '$nombre'
-                                    WHERE iddivisa = '$id';");
+            $registroListaCompra = $this->dbc->query("UPDATE pr_plantilla
+                                    SET idplandecuenta = '$idplandecuenta',
+                                    nombre_personalizado = '$nombre_personalizado',
+                                    tipo_operacion = '$tipo_operacion',
+                                    orden = '$orden'
+                                    WHERE idplantilla = '$idplantilla';");
             if ($registroListaCompra === TRUE) {                                                                                                                                                                
                 $res = array("success", "Edición exitosa","editarCaracteristicas");
             } else {
