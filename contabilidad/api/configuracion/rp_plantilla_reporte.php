@@ -199,7 +199,7 @@ class PlantillaReporte extends DB{
         echo json_encode(["success", "Registro y reordenamiento exitoso", "rp_registrar_plantilla"]);
     }
 
-    public function editar_plantilla($idplantilla, $idplandecuenta, $nombre_personalizado, $tipo_operacion, $orden, $idplantilla_padre, $nivel, $disponible_para_otro_reporte, $idempresa)
+    public function editar_plantilla_incompleto($idplantilla, $idplandecuenta, $nombre_personalizado, $tipo_operacion, $orden, $idplantilla_padre, $nivel, $disponible_para_otro_reporte, $idempresa)
     {
         $id_empresa = $this->get_id_empresa($idempresa);
 
@@ -240,7 +240,7 @@ class PlantillaReporte extends DB{
         echo json_encode(["success", "Edición y reordenamiento exitoso", "rp_editar_plantilla"]);
     }
 
-    public function editar_plantilla_completo($idplantilla, $idplandecuenta, $nombre_personalizado, $tipo_operacion, $orden, $idplantilla_padre, $nivel, $disponible_para_otro_reporte, $empresa) {
+    public function rp_editar_plantilla($idplantilla, $idplandecuenta, $nombre_personalizado, $tipo_operacion, $orden, $idplantilla_padre, $nivel, $disponible_para_otro_reporte, $empresa) {
         $idempresa = $this->get_id_empresa($empresa);
 
         $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM pr_plantilla WHERE idplantilla_padre = '$idplantilla'");
@@ -252,21 +252,119 @@ class PlantillaReporte extends DB{
         $resultado2 = $consulta2->fetch_assoc();
         $existe_agrupacion = $resultado2['total'];
 
-        if()//tipo operacion es diferente de lo q ya existe en la base de datos  entonces ir abajo
+        // if()//tipo operacion es diferente de lo q ya existe en la base de datos  entonces ir abajo
         if ($existe_plantilla > 0 || $existe_agrupacion > 0) { // EL REGISTRO TIENE DEPENDENCIAS
+            //NO SE PODRA EDITAR EL TIPO_OPERACION PERO SI EL ORDEN (EN DUDA)
+
             $res = array("danger", "El registro no puede editarse","editarCaracteristicas");
         }else {
-            // Insertar el nuevo registro
-            $registroListaCompra = $this->dbc->query("UPDATE pr_plantilla
+            // se editara
+            $pregunta = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla = '$idplantilla'");
+            $res_pregunta = $pregunta->fetch_assoc();
+            if($orden == $res_pregunta['orden']){ //NO QUIEREN CAMBIAR EL ORDEN
+                $editar = $this->dbc->query("UPDATE pr_plantilla
                                     SET idplandecuenta = '$idplandecuenta',
                                     nombre_personalizado = '$nombre_personalizado',
-                                    tipo_operacion = '$tipo_operacion',
-                                    orden = '$orden'
+                                    tipo_operacion = '$tipo_operacion'
                                     WHERE idplantilla = '$idplantilla';");
-            if ($registroListaCompra === TRUE) {                                                                                                                                                                
+
+            }elseif($orden > $res_pregunta['orden']){ // SI QUIEREN CAMBIAR EL ORDEN
+                //EL NUEVO ORDEN ES MAYOR QUE EL ORDEN Q YA ESTA REGISTRADO
+
+                if($idplantilla_padre == ""){ //ESTE REGISTRO ES DE NIVEL 1
+                $orden_inicio = $res_pregunta['orden'] + 1;
+
+                $consulta_nivel_1 = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla_reporte = '$res_pregunta[idplantilla_reporte]' 
+                AND idempresa = '$idempresa' AND nivel = '$res_pregunta[nivel]' AND orden BETWEEN '$orden_inicio' AND '$orden' ORDER BY orden ASC");
+
+                while ($rg = $this->dbc->fetch($consulta_nivel_1)) {
+                        $nuevo_orden = $rg['orden'] - 1;
+                        $editar_orden_demas = $this->dbc->query("UPDATE pr_plantilla
+                                    SET orden = '$nuevo_orden'
+                                    WHERE idplantilla = '$rg[idplantilla]';");
+                    }
+                    $editar = $this->dbc->query("UPDATE pr_plantilla
+                                    SET orden = '$orden',
+                                    idplandecuenta = '$idplandecuenta',
+                                    nombre_personalizado = '$nombre_personalizado',
+                                    tipo_operacion = '$tipo_operacion'
+                                    WHERE idplantilla = '$idplantilla';");
+
+                }else{
+                    // $consulta_nivel_2 = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla_reporte = '$res_pregunta[idplantilla_reporte]' 
+                    // AND idempresa = '$idempresa' AND nivel = '$res_pregunta[nivel]' AND idplantilla_padre ='$res_pregunta[idplantilla_padre]' ORDER BY orden ASC");
+
+                    $orden_inicio = $res_pregunta['orden'] + 1;
+
+                    $recorrer_registro = $this->dbc->query("SELECT * FROM pr_plantilla where idplantilla_reporte = '$res_pregunta[idplantilla_reporte]' 
+                    AND idempresa = '$idempresa' AND nivel = '$res_pregunta[nivel]' AND idplantilla_padre ='$res_pregunta[idplantilla_padre]' AND orden BETWEEN '$orden_inicio' AND '$orden' ORDER BY orden ASC");
+
+                    while ($rg = $this->dbc->fetch($recorrer_registro)) {
+                        $nuevo_orden = $rg['orden'] - 1;
+                        $editar_orden_demas = $this->dbc->query("UPDATE pr_plantilla
+                                    SET orden = '$nuevo_orden'
+                                    WHERE idplantilla = '$rg[idplantilla]';");
+                    }
+                    $editar = $this->dbc->query("UPDATE pr_plantilla
+                                    SET orden = '$orden',
+                                    idplandecuenta = '$idplandecuenta',
+                                    nombre_personalizado = '$nombre_personalizado',
+                                    tipo_operacion = '$tipo_operacion'
+                                    WHERE idplantilla = '$idplantilla';");
+
+                }
+            }elseif($orden < $res_pregunta['orden']){ //EL ORDEN INGRESADO ES MENOR QUE EL ORDEN DEL REGISTRO Q SE EDITARA
+
+                if($idplantilla_padre == ""){ //ESTE REGISTRO ES DE NIVEL 1
+                $orden_final = $res_pregunta['orden'] - 1; //4
+
+                $consulta_nivel_1 = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla_reporte = '$res_pregunta[idplantilla_reporte]' 
+                AND idempresa = '$idempresa' AND nivel = '$res_pregunta[nivel]' AND orden BETWEEN '$orden' AND '$orden_final' ORDER BY orden ASC");
+
+                while ($rg = $this->dbc->fetch($consulta_nivel_1)) {
+                        $nuevo_orden = $rg['orden'] + 1;
+                        $editar_orden_demas = $this->dbc->query("UPDATE pr_plantilla
+                                    SET orden = '$nuevo_orden'
+                                    WHERE idplantilla = '$rg[idplantilla]';");
+                    }
+                    $editar = $this->dbc->query("UPDATE pr_plantilla
+                                    SET orden = '$orden',
+                                    idplandecuenta = '$idplandecuenta',
+                                    nombre_personalizado = '$nombre_personalizado',
+                                    tipo_operacion = '$tipo_operacion'
+                                    WHERE idplantilla = '$idplantilla';");
+
+                }else{
+                    // $consulta_nivel_2 = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla_reporte = '$res_pregunta[idplantilla_reporte]' 
+                    // AND idempresa = '$idempresa' AND nivel = '$res_pregunta[nivel]' AND idplantilla_padre ='$res_pregunta[idplantilla_padre]' ORDER BY orden ASC");
+
+                    $orden_final = $res_pregunta['orden'] - 1;
+
+                    $recorrer_registro = $this->dbc->query("SELECT * FROM pr_plantilla where idplantilla_reporte = '$res_pregunta[idplantilla_reporte]' 
+                    AND idempresa = '$idempresa' AND nivel = '$res_pregunta[nivel]' AND idplantilla_padre ='$res_pregunta[idplantilla_padre]' AND orden BETWEEN '$orden' AND '$orden_final' ORDER BY orden ASC");
+
+                    while ($rg = $this->dbc->fetch($recorrer_registro)) {
+                        $nuevo_orden = $rg['orden'] + 1;
+                        $editar_orden_demas = $this->dbc->query("UPDATE pr_plantilla
+                                    SET orden = '$nuevo_orden'
+                                    WHERE idplantilla = '$rg[idplantilla]';");
+                    }
+                    $editar = $this->dbc->query("UPDATE pr_plantilla
+                                    SET orden = '$orden',
+                                    idplandecuenta = '$idplandecuenta',
+                                    nombre_personalizado = '$nombre_personalizado',
+                                    tipo_operacion = '$tipo_operacion'
+                                    WHERE idplantilla = '$idplantilla';");
+
+                }
+
+            }
+            // $es_diferente_orden = $res_pregunta['orden'];
+
+            if ($editar === TRUE) {                                                                                                                                                                
                 $res = array("success", "Edición exitosa","editarCaracteristicas");
             } else {
-                $res = array("danger", "No se pudo editar",$id,$nombre,$empresa);
+                $res = array("danger", "No se pudo editar");
             }
         }
         echo json_encode($res);
