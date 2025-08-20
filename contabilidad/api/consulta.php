@@ -526,9 +526,9 @@ elseif($ver[0]=="rp_listar_plantilla"){
 }elseif($ver[0]=="rp_obtener_datos_reporte"){
     $cont=new PlantillaReporte();
     $cont->obtener_datos_reporte($ver[1], $ver[2], $ver[3], $ver[4]);
-}elseif($ver[0]=="reporte_balance_general_actualizado"){
+}elseif($ver[0]=="reporte_balance_general_prueba"){
     $cont=new Reporte_confi();
-    $cont->reporte_balance_general_actualizado($ver[1],$ver[2],$ver[3]);
+    $cont->reporte_balance_general_prueba($ver[1],$ver[2],$ver[3]);
 }elseif($ver[0]=="listar_agrupacion_plantilla"){
     $cont=new PlantillaReporte();
     $cont->listar_agrupacion_plantilla($ver[1]);
@@ -584,8 +584,8 @@ elseif($ver[0]=="listar_otras_cuentas_cobrar_select"){
     $cont->listar_comprobantes_cobros($ver[1]);
 }
 
-//   listar_recibo_otras_cuentas listar_factura_otras_cuentas lista_pagar_pagado_factura listar_recibo_por_id_otras_cuentas  factura
+//   listar_recibo_otras_cuentas listar_factura_otras_cuentas lista_pagar_pagado_factura listar_recibo_por_id_otras_cuentas  factura reporte_balance_general_actualizado
 //  caja_banco listatransacciones_comercial alerta reportebalancegeneral listafacturaapi_pagado lista_cobrar_cobrado_factura  listar_recibo_otras_cuentas 
-//listaf   re listar_otras_cuentas existe_empresa_modulo listafactura_cobrado_trans listar_usuarios  listafactura_pago_trans
+//listaf   re listar_otras_cuentas existe_empresa_modulo listafactura_cobrado_trans listar_usuarios  listafactura_pago_trans anular
 //report reportecomprobantecontable eliminarfactura listar_caja_bancos_usuarios listar_usuarios listar_caja_bancos_por_usuario listar_recibo_por_id
 ?>

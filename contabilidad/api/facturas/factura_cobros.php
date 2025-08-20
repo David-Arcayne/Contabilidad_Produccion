@@ -282,4 +282,75 @@ class Factura_cobros extends DB{
         echo json_encode($res);
     }
 
+    public function anular_factura($idfactura,$tipo_factura) {
+        // $idempresa = $this->getidempresa($empresa);
+
+            // ANULAR LA FACTURA
+            $anular_factura = $this->dbc->query("UPDATE factura
+                                    SET estado = '2'
+                                    WHERE idfactura = '$idfactura';");
+
+            if ($anular_factura === TRUE) {     
+                $consulta1 = $this->dbc->query("SELECT * FROM cuentaspof WHERE idfactura = '$idfactura'");
+                $resultado1 = $consulta1->fetch_assoc();
+                $total_cobros = $resultado1['total'];
+
+                $consulta2 = $this->dbc->query("SELECT * FROM cuentaspor WHERE idfactura = '$idfactura'");
+                $resultado2 = $consulta2->fetch_assoc();
+                $total_pagos = $resultado2['total'];
+
+        if($total_cobros > 0){
+            $anular_comprobante = $this->dbc->query("UPDATE cuentaspof
+                                    SET estado = '2'
+                                    WHERE idfactura = '$idfactura';");
+        }elseif($total_pagos > 0){
+            $anular_comprobante = $this->dbc->query("UPDATE cuentaspor
+                                    SET estado = '2'
+                                    WHERE idfactura = '$idfactura';");
+        }else{
+            // SOLO SE ANULARA LAS FACTURA PORQUE NO TIENE COMPROBANTE ASIGNADO
+        }
+                $res = array("success", "Edición exitosa","editarCaracteristicas");
+            } else {
+                $res = array("danger", "No se pudo editar");
+            }
+
+        echo json_encode($res);
+    }
+
+    public function anular_recibo($idrecibo,$tipo_factura) {
+        // $idempresa = $this->getidempresa($empresa);
+
+            // ANULAR LA RECIBO
+            $anular_recibo = $this->dbc->query("UPDATE recibo
+                                    SET estado = '2'
+                                    WHERE idrecibo = '$idrecibo';");
+
+            if ($anular_recibo === TRUE) {     
+                $consulta1 = $this->dbc->query("SELECT * FROM cuentaspof WHERE idrecibo = '$idrecibo'");
+                $resultado1 = $consulta1->fetch_assoc();
+                $total_cobros = $resultado1['total'];
+
+                $consulta2 = $this->dbc->query("SELECT * FROM cuentaspor WHERE idrecibo = '$idrecibo'");
+                $resultado2 = $consulta2->fetch_assoc();
+                $total_pagos = $resultado2['total'];
+
+        if($total_cobros > 0){
+            $anular_comprobante = $this->dbc->query("UPDATE cuentaspof
+                                    SET estado = '2'
+                                    WHERE idrecibo = '$idrecibo';");
+        }elseif($total_pagos > 0){
+            $anular_comprobante = $this->dbc->query("UPDATE cuentaspor
+                                    SET estado = '2'
+                                    WHERE idrecibo = '$idrecibo';");
+        }else{
+            // SOLO SE ANULARA EL RECIBO PORQUE NO TIENE COMPROBANTE ASIGNADO
+        }
+                $res = array("success", "Edición exitosa","editarCaracteristicas");
+            } else {
+                $res = array("danger", "No se pudo editar");
+            }
+
+        echo json_encode($res);
+    }
 }
