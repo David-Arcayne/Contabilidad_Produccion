@@ -73,11 +73,11 @@ class Factura_cobros extends DB{
         if($trans == "" && $asiento == ""){
             // se crea factura sin transaccion asignada
             //$trans = 0
-            $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa', '$espesificacion', '1', '1', '0', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de','tributario_cobrado');");
+            $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`,`idotras_cuentas`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa','0', '$espesificacion', '1', '1', '0', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de','tributario_cobrado');");
   
         }elseif($trans > 0 && $asiento == 0){
             //SE CREA LA FACTURA CON LA TRANSACCION EXISTENTE QUE YA TE PASARON
-            $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa', '$espesificacion', '1', '1', '$trans', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de','tributario_cobrado');");
+            $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`,`idotras_cuentas`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa','0', '$espesificacion', '1', '1', '$trans', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de','tributario_cobrado');");
 
         }else{
             // Obtener el número de transacción más reciente y sumar 1
@@ -116,7 +116,7 @@ class Factura_cobros extends DB{
             $orden = $orden + 1;
         }
 //------------------------------------------------------------------------------
-        $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa', '$espesificacion', '1', '1', '$idtrans', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de','tributario_cobrado');");
+        $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`,`idotras_cuentas`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa','0', '$espesificacion', '1', '1', '$idtrans', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de','tributario_cobrado');");
 
         }
         }else{
@@ -125,7 +125,7 @@ class Factura_cobros extends DB{
         if($trans == "" && $asiento == ""){
             // se crea factura sin transaccion asignada
             //$trans = 0
-            $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa', '$espesificacion', '1', '1', '0', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de','$registro_desde');");
+            $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`,`idotras_cuentas`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa','0', '$espesificacion', '1', '1', '0', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de','$registro_desde');");
         
             $idfact = $this->dbc->insert_id;
 
@@ -135,7 +135,7 @@ class Factura_cobros extends DB{
             $idrecibo = $this->dbc->insert_id;
         }elseif($trans > 0 && $asiento == 0){
             //SE CREA LA FACTURA CON LA TRANSACCION EXISTENTE QUE YA TE PASARON
-            $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa', '$espesificacion', '1', '1', '$trans', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de','$registro_desde');");
+            $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`,`idotras_cuentas`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa','0', '$espesificacion', '1', '1', '$trans', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de','$registro_desde');");
         
             $idfact = $this->dbc->insert_id;
 
@@ -179,7 +179,7 @@ class Factura_cobros extends DB{
             $orden = $orden + 1;
         }
 //------------------------------------------------------------------------------
-        $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa', '$espesificacion', '1', '1', '$idtrans', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de','tributario_cobrado');");
+        $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`,`idotras_cuentas`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa','0', '$espesificacion', '1', '1', '$idtrans', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de','tributario_cobrado');");
         
         $idfact = $this->dbc->insert_id;
 
@@ -252,11 +252,11 @@ class Factura_cobros extends DB{
         
         if($cobro == 1){
             // NO SE CREARA RECIBO
-            $registro_factura = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa', '$espesificacion', '1', '1', '$trans', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de','transaccion_x_cobrar');");
+            $registro_factura = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`,`idotras_cuentas`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa','0', '$espesificacion', '1', '1', '$trans', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de','transaccion_x_cobrar');");
 
         }else{
             //SI SE CREARA RECIBO
-            $registro_factura = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa', '$espesificacion', '1', '1', '$trans', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de','transaccion_cobrado');");
+            $registro_factura = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`,`idotras_cuentas`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa','0', '$espesificacion', '1', '1', '$trans', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de','transaccion_cobrado');");
         
             $idfact = $this->dbc->insert_id;
 
@@ -282,75 +282,75 @@ class Factura_cobros extends DB{
         echo json_encode($res);
     }
 
-    public function anular_factura($idfactura,$tipo_factura) {
-        // $idempresa = $this->getidempresa($empresa);
+    // public function anular_factura($idfactura,$tipo_factura) {
+    //     // $idempresa = $this->getidempresa($empresa);
 
-            // ANULAR LA FACTURA
-            $anular_factura = $this->dbc->query("UPDATE factura
-                                    SET estado = '2'
-                                    WHERE idfactura = '$idfactura';");
+    //         // ANULAR LA FACTURA
+    //         $anular_factura = $this->dbc->query("UPDATE factura
+    //                                 SET estado = '2'
+    //                                 WHERE idfactura = '$idfactura';");
 
-            if ($anular_factura === TRUE) {     
-                $consulta1 = $this->dbc->query("SELECT * FROM cuentaspof WHERE idfactura = '$idfactura'");
-                $resultado1 = $consulta1->fetch_assoc();
-                $total_cobros = $resultado1['total'];
+    //         if ($anular_factura === TRUE) {     
+    //             $consulta1 = $this->dbc->query("SELECT * FROM cuentaspof WHERE idfactura = '$idfactura'");
+    //             $resultado1 = $consulta1->fetch_assoc();
+    //             $total_cobros = $resultado1['total'];
 
-                $consulta2 = $this->dbc->query("SELECT * FROM cuentaspor WHERE idfactura = '$idfactura'");
-                $resultado2 = $consulta2->fetch_assoc();
-                $total_pagos = $resultado2['total'];
+    //             $consulta2 = $this->dbc->query("SELECT * FROM cuentaspor WHERE idfactura = '$idfactura'");
+    //             $resultado2 = $consulta2->fetch_assoc();
+    //             $total_pagos = $resultado2['total'];
 
-        if($total_cobros > 0){
-            $anular_comprobante = $this->dbc->query("UPDATE cuentaspof
-                                    SET estado = '2'
-                                    WHERE idfactura = '$idfactura';");
-        }elseif($total_pagos > 0){
-            $anular_comprobante = $this->dbc->query("UPDATE cuentaspor
-                                    SET estado = '2'
-                                    WHERE idfactura = '$idfactura';");
-        }else{
-            // SOLO SE ANULARA LAS FACTURA PORQUE NO TIENE COMPROBANTE ASIGNADO
-        }
-                $res = array("success", "Edición exitosa","editarCaracteristicas");
-            } else {
-                $res = array("danger", "No se pudo editar");
-            }
+    //     if($total_cobros > 0){
+    //         $anular_comprobante = $this->dbc->query("UPDATE cuentaspof
+    //                                 SET estado = '2'
+    //                                 WHERE idfactura = '$idfactura';");
+    //     }elseif($total_pagos > 0){
+    //         $anular_comprobante = $this->dbc->query("UPDATE cuentaspor
+    //                                 SET estado = '2'
+    //                                 WHERE idfactura = '$idfactura';");
+    //     }else{
+    //         // SOLO SE ANULARA LAS FACTURA PORQUE NO TIENE COMPROBANTE ASIGNADO
+    //     }
+    //             $res = array("success", "Edición exitosa","editarCaracteristicas");
+    //         } else {
+    //             $res = array("danger", "No se pudo editar");
+    //         }
 
-        echo json_encode($res);
-    }
+    //     echo json_encode($res);
+    // }
 
-    public function anular_recibo($idrecibo,$tipo_factura) {
-        // $idempresa = $this->getidempresa($empresa);
+    // public function anular_recibo($idrecibo,$tipo_factura) {
+    //     // $idempresa = $this->getidempresa($empresa);
 
-            // ANULAR LA RECIBO
-            $anular_recibo = $this->dbc->query("UPDATE recibo
-                                    SET estado = '2'
-                                    WHERE idrecibo = '$idrecibo';");
+    //         // ANULAR LA RECIBO
+    //         $anular_recibo = $this->dbc->query("UPDATE recibo
+    //                                 SET estado = '2'
+    //                                 WHERE idrecibo = '$idrecibo';");
 
-            if ($anular_recibo === TRUE) {     
-                $consulta1 = $this->dbc->query("SELECT * FROM cuentaspof WHERE idrecibo = '$idrecibo'");
-                $resultado1 = $consulta1->fetch_assoc();
-                $total_cobros = $resultado1['total'];
+    //         if ($anular_recibo === TRUE) {     
+    //             $consulta1 = $this->dbc->query("SELECT * FROM cuentaspof WHERE idrecibo = '$idrecibo'");
+    //             $resultado1 = $consulta1->fetch_assoc();
+    //             $total_cobros = $resultado1['total'];
 
-                $consulta2 = $this->dbc->query("SELECT * FROM cuentaspor WHERE idrecibo = '$idrecibo'");
-                $resultado2 = $consulta2->fetch_assoc();
-                $total_pagos = $resultado2['total'];
+    //             $consulta2 = $this->dbc->query("SELECT * FROM cuentaspor WHERE idrecibo = '$idrecibo'");
+    //             $resultado2 = $consulta2->fetch_assoc();
+    //             $total_pagos = $resultado2['total'];
 
-        if($total_cobros > 0){
-            $anular_comprobante = $this->dbc->query("UPDATE cuentaspof
-                                    SET estado = '2'
-                                    WHERE idrecibo = '$idrecibo';");
-        }elseif($total_pagos > 0){
-            $anular_comprobante = $this->dbc->query("UPDATE cuentaspor
-                                    SET estado = '2'
-                                    WHERE idrecibo = '$idrecibo';");
-        }else{
-            // SOLO SE ANULARA EL RECIBO PORQUE NO TIENE COMPROBANTE ASIGNADO
-        }
-                $res = array("success", "Edición exitosa","editarCaracteristicas");
-            } else {
-                $res = array("danger", "No se pudo editar");
-            }
+    //     if($total_cobros > 0){
+    //         $anular_comprobante = $this->dbc->query("UPDATE cuentaspof
+    //                                 SET estado = '2'
+    //                                 WHERE idrecibo = '$idrecibo';");
+    //     }elseif($total_pagos > 0){
+    //         $anular_comprobante = $this->dbc->query("UPDATE cuentaspor
+    //                                 SET estado = '2'
+    //                                 WHERE idrecibo = '$idrecibo';");
+    //     }else{
+    //         // SOLO SE ANULARA EL RECIBO PORQUE NO TIENE COMPROBANTE ASIGNADO
+    //     }
+    //             $res = array("success", "Edición exitosa","editarCaracteristicas");
+    //         } else {
+    //             $res = array("danger", "No se pudo editar");
+    //         }
 
-        echo json_encode($res);
-    }
+    //     echo json_encode($res);
+    // }
 }

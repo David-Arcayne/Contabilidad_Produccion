@@ -495,6 +495,7 @@ while ($qwe = $this->dbc->fetch($registro)) {
                 "precio" => $qwe['precio'],
                 "pagado" => $asd[0],
                 "saldo" => $saldo,
+                "idforma_pago" => $qwe['forma_pago'],
                 "forma_pago" => $fp['nombre'],
                 "archivo" => $qwe['archivo']
             );
@@ -607,7 +608,7 @@ while ($qwe = $this->dbc->fetch($registro)) {
     
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
-    public function editar_otras_cuentas($idotras_cuentas,$fecha,$lugar,$id_cliente_proveedor,$nro_tributario,$contacto,$nro_doc_identidad,$idtipo,$concepto,$condiciones,$observaciones,$precio,$forma_pago) {
+    public function editar_otras_cuentas($idotras_cuentas,$fecha,$lugar,$id_cliente_proveedor,$nro_tributario,$contacto,$nro_doc_identidad,$idtipo,$concepto,$condiciones,$observaciones,$precio,$forma_pago,$fecha_venci) {
         // $idempresa = $this->getidempresa($empresa);
 
         // $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM caracteristicas WHERE caracteristica = '$nombre' AND empresa_idempresa = '$idempresa' AND idcaracteristicas != '$id'");
@@ -630,7 +631,8 @@ while ($qwe = $this->dbc->fetch($registro)) {
                                     condiciones = '$condiciones',
                                     observaciones = '$observaciones',
                                     precio = '$precio',
-                                    forma_pago = '$forma_pago'
+                                    forma_pago = '$forma_pago',
+                                    fecha_venci = '$fecha_venci'
                                     WHERE idotras_cuentas = '$idotras_cuentas';");
             if ($registroListaCompra === TRUE) {                                                                                                                                                                
                 $res = array("success", "Edición exitosa","editarCaracteristicas");
@@ -851,6 +853,7 @@ while ($qwe = $this->dbc->fetch($registro)) {
                 "precio" => $qwe['precio'],
                 "pagado" => $asd[0],
                 "saldo" => $saldo,
+                "idforma_pago" => $qwe['forma_pago'],
                 "forma_pago" => $fp['nombre'],
                 "archivo" => $qwe['archivo']
             );
@@ -1068,29 +1071,23 @@ while ($qwe = $this->dbc->fetch($registro)) {
 
                $getPedido = $this->dbc->query("SELECT *
                     FROM otras_cuentas oc
-                    WHERE oc.clase_otras_cuentas='2' AND oc.idempresa='$idempresa' ORDER BY oc.idotras_cuentas DESC");
+                    WHERE oc.clase_otras_cuentas='2' AND oc.idempresa='$idempresa'AND CURDATE() <= fecha_venci ORDER BY oc.idotras_cuentas DESC");
 
         while ($qwe = $this->dbc->fetch($getPedido)) {
 
             $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='$qwe[id_cliente_proveedor]'");
             $cl = $this->dbcm->fetch($cliente);
 
-            $cobras = $this->dbc->query("SELECT SUM(monto) FROM cuentaspof WHERE idotras_cuentas='$qwe[0]'"); //173
-                    $asd = $this->dbc->fetch($cobras);
-                    $saldo = $qwe['precio'] - $asd[0];
-
-            if($saldo != 0){
+           
                 $res = array(
                 "idotras_cuentas" => $qwe['idotras_cuentas'],
                 "fecha" => $qwe['fecha'],
                 "nro_otras_cuentas" => $qwe['nro_otras_cuentas'],
-                "saldo" => $saldo,
+                // "saldo" => $saldo,
                 "nombrep" => $cl['nombre']
                 );
                 array_push($lista, $res);
-            }else{
-
-            }
+          
             // array_push($lista, $res);
         }
     
@@ -1109,29 +1106,50 @@ while ($qwe = $this->dbc->fetch($registro)) {
 
                $getPedido = $this->dbc->query("SELECT *
                     FROM otras_cuentas oc
-                    WHERE oc.clase_otras_cuentas='1' AND oc.idempresa='$idempresa' ORDER BY oc.idotras_cuentas DESC");
+                    WHERE oc.clase_otras_cuentas='1' AND oc.idempresa='$idempresa'AND CURDATE() <= fecha_venci ORDER BY oc.idotras_cuentas DESC");
 
         while ($qwe = $this->dbc->fetch($getPedido)) {
 
             $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='$qwe[id_cliente_proveedor]'");
             $prov = $this->dbcm->fetch($proveedor);
 
-            $cobras = $this->dbc->query("SELECT SUM(monto) FROM cuentaspor WHERE idotras_cuentas='$qwe[0]'"); //173
-                    $asd = $this->dbc->fetch($cobras);
-                    $saldo = $qwe['precio'] - $asd[0];
-
-            if($saldo != '0'){
+          
                 $res = array(
                 "idotras_cuentas" => $qwe['idotras_cuentas'],
                 "fecha" => $qwe['fecha'],
                 "nro_otras_cuentas" => $qwe['nro_otras_cuentas'],
-                "saldo" => $saldo,
                 "nombrep" => $prov['nombre']
                 );
                 array_push($lista, $res);
-            }else{
+           
+            // array_push($lista, $res);
+        }
+    
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
+     public function listar_nro_tributario_cliente($id_prov_client, $cobro_pago) {
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+        $lista = [];
+        // $idempresa = $this->getidempresa($empresa);
+    
+        // Preparar la consulta
+        // $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idempresa = '$idempresa' ORDER BY idotras_cuentas DESC");
 
-            }
+        if($cobro_pago == '1'){ // CLIENTE
+        $cliente_proveedor = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente = '$id_prov_client'");
+        }else{
+        $cliente_proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor = '$id_prov_client'");
+        }
+    
+        while ($qwe = $this->dbc->fetch($cliente_proveedor)) {
+
+                $res = array(
+                "nro_tributario" => $qwe['nit']
+                );
+                array_push($lista, $res);
+          
             // array_push($lista, $res);
         }
     
@@ -1158,5 +1176,5 @@ while ($qwe = $this->dbc->fetch($registro)) {
         $qwe = $this->dbe->fetch($registro);
         return $qwe['idsucursalcontable'];
     }
-    //listar_recibo_por_id_otras_cuentas_pagar
+    //listar_recibo_por_id_otras_cuentas_pagar precio_restante editar
 }

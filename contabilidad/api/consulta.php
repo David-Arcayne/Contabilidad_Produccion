@@ -582,10 +582,25 @@ elseif($ver[0]=="listar_otras_cuentas_cobrar_select"){
 }elseif($ver[0]=="listar_comprobantes_cobros"){
     $cont=new Recibo_otras_cuentas();
     $cont->listar_comprobantes_cobros($ver[1]);
+}elseif($ver[0]=="listar_tipo_reportes_gestion"){
+    $cont=new PlantillaReporte();
+    $cont->listar_tipo_reportes_gestion($ver[1]);
+}elseif($ver[0]=="select_plantilla_estado_resultados"){
+    $cont=new PlantillaReporte();
+    $cont->select_plantilla_estado_resultados($ver[1]);
+}elseif($ver[0]=="select_plantilla_balance_general"){
+    $cont=new Reporte_confi();
+    $cont->select_plantilla_balance_general($ver[1]);
+}elseif($ver[0]=="listar_nro_tributario_cliente"){
+    $cont=new Documento_cobro();
+    $cont->listar_nro_tributario_cliente($ver[1],$ver[2]);
+}elseif($ver[0]=="listar_plantilla_por_registro"){
+    $cont=new Reporte_confi();
+    $cont->listar_plantilla_por_registro($ver[1]);
 }
 
-//   listar_recibo_otras_cuentas listar_factura_otras_cuentas lista_pagar_pagado_factura listar_recibo_por_id_otras_cuentas  factura reporte_balance_general_actualizado
-//  caja_banco listatransacciones_comercial alerta reportebalancegeneral listafacturaapi_pagado lista_cobrar_cobrado_factura  listar_recibo_otras_cuentas 
-//listaf   re listar_otras_cuentas existe_empresa_modulo listafactura_cobrado_trans listar_usuarios  listafactura_pago_trans anular
-//report reportecomprobantecontable eliminarfactura listar_caja_bancos_usuarios listar_usuarios listar_caja_bancos_por_usuario listar_recibo_por_id
+// listar_recibo_otras_cuentas listar_factura_otras_cuentas lista_pagar_pagado_factura listar_recibo_por_id_otras_cuentas  factura reporte_balance_general_actualizado
+// caja_banco listatransacciones_comercial alerta reportebalancegeneral listafacturaapi_pagado lista_cobrar_cobrado_factura  listar_recibo_otras_cuentas 
+//listaf   re listar_otras_cuentas existe_empresa_modulo listafactura_cobrado_trans listar_usuarios  listafactura_pago_trans anular milistaplanes listar_datos_contrataciones_cajas
+//report reportecomprobantecontable eliminarfactura listar_caja_bancos_usuarios listar_usuarios listar_caja_bancos_por_usuario listar_recibo_por_id reportecuenta
 ?>

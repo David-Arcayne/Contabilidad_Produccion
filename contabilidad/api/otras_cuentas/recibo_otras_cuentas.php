@@ -883,7 +883,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
         $res = "";
         $registro = $this->dbc->query("select * from gestion where idempresa='$empresa' and estado='2' Limit 1");
         $qwe = $this->dbc->fetch($registro);
-        //$res=array("id"=>,"nombre"=>$qwe['nombre']); listar_recibo_otras_cuentas cliente
+        //$res=array("id"=>,"nombre"=>$qwe['nombre']); listar_recibo_otras_cuentas cliente precio_restante
         return $qwe['idgestion'];
     }
 }

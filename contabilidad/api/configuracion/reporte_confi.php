@@ -72,9 +72,13 @@ class Reporte_confi extends DB{
         // $totalRegistros = $resultado['total'];
 
             if ($idplandecuenta != "" && $reporte != "" && $nivel != "") {
-                
+            $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM configuracion_reporte WHERE nombre_cuenta_superior ='$nombre_cuenta_superior'
+            AND nivel_registrado = '$nivel' AND idempresa ='$idempresa'");
+            $resultado = $consulta->fetch_assoc();             
+            $orden_ulti = $resultado['total'] + 1;
+
                 // Insertar el nuevo registro
-                $registroProveedor = $this->dbc->query("INSERT INTO configuracion_reporte(idplandecuenta,reporte,nombre_cuenta_superior,nivel_registrado,grupo,es_calculable,es_activo_fijo,idempresa) VALUES ('$idplandecuenta','$reporte','$nombre_cuenta_superior','$nivel','$grupo','$es_calculable','$es_activo_fijo','$idempresa')");
+                $registroProveedor = $this->dbc->query("INSERT INTO configuracion_reporte(idplandecuenta,reporte,nombre_cuenta_superior,nivel_registrado,orden,grupo,es_calculable,es_activo_fijo,idempresa) VALUES ('$idplandecuenta','$reporte','$nombre_cuenta_superior','$nivel','$orden_ulti','$grupo','$es_calculable','$es_activo_fijo','$idempresa')");
                 if ($registroProveedor === TRUE) {                                                                                                                                                                
                     $res = array("success", "Registro exitoso","registroCaracteristicas");
                 } else {
@@ -169,7 +173,7 @@ class Reporte_confi extends DB{
         
         // $get_nivel_2 = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE nivel_registrado = '2' AND idempresa = '$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
 
-        $get_nivel_2 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '' AND reporte = '$qwe[reporte]' AND idempresa='$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
+        $get_nivel_2 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '' AND reporte = '$qwe[reporte]' AND idempresa='$idempresa' ORDER BY orden ASC");// ACTIVO, PASIVO, PATRIMONIO
         while ($qwe2 = $this->dbc->fetch($get_nivel_2)) {
         $cuenta = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe2[idplandecuenta]'");// ACTIVO, PASIVO, PATRIMONIO
         $nombre_cuenta = $cuenta->fetch_assoc();
@@ -180,12 +184,13 @@ class Reporte_confi extends DB{
                 "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
                 "es_activo_fijo" => $qwe2['es_activo_fijo'],
                 "es_calculable" => $qwe2['es_calculable'],
+                "orden" => $qwe2['orden'],
                 "nivel_2" => [] //activo
                 // "nivel_3" => $qwe['nombre'],// 
                 // "estado" => $qwe['estado']
                 
             );
-            $get_nivel_3 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta[nombreplan]' AND reporte = '$qwe[reporte]' AND idempresa='$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
+            $get_nivel_3 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta[nombreplan]' AND reporte = '$qwe[reporte]' AND idempresa='$idempresa' ORDER BY orden ASC");// ACTIVO, PASIVO, PATRIMONIO
             while ($qwe3 = $this->dbc->fetch($get_nivel_3)) {
                 $cuenta2 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe3[idplandecuenta]'");// ACTIVO, PASIVO, PATRIMONIO
                 $nombre_cuenta2 = $cuenta2->fetch_assoc();
@@ -196,11 +201,12 @@ class Reporte_confi extends DB{
                 "nombre_nivel_2" => $nombre_cuenta2['nombreplan'],
                 "es_activo_fijo" => $qwe3['es_activo_fijo'],
                 "es_calculable" => $qwe3['es_calculable'],
+                "orden" => $qwe3['orden'],
                 "nivel_3" => [] //activo
                 // "nivel_3" => $qwe['nombre'],// 
                 // "estado" => $qwe['estado']
                 );
-                 $get_nivel_4 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta2[nombreplan]' AND reporte = '$qwe[reporte]' AND idempresa='$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
+                 $get_nivel_4 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta2[nombreplan]' AND reporte = '$qwe[reporte]' AND idempresa='$idempresa' ORDER BY orden ASC");// ACTIVO, PASIVO, PATRIMONIO
                 while ($qwe4 = $this->dbc->fetch($get_nivel_4)) {
                     $cuenta3 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe4[idplandecuenta]'");// ACTIVO, PASIVO, PATRIMONIO
                     $nombre_cuenta3 = $cuenta3->fetch_assoc();
@@ -212,9 +218,10 @@ class Reporte_confi extends DB{
                     "nombre_nivel_3" => $nombre_cuenta3['nombreplan'],
                     "es_activo_fijo" => $qwe4['es_activo_fijo'],
                     "es_calculable" => $qwe4['es_calculable'],
+                    "orden" => $qwe4['orden'],
                     "nivel_4" => [] //activo
                     );
-                    $get_nivel_5 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta3[nombreplan]' AND reporte = '$qwe[reporte]' AND idempresa='$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
+                    $get_nivel_5 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta3[nombreplan]' AND reporte = '$qwe[reporte]' AND idempresa='$idempresa' ORDER BY orden ASC");// ACTIVO, PASIVO, PATRIMONIO
                     while ($qwe5 = $this->dbc->fetch($get_nivel_5)) {
                         $cuenta4 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe5[idplandecuenta]'");// ACTIVO, PASIVO, PATRIMONIO
                         $nombre_cuenta4 = $cuenta4->fetch_assoc();
@@ -226,10 +233,11 @@ class Reporte_confi extends DB{
                         "nombre_nivel_4" => $nombre_cuenta4['nombreplan'],
                         "es_activo_fijo" => $qwe5['es_activo_fijo'],
                         "es_calculable" => $qwe5['es_calculable'],
+                        "orden" => $qwe5['orden'],
                         "nivel_5" => [] //activo
                         );
                 //----------------------------------------------------------------------------
-                    $get_nivel_6 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta4[nombreplan]' AND reporte = '$qwe[reporte]' AND idempresa='$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
+                    $get_nivel_6 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta4[nombreplan]' AND reporte = '$qwe[reporte]' AND idempresa='$idempresa' ORDER BY orden ASC");// ACTIVO, PASIVO, PATRIMONIO
                     while ($qwe6 = $this->dbc->fetch($get_nivel_6)) {
                         $cuenta5 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe6[idplandecuenta]'");// ACTIVO, PASIVO, PATRIMONIO
                         $nombre_cuenta5 = $cuenta5->fetch_assoc();
@@ -241,6 +249,7 @@ class Reporte_confi extends DB{
                         "nombre_nivel_5" => $nombre_cuenta5['nombreplan'],
                         "es_activo_fijo" => $qwe6['es_activo_fijo'],
                         "es_calculable" => $qwe6['es_calculable'],
+                        "orden" => $qwe6['orden'],
                         "nivel_5" => [] //activo
                         );
                         
@@ -270,7 +279,7 @@ class Reporte_confi extends DB{
         $gestion = $this->getidgestion($empresa);
 
         $lista =[];
-        $get_nivel_2 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '' AND reporte ='balance_general' AND idempresa='$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
+        $get_nivel_2 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '' AND reporte ='balance_general' AND idempresa='$idempresa' ORDER BY orden ASC");// ACTIVO, PASIVO, PATRIMONIO
         $total_pasivo_patrimonio = 0;
         while ($qwe2 = $this->dbc->fetch($get_nivel_2)) {
             $cuenta = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe2[idplandecuenta]'");// ACTIVO, PASIVO, PATRIMONIO
@@ -291,7 +300,7 @@ class Reporte_confi extends DB{
                     "nivel_2" => [] //activo
                     );
                 $suma_nivel_2 = 0;
-                $get_nivel_3 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta[nombreplan]' AND idempresa='$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
+                $get_nivel_3 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta[nombreplan]' AND idempresa='$idempresa' ORDER BY orden ASC");// ACTIVO, PASIVO, PATRIMONIO
                 while ($qwe3 = $this->dbc->fetch($get_nivel_3)) {
                     // ACTIVO_CIRCULANTE, ACTIVO_FIJO
                     // if($qwe3['es_activo_fijo'] == '1'){ // TRUE
@@ -311,7 +320,7 @@ class Reporte_confi extends DB{
                     "nivel_3" => [] //activo
                     );
                     $suma_nivel_3 = 0;
-                    $get_nivel_4 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta2[nombreplan]' AND idempresa='$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
+                    $get_nivel_4 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta2[nombreplan]' AND idempresa='$idempresa' ORDER BY orden ASC");// ACTIVO, PASIVO, PATRIMONIO
                     while ($qwe4 = $this->dbc->fetch($get_nivel_4)) {
                         // Activo_disponible, exigible, Acciones telefonicas
                         $cuenta3 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe4[idplandecuenta]'");// Activo_disponible, exigible
@@ -420,7 +429,7 @@ class Reporte_confi extends DB{
                         "suma_nivel_4" => 0,
                         "nivel_4" => [] //activo
                         );
-                        $get_nivel_5 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta3[nombreplan]' AND idempresa='$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
+                        $get_nivel_5 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta3[nombreplan]' AND idempresa='$idempresa' ORDER BY orden ASC");// ACTIVO, PASIVO, PATRIMONIO
                         $suma_nivel_4 = 0;
                         $suma_nivel_5 = 0;
                         while ($qwe5 = $this->dbc->fetch($get_nivel_5)) {
@@ -533,7 +542,7 @@ class Reporte_confi extends DB{
                         "suma_nivel_5" => 0,
                         "nivel_5" => [] //activo
                         );
-                        $get_nivel_6 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta4[nombreplan]' AND idempresa='$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
+                        $get_nivel_6 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta4[nombreplan]' AND idempresa='$idempresa' ORDER BY orden ASC");// ACTIVO, PASIVO, PATRIMONIO
                         // $suma_nivel_5 = 0;
                         while ($qwe6 = $this->dbc->fetch($get_nivel_6)) { //esto ya es nivel 5 = CALCULABLE
                             $cuenta5 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe6[idplandecuenta]'");// caja_general, banco
@@ -603,7 +612,7 @@ class Reporte_confi extends DB{
                     "nivel_2" => [] //activo
                     );
                 $suma_nivel_2 = 0;
-                $get_nivel_3 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta[nombreplan]' AND idempresa='$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
+                $get_nivel_3 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta[nombreplan]' AND idempresa='$idempresa' ORDER BY orden ASC");// ACTIVO, PASIVO, PATRIMONIO
                 while ($qwe3 = $this->dbc->fetch($get_nivel_3)) {
                     $cuenta2 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe3[idplandecuenta]'");// ACTIVO_CIRCULANTE, ACTIVO_FIJO
                     $nombre_cuenta2 = $cuenta2->fetch_assoc();
@@ -616,7 +625,7 @@ class Reporte_confi extends DB{
                     "nivel_3" => [] //activo
                     );
                     $suma_nivel_3 = 0;
-                    $get_nivel_4 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta2[nombreplan]' AND idempresa='$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
+                    $get_nivel_4 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta2[nombreplan]' AND idempresa='$idempresa' ORDER BY orden ASC");// ACTIVO, PASIVO, PATRIMONIO
                     while ($qwe4 = $this->dbc->fetch($get_nivel_4)) {
                         $cuenta3 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe4[idplandecuenta]'");// Activo_disponible, exigible
                         $nombre_cuenta3 = $cuenta3->fetch_assoc();
@@ -669,7 +678,7 @@ class Reporte_confi extends DB{
                     "nivel_2" => [] //activo
                     );
                 $suma_nivel_2 = 0;
-                $get_nivel_3 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta[nombreplan]' AND idempresa='$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
+                $get_nivel_3 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta[nombreplan]' AND idempresa='$idempresa' ORDER BY orden ASC");// ACTIVO, PASIVO, PATRIMONIO
                 while ($qwe3 = $this->dbc->fetch($get_nivel_3)) {
                     $cuenta2 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe3[idplandecuenta]'");// ACTIVO_CIRCULANTE, ACTIVO_FIJO
                     $nombre_cuenta2 = $cuenta2->fetch_assoc();
@@ -1711,6 +1720,95 @@ class Reporte_confi extends DB{
         // array_push($lista, $res2);
         echo json_encode($lista, JSON_NUMERIC_CHECK);  
 }
+public function select_plantilla_balance_general($empresa)
+    {
+        ini_set('display_errors', 1); 
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+
+        $ide = $this->getidempresa($empresa);
+        $lista = [];
+        $registro = $this->dbc->query("SELECT idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,organizacion_idorganizacion,idp FROM plandecuenta WHERE organizacion_idorganizacion='$ide' ORDER BY numero ASC");
+        while ($qwe = $this->dbc->fetch($registro)) {
+            
+            $existe_plantilla = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE idplandecuenta = '$qwe[idplandecuenta]' AND idempresa='$ide'");
+            if($existe_plantilla->num_rows > 0){
+                $res = array("idplandecuenta" => $qwe['idplandecuenta'], "numero" => $qwe['numero'], "nombre" => $qwe['nombreplan'], "estado" => 'usado');
+
+            }else{
+                $res = array("idplandecuenta" => $qwe['idplandecuenta'], "numero" => $qwe['numero'], "nombre" => $qwe['nombreplan'], "estado" => 'no_usado');
+            }
+            array_push($lista, $res);
+        }
+        echo json_encode($lista);
+    }
+
+    //-----------------------------------------------------------------------------
+    public function insertar_debajo_de($idplandecuenta,$reporte,$nombre_cuenta_superior,$nivel,$orden,$grupo,$es_calculable,$es_activo_fijo,$empresa){
+        // $idempresa = Empresa::getidempresa($empresa);
+        $idempresa = $this->getidempresa($empresa);
+        // $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM divisa WHERE nombre = '$nombre' AND idempresa = '$idempresa'");
+        // $resultado = $consulta->fetch_assoc();
+        // $totalRegistros = $resultado['total'];
+
+        //ME PASARA EL ORDEN ACTUAL Q QUIERE INSERTAR
+
+            if ($idplandecuenta != "" && $reporte != "" && $nivel != "") {
+            $consulta = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE nombre_cuenta_superior ='$nombre_cuenta_superior'
+            AND nivel_registrado = '$nivel' AND idempresa ='$idempresa' AND orden >= '$orden'");
+            // $resultado = $consulta->fetch_assoc();             
+            // $orden_ulti = $resultado['total'] + 1;
+
+            while ($qwe = $this->dbc->fetch($consulta)) {
+                $nuevo_orden = $qwe['orden'] + 1;
+                $edicion_orden = $this->dbc->query("UPDATE configuracion_reporte 
+                                                        SET orden = '$nuevo_orden' 
+                                                        WHERE idconfiguracion_reporte = '$qwe[idconfiguracion_reporte]'");
+            }
+                // Insertar el nuevo registro
+                $registro_confi = $this->dbc->query("INSERT INTO configuracion_reporte(idplandecuenta,reporte,nombre_cuenta_superior,nivel_registrado,orden,grupo,es_calculable,es_activo_fijo,idempresa) VALUES ('$idplandecuenta','$reporte','$nombre_cuenta_superior','$nivel','$orden','$grupo','$es_calculable','$es_activo_fijo','$idempresa')");
+                if ($registro_confi === TRUE) {                                                                                                                                                                
+                    $res = array("success", "Registro exitoso","registroCaracteristicas");
+                } else {
+                    $res = array("danger", "No se pudo registrar");
+                }
+            } else {
+                $res = array("danger", "No se pudo realizar el registro","Error");
+            }
+        
+        echo json_encode($res);
+        
+    }
+    public function listar_plantilla_por_registro($id) {
+        $lista = [];
+        // $idempresa = $this->getidempresa($empresa);
+    
+        // Preparar la consulta
+        $consulta = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE idconfiguracion_reporte = '$id'");
+        // $resultado = $consulta->fetch_assoc();             
+        
+        while ($qwe = $this->dbc->fetch($consulta)) {
+
+            $nuevo_orden = $qwe['orden'] + 1;
+
+            $res = array(
+                "idconfiguracion_reporte" => $qwe['idconfiguracion_reporte'],
+                "idplandecuenta" => $qwe['idplandecuenta'],
+                "reporte" => $qwe['reporte'],
+                "nombre_cuenta_superior" => $qwe['nombre_cuenta_superior'],
+                "nivel_registrado" => $qwe['nivel_registrado'],
+                "orden" => $nuevo_orden,
+                "grupo" => $qwe['grupo'],
+                "es_calculable" => $qwe['es_calculable'],
+                "es_activo_fijo" => $qwe['es_activo_fijo'],
+                "idempresa" => $qwe['idempresa']
+            );
+            array_push($lista, $res);
+        }
+    
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
+
     public function getidempresa($md5)
     {
         $registro = $this->dbe->query("select * from organizacion where md5(idorganizacion)='$md5'");
