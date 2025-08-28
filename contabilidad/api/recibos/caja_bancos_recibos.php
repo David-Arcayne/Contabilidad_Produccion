@@ -61,12 +61,12 @@ class Caja_bancos_recibos extends DB{
         WHERE oc.idempresa='$idempresa' and cp.transaccion ='0'");
         $res3 = $recibo_oc->fetch_assoc();
 
-        $recibo_reci = $this->dbc->query("SELECT count(*) AS cant4 FROM cuentaspof cp
-        INNER JOIN recibo r ON r.idrecibo=cp.idrecibo
-        WHERE r.idempresa='$idempresa' and cp.transaccion ='0'");
-        $res4 = $recibo_reci->fetch_assoc();
+        // $recibo_reci = $this->dbc->query("SELECT count(*) AS cant4 FROM cuentaspof cp
+        // INNER JOIN recibo r ON r.idrecibo=cp.idrecibo
+        // WHERE r.idempresa='$idempresa' and cp.transaccion ='0'");
+        // $res4 = $recibo_reci->fetch_assoc();
         
-        $nroRecibo = $res1['cant1'] + $res2['cant2']+ $res3['cant3']+ $res4['cant4'] + 1;
+        $nroRecibo = $res1['cant1'] + $res2['cant2']+ $res3['cant3'] + 1;
 
         $cl = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='$cliente'");
         $clientSelect = $cl->fetch_assoc();
@@ -236,12 +236,12 @@ class Caja_bancos_recibos extends DB{
         WHERE oc.idempresa='$idempresa' and cp.transaccion ='0'");
         $res3 = $recibo_oc->fetch_assoc();
 
-        $recibo_reci = $this->dbc->query("SELECT count(*) AS cant4 FROM cuentaspof cp
-        INNER JOIN recibo r ON r.idrecibo=cp.idrecibo
-        WHERE r.idempresa='$idempresa' and cp.transaccion ='0'");
-        $res4 = $recibo_reci->fetch_assoc();
+        // $recibo_reci = $this->dbc->query("SELECT count(*) AS cant4 FROM cuentaspor cp
+        // INNER JOIN recibo r ON r.idrecibo=cp.idrecibo
+        // WHERE r.idempresa='$idempresa' and cp.transaccion ='0'");
+        // $res4 = $recibo_reci->fetch_assoc();
         
-        $nroRecibo = $res1['cant1'] + $res2['cant2']+ $res3['cant3']+ $res4['cant4'] + 1;
+        $nroRecibo = $res1['cant1'] + $res2['cant2']+ $res3['cant3'] + 1;
 
         $cl = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='$cliente'");
         $proveedor_select = $cl->fetch_assoc();
@@ -2076,7 +2076,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         WHERE dc.idcaja_bancos = '$idcaja_bancos'
         AND cp.fecha BETWEEN '$fecha_ini' AND '$fecha_fin'
 
-        ORDER BY fecha ASC, nrecibo ASC;");
+        ORDER BY fecha ASC;");
     
     $aux_contador = 0;
     $saldo = 0;
@@ -2748,8 +2748,12 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         WHERE oc.idempresa='$idempresa' and cp.transaccion ='0'");
         $res3 = $recibo_oc->fetch_assoc();
 
+        // $recibo_reci = $this->dbc->query("SELECT count(*) AS cant4 FROM cuentaspof cp
+        // INNER JOIN recibo r ON r.idrecibo=cp.idrecibo
+        // WHERE r.idempresa='$idempresa' and cp.transaccion ='0'");
+        // $res4 = $recibo_reci->fetch_assoc();
+        
         $nroRecibo = $res1['cant1'] + $res2['cant2']+ $res3['cant3'] + 1;
-
         // $cl = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='$cliente'");
         // $clientSelect = $cl->fetch_assoc();
 
@@ -2757,8 +2761,8 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             // se crea factura sin transaccion asignada
             //$trans = 0
 
-            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','$trans','0',NULL,'$registro_desde')");
+            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
+            VALUES('$nroRecibo','$fecha','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','0','$trans','0',NULL,'$registro_desde')");
 
             $idrecibo = $this->dbc->insert_id;
         }elseif($trans > 0 && $asiento == 0){
@@ -2766,8 +2770,8 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         
             $idfact = $this->dbc->insert_id;
 
-            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','$trans','0',NULL,'$registro_desde')");
+            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
+            VALUES('$nroRecibo','$fecha','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','0','$trans','0',NULL,'$registro_desde')");
 
             $idrecibo = $this->dbc->insert_id;
         }else{
@@ -2810,8 +2814,8 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         
         // $idfact = $this->dbc->insert_id;
 
-        $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','$idtrans','0',NULL,'$registro_desde')");
+        $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
+            VALUES('$nroRecibo','$fecha','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','0','$idtrans','0',NULL,'$registro_desde')");
 
         $idrecibo = $this->dbc->insert_id;
         }
@@ -2873,14 +2877,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         $idsucursal = $this->getidsucursal($sucursal);
         $idempresa = $this->getidempresa($empresa);
         $gestion = $this->getgestionactualid($idempresa);
-        // $co = 0;
-        // $pa = 0;
-        // if ($cobro == 1 || $cobro == 2) {
-        //     $co = $cobro;
-        // }
-        // if ($pagar == 1 || $pagar == 2) {
-        //     $pa = $pagar;
-        // }
+    
         $res = ""; //array($fecha,$nfactura,$nautorizacion,$codigocontrol,$monto,$tasacero,$export,$npoliza,$ice,$descuento,$espesificacion,$cliente,$co,$pa,$trans,$clasefactura,$cuenta,$idempresa,$idsucursal);
         
         //--------------------------------------------------------------------
@@ -2899,6 +2896,11 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         WHERE oc.idempresa='$idempresa' and cp.transaccion ='0'");
         $res3 = $recibo_oc->fetch_assoc();
 
+        // $recibo_reci = $this->dbc->query("SELECT count(*) AS cant4 FROM cuentaspor cp
+        // INNER JOIN recibo r ON r.idrecibo=cp.idrecibo
+        // WHERE r.idempresa='$idempresa' and cp.transaccion ='0'");
+        // $res4 = $recibo_reci->fetch_assoc();
+        
         $nroRecibo = $res1['cant1'] + $res2['cant2']+ $res3['cant3'] + 1;
 
         // $cl = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='$cliente'");
@@ -2908,8 +2910,8 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             // se crea factura sin transaccion asignada
             //$trans = 0
 
-            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','$trans','0',NULL,'$registro_desde')");
+            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
+            VALUES('$nroRecibo','$fecha','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','0','$trans','0',NULL,'$registro_desde')");
 
             $idrecibo = $this->dbc->insert_id;
         }elseif($trans > 0 && $asiento == 0){
@@ -2917,8 +2919,8 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         
             $idfact = $this->dbc->insert_id;
 
-            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','$trans','0',NULL,'$registro_desde')");
+            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
+            VALUES('$nroRecibo','$fecha','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','0','$trans','0',NULL,'$registro_desde')");
 
             $idrecibo = $this->dbc->insert_id;
         }else{
@@ -2961,8 +2963,8 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         
         // $idfact = $this->dbc->insert_id;
 
-        $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','$idtrans','0',NULL,'$registro_desde')");
+        $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
+            VALUES('$nroRecibo','$fecha','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','0','$idtrans','0',NULL,'$registro_desde')");
 
         $idrecibo = $this->dbc->insert_id;
         }
@@ -3074,8 +3076,8 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
             $idrecibo_nuevo = $this->dbc->insert_id;
 
-            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha','$lugar','varios clientes','$persona','$ci','$precio','0','$id_otras_cuentas_aux','0','0',NULL,'$registro_desde')");
+            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
+            VALUES('$nroRecibo','$fecha','$lugar','varios clientes','$persona','$ci','$precio','0','$id_otras_cuentas_aux','$idrecibo_nuevo','0','0',NULL,'$registro_desde')");
 
             $idrecibo = $this->dbc->insert_id;
         }elseif($trans > 0 && $asiento == 0){
@@ -3085,8 +3087,8 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
             $idrecibo_nuevo = $this->dbc->insert_id;
 
-            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha','$lugar','varios clientes','$persona','$ci','$precio','0','$id_otras_cuentas_aux','$trans','0',NULL,'$registro_desde')");
+            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
+            VALUES('$nroRecibo','$fecha','$lugar','varios clientes','$persona','$ci','$precio','0','$id_otras_cuentas_aux','$idrecibo_nuevo','$trans','0',NULL,'$registro_desde')");
 
             $idrecibo = $this->dbc->insert_id;
         }else{
@@ -3131,8 +3133,8 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
         $idrecibo_nuevo = $this->dbc->insert_id;
 
-        $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha','$lugar','$persona','$ci','$precio','0','$id_otras_cuentas_aux','$idtrans','0',NULL,'$registro_desde')");
+        $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
+            VALUES('$nroRecibo','$fecha','$lugar','$persona','$ci','$precio','0','$id_otras_cuentas_aux','$idrecibo_nuevo','$idtrans','0',NULL,'$registro_desde')");
 
         $idrecibo = $this->dbc->insert_id;
         }
@@ -3197,17 +3199,17 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         $res = ""; //array($fecha,$nfactura,$nautorizacion,$codigocontrol,$monto,$tasacero,$export,$npoliza,$ice,$descuento,$espesificacion,$cliente,$co,$pa,$trans,$clasefactura,$cuenta,$idempresa,$idsucursal);
         
         //--------------------------------------------------------------------
-        $recibo_trans = $this->dbc->query("SELECT count(*) AS cant1 FROM cuentaspof cp 
+        $recibo_trans = $this->dbc->query("SELECT count(*) AS cant1 FROM cuentaspor cp 
         INNER JOIN transacciones t ON t.idtransacciones=cp.transaccion 
         WHERE t.organizacion_idorganizacion='$idempresa'");
         $res1 = $recibo_trans->fetch_assoc();
 
-        $recibo_fact = $this->dbc->query("SELECT count(*) AS cant2 FROM cuentaspof cp
+        $recibo_fact = $this->dbc->query("SELECT count(*) AS cant2 FROM cuentaspor cp
             INNER JOIN factura f ON f.idfactura=cp.idfactura
             WHERE f.idorganizacion='$idempresa' AND cp.transaccion = '0'");
         $res2 = $recibo_fact->fetch_assoc();
 
-        $recibo_oc = $this->dbc->query("SELECT count(*) AS cant3 FROM cuentaspof cp
+        $recibo_oc = $this->dbc->query("SELECT count(*) AS cant3 FROM cuentaspor cp
         INNER JOIN otras_cuentas oc ON oc.idotras_cuentas=cp.idotras_cuentas
         WHERE oc.idempresa='$idempresa' and cp.transaccion ='0'");
         $res3 = $recibo_oc->fetch_assoc();
@@ -3244,8 +3246,8 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
             $idrecibo_nuevo = $this->dbc->insert_id;
 
-            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha','$lugar','varios clientes','$persona','$ci','$precio','0','$id_otras_cuentas_aux','0','0',NULL,'$registro_desde')");
+            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
+            VALUES('$nroRecibo','$fecha','$lugar','varios clientes','$persona','$ci','$precio','0','$id_otras_cuentas_aux','$idrecibo_nuevo','0','0',NULL,'$registro_desde')");
 
             $idrecibo = $this->dbc->insert_id;
         }elseif($trans > 0 && $asiento == 0){
@@ -3255,8 +3257,8 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
             $idrecibo_nuevo = $this->dbc->insert_id;
 
-            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha','$lugar','varios clientes','$persona','$ci','$precio','0','$id_otras_cuentas_aux','$trans','0',NULL,'$registro_desde')");
+            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
+            VALUES('$nroRecibo','$fecha','$lugar','varios clientes','$persona','$ci','$precio','0','$id_otras_cuentas_aux','$idrecibo_nuevo','$trans','0',NULL,'$registro_desde')");
 
             $idrecibo = $this->dbc->insert_id;
         }else{
@@ -3301,8 +3303,8 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
         $idrecibo_nuevo = $this->dbc->insert_id;
 
-        $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha','$lugar','$persona','$ci','$precio','0','$id_otras_cuentas_aux','$idtrans','0',NULL,'$registro_desde')");
+        $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
+            VALUES('$nroRecibo','$fecha','$lugar','$persona','$ci','$precio','0','$id_otras_cuentas_aux','$idrecibo_nuevo','$idtrans','0',NULL,'$registro_desde')");
 
         $idrecibo = $this->dbc->insert_id;
         }
@@ -3431,7 +3433,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         return $qwe['idusuario'];
 
     }    
-    // listar_recibo_por_caja_bancos array precio_restante
-
+    // listar_recibo_por_caja_bancos array precio_restante registrar_recibo_pago_cajaBancos_en_facturas res4 registrar_recibo_cobro_cajaBancos_en_otras_cuentas
+//registrar_factura_recibo_cobro_cajaBancos, registrar_factura_recibo_pago_cajaBancos registrar_recibo_cobro_cajaBancos_en_facturas
 }
 ?>
