@@ -475,15 +475,17 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idrecibo'],$_POST['nfactura'],$_POST['tipo_documento'],$_POST['fecha'],$_POST['monto'],$_POST ['por_concepto_de'],$_POST['cliente_prov']));
         }
-    }elseif($ver=="editar_caja_bancos_otras_cuentas"){
-        if(isset($_POST['idrecibo'],$_POST['nro_documento'],$_POST['tipo_documento'],$_POST['fecha'],$_POST['tipo'],$_POST ['precio'],$_POST['concepto'],$_POST['cliente_prov'])){
-            $cont=new caja_bancos_recibos();
-            $cont->editar_caja_bancos_otras_cuentas($_POST['idrecibo'],$_POST['nro_documento'],$_POST['tipo_documento'],$_POST['fecha'],$_POST['tipo'],$_POST ['precio'],$_POST['concepto'],$_POST['cliente_prov']);
-        }
-        else{
-            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idrecibo'],$_POST['nro_documento'],$_POST['tipo_documento'],$_POST['fecha'],$_POST['tipo'],$_POST ['precio'],$_POST['concepto'],$_POST['cliente_prov']));
-        }
-    }elseif($ver=="registrar_cuenta_pre_cierre"){
+    }
+    // elseif($ver=="editar_caja_bancos_otras_cuentas"){
+    //     if(isset($_POST['idrecibo'],$_POST['nro_documento'],$_POST['tipo_documento'],$_POST['fecha'],$_POST['tipo'],$_POST ['precio'],$_POST['concepto'],$_POST['cliente_prov'])){
+    //         $cont=new caja_bancos_recibos();
+    //         $cont->editar_caja_bancos_otras_cuentas($_POST['idrecibo'],$_POST['nro_documento'],$_POST['tipo_documento'],$_POST['fecha'],$_POST['tipo'],$_POST ['precio'],$_POST['concepto'],$_POST['cliente_prov']);
+    //     }
+    //     else{
+    //         echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idrecibo'],$_POST['nro_documento'],$_POST['tipo_documento'],$_POST['fecha'],$_POST['tipo'],$_POST ['precio'],$_POST['concepto'],$_POST['cliente_prov']));
+    //     }
+    // }
+    elseif($ver=="registrar_cuenta_pre_cierre"){
         if(isset($_POST['fecha'],$_POST['empresa'],$_POST['sucursal'])){
             $cont=new Transacciones();
             $cont->registrar_cuenta_pre_cierre($_POST['fecha'],$_POST['empresa'],$_POST['sucursal']);
@@ -700,5 +702,5 @@ if($data['ver'] == "asignar_asiento_A_factura") {
 
 //  vincula  -- crearfacturasf5 registrar_factura_cobro registrar_factura_cobro_otras_cuentas --> aumentar usuario
 //  registrocobrarfacturaGrupal crearfacturas caja_bancos registrar_factura_pago registrar_otras_cuentas registrar_recibo_otras_cuentas--> aumentar usuario creartransaccion
-}// registrar_factura_recibo_cobro_cajaBancos  registrar_recibo_cobro_cajaBancos_en_otras_cuentas
+}// editar_caja_bancos_facturas registrar_factura_recibo_cobro_cajaBancos
 ?> 

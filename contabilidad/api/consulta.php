@@ -600,7 +600,7 @@ elseif($ver[0]=="listar_otras_cuentas_cobrar_select"){
 }
 
 // listar_recibo_otras_cuentas listar_factura_otras_cuentas lista_pagar_pagado_factura listar_recibo_por_id_otras_cuentas  factura reporte_balance_general_actualizado
-// caja_banco listatransacciones_comercial alerta reportebalancegeneral listafacturaapi_pagado lista_cobrar_cobrado_factura  listar_recibo_otras_cuentas 
+// caja_banco listatransacciones_comercial alerta reportebalancegeneral listafacturaapi_pagado lista_cobrar_cobrado_factura  listar_recibo_otras_cuentas  listar_recibo_otras_cuentas_pagar
 //listaf   re listar_otras_cuentas existe_empresa_modulo listafactura_cobrado_trans listar_usuarios  listafactura_pago_trans anular milistaplanes listar_datos_contrataciones_cajas
-//report reportecomprobantecontable eliminarfactura listar_caja_bancos_usuarios listar_usuarios listar_caja_bancos_por_usuario listar_recibo_por_id reportecuenta listar_recibo_otras_cuentas_pagar
+
 ?>

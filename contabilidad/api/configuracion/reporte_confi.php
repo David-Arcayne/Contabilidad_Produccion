@@ -177,6 +177,14 @@ class Reporte_confi extends DB{
         while ($qwe2 = $this->dbc->fetch($get_nivel_2)) {
         $cuenta = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe2[idplandecuenta]'");// ACTIVO, PASIVO, PATRIMONIO
         $nombre_cuenta = $cuenta->fetch_assoc();
+        
+        $depre_consulta = $this->dbc->query("SELECT * from vinculacion_cuenta_depreciacion where idcuenta_depreciacion = '$qwe2[idplandecuenta]'");// ACTIVO, PASIVO, PATRIMONIO
+
+        if($depre_consulta->num_rows > 0){
+            $es_depreciacion = 'si';
+        }else{
+            $es_depreciacion = 'no';
+        }
             $res2 = array(
                 "idconfiguracion_reporte" => $qwe2['idconfiguracion_reporte'],
                 "idplandecuenta" => $nombre_cuenta['idplandecuenta'],
@@ -185,6 +193,7 @@ class Reporte_confi extends DB{
                 "es_activo_fijo" => $qwe2['es_activo_fijo'],
                 "es_calculable" => $qwe2['es_calculable'],
                 "orden" => $qwe2['orden'],
+                "es_depreciacion" => $es_depreciacion,
                 "nivel_2" => [] //activo
                 // "nivel_3" => $qwe['nombre'],// 
                 // "estado" => $qwe['estado']
@@ -194,6 +203,15 @@ class Reporte_confi extends DB{
             while ($qwe3 = $this->dbc->fetch($get_nivel_3)) {
                 $cuenta2 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe3[idplandecuenta]'");// ACTIVO, PASIVO, PATRIMONIO
                 $nombre_cuenta2 = $cuenta2->fetch_assoc();
+
+                $depre_consulta = $this->dbc->query("SELECT * from vinculacion_cuenta_depreciacion where idcuenta_depreciacion = '$qwe3[idplandecuenta]'");// ACTIVO, PASIVO, PATRIMONIO
+
+                if($depre_consulta->num_rows > 0){
+                    $es_depreciacion = 'si';
+                }else{
+                    $es_depreciacion = 'no';
+                }
+
                 $res3 = array(
                 "idconfiguracion_reporte" => $qwe3['idconfiguracion_reporte'],
                 "idplandecuenta" => $nombre_cuenta2['idplandecuenta'],
@@ -202,6 +220,7 @@ class Reporte_confi extends DB{
                 "es_activo_fijo" => $qwe3['es_activo_fijo'],
                 "es_calculable" => $qwe3['es_calculable'],
                 "orden" => $qwe3['orden'],
+                "es_depreciacion" => $es_depreciacion,
                 "nivel_3" => [] //activo
                 // "nivel_3" => $qwe['nombre'],// 
                 // "estado" => $qwe['estado']
@@ -211,6 +230,14 @@ class Reporte_confi extends DB{
                     $cuenta3 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe4[idplandecuenta]'");// ACTIVO, PASIVO, PATRIMONIO
                     $nombre_cuenta3 = $cuenta3->fetch_assoc();
 
+                    $depre_consulta = $this->dbc->query("SELECT * from vinculacion_cuenta_depreciacion where idcuenta_depreciacion = '$qwe4[idplandecuenta]'");// ACTIVO, PASIVO, PATRIMONIO
+
+                    if($depre_consulta->num_rows > 0){
+                        $es_depreciacion = 'si';
+                    }else{
+                        $es_depreciacion = 'no';
+                    }
+
                     $res4 = array(
                     "idconfiguracion_reporte" => $qwe4['idconfiguracion_reporte'],
                     "idplandecuenta" => $nombre_cuenta3['idplandecuenta'],   
@@ -219,12 +246,21 @@ class Reporte_confi extends DB{
                     "es_activo_fijo" => $qwe4['es_activo_fijo'],
                     "es_calculable" => $qwe4['es_calculable'],
                     "orden" => $qwe4['orden'],
+                    "es_depreciacion" => $es_depreciacion,
                     "nivel_4" => [] //activo
                     );
                     $get_nivel_5 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta3[nombreplan]' AND reporte = '$qwe[reporte]' AND idempresa='$idempresa' ORDER BY orden ASC");// ACTIVO, PASIVO, PATRIMONIO
                     while ($qwe5 = $this->dbc->fetch($get_nivel_5)) {
                         $cuenta4 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe5[idplandecuenta]'");// ACTIVO, PASIVO, PATRIMONIO
                         $nombre_cuenta4 = $cuenta4->fetch_assoc();
+
+                        $depre_consulta = $this->dbc->query("SELECT * from vinculacion_cuenta_depreciacion where idcuenta_depreciacion = '$qwe5[idplandecuenta]'");// ACTIVO, PASIVO, PATRIMONIO
+
+                        if($depre_consulta->num_rows > 0){
+                            $es_depreciacion = 'si';
+                        }else{
+                            $es_depreciacion = 'no';
+                        }
 
                         $res5 = array(
                         "idconfiguracion_reporte" => $qwe5['idconfiguracion_reporte'],
@@ -234,6 +270,7 @@ class Reporte_confi extends DB{
                         "es_activo_fijo" => $qwe5['es_activo_fijo'],
                         "es_calculable" => $qwe5['es_calculable'],
                         "orden" => $qwe5['orden'],
+                        "es_depreciacion" => $es_depreciacion,
                         "nivel_5" => [] //activo
                         );
                 //----------------------------------------------------------------------------
@@ -250,6 +287,7 @@ class Reporte_confi extends DB{
                         "es_activo_fijo" => $qwe6['es_activo_fijo'],
                         "es_calculable" => $qwe6['es_calculable'],
                         "orden" => $qwe6['orden'],
+                        "es_depreciacion" => $es_depreciacion,
                         "nivel_5" => [] //activo
                         );
                         
@@ -816,19 +854,20 @@ class Reporte_confi extends DB{
             if($existe_en_vinculacion->num_rows > 0){
                 $resultado33 = $existe_en_vinculacion->fetch_assoc(); 
                 if($resultado33['columna_encontrada'] == 'idcuenta'){
-                    //SE ELIMINARA LA CUENTA PRINCIPAL Y SU VINCULACION
-                    // $consulta3 = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE idplandecuenta = '$id'");
-
+                    //SE ELIMINARA LA CUENTA PRINCIPAL Y SU VINCULACION 
+//(elimina la cuenta principal, entonces se eliminara ambas cuetas de la tabla confi_reporte y la vinculacion en la tabla vincu)
                     $delete_confi = $this->dbc->query("DELETE FROM configuracion_reporte WHERE idconfiguracion_reporte = '$id'");
                     $delete_confi2 = $this->dbc->query("DELETE FROM configuracion_reporte WHERE idplandecuenta = '$resultado33[idcuenta_depreciacion]'");
    
                     $delete_vincu = $this->dbc->query("DELETE FROM vinculacion_cuenta_depreciacion WHERE idvinculacion_cuenta_depreciacion = '$resultado33[idvinculacion_cuenta_depreciacion]'");
                 }else{
                     // SOLO SE ELIMINARA 2 REGISTROS, OSEA EL REGISTRO DE CONFIGURACION_REPORTE Y DE LA TABLA VINCULACION
+//(aqui elimina la depreciacion de una cuenta, entonces se eliminara de la tabla vinculacion y de la tabla configuracion reporte porque estaba el registro en ambas tablas)
+
                     $delete_confi = $this->dbc->query("DELETE FROM configuracion_reporte WHERE idconfiguracion_reporte = '$id'");
                     $delete_vincu = $this->dbc->query("DELETE FROM vinculacion_cuenta_depreciacion WHERE idvinculacion_cuenta_depreciacion = '$resultado33[idvinculacion_cuenta_depreciacion]'");
                 }   
-            }else{
+            }else{ // ESTE REGISTRO NO ES UN ACTIVO FIJO POR ESO LA ELIMINACION ES SIMPLE
                 $delete_confi = $this->dbc->query("DELETE FROM configuracion_reporte WHERE idconfiguracion_reporte = '$id'");
             }
 
