@@ -543,7 +543,7 @@ class Reporte_confi extends DB{
                                 
                               } 
 
-                            }else{
+                            }else{ //NO ES ACTIVO FIJO
                                 $suma_cuentas = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total FROM transacciones t
                                 INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
                                 INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
@@ -594,7 +594,7 @@ class Reporte_confi extends DB{
                                 $valor2 = $suma_cuentas2->fetch_assoc();
                                 $suma_nivel_5 = $suma_nivel_5 + $valor2['total'];
                                 if($valor2['total'] == null || $valor2['total'] == '0'){
-//-----------------------------------------------------
+        //------------------------------------------------------------------------------
                                 }else{
                                     $res6 = array(
                                 "idconfiguracion_reporte" => $qwe6['idconfiguracion_reporte'],

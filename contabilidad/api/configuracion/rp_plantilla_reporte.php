@@ -989,31 +989,28 @@ class PlantillaReporte extends DB{
                     }
                     // FIN DEL NIVEL 3 333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333
                 }
-                $plan_cuenta = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$aux_calculable[idplandecuenta]'");// caja_general, banco
+                $plan_cuenta = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$aux_nivel_2[idplandecuenta]'");// caja_general, banco
                 $nombre_cuenta = $plan_cuenta->fetch_assoc();
 
-                // $ingreso_egreso = $this->dbc->query("SELECT * FROM plandecuenta WHERE numero >= '5.0.0.00.00' AND numero < '6.0.0.00.00'");// EGRESO_GASTOS
-                // $nombre_cuenta = $ingreso_egreso->fetch_assoc();
-                    //select * from plandecuenta where numero >= '5.0.0.00.00' and numero < '6.0.0.00.00' order by numero desc
-                    if($nombre_cuenta['numero'] >= '4.0.0.00.00' && '5.0.0.00.00' > $nombre_cuenta['numero']){ // INGRESOS
-                            $suma_cuentas2 = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(haber) - SUM(debe) AS total FROM transacciones t
+                if($nombre_cuenta['numero'] >= '4.0.0.00.00' && '5.0.0.00.00' > $nombre_cuenta['numero']){ // INGRESOS
+                        $suma_cuentas2 = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(haber) - SUM(debe) AS total FROM transacciones t
                                 INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
                                 INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
-                                where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$aux_calculable[idplandecuenta]'
+                                where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$aux_nivel_2[idplandecuenta]'
                                 AND t.estado NOT IN (4, 5, 6) AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
 
                     }elseif($nombre_cuenta['numero'] >= '5.0.0.00.00' && '6.0.0.00.00' > $nombre_cuenta['numero']){ // EGRESOS_GASTOS
                         $suma_cuentas2 = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total FROM transacciones t
                                 INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
                                 INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
-                                where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$aux_calculable[idplandecuenta]'
+                                where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$aux_nivel_2[idplandecuenta]'
                                 AND t.estado NOT IN (4, 5, 6) AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
 
                     }else{ // las cuentas de 6.0.0.00.00 ORDEN
                         $suma_cuentas2 = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total FROM transacciones t
                                 INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
                                 INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
-                                where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$aux_calculable[idplandecuenta]'
+                                where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$aux_nivel_2[idplandecuenta]'
                                 AND t.estado NOT IN (4, 5, 6) AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
 
                     }
