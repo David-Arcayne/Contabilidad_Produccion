@@ -965,31 +965,8 @@ class PlantillaReporte extends DB{
 
                 if($aux_nivel_2['tipo_operacion'] == 'calculable'){ //SI ES CALCULABLE
                     // recargo, descuento
-
-                }else{ // NO ES CALCULABLE
-                    $nivel_3 = $this->dbc->query("SELECT * from pr_plantilla WHERE idplantilla_padre = '$aux_nivel_2[idplantilla]'");// vents_cafe_yungs, vnts cafe_nueva esperanza
-                    // NIVEL 3 333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333
-                    
-                    while ($aux_nivel_3 = $this->dbc->fetch($nivel_3)) {
-                        if($aux_nivel_3['tipo_operacion'] == 'calculable'){ //SI ES CALCULABLE   
-                            // venta cafe yungas y venta cafe nueva esperanza
-                            
-                        }else{ // NO ES CALCULABLE
-                            $nivel_4 = $this->dbc->query("SELECT * from pr_plantilla WHERE idplantilla_padre = '$aux_nivel_3[idplantilla]'");// vents_cafe_yungs, vnts cafe_nueva esperanza
-                            // NIVEL 4 4444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444
-                            while ($aux_nivel_4 = $this->dbc->fetch($nivel_4)) {
-                                if($aux_nivel_4['tipo_operacion'] == 'calculable'){ //SI ES CALCULABLE   
-
-                                }else{ // NO ES CALCULABLE
-                                    
-                                }     
-                            }
-                            // NIVEL 4 4444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444        
-                        }     
-                    }
-                    // FIN DEL NIVEL 3 333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333
-                }
-                $plan_cuenta = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$aux_nivel_2[idplandecuenta]'");// caja_general, banco
+                    //--------------------------------------------------------------------------------------------------------------------------------------------------------------
+                    $plan_cuenta = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$aux_nivel_2[idplandecuenta]'");// caja_general, banco
                 $nombre_cuenta = $plan_cuenta->fetch_assoc();
 
                 if($nombre_cuenta['numero'] >= '4.0.0.00.00' && '5.0.0.00.00' > $nombre_cuenta['numero']){ // INGRESOS
@@ -1031,8 +1008,42 @@ class PlantillaReporte extends DB{
                         );
                     array_push($res['nivel_2'], $res2);  
 
-                // }  
+                // } 
+                    //----------------------------------------------------------------------------------------------------------------------------------------------------------------
+                }else{ // NO ES CALCULABLE
+                    // NIVEL 3 333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333
+                    $res2 = array(
+                        // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
+                        "idplandecuenta" => $nombre_cuenta['idplandecuenta'],
+                        "codigo" => $nombre_cuenta['numero'],
+                        "nombre_cuenta" => $nombre_cuenta['nombreplan'],
+                        // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
+                        "valor" => 0,
+                        // "nivel_3" => [] //activo
+                        );
 
+                    $nivel_3 = $this->dbc->query("SELECT * from pr_plantilla WHERE idplantilla_padre = '$aux_nivel_2[idplantilla]'");// vents_cafe_yungs, vnts cafe_nueva esperanza
+                    
+                    while ($aux_nivel_3 = $this->dbc->fetch($nivel_3)) {
+                        if($aux_nivel_3['tipo_operacion'] == 'calculable'){ //SI ES CALCULABLE   
+                            // venta cafe yungas y venta cafe nueva esperanza
+                            
+                        }else{ // NO ES CALCULABLE
+                            // NIVEL 4 4444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444
+                            $nivel_4 = $this->dbc->query("SELECT * from pr_plantilla WHERE idplantilla_padre = '$aux_nivel_3[idplantilla]'");// vents_cafe_yungs, vnts cafe_nueva esperanza
+
+                            while ($aux_nivel_4 = $this->dbc->fetch($nivel_4)) {
+                                if($aux_nivel_4['tipo_operacion'] == 'calculable'){ //SI ES CALCULABLE   
+
+                                }else{ // NO ES CALCULABLE
+                                    
+                                }     
+                            }
+                            // FIN DEL NIVEL 4 4444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444        
+                        }     
+                    }
+                    // FIN DEL NIVEL 3 333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333
+                }
             }
             $res['suma_nivel_2'] = $suma_nivel_2;
             // FIN DEL NIVEL 2 2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222 
@@ -1043,6 +1054,7 @@ class PlantillaReporte extends DB{
                 $res['suma_nivel_2'] = $agru_aux['monto']; //esto en caso de que el monto siempre sea mayor a cero
             }
             }// AQUI TERMINA EL NO ES CALCULABLE }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+            
             // $res = array(
             //         // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
             //         "idplantilla" => $pl_list['idplantilla'],

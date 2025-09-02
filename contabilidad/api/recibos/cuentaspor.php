@@ -2,11 +2,20 @@
 require_once "../../db/db.php";
 class Cuentaspor extends DB{
 
-    public function registropagarfactura($idfactura,$lugar, $idtransaccion,$idcaja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$archivo)
+    public function registropagarfactura($idfactura,$lugar, $idtransaccion,$idcaja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$archivo,$zn)
     {
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
+
+        // Establecer la zona horaria recibida
+        date_default_timezone_set($zn);
+                
+        // Obtener la hora actual del Pais en el que se registra
+        $hora_actual = date('H:i:s');
+
+        // Combinar la fecha recibida con la hora actual
+        $fecha_completa = $fecha . ' ' . $hora_actual; // Resultado tipo DATETIME
 
         $caja_bancos = json_decode($idcaja_bancos, true);
         $res = "";
@@ -80,7 +89,7 @@ class Cuentaspor extends DB{
 
     if(empty($archivo['name'])){
         $registropago = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
-        VALUES(NULL,'$nrecibo','$fecha','$lugar','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$idcuenta',NULL)");
+        VALUES(NULL,'$nrecibo','$fecha_completa','$lugar','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$idcuenta',NULL)");
 
     if ($registropago === TRUE) {
         $idcuentaspor = $this->dbc->insert_id;
@@ -115,7 +124,7 @@ class Cuentaspor extends DB{
     if(move_uploaded_file($archivo_tmp, $ruta_destino)){
          //registrar pago, preguntar guardar la anterior transaccion o la nueva
     $registropago2 = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
-    VALUES(NULL,'$nrecibo','$fecha','$lugar','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$idcuenta','$unique_name')");
+    VALUES(NULL,'$nrecibo','$fecha_completa','$lugar','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$idcuenta','$unique_name')");
 
     if ($registropago2 === TRUE) {
         $idcuentaspor = $this->dbc->insert_id;

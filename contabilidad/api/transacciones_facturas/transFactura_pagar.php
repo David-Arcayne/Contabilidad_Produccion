@@ -37,13 +37,22 @@ class TransFactura_pagar extends DB{
     }
 
     // public function registrocobrarfactura($idfactura, $idtransaccion, $idcuenta, $fecha, $nrecibo, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa)
-    public function registropagarfacturaGrupal($fecha,$persona,$ci,$monto,$idasientotipo,$idcaja_bancos,$empresa,$sucursal,$archivo,$data)
+    public function registropagarfacturaGrupal($fecha,$persona,$ci,$monto,$idasientotipo,$idcaja_bancos,$empresa,$sucursal,$archivo,$data,$zn)
     {
         // echo json_encode($data);
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
-    
+
+        // Establecer la zona horaria recibida
+        date_default_timezone_set($zn);
+                
+        // Obtener la hora actual del Pais en el que se registra
+        $hora_actual = date('H:i:s');
+
+        // Combinar la fecha recibida con la hora actual
+        $fecha_completa = $fecha . ' ' . $hora_actual; // Resultado tipo DATETIME
+
         if($idcaja_bancos == ""){
 
         }else{
@@ -123,7 +132,7 @@ $nroTransaccion = $resultado12['codigotransaccion'] + 1;
 
 if(empty($archivo['name'])){
     $registropago = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,archivo)
-    VALUES(NULL,'$nrecibo','$fecha','varios clientes','$persona','$ci','$monto','0','$idtrans','0',NULL)");
+    VALUES(NULL,'$nrecibo','$fecha_completa','varios clientes','$persona','$ci','$monto','0','$idtrans','0',NULL)");
 
 // $registropago = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta)
 // VALUES('$nrecibo','$fecha','varios clientes','$persona','$ci','$monto','0','$idtrans','0')");
@@ -152,7 +161,7 @@ if ($archivo['error'] == UPLOAD_ERR_OK) {
 if(move_uploaded_file($archivo_tmp, $ruta_destino)){
      //registrar pago, preguntar guardar la anterior transaccion o la nueva
      $registropago2 = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,archivo)
-    VALUES(NULL,'$nrecibo','$fecha','varios clientes','$persona','$ci','$monto','0','$idtrans','0','$unique_name')");
+    VALUES(NULL,'$nrecibo','$fecha_completa','varios clientes','$persona','$ci','$monto','0','$idtrans','0','$unique_name')");
 
 if ($registropago2 === TRUE) {
     $res = array("success", "Registro Realizado", "registropagarfacturaGrupal");

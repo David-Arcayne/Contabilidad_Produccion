@@ -118,7 +118,7 @@ class Transacciones_facturas extends DB{
         echo json_encode($res);
     }
 
-    public function registrocobrarfacturaGrupal($fecha,$persona,$ci,$monto,$idtransaccion,$idcaja_bancos,$idasientotipo,$idempresa,$idsucursal,$archivo,$data)
+    public function registrocobrarfacturaGrupal($fecha,$persona,$ci,$monto,$idtransaccion,$idcaja_bancos,$idasientotipo,$idempresa,$idsucursal,$archivo,$data,$zn)
     {
     if($idcaja_bancos == ""){
 // NO PASARA NADA
@@ -132,6 +132,15 @@ class Transacciones_facturas extends DB{
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
     
+        // Establecer la zona horaria recibida
+        date_default_timezone_set($zn);
+                
+        // Obtener la hora actual del Pais en el que se registra
+        $hora_actual = date('H:i:s');
+
+        // Combinar la fecha recibida con la hora actual
+        $fecha_completa = $fecha . ' ' . $hora_actual; // Resultado tipo DATETIME
+
         $ide = $this->getidempresa($idempresa);
         $sucursal = $this->getidsucursal($idsucursal); 
         $gestion = $this->getgestionactualid($ide);
@@ -208,7 +217,7 @@ $nroTransaccion = $resultado12['codigotransaccion'] + 1;
 //-------------------------------------------------------------------------------------------------
         if(empty($archivo['name'])){
             $registropago = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,archivo)
-            VALUES(NULL,'$nrecibo','$fecha','varios clientes','$persona','$ci','$monto','0','$idtrans','0',NULL)");
+            VALUES(NULL,'$nrecibo','$fecha_completa','varios clientes','$persona','$ci','$monto','0','$idtrans','0',NULL)");
 
         if ($registropago === TRUE) {
 
@@ -248,7 +257,7 @@ $nroTransaccion = $resultado12['codigotransaccion'] + 1;
         if(move_uploaded_file($archivo_tmp, $ruta_destino)){
              //registrar pago, preguntar guardar la anterior transaccion o la nueva
              $registropago2 = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,archivo)
-            VALUES(NULL,'$nrecibo','$fecha','varios clientes','$persona','$ci','$monto','0','$idtrans','0','$unique_name')");
+            VALUES(NULL,'$nrecibo','$fecha_completa','varios clientes','$persona','$ci','$monto','0','$idtrans','0','$unique_name')");
 
         if ($registropago2 === TRUE) {
             $idcuentaspof = $this->dbc->insert_id;

@@ -163,7 +163,7 @@ class Factura_comercial extends DB{
         }
         echo json_encode($lista);
     }
-      public function cobro_asignacion_factura_comercial($fecha,$monto_total,$monto_recibo,$idtransaccion,$idcaja_bancos,$idasientotipo,$idempresa,$idsucursal,$data)
+      public function cobro_asignacion_factura_comercial($fecha,$monto_total,$monto_recibo,$idtransaccion,$idcaja_bancos,$idasientotipo,$idempresa,$idsucursal,$data,$zn)
     {  
         $caja_bancos = json_decode($idcaja_bancos, true);
         $facturas = json_decode($data, true);
@@ -172,7 +172,14 @@ class Factura_comercial extends DB{
         // ini_set('display_startup_errors', 1);
         // error_reporting(E_ALL);
     
-        // echo json_encode(array($fecha,$monto,$idtransaccion,$idcaja_bancos,$idasientotipo,$idempresa,$idsucursal,$data,$caja_bancos,$facturas));
+        // Establecer la zona horaria recibida
+        date_default_timezone_set($zn);
+                
+        // Obtener la hora actual del Pais en el que se registra
+        $hora_actual = date('H:i:s');
+
+        // Combinar la fecha recibida con la hora actual
+        $fecha_completa = $fecha . ' ' . $hora_actual; // Resultado tipo DATETIME
 
         $ide = $this->getidempresa($idempresa);
         $sucursal = $this->getidsucursal($idsucursal); 
@@ -261,7 +268,7 @@ $nroTransaccion = $resultado12['codigotransaccion'] + 1;
                  if($aux_cont < 1){ //ENTRA POR PRIMERA VEZ DESPUES NUNCA MAS ENTRA
 
                  $registropago = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,archivo)
-                VALUES(NULL,'$nrecibo','$fecha','varios clientes','persona_comercial','1111','$monto_recibo','0','$idtrans','0',NULL)");
+                VALUES(NULL,'$nrecibo','$fecha_completa','varios clientes','persona_comercial','1111','$monto_recibo','0','$idtrans','0',NULL)");
                 
                 $idcuentaspof = $this->dbc->insert_id;
                     $aux_cont++;

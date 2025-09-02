@@ -1,7 +1,7 @@
 <?php
 require_once "../../db/db.php";
 class Recibo_otras_cuentas extends DB{
-public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtransaccion,$idcaja_bancos, $fecha, $persona, $ci, $monto, $asiento, $sucursal, $empresa,$archivo,$nro_recibo,$concepto,$client_prov)
+public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtransaccion,$idcaja_bancos, $fecha, $persona, $ci, $monto, $asiento, $sucursal, $empresa,$archivo,$nro_recibo,$concepto,$client_prov,$zn)
     {
         // echo json_encode(array($idfactura, $idtransaccion,$caja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$archivo));
 
@@ -9,6 +9,16 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
     
+        // Establecer la zona horaria recibida
+        date_default_timezone_set($zn);
+                
+        // Obtener la hora actual del Pais en el que se registra
+        $hora_actual = date('H:i:s');
+
+        // Combinar la fecha recibida con la hora actual
+        $fecha_completa = $fecha . ' ' . $hora_actual; // Resultado tipo DATETIME
+
+
         $caja_bancos = json_decode($idcaja_bancos, true);
         $res = "";
         $sucursal = $this->getidsucursal($sucursal);
@@ -49,7 +59,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
             $idrecibo_nuevo = $this->dbc->insert_id;
 
             $registropago2 = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
-        VALUES(NULL,'$nrecibo','$fecha','$lugar','0','$persona','$ci','$monto','0','$idotras_cuentas','0','0',NULL)");
+        VALUES(NULL,'$nrecibo','$fecha_completa','$lugar','0','$persona','$ci','$monto','0','$idotras_cuentas','0','0',NULL)");
 
             $idrecibo = $this->dbc->insert_id;
 
@@ -61,7 +71,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
             $idrecibo_nuevo = $this->dbc->insert_id;
 
             $registropago2 = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
-        VALUES(NULL,'$nrecibo','$fecha','$lugar','0','$persona','$ci','$monto','0','$idotras_cuentas','$idtransaccion','0',NULL)");
+        VALUES(NULL,'$nrecibo','$fecha_completa','$lugar','0','$persona','$ci','$monto','0','$idotras_cuentas','$idtransaccion','0',NULL)");
 
             $idrecibo = $this->dbc->insert_id;
         }else{
@@ -102,7 +112,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
             $idrecibo_nuevo = $this->dbc->insert_id;
 
             $registropago2 = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
-            VALUES(NULL,'$nrecibo','$fecha','$lugar','0','$persona','$ci','$monto','0','$idotras_cuentas','$trans','0',NULL)");
+            VALUES(NULL,'$nrecibo','$fecha_completa','$lugar','0','$persona','$ci','$monto','0','$idotras_cuentas','$trans','0',NULL)");
 
             $idrecibo = $this->dbc->insert_id;
         }
@@ -262,7 +272,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
     //  }
 
 
-    public function registrar_recibo_otras_cuentas_pagar($idotras_cuentas, $lugar, $idtransaccion,$idcaja_bancos, $fecha, $persona, $ci, $monto, $asiento, $sucursal, $empresa,$archivo,$nro_recibo,$concepto,$client_prov)
+    public function registrar_recibo_otras_cuentas_pagar($idotras_cuentas, $lugar, $idtransaccion,$idcaja_bancos, $fecha, $persona, $ci, $monto, $asiento, $sucursal, $empresa,$archivo,$nro_recibo,$concepto,$client_prov,$zn)
     {
         // echo json_encode(array($idfactura, $idtransaccion,$caja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$archivo));
 
@@ -270,6 +280,16 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
     
+        // Establecer la zona horaria recibida
+        date_default_timezone_set($zn);
+                
+        // Obtener la hora actual del Pais en el que se registra
+        $hora_actual = date('H:i:s');
+
+        // Combinar la fecha recibida con la hora actual
+        $fecha_completa = $fecha . ' ' . $hora_actual; // Resultado tipo DATETIME
+
+
         $caja_bancos = json_decode($idcaja_bancos, true);
         $res = "";
         $sucursal = $this->getidsucursal($sucursal);
@@ -310,7 +330,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
             $idrecibo_nuevo = $this->dbc->insert_id;
 
             $registropago2 = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
-        VALUES(NULL,'$nrecibo','$fecha','$lugar','0','$persona','$ci','$monto','0','$idotras_cuentas','0','0',NULL)");
+        VALUES(NULL,'$nrecibo','$fecha_completa','$lugar','0','$persona','$ci','$monto','0','$idotras_cuentas','0','0',NULL)");
 
             $idrecibo = $this->dbc->insert_id;
 
@@ -322,7 +342,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
             $idrecibo_nuevo = $this->dbc->insert_id;
 
             $registropago2 = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
-        VALUES(NULL,'$nrecibo','$fecha','$lugar','0','$persona','$ci','$monto','0','$idotras_cuentas','$idtransaccion','0',NULL)");
+        VALUES(NULL,'$nrecibo','$fecha_completa','$lugar','0','$persona','$ci','$monto','0','$idotras_cuentas','$idtransaccion','0',NULL)");
 
             $idrecibo = $this->dbc->insert_id;
         }else{
@@ -361,7 +381,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
             $idrecibo_nuevo = $this->dbc->insert_id;
 
             $registropago2 = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
-            VALUES(NULL,'$nrecibo','$fecha','$lugar','0','$persona','$ci','$monto','0','$idotras_cuentas','$trans','0',NULL)");
+            VALUES(NULL,'$nrecibo','$fecha_completa','$lugar','0','$persona','$ci','$monto','0','$idotras_cuentas','$trans','0',NULL)");
 
             $idrecibo = $this->dbc->insert_id;
         }
@@ -440,8 +460,17 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
         echo json_encode($res);
     }
 
-    public function registrar_factura_cobro_otras_cuentas($por_concepto_de,$fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento,$clasefactura,$cobro, $pagar,$idotras_cuentas, $espesificacion,$trans, $cliente, $empresa,   $cuenta,  $sucursal,$asiento,$idcajas_bancos)
+    public function registrar_factura_cobro_otras_cuentas($por_concepto_de,$fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento,$clasefactura,$cobro, $pagar,$idotras_cuentas, $espesificacion,$trans, $cliente, $empresa,   $cuenta,  $sucursal,$asiento,$idcajas_bancos,$zn)
        {
+
+        // Establecer la zona horaria recibida
+        date_default_timezone_set($zn);
+                
+        // Obtener la hora actual del Pais en el que se registra
+        $hora_actual = date('H:i:s');
+
+        // Combinar la fecha recibida con la hora actual
+        $fecha_completa = $fecha . ' ' . $hora_actual; // Resultado tipo DATETIME
 
         $idempresa = $this->getidempresa($empresa);
         $idsucursal = $this->getidsucursal($sucursal); 
@@ -496,7 +525,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
             $idfact = $this->dbc->insert_id;
 
             $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$trans','0',NULL,'cobrado_otras_cuentas')");
+            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$trans','0',NULL,'cobrado_otras_cuentas')");
 
             $idrecibo = $this->dbc->insert_id;
         }elseif($trans > 0 && $asiento == 0){
@@ -506,7 +535,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
             $idfact = $this->dbc->insert_id;
 
             $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$trans','0',NULL,'cobrado_otras_cuentas')");
+            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$trans','0',NULL,'cobrado_otras_cuentas')");
 
             $idrecibo = $this->dbc->insert_id;
         }else{
@@ -550,7 +579,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
         $idfact = $this->dbc->insert_id;
 
         $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$idtrans','0',NULL,'cobrado_otras_cuentas')");
+            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$idtrans','0',NULL,'cobrado_otras_cuentas')");
 
         $idrecibo = $this->dbc->insert_id;
         }
@@ -575,8 +604,17 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
         echo json_encode($res);
     }
 
-    public function registrar_factura_pago_otras_cuentas($por_concepto_de,$fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento,$clasefactura,$cobro, $pagar,$idotras_cuentas, $espesificacion,$trans, $cliente, $empresa,   $cuenta,  $sucursal,$asiento,$idcajas_bancos)
+    public function registrar_factura_pago_otras_cuentas($por_concepto_de,$fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento,$clasefactura,$cobro, $pagar,$idotras_cuentas, $espesificacion,$trans, $cliente, $empresa,   $cuenta,  $sucursal,$asiento,$idcajas_bancos,$zn)
        {
+
+        // Establecer la zona horaria recibida
+        date_default_timezone_set($zn);
+                
+        // Obtener la hora actual del Pais en el que se registra
+        $hora_actual = date('H:i:s');
+
+        // Combinar la fecha recibida con la hora actual
+        $fecha_completa = $fecha . ' ' . $hora_actual; // Resultado tipo DATETIME
 
         $idempresa = $this->getidempresa($empresa);
         $idsucursal = $this->getidsucursal($sucursal); 
@@ -631,7 +669,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
             $idfact = $this->dbc->insert_id;
 
             $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$trans','0',NULL,'pagado_otras_cuentas')");
+            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$trans','0',NULL,'pagado_otras_cuentas')");
 
             $idrecibo = $this->dbc->insert_id;
         }elseif($trans > 0 && $asiento == 0){
@@ -641,7 +679,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
             $idfact = $this->dbc->insert_id;
 
             $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$trans','0',NULL,'pagado_otras_cuentas')");
+            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$trans','0',NULL,'pagado_otras_cuentas')");
 
             $idrecibo = $this->dbc->insert_id;
         }else{
@@ -685,7 +723,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
         $idfact = $this->dbc->insert_id;
 
         $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$idtrans','0',NULL,'pagado_otras_cuentas')");
+            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$idtrans','0',NULL,'pagado_otras_cuentas')");
 
         $idrecibo = $this->dbc->insert_id;
         }
@@ -699,9 +737,6 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
             }
             }
         
-        // }
-    
-        // $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`, `clasefactura`, `cobrado`, `pagado`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento', '$clasefactura', '$co', '$pa', '$espesificacion', '1', '1', '$trans', '$cliente', '$idempresa', '$cuenta', '$idsucursal');");
         if ($registro === TRUE) {
             $res = array("success", "Registro Correcto", "crearfactura");
         } else {
