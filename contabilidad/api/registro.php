@@ -698,8 +698,15 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idplandecuenta'],$_POST['reporte'],$_POST['nombre_cuenta_superior'],$_POST['nivel_registrado'],$_POST['orden'],$_POST['grupo'],$_POST['es_calculable'],$_POST['es_activo_fijo'],$_POST['empresa']));
         }
+    }elseif($ver=="registrar_agrupacion_rubro_plandecuenta"){
+        if(isset($_POST['idtipo_plandecuenta'],$_POST['numero'],$_POST['empresa'])){
+            $cont=new Plandecuentas();
+            $cont->registrar_agrupacion_rubro_plandecuenta($_POST['idtipo_plandecuenta'],$_POST['numero'],$_POST['empresa']);
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idtipo_plandecuenta'],$_POST['numero'],$_POST['empresa']));
+        }
     }
-
 //  vincula  -- crearfacturasf5 registrar_factura_cobro registrar_factura_cobro_otras_cuentas --> aumentar usuario 
 //  registrocobrarfacturaGrupal crearfacturas caja_bancos registrar_factura_pago registrar_otras_cuentas registrar_recibo_otras_cuentas--> aumentar usuario creartransaccion
 }// editar_caja_bancos_facturas registrar_factura_recibo_cobro_cajaBancos  editar_recibo_caja registrar_recibo_otras_cuentas

@@ -600,6 +600,12 @@ elseif($ver[0]=="listar_otras_cuentas_cobrar_select"){
 }elseif($ver[0]=="listar_recibo_facturas_otras_cuentas"){
     $cont=new Recibo_otras_cuentas();
     $cont->listar_recibo_facturas_otras_cuentas($ver[1]);
+}elseif($ver[0]=="listar_tipo_plandecuenta"){
+    $cont=new Plandecuentas();
+    $cont->listar_tipo_plandecuenta($ver[1]);
+}elseif($ver[0]=="listar_agrupacion_rubro_plandecuenta"){
+    $cont=new Plandecuentas();
+    $cont->listar_agrupacion_rubro_plandecuenta($ver[1]);
 }
 
 // listar_recibo_otras_cuentas listar_factura_otras_cuentas lista_pagar_pagado_factura listar_recibo_por_id_otras_cuentas  factura reporte_balance_general_actualizado

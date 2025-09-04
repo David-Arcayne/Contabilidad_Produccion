@@ -871,14 +871,16 @@ class PlantillaReporte extends DB{
                 $pla_cuen = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$pl_list[idplandecuenta]'");// VENTAS->NOMBRE
                 $nombre_cuen = $pla_cuen->fetch_assoc();
                 $nombre_cuenta = $nombre_cuen['nombreplan'];
+                $codigo = $nombre_cuen['numero'];
             }else{
                 $nombre_cuenta = $pl_list['nombre_personalizado'];
+                $codigo = "";
             }
             if($pl_list['tipo_operacion'] == 'calculable'){ // ES CALCULABLE REGISTRO PADREEE
                 $cuenta_plan = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$pl_list[idplandecuenta]'");// VENTAS->NOMBRE
                 $pc = $cuenta_plan->fetch_assoc();
 
-                $valor_auxi = $this->calculables_estado_resultados($pc['numero'], $idempresa, $gestion,$pl_list['idplandecuenta'],$fecha_ini,$fecha_fin);
+                $valor_auxi = $this->calculables_estado_resultados($pc['numero'], $idempresa, $gestion,$pl_list['idplandecuenta'],$fecha_ini,$fecha_fin,$pl_list['idplantilla']);
 
                 // $suma_nivel_2 = $valor_auxi + $valor2['total'];
                 if($valor_auxi == null || $valor_auxi == '0'){
@@ -887,7 +889,7 @@ class PlantillaReporte extends DB{
                     $res = array(
                     // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
                     "idplantilla" => $pl_list['idplantilla'],
-                    "codigo" => $nombre_cuen['numero'],
+                    "codigo" => $codigo,
                     "nombre_personalizado" => $nombre_cuenta,
                     "tipo_operacion" => $pl_list['tipo_operacion'],
                     "suma_nivel_2" => $valor_auxi,
@@ -902,7 +904,7 @@ class PlantillaReporte extends DB{
                 $res = array(
                     // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
                     "idplantilla" => $pl_list['idplantilla'],
-                    "codigo" => $nombre_cuen['numero'],
+                    "codigo" => $codigo,
                     "nombre_personalizado" => $nombre_cuenta,
                     "tipo_operacion" => $pl_list['tipo_operacion'],
                     "suma_nivel_2" => 0,
@@ -950,7 +952,7 @@ class PlantillaReporte extends DB{
                 //     $plan_cuenta = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$aux_nivel_2[idplandecuenta]'");// caja_general, banco
                 // $nombre_cuenta = $plan_cuenta->fetch_assoc();
 
-                $valor_total = $this->calculables_estado_resultados($nombre_cuenta['numero'], $idempresa, $gestion,$aux_nivel_2['idplandecuenta'],$fecha_ini,$fecha_fin);
+                $valor_total = $this->calculables_estado_resultados($nombre_cuenta['numero'], $idempresa, $gestion,$aux_nivel_2['idplandecuenta'],$fecha_ini,$fecha_fin,$aux_nivel_2['idplantilla']);
 
                 // $valor2 = $suma_cuentas2->fetch_assoc();
                 $suma_nivel_2 = $suma_nivel_2 + $valor_total;
@@ -995,7 +997,7 @@ class PlantillaReporte extends DB{
                             $plan_cuenta2 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$aux_nivel_3[idplandecuenta]'");// caja_general, banco
                             $nombre_cuenta2 = $plan_cuenta2->fetch_assoc();
 
-                            $valor_total3 = $this->calculables_estado_resultados($nombre_cuenta2['numero'], $idempresa, $gestion,$aux_nivel_3['idplandecuenta'],$fecha_ini,$fecha_fin);
+                            $valor_total3 = $this->calculables_estado_resultados($nombre_cuenta2['numero'], $idempresa, $gestion,$aux_nivel_3['idplandecuenta'],$fecha_ini,$fecha_fin,$aux_nivel_3['idplantilla']);
 
                             $suma_nivel_3 = $suma_nivel_3 + $valor_total3;
                             // if($valor2['total'] == null || $valor2['total'] == '0'){
@@ -1065,7 +1067,7 @@ class PlantillaReporte extends DB{
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
 
-    private function calculables_estado_resultados($numero, $idempresa, $gestion,$idplandecuenta,$fecha_ini,$fecha_fin)
+    private function calculables_estado_resultados($numero, $idempresa, $gestion,$idplandecuenta,$fecha_ini,$fecha_fin,$idplantilla)
     {
         if($numero >= '4.0.0.00.00' && '5.0.0.00.00' > $numero){ // INGRESOS
             $calcu = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(haber) - SUM(debe) AS total FROM transacciones t
@@ -1074,6 +1076,9 @@ class PlantillaReporte extends DB{
                 where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$idplandecuenta'
                 AND t.estado NOT IN (4, 5, 6) AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
 
+            $valor_auxi = $calcu->fetch_assoc();
+            $valor_total = $valor_auxi['total'];
+
         }elseif($numero >= '5.0.0.00.00' && '6.0.0.00.00' > $numero){ // EGRESOS_GASTOS
             $calcu = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total FROM transacciones t
                 INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
@@ -1081,17 +1086,47 @@ class PlantillaReporte extends DB{
                 where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$idplandecuenta'
                 AND t.estado NOT IN (4, 5, 6) AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
 
+            $valor_auxi = $calcu->fetch_assoc();
+            $valor_total = $valor_auxi['total'];
+
         }else{ // las cuentas de 6.0.0.00.00 ORDEN
-            $calcu = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total FROM transacciones t
+            $plantilla = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla = '$idplantilla'");// HIJOS DE LAS PLANTILLAS AGRUPADORAS
+            $pl_tipo = $plantilla->fetch_assoc();
+           
+            if($pl_tipo['ingreso_gasto'] == 'ingreso'){ // ES INGRESO
+                // INGRESOS
+                $calcu = $this->dbc->query("SELECT SUM(dt.haber) - SUM(dt.debe) AS total FROM transacciones t
                 INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
                 INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
                 where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$idplandecuenta'
                 AND t.estado NOT IN (4, 5, 6) AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
+            }elseif($pl_tipo['ingreso_gasto'] == 'gasto'){ // ES GASTO
+                // EGRESOS_GASTOS
+                $calcu = $this->dbc->query("SELECT SUM(dt.debe) - SUM(dt.haber) AS total FROM transacciones t
+                INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
+                INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
+                where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$idplandecuenta'
+                AND t.estado NOT IN (4, 5, 6) AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
+            }else{ // SON NULL PERO TALVEZ BORREMOS ESTA OPCION, SIEMPRE DEBERIA SER INGRESO O GASTO SI ES CUENTA DE ORDEN
 
             }
 
-        $valor_auxi = $calcu->fetch_assoc();
-        return $valor_auxi['total'];
+            if(!$calcu){
+                $valor_total = 0;
+            }else{
+                $valor_aux = $calcu->fetch_assoc();
+                if($valor_aux['total'] > 0){
+                    $valor_total = $valor_aux['total'];
+                }else{
+                    $valor_total = 0;
+                }
+            }
+            
+        }
+
+        // $valor_auxi = $calcu->fetch_assoc();
+        // $valor_total = $valor_auxi['total'];
+        return $valor_total;
     }
     public function editar_otras_operaciones($idagrupacion_plantilla, $idplantilla_hijo, $operacion, $monto)
     {

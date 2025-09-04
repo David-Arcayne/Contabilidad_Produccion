@@ -240,6 +240,67 @@ class Plandecuentas extends DB{
         echo json_encode($lista);
     }
 
+    public function registrar_agrupacion_rubro_plandecuenta($idtipo_plandecuenta,$numero,$empresa){
+        // $idempresa = Empresa::getidempresa($empresa);
+        $idempresa = $this->getidempresa($empresa);
+        // $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM divisa WHERE nombre = '$nombre' AND idempresa = '$idempresa'");
+        // $resultado = $consulta->fetch_assoc();
+        // $totalRegistros = $resultado['total'];
+
+        // if ($totalRegistros > 0) {
+        //     $res = array("danger", "El registro ya existe","Error");
+        // } else {
+            // Insertar el nuevo registro
+            $registrar_agrupacion = $this->dbc->query("INSERT INTO agrupacion_rubro_plandecuenta(idtipo_plandecuenta,numero,idempresa) VALUES ('$idtipo_plandecuenta','$numero','$idempresa')");
+            if ($registrar_agrupacion === TRUE) {                                                                                                                                                                
+                $res = array("success", "Registro exitoso","registroCaracteristicas");
+            } else {
+                $res = array("danger", "No se pudo registrar");
+            }
+        // }
+        echo json_encode($res);
+        
+    }
+
+    public function listar_tipo_plandecuenta($empresa) {
+        $lista = [];
+        $idempresa = $this->getidempresa($empresa);
+    
+        // Preparar la consulta
+        $get = $this->dbc->query("SELECT * FROM tipo_plandecuenta");
+    
+        while ($qwe = $this->dbc->fetch($get)) {
+            $res = array(
+                "idtipo_plandecuenta" => $qwe['idtipo_plandecuenta'],
+                "nombre" => $qwe['nombre']
+            );
+            array_push($lista, $res);
+        }
+    
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
+    public function listar_agrupacion_rubro_plandecuenta($empresa) {
+        $lista = [];
+        $idempresa = $this->getidempresa($empresa);
+    
+        // Preparar la consulta
+        $get = $this->dbc->query("SELECT * FROM agrupacion_rubro_plandecuenta WHERE idempresa = '$idempresa'");
+    
+        while ($qwe = $this->dbc->fetch($get)) {
+            $get_nombre = $this->dbc->query("SELECT * FROM tipo_plandecuenta WHERE idtipo_plandecuenta = '$qwe[idtipo_plandecuenta]'");
+            $nombre = $get_nombre->fetch_assoc();
+            $res = array(
+                "idagrupacion_rubro_plandecuenta" => $qwe['idagrupacion_rubro_plandecuenta'],
+                "idtipo_plandecuenta" => $qwe['idtipo_plandecuenta'],
+                "nombre" => $nombre['nombre'],
+                "numero" => $qwe['numero'],
+            );
+            array_push($lista, $res);
+        }
+    
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
+
     public function getidusuario($md5){
         $registro=$this->dbrh->query("select * from usuario where md5(idusuario)='$md5'");
         $qwe=$this->dbrh->fetch($registro);
