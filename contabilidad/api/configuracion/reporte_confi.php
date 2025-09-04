@@ -1869,6 +1869,6 @@ public function select_plantilla_balance_general($empresa)
     //     //$res=array("id"=>,"nombre"=>$qwe['nombre']); listapagarfactura
     //     return $qwe['idgestion'];
     // }
-
+//activo--1    pasivo --2  patrimonio---3    ingresos---4   egresos_gastos --5  orden ---6
 }
 ?>

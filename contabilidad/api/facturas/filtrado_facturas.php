@@ -268,9 +268,9 @@ class Filtrado_facturas extends DB{
         // $idempresa = $this->getidempresa($empresa);
                   // echo json_encode(array($cobrado,$idcaja_bancos,$empresa));
                   
-                  ini_set('display_errors', 1);
-                  ini_set('display_startup_errors', 1);
-                  error_reporting(E_ALL);
+                //   ini_set('display_errors', 1);
+                //   ini_set('display_startup_errors', 1);
+                //   error_reporting(E_ALL);
   
   
           $lista = [];
@@ -299,12 +299,10 @@ class Filtrado_facturas extends DB{
           $otras_cuentas_comas = implode(",", $array_id_otrasCuentas);
 
               if($otras_cuentas_comas == ""){//EL ARRAY ESTABA VACIO
-                   $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idempresa = '$idempresa' AND pagado = 1 AND transacciones_idtransacciones = 0;"); //POR COBRAR
+                //    $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idempresa = '$idempresa' AND pagado = 1 AND transacciones_idtransacciones = 0;"); //POR COBRAR
+                   $getPedido = [];
               }else{
-                  $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idotras_cuentas IN ($otras_cuentas_comas)
-                  UNION
-                  SELECT * FROM otras_cuentas WHERE idempresa = '$idempresa' AND pagado = 1 AND transacciones_idtransacciones = 0;"); //POR COBRAR
-  
+                  $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idotras_cuentas IN ($otras_cuentas_comas)"); //POR COBRAR
               }
   
           }elseif($cobrado == 2){ // PAGADO
@@ -322,12 +320,11 @@ class Filtrado_facturas extends DB{
           }
   
           $otras_cuentas_comas = implode(",", $array_id_otrasCuentas);
-              if($otras_cuentas_comas == ""){//EL ARRAY ESTABA VACIO
-                  $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idempresa = '$idempresa' AND pagado = 2 AND transacciones_idtransacciones = 0;"); //POR COBRAR
-             }else{
-                 $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idotras_cuentas IN ($otras_cuentas_comas)
-                 UNION
-                 SELECT * FROM otras_cuentas WHERE idempresa = '$idempresa' AND pagado = 2 AND transacciones_idtransacciones = 0;"); //POR COBRAR
+            if($otras_cuentas_comas == ""){//EL ARRAY ESTABA VACIO
+                // $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idempresa = '$idempresa' AND pagado = 2 AND transacciones_idtransacciones = 0;"); //POR COBRAR
+                $getPedido = [];
+            }else{
+                 $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idotras_cuentas IN ($otras_cuentas_comas)"); //POR COBRAR
   
              }
           }else{ //TODOS
@@ -347,17 +344,16 @@ class Filtrado_facturas extends DB{
           $otras_cuentas_comas = implode(",", $array_id_otrasCuentas);
 
               if($otras_cuentas_comas == ""){//EL ARRAY ESTABA VACIO
-                  $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idempresa = '$idempresa' AND pagado != 0 AND transacciones_idtransacciones = 0;"); //POR COBRAR
+                //   $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idempresa = '$idempresa' AND pagado != 0 AND transacciones_idtransacciones = 0;"); //POR COBRAR
+                $getPedido = [];
              }else{
-                 $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idotras_cuentas IN ($otras_cuentas_comas)
-                 UNION
-                 SELECT * FROM otras_cuentas WHERE idempresa = '$idempresa' AND pagado != 0 AND transacciones_idtransacciones = 0;"); //POR COBRAR
+                 $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idotras_cuentas IN ($otras_cuentas_comas)"); //POR COBRAR
   
              }
           }
       
-  
-          while ($qwe = $this->dbc->fetch($getPedido)) {
+          if($getPedido->num_rows > 0){
+            while ($qwe = $this->dbc->fetch($getPedido)) {
             $res = array(
                 "idotras_cuentas" => $qwe['idotras_cuentas'],
                 "fecha" => $qwe['fecha'],
@@ -382,6 +378,9 @@ class Filtrado_facturas extends DB{
   
               array_push($lista, $res);
           }
+          }else{
+
+          }
       
           echo json_encode($lista, JSON_NUMERIC_CHECK);
           // echo json_encode(array($caja_bancos,$factura_comas));
@@ -391,9 +390,9 @@ class Filtrado_facturas extends DB{
         // $idempresa = $this->getidempresa($empresa);
                   // echo json_encode(array($cobrado,$idcaja_bancos,$empresa));
                   
-                  ini_set('display_errors', 1);
-                  ini_set('display_startup_errors', 1);
-                  error_reporting(E_ALL);
+                //   ini_set('display_errors', 1);
+                //   ini_set('display_startup_errors', 1);
+                //   error_reporting(E_ALL);
   
   
           $lista = [];
@@ -422,12 +421,10 @@ class Filtrado_facturas extends DB{
           $otras_cuentas_comas = implode(",", $array_id_otrasCuentas);
 
               if($otras_cuentas_comas == ""){//EL ARRAY ESTABA VACIO
-                   $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idempresa = '$idempresa' AND cobrado = 1 AND transacciones_idtransacciones = 0;"); //POR COBRAR
+                //    $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idempresa = '$idempresa' AND cobrado = 1 AND transacciones_idtransacciones = 0;"); //POR COBRAR
+                   $getPedido = [];
               }else{
-                  $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idotras_cuentas IN ($otras_cuentas_comas)
-                  UNION
-                  SELECT * FROM otras_cuentas WHERE idempresa = '$idempresa' AND cobrado = 1 AND transacciones_idtransacciones = 0;"); //POR COBRAR
-  
+                  $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idotras_cuentas IN ($otras_cuentas_comas)"); //POR COBRAR
               }
   
           }elseif($cobrado == 2){ // PAGADO
@@ -447,11 +444,10 @@ class Filtrado_facturas extends DB{
           $otras_cuentas_comas = implode(",", $array_id_otrasCuentas);
 
               if($otras_cuentas_comas == ""){//EL ARRAY ESTABA VACIO
-                  $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idempresa = '$idempresa' AND cobrado = 2 AND transacciones_idtransacciones = 0;"); //POR COBRAR
+                //   $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idempresa = '$idempresa' AND cobrado = 2 AND transacciones_idtransacciones = 0;"); //POR COBRAR
+                 $getPedido = [];
              }else{
-                 $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idotras_cuentas IN ($otras_cuentas_comas)
-                 UNION
-                 SELECT * FROM otras_cuentas WHERE idempresa = '$idempresa' AND cobrado = 2 AND transacciones_idtransacciones = 0;"); //POR COBRAR
+                 $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idotras_cuentas IN ($otras_cuentas_comas)"); //POR COBRAR
   
              }
           }else{ //TODOS
@@ -471,17 +467,16 @@ class Filtrado_facturas extends DB{
           $otras_cuentas_comas = implode(",", $array_id_otrasCuentas);
 
               if($otras_cuentas_comas == ""){//EL ARRAY ESTABA VACIO
-                  $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idempresa = '$idempresa' AND cobrado != 0 AND transacciones_idtransacciones = 0;"); //POR COBRAR
-             }else{
-                 $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idotras_cuentas IN ($otras_cuentas_comas)
-                 UNION
-                 SELECT * FROM otras_cuentas WHERE idempresa = '$idempresa' AND cobrado != 0 AND transacciones_idtransacciones = 0;"); //POR COBRAR
+                //   $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idempresa = '$idempresa' AND cobrado != 0 AND transacciones_idtransacciones = 0;"); //POR COBRAR
+                $getPedido = [];
+               }else{
+                 $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idotras_cuentas IN ($otras_cuentas_comas)"); //POR COBRAR
   
              }
           }
       
-  
-          while ($qwe = $this->dbc->fetch($getPedido)) {
+          if($getPedido->num_rows > 0){
+            while ($qwe = $this->dbc->fetch($getPedido)) {
             $res = array(
                 "idotras_cuentas" => $qwe['idotras_cuentas'],
                 "fecha" => $qwe['fecha'],
@@ -505,6 +500,9 @@ class Filtrado_facturas extends DB{
             );
   
               array_push($lista, $res);
+          }
+          }else{
+
           }
       
           echo json_encode($lista, JSON_NUMERIC_CHECK);

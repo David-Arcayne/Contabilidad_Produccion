@@ -264,6 +264,55 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
     
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
+    public function listar_recibo_facturas_otras_cuentas($idotras_cuentas) {
+        $lista = [];
+        // $idempresa = $this->getidempresa($empresa); 
+        $listado_recibo_aux = $this->dbc->query("SELECT * FROM recibo WHERE idotras_cuentas='$idotras_cuentas'");
+        
+        $listado_factura_aux = $this->dbc->query("SELECT * FROM factura WHERE idotras_cuentas='$idotras_cuentas'");
+
+        // if($listado_recibo_aux->num_rows > 0){ //RECIBOS
+            while ($qwe = $this->dbc->fetch($listado_recibo_aux)) {
+
+            $trans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE idtransacciones='$qwe[transaccion]'");
+            $idtr = $trans->fetch_assoc();
+
+            if($qwe['cobrado'] == '0' && $qwe['pagado'] > 0){
+                $cliente_proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='$qwe[cliente_proveedor]'");
+            }else{
+                $cliente_proveedor = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='$qwe[cliente_proveedor]'");
+            }
+            $cl_pv = $cliente_proveedor->fetch_assoc();
+            $res = array("fecha" => $qwe['fecha'], "nro_documento" => $qwe['nro_recibo'], "codigotransaccion" => $idtr['codigotransaccion'],
+                "cliente_proveedor" => $cl_pv['nombre'],"concepto" => $qwe['concepto'],
+                "monto" => $qwe['monto'],
+                "tipo" => 'recibo');
+            array_push($lista, $res);
+            }
+        // }
+        // else{ //FACTURAS
+            while ($zxc = $this->dbc->fetch($listado_factura_aux)) {
+
+            $trans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE idtransacciones='$zxc[transacciones_idtransacciones]'");
+            $idtr = $trans->fetch_assoc();
+
+            if($zxc['cobrado'] == '0' && $zxc['pagado'] > 0){
+                $cliente_proveedor2 = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='$zxc[proveedorcliente_idproveedorcliente]'");
+            }else{
+                $cliente_proveedor2 = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='$zxc[proveedorcliente_idproveedorcliente]'");
+            }
+            $cl_pv2 = $cliente_proveedor2->fetch_assoc();
+
+            $res = array("fecha" => $zxc['fecha'], "nro_documento" => $zxc['nfactura'], "codigotransaccion" => $idtr['codigotransaccion'],
+                "cliente_proveedor" => $cl_pv2['nombre'],"concepto" => $zxc['por_concepto_de'],
+                "monto" => $zxc['montofactura'],
+                "tipo" => 'factura');
+            array_push($lista, $res);
+            }
+        // }     
+    
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
     //  //SOLO HAY INDIVIDUALES
     //  $registro = $this->dbc->query("SELECT c.idcuentaspor,c.nrecibo,c.fecha,c.monto,c.persona,c.ci,c.transaccion,c.archivo FROM cuentaspof as c WHERE c.idfactura='$idfactura'");
     //  while ($qwe = $this->dbc->fetch($registro)) {

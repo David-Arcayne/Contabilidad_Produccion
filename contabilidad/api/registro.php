@@ -702,5 +702,5 @@ if($data['ver'] == "asignar_asiento_A_factura") {
 
 //  vincula  -- crearfacturasf5 registrar_factura_cobro registrar_factura_cobro_otras_cuentas --> aumentar usuario 
 //  registrocobrarfacturaGrupal crearfacturas caja_bancos registrar_factura_pago registrar_otras_cuentas registrar_recibo_otras_cuentas--> aumentar usuario creartransaccion
-}// editar_caja_bancos_facturas registrar_factura_recibo_cobro_cajaBancos  editar_recibo_caja
+}// editar_caja_bancos_facturas registrar_factura_recibo_cobro_cajaBancos  editar_recibo_caja registrar_recibo_otras_cuentas
 ?> 
