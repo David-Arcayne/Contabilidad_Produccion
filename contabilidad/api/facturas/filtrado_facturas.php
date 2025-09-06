@@ -443,7 +443,7 @@ class Filtrado_facturas extends DB{
   
           $otras_cuentas_comas = implode(",", $array_id_otrasCuentas);
 
-              if($otras_cuentas_comas == ""){//EL ARRAY ESTABA VACIO
+            if($otras_cuentas_comas == ""){//EL ARRAY ESTABA VACIO
                 //   $getPedido = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idempresa = '$idempresa' AND cobrado = 2 AND transacciones_idtransacciones = 0;"); //POR COBRAR
                  $getPedido = [];
              }else{

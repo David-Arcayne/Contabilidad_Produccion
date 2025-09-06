@@ -243,13 +243,13 @@ class Plandecuentas extends DB{
     public function registrar_agrupacion_rubro_plandecuenta($idtipo_plandecuenta,$numero,$empresa){
         // $idempresa = Empresa::getidempresa($empresa);
         $idempresa = $this->getidempresa($empresa);
-        // $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM divisa WHERE nombre = '$nombre' AND idempresa = '$idempresa'");
-        // $resultado = $consulta->fetch_assoc();
-        // $totalRegistros = $resultado['total'];
+        $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM agrupacion_rubro_plandecuenta WHERE numero = '$numero' AND idempresa = '$idempresa'");
+        $resultado = $consulta->fetch_assoc();
+        $totalRegistros = $resultado['total'];
 
-        // if ($totalRegistros > 0) {
-        //     $res = array("danger", "El registro ya existe","Error");
-        // } else {
+        if ($totalRegistros > 0) {
+            $res = array("danger", "El registro ya existe","Error");
+        } else {
             // Insertar el nuevo registro
             $registrar_agrupacion = $this->dbc->query("INSERT INTO agrupacion_rubro_plandecuenta(idtipo_plandecuenta,numero,idempresa) VALUES ('$idtipo_plandecuenta','$numero','$idempresa')");
             if ($registrar_agrupacion === TRUE) {                                                                                                                                                                
@@ -257,17 +257,49 @@ class Plandecuentas extends DB{
             } else {
                 $res = array("danger", "No se pudo registrar");
             }
-        // }
+        }
         echo json_encode($res);
         
     }
 
-    public function listar_tipo_plandecuenta($empresa) {
+    public function editar_agrupacion_rubro_plandecuenta($id,$idtipo_plandecuenta,$numero,$empresa) {
+        $idempresa = $this->getidempresa($empresa);
+
+        $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM agrupacion_rubro_plandecuenta WHERE numero = '$numero' AND idempresa = '$idempresa' AND idagrupacion_rubro_plandecuenta != '$id'");
+        $resultado = $consulta->fetch_assoc();
+        $totalRegistros = $resultado['total'];
+
+        if ($totalRegistros > 0) {
+            $res = array("danger", "El registro ya existe","editarCaracteristicas");
+        }else {
+            // Insertar el nuevo registro
+            $registroListaCompra = $this->dbc->query("UPDATE agrupacion_rubro_plandecuenta
+                                    SET idtipo_plandecuenta = '$idtipo_plandecuenta',
+                                    numero = '$numero'
+                                    WHERE idagrupacion_rubro_plandecuenta = '$id';");
+            if ($registroListaCompra === TRUE) {                                                                                                                                                                
+                $res = array("success", "Edición exitosa","editarCaracteristicas");
+            } else {
+                $res = array("danger", "No se pudo editar");
+            }
+        }
+        echo json_encode($res);
+    }
+    public function listar_tipo_plandecuenta($empresa,$id) {
         $lista = [];
         $idempresa = $this->getidempresa($empresa);
-    
+        $agru = $this->dbc->query("SELECT * FROM agrupacion_rubro_plandecuenta WHERE idempresa = '$idempresa'");
+        $array_agru = [];
+        while ($aux_agru = $this->dbc->fetch($agru)) {
+            if($aux_agru['idagrupacion_rubro_plandecuenta'] == $id){
+                
+            }else{
+                array_push($array_agru, $aux_agru['idtipo_plandecuenta']); //ARRAY DE LOS Q NO LISTARA
+            }
+        }
+        $id_pl_cuentas = implode(",", $array_agru );
         // Preparar la consulta
-        $get = $this->dbc->query("SELECT * FROM tipo_plandecuenta");
+        $get = $this->dbc->query("SELECT * FROM tipo_plandecuenta where idtipo_plandecuenta not in ($id_pl_cuentas)");
     
         while ($qwe = $this->dbc->fetch($get)) {
             $res = array(
@@ -300,7 +332,26 @@ class Plandecuentas extends DB{
     
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
+    public function eliminar_agrupacion_rubro_plandecuenta($id){
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+        $existe_plandecuenta = $this->dbc->query("SELECT * FROM plandecuenta WHERE idagrupacion_rubro_plandecuenta = '$id'");
 
+            if ($existe_plandecuenta->num_rows > 0) {
+                $res = array("danger", "No se puede eliminar porque hay registros en plandecuentas","eliminar_proveedor");
+            } else {
+                // Insertar el nuevo registro
+                $delete = $this->dbc->query("DELETE FROM agrupacion_rubro_plandecuenta WHERE idagrupacion_rubro_plandecuenta = '$id'");
+                if ($delete === TRUE) {                                                                                                                                                    
+                    $res = array("success", "se elimino exitosamente","eliminarCaracteristica");
+                } else {
+                    $res = array("danger", "No se pudo registrar");
+                }
+            }
+            echo json_encode($res);
+    }
+    
     public function getidusuario($md5){
         $registro=$this->dbrh->query("select * from usuario where md5(idusuario)='$md5'");
         $qwe=$this->dbrh->fetch($registro);

@@ -198,7 +198,7 @@ class Admin extends DB
         echo json_encode($lista);
     }
 
-    public function registroplanes($numero, $plan, $descripcion, $tipo, $idp, $empresa)
+    public function registroplanes($numero, $plan, $descripcion, $tipo, $idp,$rubro, $empresa)
     {
         $ide = $this->getidempresa($empresa);
         
@@ -211,8 +211,8 @@ class Admin extends DB
             $res = array("danger", "El numero de codigo ya existe");
         }elseif(empty($idp)){
             // $res = array("success", "Se registro Correctamente", "registroplanes"); registroplanesf5
-          $registro = $this->dbc->query("INSERT INTO plandecuenta(idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,idp,organizacion_idorganizacion)
-            VALUES (NULL,'$numero','$plan','$descripcion','$tipo','2','$idp','$ide')");
+          $registro = $this->dbc->query("INSERT INTO plandecuenta(idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,idp,idagrupacion_rubro_plandecuenta,organizacion_idorganizacion)
+            VALUES (NULL,'$numero','$plan','$descripcion','$tipo','2','$idp','$rubro','$ide')");
             if ($registro === TRUE) {
                 $res = array("success", "Se registro Correctamente", "registroplanes");
             } else {
@@ -228,8 +228,8 @@ class Admin extends DB
             if($codigo_padre[0] == $codigo[0]){
                 // $res = array("success", "Se registro Correctamente", "registroplanes");
       
-                $registro = $this->dbc->query("INSERT INTO plandecuenta(idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,idp,organizacion_idorganizacion)
-                VALUES (NULL,'$numero','$plan','$descripcion','$tipo','2','$idp','$ide')");
+                $registro = $this->dbc->query("INSERT INTO plandecuenta(idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,idp,idagrupacion_rubro_plandecuenta,organizacion_idorganizacion)
+                VALUES (NULL,'$numero','$plan','$descripcion','$tipo','2','$idp','$rubro','$ide')");
                 if ($registro === TRUE) {
                     $res = array("success", "Se registro Correctamente", "registroplanes");
                 } else {
@@ -244,7 +244,7 @@ class Admin extends DB
         echo json_encode($res);
     }
 
-    public function editarregistroplanes($idplan, $numero, $plan, $descripcion, $tipo, $idp,$empresa)
+    public function registroplanesf5($idplan, $numero, $plan, $descripcion, $tipo, $idp,$empresa)
     {
         $ide = $this->getidempresa($empresa);
         $res = "";

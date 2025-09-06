@@ -28,10 +28,10 @@ $json = file_get_contents('php://input'); // Decodificar el JSON en un arreglo P
 $data = json_decode($json, true);
 if($ver=="registroplanes"){
 $ad=new Admin();
-$ad->registroplanes($_POST['numero'],$_POST['plan'],$_POST['descripcion'],$_POST['tipo'],$_POST['plandecuenta'],$_POST['empresa']);
+$ad->registroplanes($_POST['numero'],$_POST['plan'],$_POST['descripcion'],$_POST['tipo'],$_POST['plandecuenta'],$_POST['idagrupacion_rubro_plandecuenta'],$_POST['empresa']);
 }elseif($ver=="registroplanesf5"){
     $ad=new Admin();
-    $ad->editarregistroplanes($_POST['idplan'],$_POST['numero'],$_POST['plan'],$_POST['descripcion'],$_POST['tipo'],$_POST['plandecuenta'],$_POST['empresa_id']);
+    $ad->registroplanesf5($_POST['idplan'],$_POST['numero'],$_POST['plan'],$_POST['descripcion'],$_POST['tipo'],$_POST['plandecuenta'],$_POST['empresa_id']);
 }elseif($ver=="registrotipodecambio"){
 $adm=new Admin();
 $adm->registrotipodecambio($_POST['dolar'],$_POST['ufv'],$_POST['fecha'],$_POST['empresa']);
@@ -706,6 +706,9 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idtipo_plandecuenta'],$_POST['numero'],$_POST['empresa']));
         }
+    }elseif($ver=="editar_agrupacion_rubro_plandecuenta"){
+    $cont=new Plandecuentas();
+    $cont->editar_agrupacion_rubro_plandecuenta($_POST['idagrupacion_rubro_plandecuenta'],$_POST['idtipo_plandecuenta'],$_POST['numero'],$_POST['empresa']);
     }
 //  vincula  -- crearfacturasf5 registrar_factura_cobro registrar_factura_cobro_otras_cuentas --> aumentar usuario 
 //  registrocobrarfacturaGrupal crearfacturas caja_bancos registrar_factura_pago registrar_otras_cuentas registrar_recibo_otras_cuentas--> aumentar usuario creartransaccion
