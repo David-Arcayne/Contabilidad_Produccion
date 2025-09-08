@@ -286,6 +286,10 @@ class Plandecuentas extends DB{
         echo json_encode($res);
     }
     public function listar_tipo_plandecuenta($empresa,$id) {
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+
         $lista = [];
         $idempresa = $this->getidempresa($empresa);
         $agru = $this->dbc->query("SELECT * FROM agrupacion_rubro_plandecuenta WHERE idempresa = '$idempresa'");
@@ -299,7 +303,11 @@ class Plandecuentas extends DB{
         }
         $id_pl_cuentas = implode(",", $array_agru );
         // Preparar la consulta
-        $get = $this->dbc->query("SELECT * FROM tipo_plandecuenta where idtipo_plandecuenta not in ($id_pl_cuentas)");
+        if($id_pl_cuentas == ""){
+            $get = $this->dbc->query("SELECT * FROM tipo_plandecuenta where idtipo_plandecuenta");
+        }else{
+            $get = $this->dbc->query("SELECT * FROM tipo_plandecuenta where idtipo_plandecuenta not in ($id_pl_cuentas)");
+        }
     
         while ($qwe = $this->dbc->fetch($get)) {
             $res = array(

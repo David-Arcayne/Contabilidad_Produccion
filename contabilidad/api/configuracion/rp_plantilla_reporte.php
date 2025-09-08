@@ -1185,21 +1185,26 @@ class PlantillaReporte extends DB{
     }
     public function select_plantilla_estado_resultados($empresa)
     {
-        ini_set('display_errors', 1); 
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+        // ini_set('display_errors', 1); 
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
 
         $ide = $this->get_id_empresa($empresa);
         $lista = [];
-        $registro = $this->dbc->query("SELECT idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,organizacion_idorganizacion,idp FROM plandecuenta WHERE organizacion_idorganizacion='$ide' ORDER BY numero ASC");
+        $registro = $this->dbc->query("SELECT idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,organizacion_idorganizacion,idp,idagrupacion_rubro_plandecuenta FROM plandecuenta WHERE organizacion_idorganizacion='$ide' ORDER BY numero ASC");
         while ($qwe = $this->dbc->fetch($registro)) {
-            
+            $aux1 = $this->dbc->query("SELECT * FROM agrupacion_rubro_plandecuenta WHERE idagrupacion_rubro_plandecuenta='$qwe[idagrupacion_rubro_plandecuenta]'");
+            $agru = $aux1->fetch_assoc();
+
+            $aux2 = $this->dbc->query("SELECT * FROM tipo_plandecuenta WHERE idtipo_plandecuenta='$agru[idtipo_plandecuenta]'");
+            $tipo_pl = $aux2->fetch_assoc();
+
             $existe_plantilla = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplandecuenta = '$qwe[idplandecuenta]' AND idempresa='$ide'");
             if($existe_plantilla->num_rows > 0){
-                $res = array("idplandecuenta" => $qwe['idplandecuenta'], "numero" => $qwe['numero'], "nombre" => $qwe['nombreplan'], "estado" => 'usado');
+                $res = array("idplandecuenta" => $qwe['idplandecuenta'], "numero" => $qwe['numero'], "nombre" => $qwe['nombreplan'], "estado" => 'usado',"rubro" => $tipo_pl['nombre']);
 
             }else{
-                $res = array("idplandecuenta" => $qwe['idplandecuenta'], "numero" => $qwe['numero'], "nombre" => $qwe['nombreplan'], "estado" => 'no_usado');
+                $res = array("idplandecuenta" => $qwe['idplandecuenta'], "numero" => $qwe['numero'], "nombre" => $qwe['nombreplan'], "estado" => 'no_usado', "rubro" => $tipo_pl['nombre']);
             }
             array_push($lista, $res);
         }
