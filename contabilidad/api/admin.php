@@ -184,14 +184,20 @@ class Admin extends DB
     {
         $ide = $this->getidempresa($empresa);
         $lista = [];
-        $registro = $this->dbc->query("SELECT idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,organizacion_idorganizacion,idp FROM plandecuenta WHERE organizacion_idorganizacion='$ide' ORDER BY numero ASC");
+        $registro = $this->dbc->query("SELECT idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,organizacion_idorganizacion,idp,idagrupacion_rubro_plandecuenta FROM plandecuenta WHERE organizacion_idorganizacion='$ide' ORDER BY numero ASC");
         while ($qwe = $this->dbc->fetch($registro)) {
             $numero_descompuesto = explode(".", $qwe[1]); 
             $aux = $this->dbc->query("SELECT nombreplan FROM plandecuenta WHERE numero >= $numero_descompuesto[0] LIMIT 1");
             $name_plan = $aux->fetch_assoc();
             // --> select * from plandecuenta where numero >= 1 limit 1
             // if($codigo_padre[0] == 1){ }
-            $res = array("id" => $qwe[0], "numero" => $qwe[1], "plan" => $qwe[2], "descripcion" => $qwe[3], "rubro" => $name_plan['nombreplan'], "tipo" => $qwe[4], "consolidar" => $qwe[5], "empresa" => $qwe[6], "idp" => $qwe[7]);
+        $agru = $this->dbc->query("SELECT * FROM agrupacion_rubro_plandecuenta WHERE idagrupacion_rubro_plandecuenta='$qwe[idagrupacion_rubro_plandecuenta]'");
+        $agru_aux = $agru->fetch_assoc();
+
+        $tipo_pl = $this->dbc->query("SELECT * from tipo_plandecuenta where idtipo_plandecuenta = '$agru_aux[idtipo_plandecuenta]'");// HIJOS DE LAS PLANTILLAS AGRUPADORAS
+        $pl_aux = $tipo_pl->fetch_assoc();
+
+            $res = array("id" => $qwe[0], "numero" => $qwe[1], "plan" => $qwe[2], "descripcion" => $qwe[3], "rubro" => $name_plan['nombreplan'], "tipo" => $qwe[4], "consolidar" => $qwe[5], "empresa" => $qwe[6], "idp" => $qwe[7],"idagrupacion_rubro_plandecuenta" => $qwe[8],"nombre_rubro" => $pl_aux['nombre']);
 
             array_push($lista, $res);
         }
@@ -244,7 +250,7 @@ class Admin extends DB
         echo json_encode($res);
     }
 
-    public function registroplanesf5($idplan, $numero, $plan, $descripcion, $tipo, $idp,$empresa)
+    public function registroplanesf5($idplan, $numero, $plan, $descripcion, $tipo, $idp,$idagrupacion_rubro_plandecuenta,$empresa)
     {
         $ide = $this->getidempresa($empresa);
         $res = "";
@@ -257,7 +263,8 @@ class Admin extends DB
         }elseif(empty($idp)){
             // $res = array("success", "Se registro Correctamente", "registroplanes");
         $registro = $this->dbc->query("UPDATE plandecuenta 
-        SET numero='$numero',nombreplan='$plan',descripcion='$descripcion',saldonormal='$tipo',idp='$idp' where idplandecuenta='$idplan'");
+        SET numero='$numero',nombreplan='$plan',descripcion='$descripcion',saldonormal='$tipo',idp='$idp',idagrupacion_rubro_plandecuenta = '$idagrupacion_rubro_plandecuenta' 
+        WHERE idplandecuenta='$idplan'");
 
         //   $registro = $this->dbc->query("INSERT INTO plandecuenta(idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,idp,organizacion_idorganizacion)
             // VALUES (NULL,'$numero','$plan','$descripcion','$tipo','2','$idp','$ide')");
@@ -276,7 +283,8 @@ class Admin extends DB
             if($codigo_padre[0] == $codigo[0]){
                 // $res = array("success", "Se registro Correctamente", "registroplanes");
                 $registro = $this->dbc->query("UPDATE plandecuenta 
-        SET numero='$numero',nombreplan='$plan',descripcion='$descripcion',saldonormal='$tipo',idp='$idp' where idplandecuenta='$idplan'");
+        SET numero='$numero',nombreplan='$plan',descripcion='$descripcion',saldonormal='$tipo',idp='$idp',idagrupacion_rubro_plandecuenta = '$idagrupacion_rubro_plandecuenta' 
+        WHERE idplandecuenta='$idplan'");
                 // $registro = $this->dbc->query("INSERT INTO plandecuenta(idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,idp,organizacion_idorganizacion)
                 // VALUES (NULL,'$numero','$plan','$descripcion','$tipo','2','$idp','$ide')");
                 if ($registro === TRUE) {
@@ -289,12 +297,7 @@ class Admin extends DB
                 $res = array("danger", "El numero de codigo no esta en el rango permitido",$codigo_padre[0],$codigo[0],$idp);
             }
         }
-        // $registro = $this->dbc->query("update plandecuenta set numero='$numero',nombreplan='$plan',descripcion='$descripcion',saldonormal='$tipo',idp='$idp' where idplandecuenta='$idplan'");
-        // if ($registro === TRUE) {
-        //     $res = array("success", "Se Actualizo Correctamente", "registroplanes");
-        // } else {
-        //     $res = array("danger", "No se pudo registrar");
-        // }
+   
         echo json_encode($res);
     }
     public function deleteplan($id) {

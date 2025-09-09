@@ -469,7 +469,8 @@ class Reporte_confi extends DB{
                         );
                         $get_nivel_5 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta3[nombreplan]' AND idempresa='$idempresa' ORDER BY orden ASC");// ACTIVO, PASIVO, PATRIMONIO
                         $suma_nivel_4 = 0;
-                        $suma_nivel_5 = 0;
+                        // $suma_nivel_5 = 0;
+                        $aux_sum_5 = 0;
                         while ($qwe5 = $this->dbc->fetch($get_nivel_5)) {
                             $cuenta4 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe5[idplandecuenta]'");// caja_general, banco
                             $nombre_cuenta4 = $cuenta4->fetch_assoc();
@@ -551,11 +552,11 @@ class Reporte_confi extends DB{
                                 AND t.estado NOT IN (4, 5, 6) AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
 
                                 $valor = $suma_cuentas->fetch_assoc();
-                                // $suma_nivel_4 = $suma_nivel_4 + $valor['total'];
+                                $suma_nivel_4 = $suma_nivel_4 + $valor['total'];
                                 if($valor['total'] == null || $valor['total'] == '0'){
                                     //--------------------------------------------
                                 }else{
-                                    $suma_nivel_4 = $suma_nivel_4 + $valor['total'];
+                                    // $suma_nivel_4 = $suma_nivel_4 + $valor['total'];
                                     $res5 = array(
                                     "idconfiguracion_reporte" => $qwe5['idconfiguracion_reporte'],
                                     "idplandecuenta" => $nombre_cuenta4['idplandecuenta'], 
@@ -581,7 +582,7 @@ class Reporte_confi extends DB{
                         "nivel_5" => [] //activo
                         );
                         $get_nivel_6 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta4[nombreplan]' AND idempresa='$idempresa' ORDER BY orden ASC");// ACTIVO, PASIVO, PATRIMONIO
-                        // $suma_nivel_5 = 0;
+                        $suma_nivel_5 = 0;
                         while ($qwe6 = $this->dbc->fetch($get_nivel_6)) { //esto ya es nivel 5 = CALCULABLE
                             $cuenta5 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe6[idplandecuenta]'");// caja_general, banco
                             $nombre_cuenta5 = $cuenta5->fetch_assoc();
@@ -593,6 +594,8 @@ class Reporte_confi extends DB{
 
                                 $valor2 = $suma_cuentas2->fetch_assoc();
                                 $suma_nivel_5 = $suma_nivel_5 + $valor2['total'];
+                                    // $aux_sum_5 = $suma_nivel_5;
+
                                 if($valor2['total'] == null || $valor2['total'] == '0'){
         //------------------------------------------------------------------------------
                                 }else{
@@ -609,8 +612,12 @@ class Reporte_confi extends DB{
                                 
                                 // $res4['suma_nivel_5'] = $suma_nivel_5;
                         }
+                        // $aux_sum_5 = $suma_nivel_5;
+
                         $res5['suma_nivel_5'] = $suma_nivel_5;
                         $res5['valor'] = $suma_nivel_5;
+                        $suma_nivel_4 = $suma_nivel_4 + $res5['suma_nivel_5'];
+
                             array_push($res4['nivel_4'], $res5); 
 
                         } // AQUI TERMINA EL NO ES CALCULABLE
@@ -618,7 +625,7 @@ class Reporte_confi extends DB{
                         // $suma_nivel_3 = $suma_nivel_3 + $res4['suma_nivel_4'];
                         // array_push($res3['nivel_3'], $res4); 
                          }
-                         $res4['suma_nivel_4'] = $suma_nivel_4 + $suma_nivel_5;
+                         $res4['suma_nivel_4'] = $suma_nivel_4;
                         $suma_nivel_3 = $suma_nivel_3 + $res4['suma_nivel_4'];
                 array_push($res3['nivel_3'], $res4); 
                         

@@ -154,7 +154,7 @@ class PlantillaReporte extends DB{
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
 
-    public function registrar_plantilla($idplantilla_reporte, $idplantilla_padre, $idplandecuenta, $nombre_personalizado, $tipo_operacion, $nivel, $orden, $disponible_para_otro_reporte, $idempresa)
+    public function registrar_plantilla($idplantilla_reporte, $idplantilla_padre, $idplandecuenta, $nombre_personalizado, $tipo_operacion, $nivel, $orden, $disponible_para_otro_reporte,$ingreso_egreso, $idempresa)
     {
         $id_empresa = $this->get_id_empresa($idempresa);
 
@@ -166,11 +166,18 @@ class PlantillaReporte extends DB{
         $v6 = (int) $nivel;
         $v7 = $orden ? (int) $orden : NULL;
         $v8 = $disponible_para_otro_reporte ? 'si' : 'no';
-        $v9 = (int) $id_empresa;
+        $v9 = trim($ingreso_egreso) !== '' ? trim($ingreso_egreso) : null;
+        $v10 = (int) $id_empresa;
 
         // Insertar nuevo registro
-        $stmt_insert = $this->dbc->prepare("INSERT INTO pr_plantilla (idplantilla_reporte, idplantilla_padre, idplandecuenta, nombre_personalizado, tipo_operacion, nivel, orden, disponible_para_otro_reporte, idempresa) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt_insert->bind_param("iiissiisi", $v1, $v2, $v3, $v4, $v5, $v6, $v7, $v8, $v9);
+        // if($ingreso_egreso == ""){
+            $stmt_insert = $this->dbc->prepare("INSERT INTO pr_plantilla (idplantilla_reporte, idplantilla_padre, idplandecuenta, nombre_personalizado, tipo_operacion, nivel, orden, disponible_para_otro_reporte, idempresa) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt_insert->bind_param("iiissiisi", $v1, $v2, $v3, $v4, $v5, $v6, $v7, $v8, $v10);
+        // }else{
+            $stmt_insert = $this->dbc->prepare("INSERT INTO pr_plantilla (idplantilla_reporte, idplantilla_padre, idplandecuenta, nombre_personalizado, tipo_operacion, nivel, orden, disponible_para_otro_reporte,ingreso_egreso, idempresa) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt_insert->bind_param("iiissiissi", $v1, $v2, $v3, $v4, $v5, $v6, $v7, $v8, $v9, $v10);
+        // }
+     
         if (!$stmt_insert->execute()) {
             echo json_encode(["danger", "Error al registrar"]);
             return;
@@ -187,7 +194,7 @@ class PlantillaReporte extends DB{
                 WHERE idplantilla_reporte = $v1
                 AND $filtro_padre
                 AND nivel = $v6
-                AND idempresa = $v9
+                AND idempresa = $v10
                 ORDER BY ISNULL(orden), orden ASC, idplantilla DESC
             ) AS ordenado
             ON p.idplantilla = ordenado.idplantilla
@@ -197,6 +204,7 @@ class PlantillaReporte extends DB{
             echo json_encode(["danger", "Error al reordenar"]);
             return;
         }
+        // echo json_encode(array($idplantilla_reporte, $idplantilla_padre, $idplandecuenta, $nombre_personalizado, $tipo_operacion, $nivel, $orden, $disponible_para_otro_reporte,$ingreso_egreso, $idempresa));
 
         echo json_encode(["success", "Registro y reordenamiento exitoso", "rp_registrar_plantilla"]);
     }
@@ -880,7 +888,7 @@ class PlantillaReporte extends DB{
                 $cuenta_plan = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$pl_list[idplandecuenta]'");// VENTAS->NOMBRE
                 $pc = $cuenta_plan->fetch_assoc();
 
-                $valor_auxi = $this->calculables_estado_resultados($pc['numero'], $idempresa, $gestion,$pl_list['idplandecuenta'],$fecha_ini,$fecha_fin,$pl_list['idplantilla']);
+                $valor_auxi = $this->calculables_estado_resultados($pc['idagrupacion_rubro_plandecuenta'], $idempresa, $gestion,$pl_list['idplandecuenta'],$fecha_ini,$fecha_fin,$pl_list['idplantilla']);
 
                 // $suma_nivel_2 = $valor_auxi + $valor2['total'];
                 if($valor_auxi == null || $valor_auxi == '0'){
@@ -944,29 +952,29 @@ class PlantillaReporte extends DB{
             // $suma_nivel_3 = 0;
             while ($aux_nivel_2 = $this->dbc->fetch($pl_padre_calcu)) { //CALCULABLES o TALVES TAMBIEN NO CALCULABLES
 
-                $plan_cuenta = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$aux_nivel_2[idplandecuenta]'");// caja_general, banco
-                $nombre_cuenta = $plan_cuenta->fetch_assoc();
+                $plan_cuenta2 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$aux_nivel_2[idplandecuenta]'");// caja_general, banco
+                $nombre_cuenta2 = $plan_cuenta2->fetch_assoc();
                 if($aux_nivel_2['tipo_operacion'] == 'calculable'){ //SI ES CALCULABLE
                     // recargo, descuento
                     //--------------------------------------------------------------------------------------------------------------------------------------------------------------
                 //     $plan_cuenta = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$aux_nivel_2[idplandecuenta]'");// caja_general, banco
                 // $nombre_cuenta = $plan_cuenta->fetch_assoc();
 
-                $valor_total = $this->calculables_estado_resultados($nombre_cuenta['numero'], $idempresa, $gestion,$aux_nivel_2['idplandecuenta'],$fecha_ini,$fecha_fin,$aux_nivel_2['idplantilla']);
+                $valor_total2 = $this->calculables_estado_resultados($nombre_cuenta2['idagrupacion_rubro_plandecuenta'], $idempresa, $gestion,$aux_nivel_2['idplandecuenta'],$fecha_ini,$fecha_fin,$aux_nivel_2['idplantilla']);
 
                 // $valor2 = $suma_cuentas2->fetch_assoc();
-                $suma_nivel_2 = $suma_nivel_2 + $valor_total;
+                $suma_nivel_2 = $suma_nivel_2 + $valor_total2;
 
                 // if($valor2['total'] == null || $valor2['total'] == '0'){
                 //     //-----------------------------------
                 // }else{
                     $res2 = array(
                         // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
-                        "idplandecuenta" => $nombre_cuenta['idplandecuenta'],
-                        "codigo" => $nombre_cuenta['numero'],
-                        "nombre_cuenta" => $nombre_cuenta['nombreplan'],
+                        "idplandecuenta" => $nombre_cuenta2['idplandecuenta'],
+                        "codigo" => $nombre_cuenta2['numero'],
+                        "nombre_cuenta" => $nombre_cuenta2['nombreplan'],
                         // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
-                        "valor" => $valor_total,
+                        "valor" => $valor_total2,
                         "suma_nivel_3" => 0,
                         // "nivel_3" => [] //activo
                         );
@@ -978,9 +986,9 @@ class PlantillaReporte extends DB{
                     // NIVEL 3 333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333
                     $res2 = array(
                         // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
-                        "idplandecuenta" => $nombre_cuenta['idplandecuenta'],
-                        "codigo" => $nombre_cuenta['numero'],
-                        "nombre_cuenta" => $nombre_cuenta['nombreplan'],
+                        "idplandecuenta" => $nombre_cuenta2['idplandecuenta'],
+                        "codigo" => $nombre_cuenta2['numero'],
+                        "nombre_cuenta" => $nombre_cuenta2['nombreplan'],
                         // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
                         "valor" => 0,
                         "suma_nivel_3" => 0,
@@ -991,13 +999,14 @@ class PlantillaReporte extends DB{
                     
                     $suma_nivel_3 = 0;
                     while ($aux_nivel_3 = $this->dbc->fetch($nivel_3)) {
+                        
+                        $plan_cuenta3 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$aux_nivel_3[idplandecuenta]'");// caja_general, banco
+                        $nombre_cuenta3 = $plan_cuenta3->fetch_assoc();
+
                         if($aux_nivel_3['tipo_operacion'] == 'calculable'){ //SI ES CALCULABLE   
                             // venta cafe yungas y venta cafe nueva esperanza
-                            
-                            $plan_cuenta2 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$aux_nivel_3[idplandecuenta]'");// caja_general, banco
-                            $nombre_cuenta2 = $plan_cuenta2->fetch_assoc();
 
-                            $valor_total3 = $this->calculables_estado_resultados($nombre_cuenta2['numero'], $idempresa, $gestion,$aux_nivel_3['idplandecuenta'],$fecha_ini,$fecha_fin,$aux_nivel_3['idplantilla']);
+                            $valor_total3 = $this->calculables_estado_resultados($nombre_cuenta3['idagrupacion_rubro_plandecuenta'], $idempresa, $gestion,$aux_nivel_3['idplandecuenta'],$fecha_ini,$fecha_fin,$aux_nivel_3['idplantilla']);
 
                             $suma_nivel_3 = $suma_nivel_3 + $valor_total3;
                             // if($valor2['total'] == null || $valor2['total'] == '0'){
@@ -1005,26 +1014,109 @@ class PlantillaReporte extends DB{
                             // }else{
                                 $res3 = array(
                                     // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
-                                    "idplandecuenta" => $nombre_cuenta2['idplandecuenta'],
-                                    "codigo" => $nombre_cuenta2['numero'],
-                                    "nombre_cuenta" => $nombre_cuenta2['nombreplan'],
+                                    "idplandecuenta" => $nombre_cuenta3['idplandecuenta'],
+                                    "codigo" => $nombre_cuenta3['numero'],
+                                    "nombre_cuenta" => $nombre_cuenta3['nombreplan'],
                                     // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
                                     "valor" => $valor_total3,
-                                    // "nivel_3" => [] //activo
+                                    "suma_nivel_4" => 0,
+                                    // "nivel_4" => [] //activo
                                     );
                                 array_push($res2['nivel_3'], $res3);  
 
                         }else{ // NO ES CALCULABLE
                             // NIVEL 4 4444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444
+                            $res3 = array(
+                                    // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
+                                    "idplandecuenta" => $nombre_cuenta3['idplandecuenta'],
+                                    "codigo" => $nombre_cuenta3['numero'],
+                                    "nombre_cuenta" => $nombre_cuenta3['nombreplan'],
+                                    // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
+                                    "valor" => 0,
+                                    "suma_nivel_4" => 0,
+                                    "nivel_4" => [] //activo
+                                    );
+
                             $nivel_4 = $this->dbc->query("SELECT * from pr_plantilla WHERE idplantilla_padre = '$aux_nivel_3[idplantilla]'");// vents_cafe_yungs, vnts cafe_nueva esperanza
 
-                            while ($aux_nivel_4 = $this->dbc->fetch($nivel_4)) {
-                                if($aux_nivel_4['tipo_operacion'] == 'calculable'){ //SI ES CALCULABLE   
+                            $suma_nivel_4 = 0;
 
+                            while ($aux_nivel_4 = $this->dbc->fetch($nivel_4)) {
+
+                                $plan_cuenta4 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$aux_nivel_4[idplandecuenta]'");// caja_general, banco
+                                $nombre_cuenta4 = $plan_cuenta4->fetch_assoc();
+
+                                if($aux_nivel_4['tipo_operacion'] == 'calculable'){ //SI ES CALCULABLE   
+                                    $valor_total4 = $this->calculables_estado_resultados($nombre_cuenta4['idagrupacion_rubro_plandecuenta'], $idempresa, $gestion,$aux_nivel_4['idplandecuenta'],$fecha_ini,$fecha_fin,$aux_nivel_4['idplantilla']);
+
+                                    $suma_nivel_4 = $suma_nivel_4 + $valor_total4;
+                                    // if($valor2['total'] == null || $valor2['total'] == '0'){
+                                    //     //-----------------------------------
+                                    // }else{
+                                        $res4 = array(
+                                            // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
+                                            "idplandecuenta" => $nombre_cuenta4['idplandecuenta'],
+                                            "codigo" => $nombre_cuenta4['numero'],
+                                            "nombre_cuenta" => $nombre_cuenta4['nombreplan'],
+                                            // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
+                                            "valor" => $valor_total4,
+                                            // "suma_nivel_4" => 0,
+                                            // "nivel_4" => [] //activo
+                                            );
+                                        array_push($res3['nivel_4'], $res4);  
                                 }else{ // NO ES CALCULABLE
-                                    
+                                    // NIVEL 5 55555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555
+                                    $res4 = array(
+                                            // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
+                                            "idplandecuenta" => $nombre_cuenta4['idplandecuenta'],
+                                            "codigo" => $nombre_cuenta4['numero'],
+                                            "nombre_cuenta" => $nombre_cuenta4['nombreplan'],
+                                            // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
+                                            "valor" => 0,
+                                            "suma_nivel_4" => 0,
+                                            "nivel_5" => [] //activo
+                                            );
+
+                                    $nivel_5 = $this->dbc->query("SELECT * from pr_plantilla WHERE idplantilla_padre = '$aux_nivel_4[idplantilla]'");// vents_cafe_yungs, vnts cafe_nueva esperanza
+
+                                    $suma_nivel_5 = 0;
+
+                                    while ($aux_nivel_5 = $this->dbc->fetch($nivel_5)) { // ENTRANDO AL NIVEL 555555555
+
+                                        $plan_cuenta5 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$aux_nivel_5[idplandecuenta]'");// caja_general, banco
+                                        $nombre_cuenta5 = $plan_cuenta5->fetch_assoc();
+
+                                        $valor_total5 = $this->calculables_estado_resultados($nombre_cuenta4['idagrupacion_rubro_plandecuenta'], $idempresa, $gestion,$aux_nivel_4['idplandecuenta'],$fecha_ini,$fecha_fin,$aux_nivel_4['idplantilla']);
+
+                                        $suma_nivel_5 = $suma_nivel_5 + $valor_total5;
+                                        // if($valor2['total'] == null || $valor2['total'] == '0'){
+                                        //     //-----------------------------------
+                                        // }else{
+                                            $res5 = array(
+                                                // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
+                                                "idplandecuenta" => $nombre_cuenta5['idplandecuenta'],
+                                                "codigo" => $nombre_cuenta5['numero'],
+                                                "nombre_cuenta" => $nombre_cuenta5['nombreplan'],
+                                                // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
+                                                "valor" => $valor_total5,
+                                                // "suma_nivel_4" => 0,
+                                                // "nivel_4" => [] //activo
+                                                );
+                                            array_push($res4['nivel_5'], $res5); 
+                                    }
+                                    //ESTO AUMENTE ANTES DE IR A ALMORZAR,,,,,,,
+                                    $res4['suma_nivel_5'] = $suma_nivel_5;
+                                    $res4['valor'] = $suma_nivel_5;
+                                    $suma_nivel_4 = $suma_nivel_4 + $res4['valor'];
+
                                 }     
                             }
+                            //ESTO AUMENTE ANTES DE IR A ALMORZAR,,,,,,,
+                            $res3['suma_nivel_4'] = $suma_nivel_4;
+                            $res3['valor'] = $suma_nivel_4;
+                            $suma_nivel_3 = $suma_nivel_3 + $res3['valor'];
+
+                            array_push($res2['nivel_3'], $res3);  
                             // FIN DEL NIVEL 4 4444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444        
                         }     
                     }
@@ -1067,9 +1159,15 @@ class PlantillaReporte extends DB{
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
 
-    private function calculables_estado_resultados($numero, $idempresa, $gestion,$idplandecuenta,$fecha_ini,$fecha_fin,$idplantilla)
+    private function calculables_estado_resultados($id_agru_rubro, $idempresa, $gestion,$idplandecuenta,$fecha_ini,$fecha_fin,$idplantilla)
     {
-        if($numero >= '4.0.0.00.00' && '5.0.0.00.00' > $numero){ // INGRESOS
+        $agru = $this->dbc->query("SELECT * from agrupacion_rubro_plandecuenta where idagrupacion_rubro_plandecuenta = '$id_agru_rubro'");// HIJOS DE LAS PLANTILLAS AGRUPADORAS
+        $agru_aux = $agru->fetch_assoc();
+
+        $tipo_pl = $this->dbc->query("SELECT * from tipo_plandecuenta where idtipo_plandecuenta = '$agru_aux[idtipo_plandecuenta]'");// HIJOS DE LAS PLANTILLAS AGRUPADORAS
+        $pl_aux = $tipo_pl->fetch_assoc();
+
+        if($pl_aux['nombre'] == 'Ingreso' || $pl_aux['nombre'] == 'Pasivo' || $pl_aux['nombre'] == 'Patrimonio'){ // INGRESOS 4.0.0.00.00 - pasivo, patrimonio
             $calcu = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(haber) - SUM(debe) AS total FROM transacciones t
                 INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
                 INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
@@ -1079,7 +1177,7 @@ class PlantillaReporte extends DB{
             $valor_auxi = $calcu->fetch_assoc();
             $valor_total = $valor_auxi['total'];
 
-        }elseif($numero >= '5.0.0.00.00' && '6.0.0.00.00' > $numero){ // EGRESOS_GASTOS
+        }elseif($pl_aux['nombre'] == 'Gasto' || $pl_aux['nombre'] == 'Costo' || $pl_aux['nombre'] == 'Activo'){ // EGRESOS_GASTOS 5.0.0.00.00   activo
             $calcu = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total FROM transacciones t
                 INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
                 INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
@@ -1089,18 +1187,18 @@ class PlantillaReporte extends DB{
             $valor_auxi = $calcu->fetch_assoc();
             $valor_total = $valor_auxi['total'];
 
-        }else{ // las cuentas de 6.0.0.00.00 ORDEN
+        }elseif($pl_aux['nombre'] == 'Cuentas de Orden'){ // las cuentas de 6.0.0.00.00 ORDEN
             $plantilla = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla = '$idplantilla'");// HIJOS DE LAS PLANTILLAS AGRUPADORAS
             $pl_tipo = $plantilla->fetch_assoc();
            
-            if($pl_tipo['ingreso_gasto'] == 'ingreso'){ // ES INGRESO
+            if($pl_tipo['ingreso_egreso'] == 'ingreso'){ // ES INGRESO
                 // INGRESOS
                 $calcu = $this->dbc->query("SELECT SUM(dt.haber) - SUM(dt.debe) AS total FROM transacciones t
                 INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
                 INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
                 where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$idplandecuenta'
                 AND t.estado NOT IN (4, 5, 6) AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
-            }elseif($pl_tipo['ingreso_gasto'] == 'gasto'){ // ES GASTO
+            }elseif($pl_tipo['ingreso_egreso'] == 'egreso'){ // ES GASTO
                 // EGRESOS_GASTOS
                 $calcu = $this->dbc->query("SELECT SUM(dt.debe) - SUM(dt.haber) AS total FROM transacciones t
                 INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
@@ -1208,6 +1306,29 @@ class PlantillaReporte extends DB{
             }
             array_push($lista, $res);
         }
+        echo json_encode($lista);
+    }
+    public function es_cuenta_de_orden($idcuenta)
+    {
+        // ini_set('display_errors', 1); 
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
+
+        // $ide = $this->get_id_empresa($empresa);
+        $lista = [];
+        $plandecuenta = $this->dbc->query("SELECT idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,organizacion_idorganizacion,idp,idagrupacion_rubro_plandecuenta FROM plandecuenta WHERE idplandecuenta = '$idcuenta'");
+        $aux_plan = $plandecuenta->fetch_assoc();
+
+        $aux1 = $this->dbc->query("SELECT * FROM agrupacion_rubro_plandecuenta WHERE idagrupacion_rubro_plandecuenta='$aux_plan[idagrupacion_rubro_plandecuenta]'");
+        $agru = $aux1->fetch_assoc();
+
+        $aux2 = $this->dbc->query("SELECT * FROM tipo_plandecuenta WHERE idtipo_plandecuenta='$agru[idtipo_plandecuenta]'");
+        $tipo_pl = $aux2->fetch_assoc();
+        
+        $res = array("rubro" => $tipo_pl['nombre']);
+        
+        array_push($lista, $res);
+        
         echo json_encode($lista);
     }
 }
