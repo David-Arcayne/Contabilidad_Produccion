@@ -303,9 +303,9 @@ class Transacciones extends DB{
 
     public function listadetalletransaccion($trans)
     {
-          ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+        //   ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
         $lista = [];
         $array_plancuenta = [];
 
@@ -390,6 +390,17 @@ if($filtrado->num_rows > 0){
         
     //     // Procesa los resultados
         while ($qwe = $this->dbc->fetch($transdeta)) {
+            $array_codigo = explode(".", $qwe[2]); 
+            if($array_codigo[4] == '00'){
+                //no pasa nada 
+                $cuenta_padre = "";
+            }else{
+                $aux = $array_codigo[0].".".$array_codigo[1].".".$array_codigo[2].".".$array_codigo[3].".00";
+                $cuenta=$this->dbc->query("SELECT * FROM plandecuenta WHERE numero ='$aux' AND organizacion_idorganizacion ='$qwe[idorganizacion]'");
+                $resu = $this->dbc->fetch($cuenta);
+                $cuenta_padre = $resu['nombreplan'];
+
+            }
             $facturas=$this->dbc->query("SELECT COUNT(*) as listafactura
                     FROM factura AS f 
                     WHERE f.cuenta = $qwe[7]");
@@ -406,6 +417,7 @@ if($filtrado->num_rows > 0){
                 "idplan" => $qwe['idplandecuenta'],
                 "factura" => $fa['listafactura'],
                 "orden"=>$qwe['orden'],
+                "cuenta_padre"=>$cuenta_padre,
                 "monto_ini"=>$resp
             );
             
@@ -1122,5 +1134,121 @@ if($filtrado->num_rows > 0){
         echo json_encode($res);
         // echo json_encode(array($transacciones,$transaccion_array));
     }  
+    public function lista_plande_subcuentas($empresa)
+    {
+        $ide = $this->getidempresa($empresa);
+        $lista = [];
+        $registro = $this->dbc->query("SELECT idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,organizacion_idorganizacion,idp,idagrupacion_rubro_plandecuenta FROM plandecuenta WHERE organizacion_idorganizacion='$ide' ORDER BY numero ASC");
+        while ($qwe = $this->dbc->fetch($registro)) {
+
+            $array_codigo = explode(".", $qwe[1]); 
+            $aux = $this->dbc->query("SELECT nombreplan FROM plandecuenta WHERE numero >= $array_codigo[0] LIMIT 1");
+            $name_plan = $aux->fetch_assoc();
+
+            if($array_codigo[4] == '00' && $array_codigo[3] != '00'){ // 1.1.1.01.00
+                $pl_cuenta_padre = $this->dbc->query("SELECT * FROM plandecuenta WHERE idp = $qwe[0]");
+
+                if($pl_cuenta_padre->num_rows > 0){
+                    //no muestras la cuenta porque tiene una subcuenta mas
+                }else{
+                    $res = array("id" => $qwe[0], "numero" => $qwe[1], "plan" => $qwe[2], "descripcion" => $qwe[3], "rubro" => $name_plan['nombreplan'], "tipo" => $qwe[4], "consolidar" => $qwe[5], "empresa" => $qwe[6], "idp" => $qwe[7],"idagrupacion_rubro_plandecuenta" => $qwe[8]);
+                    array_push($lista, $res);
+                }
+
+
+            }elseif($array_codigo[4] != '00' && $array_codigo[3] != '00'){ // 1.1.1.01.01
+                $res = array("id" => $qwe[0], "numero" => $qwe[1], "plan" => $qwe[2], "descripcion" => $qwe[3], "rubro" => $name_plan['nombreplan'], "tipo" => $qwe[4], "consolidar" => $qwe[5], "empresa" => $qwe[6], "idp" => $qwe[7],"idagrupacion_rubro_plandecuenta" => $qwe[8]);
+                array_push($lista, $res);
+            }else{
+                //no listara la cuenta porque solo tiene hasta el 3er nivel 1.1.1.00.00
+            }
+            
+            // array_push($lista, $res);
+        }
+        echo json_encode($lista);
+    }
+    public function lista_padres_plandecuentas($idplandecuenta)
+{
+    $lista = [];
+    $plancuenta = $this->dbc->query("SELECT * FROM plandecuenta WHERE idplandecuenta='$idplandecuenta'");
+    $pl_cuenta = $plancuenta->fetch_assoc();
+
+    $array_codigo = explode(".", $pl_cuenta['numero']); // Ej: [1,1,1,02,01]
+    $cantidad = count($array_codigo);
+
+    // Generar padres hasta el penúltimo nivel
+    for ($i = 0; $i < $cantidad - 1; $i++) {
+        $nuevo_codigo = [];
+
+        // Mantener los valores hasta el índice actual
+        for ($j = 0; $j <= $i; $j++) {
+            $nuevo_codigo[] = $array_codigo[$j];
+        }
+
+        // Reemplazar los siguientes con ceros
+        for ($j = $i + 1; $j < $cantidad; $j++) {
+            $nuevo_codigo[] = ($j >= 3) ? "00" : "0";
+        }
+
+        // Verificar que el número generado sea diferente al original
+        $codigo_generado = implode(".", $nuevo_codigo);
+        if ($codigo_generado !== $pl_cuenta['numero']) {
+            $consu_pl = $this->dbc->query("SELECT * FROM plandecuenta WHERE numero ='$codigo_generado' 
+            AND organizacion_idorganizacion ='$pl_cuenta[organizacion_idorganizacion]'");
+            $aux_pl_c = $consu_pl->fetch_assoc();
+
+            $lista[] = ["numero" => $codigo_generado, "nombre" => $aux_pl_c['nombreplan']];
+        }
+    }
+
+    echo json_encode($lista);
+}
+
+
+
+    // public function lista_padres_plandecuentas($idplandecuenta)
+    // {
+    //     // $ide = $this->getidempresa($empresa);
+    //     $lista = [];
+    //     $plancuenta = $this->dbc->query("SELECT * FROM plandecuenta WHERE idplandecuenta='$idplandecuenta'");
+    //     $pl_cuenta = $plancuenta->fetch_assoc();
+
+    //         $array_codigo = explode(".", $pl_cuenta['numero']); //[1.1.1.02.00] 
+    //         $cantidad = count($array_codigo);
+    //         $i = 0;
+    //         $aux_numero = "";
+    //         while($i < $cantidad){
+    //             $aux_numero = $array_codigo[$i];
+
+    //             $aux_increment = $i;
+    //             $aux_array = $aux_numero;
+    //             while($aux_increment < $cantidad){
+    //                 if($aux_increment == '3'){
+    //                     $aux_array = $aux_array ."."."00";
+
+    //                 }elseif($aux_increment == '4'){
+    //                     $aux_array = $aux_array ."."."00";
+
+    //                 }else{
+    //                     $aux_array = $aux_array ."."."0";
+
+    //                 }
+    //                 $aux_increment++;
+    //             }
+    //             //1.0.0.00.00
+    //             // $aux_numero = $aux_numero .".".
+    //             $aux_numero = $aux_array;
+
+    //             $i++;
+    //             $res = array(
+    //             "numero" => $aux_numero
+    //         );
+    //         array_push($lista, $res);
+    //         }
+            
+    //         // array_push($lista, $res);
+        
+    //     echo json_encode($lista);
+    // }
 //array_push decode update
 }

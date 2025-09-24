@@ -908,7 +908,9 @@ $totalHaber = 0;
         cp.persona,
         cp.ci,
         cp.nrecibo,
-        cp.monto
+        cp.monto,
+        cp.idfactura,
+        cp.idrecibo
     FROM cuentaspof AS cp
     WHERE cp.transaccion = '$qwe[5]'
 
@@ -920,22 +922,58 @@ $totalHaber = 0;
         cp.persona,
         cp.ci,
         cp.nrecibo,
-        cp.monto
+        cp.monto,
+        cp.idfactura,
+        cp.idrecibo
     FROM cuentaspor AS cp
     WHERE cp.transaccion = '$qwe[5]';");
        while($reci=$this->dbc->fetch($recibo)){
 
-           $rec=array("idrecibo"=>$reci[0],"fecha"=>$reci[1],"persona"=>$reci[2],"ci"=>$reci[3],"nrecibo"=>$reci[4],"monto"=>$reci[5]);
+        if($reci['idfactura'] == null || $reci['idfactura'] == '0'){  // PERTENECE A RECIBO
+            $recibo_lista=$this->dbc->query("SELECT * FROM recibo WHERE idrecibo ='$reci[idrecibo]'");
+            $rec_aux = $recibo_lista->fetch_assoc();
+            if($rec_aux['cobrado'] == '0'){ // ES PAGADO
+                  $prov_client=$this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor ='$rec_aux[cliente_proveedor]'");
+                  $pv_cl = $prov_client->fetch_assoc();
+
+            }else{   // ES COBRADO
+              $prov_client=$this->dbcm->query("SELECT * FROM cliente WHERE id_cliente ='$rec_aux[cliente_proveedor]'");
+                    $pv_cl = $prov_client->fetch_assoc();
+            }
+        }else{    // PERTENECE A FACTURA
+            $recibo_lista=$this->dbc->query("SELECT * FROM factura WHERE idfactura ='$reci[idfactura]'");
+              $rec_aux = $recibo_lista->fetch_assoc();
+              if($rec_aux['cobrado'] == '0'){ // ES PAGADO
+                    $prov_client=$this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor ='$rec_aux[proveedorcliente_idproveedorcliente]'");
+                    $pv_cl = $prov_client->fetch_assoc();
+
+              }else{   // ES COBRADO
+                  $prov_client=$this->dbcm->query("SELECT * FROM cliente WHERE id_cliente ='$rec_aux[proveedorcliente_idproveedorcliente]'");
+                    $pv_cl = $prov_client->fetch_assoc();
+              }
+        }
+           $rec=array("idrecibo"=>$reci[0],"fecha"=>$reci[1],"persona"=>$pv_cl['nombre'],"ci"=>$reci[3],"nrecibo"=>$reci[4],"monto"=>$reci[5]);
            array_push($recibos,$rec);
        
        }
 
 
-      $dt=$this->dbc->query("SELECT p.numero,p.nombreplan,d.nota,d.debe,d.haber FROM detalletransaccion AS d
+      $dt=$this->dbc->query("SELECT p.numero,p.nombreplan,d.nota,d.debe,d.haber,d.idorganizacion FROM detalletransaccion AS d
        INNER JOIN plandecuenta AS p ON p.idplandecuenta=d.idplandecuenta
-       WHERE d.transacciones_idtransacciones='$qwe[5]';");
+       WHERE d.transacciones_idtransacciones='$qwe[5]' ORDER BY d.orden ASC;");
        while($asd=$this->dbc->fetch($dt)){
-           $det=array("numero"=>$asd[0],"plan"=>$asd[1],"nota"=>$asd[2],"debe"=>$asd[3],"haber"=>$asd[4]);
+        $array_codigo = explode(".", $asd['numero']); 
+            if($array_codigo[4] == '00'){
+                //no pasa nada 
+                $cuenta_padre = "";
+            }else{
+                $aux = $array_codigo[0].".".$array_codigo[1].".".$array_codigo[2].".".$array_codigo[3].".00";
+                $cuenta=$this->dbc->query("SELECT * FROM plandecuenta WHERE numero ='$aux' AND organizacion_idorganizacion ='$asd[idorganizacion]'");
+                $resu = $this->dbc->fetch($cuenta);
+                $cuenta_padre = $resu['nombreplan'];
+
+            }
+           $det=array("numero"=>$asd[0],"plan"=>$asd[1],"nota"=>$asd[2],"debe"=>$asd[3],"haber"=>$asd[4],"cuenta_padre"=>$cuenta_padre);
            array_push($detalle,$det);
        }
 

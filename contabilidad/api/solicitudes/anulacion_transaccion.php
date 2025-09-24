@@ -225,7 +225,7 @@ public function registrar_anular_eliminar_activar_transaccion($idtransaccion,$mo
 
                 }else{
                       //NO SE ANULARA NI CAMBIARA ESTADO DE TRANSACCION NI DETALLE TRANSACCION  
-                      $res = array("danger", "Se Denego el permiso para eliminar transaccion", "cambiarEstado_anular_eliminar_transaccion");
+                      $res = array("success", "Se Denego el permiso para eliminar transaccion", "cambiarEstado_anular_eliminar_transaccion");
                 }
             }else{// ACTIVAR --> estado_opcion = 3
                 $update_soli=$this->dbc->query("UPDATE solicitud_anular_eliminar 
@@ -254,7 +254,7 @@ public function registrar_anular_eliminar_activar_transaccion($idtransaccion,$mo
 
             }else{ //DENEGADO --> estado_solicitud == 3
                 //NO SE ANULARA NI CAMBIARA ESTADO DE TRANSACCION NI DETALLE TRANSACCION  
-                $res = array("danger", "Se Denego el permiso para anular", "cambiarEstado_anular_eliminar_transaccion");
+                $res = array("success", "Se Denego el permiso para anular", "cambiarEstado_anular_eliminar_transaccion");
 
             }
             }       

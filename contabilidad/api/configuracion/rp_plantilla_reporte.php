@@ -965,9 +965,9 @@ class PlantillaReporte extends DB{
                 // $valor2 = $suma_cuentas2->fetch_assoc();
                 $suma_nivel_2 = $suma_nivel_2 + $valor_total2;
 
-                // if($valor2['total'] == null || $valor2['total'] == '0'){
-                //     //-----------------------------------
-                // }else{
+                if($valor_total2 == null || $valor_total2 == '0'){
+                    //-----------------------------------
+                }else{
                     $res2 = array(
                         // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
                         "idplandecuenta" => $nombre_cuenta2['idplandecuenta'],
@@ -980,7 +980,7 @@ class PlantillaReporte extends DB{
                         );
                     array_push($res['nivel_2'], $res2);  
 
-                // } 
+                } 
                     //----------------------------------------------------------------------------------------------------------------------------------------------------------------
                 }else{ // NO ES CALCULABLE
                     // NIVEL 3 333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333
@@ -1009,9 +1009,9 @@ class PlantillaReporte extends DB{
                             $valor_total3 = $this->calculables_estado_resultados($nombre_cuenta3['idagrupacion_rubro_plandecuenta'], $idempresa, $gestion,$aux_nivel_3['idplandecuenta'],$fecha_ini,$fecha_fin,$aux_nivel_3['idplantilla']);
 
                             $suma_nivel_3 = $suma_nivel_3 + $valor_total3;
-                            // if($valor2['total'] == null || $valor2['total'] == '0'){
-                            //     //-----------------------------------
-                            // }else{
+                            if($valor_total3 == null || $valor_total3 == '0'){
+                                //-----------------------------------
+                            }else{
                                 $res3 = array(
                                     // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
                                     "idplandecuenta" => $nombre_cuenta3['idplandecuenta'],
@@ -1024,6 +1024,7 @@ class PlantillaReporte extends DB{
                                     );
                                 array_push($res2['nivel_3'], $res3);  
 
+                            }
                         }else{ // NO ES CALCULABLE
                             // NIVEL 4 4444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444
                             $res3 = array(
@@ -1050,9 +1051,9 @@ class PlantillaReporte extends DB{
                                     $valor_total4 = $this->calculables_estado_resultados($nombre_cuenta4['idagrupacion_rubro_plandecuenta'], $idempresa, $gestion,$aux_nivel_4['idplandecuenta'],$fecha_ini,$fecha_fin,$aux_nivel_4['idplantilla']);
 
                                     $suma_nivel_4 = $suma_nivel_4 + $valor_total4;
-                                    // if($valor2['total'] == null || $valor2['total'] == '0'){
-                                    //     //-----------------------------------
-                                    // }else{
+                                    if($valor_total4 == null || $valor_total4 == '0'){
+                                        //-----------------------------------
+                                    }else{
                                         $res4 = array(
                                             // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
                                             "idplandecuenta" => $nombre_cuenta4['idplandecuenta'],
@@ -1060,10 +1061,11 @@ class PlantillaReporte extends DB{
                                             "nombre_cuenta" => $nombre_cuenta4['nombreplan'],
                                             // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
                                             "valor" => $valor_total4,
-                                            // "suma_nivel_4" => 0,
+                                            "suma_nivel_4" => 0,
                                             // "nivel_4" => [] //activo
                                             );
-                                        array_push($res3['nivel_4'], $res4);  
+                                        array_push($res3['nivel_4'], $res4); 
+                                    } 
                                 }else{ // NO ES CALCULABLE
                                     // NIVEL 5 55555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555
                                     $res4 = array(
@@ -1086,12 +1088,12 @@ class PlantillaReporte extends DB{
                                         $plan_cuenta5 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$aux_nivel_5[idplandecuenta]'");// caja_general, banco
                                         $nombre_cuenta5 = $plan_cuenta5->fetch_assoc();
 
-                                        $valor_total5 = $this->calculables_estado_resultados($nombre_cuenta4['idagrupacion_rubro_plandecuenta'], $idempresa, $gestion,$aux_nivel_4['idplandecuenta'],$fecha_ini,$fecha_fin,$aux_nivel_4['idplantilla']);
+                                        $valor_total5 = $this->calculables_estado_resultados($nombre_cuenta5['idagrupacion_rubro_plandecuenta'], $idempresa, $gestion,$aux_nivel_5['idplandecuenta'],$fecha_ini,$fecha_fin,$aux_nivel_5['idplantilla']);
 
                                         $suma_nivel_5 = $suma_nivel_5 + $valor_total5;
-                                        // if($valor2['total'] == null || $valor2['total'] == '0'){
-                                        //     //-----------------------------------
-                                        // }else{
+                                        if($valor_total5 == null || $valor_total5 == '0'){
+                                            //-----------------------------------
+                                        }else{
                                             $res5 = array(
                                                 // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
                                                 "idplandecuenta" => $nombre_cuenta5['idplandecuenta'],
@@ -1103,11 +1105,16 @@ class PlantillaReporte extends DB{
                                                 // "nivel_4" => [] //activo
                                                 );
                                             array_push($res4['nivel_5'], $res5); 
-                                    }
+                                            }
+                                    } 
+                                    // FIN DEL NIVEL 5 55555555555555555555555555555555555555555555555555555555555555555555555555555555
+                                    // array_push($res3['nivel_4'], $res4);  
+
                                     //ESTO AUMENTE ANTES DE IR A ALMORZAR,,,,,,,
-                                    $res4['suma_nivel_5'] = $suma_nivel_5;
+                                    // $res4['suma_nivel_5'] = $suma_nivel_5;
                                     $res4['valor'] = $suma_nivel_5;
                                     $suma_nivel_4 = $suma_nivel_4 + $res4['valor'];
+                                    array_push($res3['nivel_4'], $res4); 
 
                                 }     
                             }
@@ -1148,11 +1155,11 @@ class PlantillaReporte extends DB{
 
     
 
-            // if($res['suma_nivel_2'] == '0' || $res['suma_nivel_2'] == null){
-            //     //nada
-            // }else{
+            if($res['suma_nivel_2'] == '0' || $res['suma_nivel_2'] == null){
+                //nada
+            }else{
                 array_push($lista, $res);
-            // }
+            }
             // array_push($lista, $res);  
             $lista_aux_buscador = [];        
         }

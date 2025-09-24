@@ -1648,6 +1648,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         "lugar" => $qwe['lugar'],
                         "persona" => $qwe['persona'],
                         "ci" => $qwe['ci'],
+                        "factura_recibo" => "recibo",
                         "nro_documento" => "$reci[nro_recibo]",
                         "por_concepto_de" => "$reci[concepto]",
                         // "idtipo" => "$reci[idtipo]",
@@ -1681,6 +1682,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                     "lugar" => $qwe['lugar'],
                     "persona" => $qwe['persona'],
                     "ci" => $qwe['ci'],
+                    "factura_recibo" => "recibo",
                     "nro_documento" => "$reci[nro_recibo]",
                     "por_concepto_de" => "$reci[concepto]",
                     // "idtipo" => "$oc[idtipo]",
@@ -1748,6 +1750,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         "lugar" => $qwe['lugar'],
                         "persona" => $qwe['persona'],
                         "ci" => $qwe['ci'],
+                        "factura_recibo" => "factura",
                         "nro_documento" => "$fact[nfactura]",
                         "por_concepto_de" => "$fact[por_concepto_de]",
                         "codigotransaccion" => $tr['codigotransaccion'],
@@ -1779,6 +1782,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                     "lugar" => $qwe['lugar'],
                     "persona" => $qwe['persona'],
                     "ci" => $qwe['ci'],
+                    "factura_recibo" => "factura",
                     "nro_documento" => "$fact[nfactura]",
                     "por_concepto_de" => "$fact[por_concepto_de]",
                     "codigotransaccion" => $tr['codigotransaccion'],
@@ -1909,6 +1913,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "lugar" => $qwe['lugar'],
                             "persona" => $qwe['persona'],
                             "ci" => $qwe['ci'],
+                            "factura_recibo" => "recibo",
                             "nro_documento" => "$reci[nro_recibo]",
                             "por_concepto_de" => "$reci[concepto]",
                             // "idtipo" => "$oc[idtipo]",
@@ -1941,6 +1946,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         "lugar" => $qwe['lugar'],
                         "persona" => $qwe['persona'],
                         "ci" => $qwe['ci'],
+                        "factura_recibo" => "recibo",
                         "nro_documento" => "$reci[nro_recibo]",
                         "por_concepto_de" => "$reci[concepto]",
                         // "idtipo" => "$oc[idtipo]",
@@ -2007,6 +2013,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "lugar" => $qwe['lugar'],
                             "persona" => $qwe['persona'],
                             "ci" => $qwe['ci'],
+                            "factura_recibo" => "factura",
                             "nro_documento" => "$fact[nfactura]",
                             "por_concepto_de" => $fact['por_concepto_de'],
                             "codigotransaccion" => $tr['codigotransaccion'],
@@ -2037,6 +2044,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         "lugar" => $qwe['lugar'],
                         "persona" => $qwe['persona'],
                         "ci" => $qwe['ci'],
+                        "factura_recibo" => "factura",
                         "nro_documento" => "$fact[nfactura]",
                         "por_concepto_de" => "$fact[por_concepto_de]",
                         "codigotransaccion" => $tr['codigotransaccion'],
@@ -2308,6 +2316,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "lugar" => $qwe['lugar'],
                             "persona" => $qwe['persona'],
                             "ci" => $qwe['ci'],
+                            "factura_recibo" => "recibo",
                             "nro_documento" => "$reci[nro_recibo]",
                             "por_concepto_de" => "$reci[concepto]",
                             // "idtipo" => "$oc[idtipo]",
@@ -2355,6 +2364,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "lugar" => $qwe['lugar'],
                             "persona" => $qwe['persona'],
                             "ci" => $qwe['ci'],
+                            "factura_recibo" => "factura",
                             "nro_documento" => $factu,
                             "por_concepto_de" => $fact['por_concepto_de'],
                             "codigotransaccion" => $tr['codigotransaccion'],
@@ -2398,6 +2408,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "lugar" => $qwe['lugar'],
                             "persona" => $qwe['persona'],
                             "ci" => $qwe['ci'],
+                            "factura_recibo" => "recibo",
                             "nro_documento" => "$reci[nro_recibo]",
                             "por_concepto_de" => "$reci[concepto]",
                             // "idtipo" => "$oc[idtipo]",
@@ -2445,6 +2456,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "lugar" => $qwe['lugar'],
                             "persona" => $qwe['persona'],
                             "ci" => $qwe['ci'],
+                            "factura_recibo" => "factura",
                             "nro_documento" => $factu,
                             "por_concepto_de" => $fact['por_concepto_de'],
                             "codigotransaccion" => $tr['codigotransaccion'],
@@ -2610,37 +2622,46 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         echo json_encode($res);
     }
 
-    public function editar_caja_bancos_facturas($idrecibo,$nfactura,$tipo_documento,$fecha,$monto,$por_concepto_de,$cliente_prov){
+    public function editar_caja_bancos_facturas($idcomprobante,$nfactura,$tipo_documento,$fecha,$monto,$por_concepto_de,$cliente_prov,$archivo,$lugar,$persona,$ci){
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
         $res="";
         //tipo_documento = 1,2 facturas --> cobrar- pagar
-        if($tipo_documento == 1){//COBRAR   
-            $recibo_grupal = $this->dbc->query("SELECT * FROM cuentascobrar_grupal WHERE idcuentaspof = '$idrecibo'");
+        //LAS FACTURAS TODAS ESTAN PAGADAS Y COBRADAS, ENTONCES TODAS LAS FACTURAS Q SE EDITARAN YA TIENEN COMPROBANTES
+        if($tipo_documento == 1){//COBRADO
+            $recibo_grupal = $this->dbc->query("SELECT * FROM cuentascobrar_grupal WHERE idcuentaspof = '$idcomprobante'");
             if ($recibo_grupal->num_rows > 0) {
                 //es grupal, no se podra editar
                 $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
 
             }else{
                 //SE EDITARA FACTURA Y RECIBO
-                $cuentaspof = $this->dbc->query("SELECT * FROM cuentaspof WHERE idcuentaspof = '$idrecibo'");
+                $cuentaspof = $this->dbc->query("SELECT * FROM cuentaspof WHERE idcuentaspof = '$idcomprobante'");
                 $resu = $this->dbc->fetch($cuentaspof);
 
-                $dt_cajas = $this->dbc->query("SELECT * FROM detalle_caja_bancos_cobrar WHERE idcuentaspof = '$idrecibo'");
+                $fecha_nueva = $this->obtener_fecha_hora_nueva($resu['fecha'],$fecha);
+
+                $dt_cajas = $this->dbc->query("SELECT * FROM detalle_caja_bancos_cobrar WHERE idcuentaspof = '$idcomprobante'");
 
                 if ($dt_cajas->num_rows > 0) {
 
-                    $edicion_dt_cajas=$this->dbc->query("UPDATE detalle_caja_bancos_cobrar SET monto='$monto' WHERE idcuentaspof='$idrecibo'");
+                    $edicion_dt_cajas=$this->dbc->query("UPDATE detalle_caja_bancos_cobrar SET monto='$monto' WHERE idcuentaspof='$idcomprobante'");
 
                 }else{
                     //no se edita detalle_cajaBancos
                 }
 
-                $edicion_recibo=$this->dbc->query("UPDATE cuentaspof SET fecha='$fecha',monto='$monto' WHERE idcuentaspof='$idrecibo'");
+                 // SE ESTA EDITANDO LA FACTURA Y EL COMPROBANTE
+
+                $edicion_recibo = $this->editar_comprobante($fecha_nueva,$monto,$idcomprobante,$archivo,$tipo_documento,$lugar,$persona,$ci);
+                // $edicion_recibo=$this->dbc->query("UPDATE cuentaspof SET fecha='$fecha_nueva',monto='$monto' WHERE idcuentaspof='$idcomprobante'");
 
                 $edicion_factura=$this->dbc->query("UPDATE factura SET nfactura = '$nfactura',fecha='$fecha',montofactura='$monto',por_concepto_de='$por_concepto_de',proveedorcliente_idproveedorcliente='$cliente_prov' WHERE idfactura='$resu[idfactura]'");
 
             }
-        }else{ //PAGAR  2
-            $recibo_grupal = $this->dbc->query("SELECT * FROM cuentaspagar_grupal WHERE idcuentaspor = '$idrecibo'");
+        }else{ //PAGADO
+            $recibo_grupal = $this->dbc->query("SELECT * FROM cuentaspagar_grupal WHERE idcuentaspor = '$idcomprobante'");
             if ($recibo_grupal->num_rows > 0) {
                 //es grupal, no se podra editar
                 $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
@@ -2648,23 +2669,25 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             }else{
                 //SE EDITARA FACTURA Y RECIBO
 
-                $cuentaspor = $this->dbc->query("SELECT * FROM cuentaspor WHERE idcuentaspor = '$idrecibo'");
+                $cuentaspor = $this->dbc->query("SELECT * FROM cuentaspor WHERE idcuentaspor = '$idcomprobante'");
                 $resu = $this->dbc->fetch($cuentaspor);
 
-                $dt_cajas = $this->dbc->query("SELECT * FROM detalle_caja_bancos_pagar WHERE idcuentaspor = '$idrecibo'");
+                $fecha_nueva = $this->obtener_fecha_hora_nueva($resu['fecha'],$fecha);
+
+                $dt_cajas = $this->dbc->query("SELECT * FROM detalle_caja_bancos_pagar WHERE idcuentaspor = '$idcomprobante'");
 
                 if ($dt_cajas->num_rows > 0) {
 
-                    $edicion_dt_cajas=$this->dbc->query("UPDATE detalle_caja_bancos_pagar SET monto='$monto' WHERE idcuentaspor='$idrecibo'");
+                    $edicion_dt_cajas=$this->dbc->query("UPDATE detalle_caja_bancos_pagar SET monto='$monto' WHERE idcuentaspor='$idcomprobante'");
 
                 }else{
                     //no se edita detalle_cajaBancos
                 }
-
-                $edicion_recibo=$this->dbc->query("UPDATE cuentaspor SET fecha='$fecha',monto='$monto' WHERE idcuentaspor='$idrecibo'");
-
                 $edicion_factura=$this->dbc->query("UPDATE factura SET nfactura = '$nfactura',fecha='$fecha',montofactura='$monto',por_concepto_de='$por_concepto_de',proveedorcliente_idproveedorcliente='$cliente_prov' WHERE idfactura='$resu[idfactura]'");
 
+                $edicion_recibo = $this->editar_comprobante($fecha_nueva,$monto,$idcomprobante,$archivo,$tipo_documento,$lugar,$persona,$ci);
+              
+                
             }
         }
 
@@ -2674,6 +2697,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
         }
         echo json_encode($res);
+        // echo json_encode(array($idcomprobante,$nfactura,$tipo_documento,$fecha,$monto,$por_concepto_de,$cliente_prov,$archivo,$lugar,$persona,$ci));
     }
 
     // public function editar_caja_bancos_otras_cuentas($idrecibo,$nro_documento,$tipo_documento,$fecha,$tipo,$precio,$concepto,$cliente_prov){
@@ -3501,7 +3525,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
 
-    public function editar_recibo_caja_bancos($idrecibo,$lugar,$persona,$ci,$fecha){
+    public function editar_recibo_caja_bancos_antiguo($idrecibo,$lugar,$persona,$ci,$fecha){
 
         if (0 > 0) {
             $res = array("danger", "El registro ya existe","Error");
@@ -3518,38 +3542,41 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         echo json_encode($res);
         
     }
-    public function editar_recibo_caja_bancos_nuevo($idrecibo,$nfactura,$tipo_documento,$fecha,$monto,$por_concepto_de,$cliente_prov){
+    public function editar_recibo_caja_bancos($idcomprobante,$lugar,$persona,$ci,$fecha,$nro_recibo,$concepto,$cliente_prov,$monto,$tipo_documento,$archivo){
         $res="";
+
         //tipo_documento = 1,2 facturas --> cobrar- pagar
-        if($tipo_documento == 1){//COBRAR   
-            $recibo_grupal = $this->dbc->query("SELECT * FROM cuentascobrar_grupal WHERE idcuentaspof = '$idrecibo'");
+        if($tipo_documento == '1'){//COBRAR   
+            $recibo_grupal = $this->dbc->query("SELECT * FROM cuentascobrar_grupal WHERE idcuentaspof = '$idcomprobante'");
             if ($recibo_grupal->num_rows > 0) {
                 //es grupal, no se podra editar
                 $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
 
             }else{
                 //SE EDITARA FACTURA Y RECIBO
-                $cuentaspof = $this->dbc->query("SELECT * FROM cuentaspof WHERE idcuentaspof = '$idrecibo'");
+                $cuentaspof = $this->dbc->query("SELECT * FROM cuentaspof WHERE idcuentaspof = '$idcomprobante'");
                 $resu = $this->dbc->fetch($cuentaspof);
 
-                $dt_cajas = $this->dbc->query("SELECT * FROM detalle_caja_bancos_cobrar WHERE idcuentaspof = '$idrecibo'");
+                $fecha_nueva = $this->obtener_fecha_hora_nueva($resu['fecha'],$fecha);
+
+                $dt_cajas = $this->dbc->query("SELECT * FROM detalle_caja_bancos_cobrar WHERE idcuentaspof = '$idcomprobante'");
 
                 if ($dt_cajas->num_rows > 0) {
 
-                    $edicion_dt_cajas=$this->dbc->query("UPDATE detalle_caja_bancos_cobrar SET monto='$monto' WHERE idcuentaspof='$idrecibo'");
+                    $edicion_dt_cajas=$this->dbc->query("UPDATE detalle_caja_bancos_cobrar SET monto='$monto' WHERE idcuentaspof='$idcomprobante'");
 
                 }else{
                     //no se edita detalle_cajaBancos
                 }
-
-                $edicion_recibo=$this->dbc->query("UPDATE cuentaspof SET fecha='$fecha',monto='$monto' WHERE idcuentaspof='$idrecibo'");
+                $edicion_comprobante = $this->editar_comprobante($fecha_nueva,$monto,$idcomprobante,$archivo,$tipo_documento,$lugar,$persona,$ci);
+                // $edicion_comprobante=$this->dbc->query("UPDATE cuentaspof SET lugar = '$lugar',persona = '$persona',ci = '$ci', fecha='$fecha_nueva',monto='$monto' WHERE idcuentaspof='$idcomprobante'");
 
                 // $edicion_factura=$this->dbc->query("UPDATE factura SET nfactura = '$nfactura',fecha='$fecha',montofactura='$monto',por_concepto_de='$por_concepto_de',proveedorcliente_idproveedorcliente='$cliente_prov' WHERE idfactura='$resu[idfactura]'");
-                $edicion_recibo=$this->dbc->query("UPDATE recibo SET nfactura = '$nfactura',fecha='$fecha',montofactura='$monto',por_concepto_de='$por_concepto_de',proveedorcliente_idproveedorcliente='$cliente_prov' WHERE idfactura='$resu[idfactura]'");
+                $edicion_recibo=$this->dbc->query("UPDATE recibo SET nro_recibo = '$nro_recibo',fecha='$fecha',monto='$monto',concepto='$concepto',cliente_proveedor='$cliente_prov' WHERE idrecibo='$resu[idrecibo]'");
 
             }
         }else{ //PAGAR  2
-            $recibo_grupal = $this->dbc->query("SELECT * FROM cuentaspagar_grupal WHERE idcuentaspor = '$idrecibo'");
+            $recibo_grupal = $this->dbc->query("SELECT * FROM cuentaspagar_grupal WHERE idcuentaspor = '$idcomprobante'");
             if ($recibo_grupal->num_rows > 0) {
                 //es grupal, no se podra editar
                 $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
@@ -3557,32 +3584,235 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             }else{
                 //SE EDITARA FACTURA Y RECIBO
 
-                $cuentaspor = $this->dbc->query("SELECT * FROM cuentaspor WHERE idcuentaspor = '$idrecibo'");
+                $cuentaspor = $this->dbc->query("SELECT * FROM cuentaspor WHERE idcuentaspor = '$idcomprobante'");
                 $resu = $this->dbc->fetch($cuentaspor);
 
-                $dt_cajas = $this->dbc->query("SELECT * FROM detalle_caja_bancos_pagar WHERE idcuentaspor = '$idrecibo'");
+                $fecha_nueva = $this->obtener_fecha_hora_nueva($resu['fecha'],$fecha);
+
+                // Crear objeto DateTime desde la fecha original
+                $dtOriginal = new DateTime($resu['fecha']);
+
+                // Extraer la hora original
+                $horaOriginal = $dtOriginal->format('H:i:s');
+
+                // Combinar nueva fecha con hora original
+                $fechaFinal = $fecha . ' ' . $horaOriginal;
+
+                // Si quieres convertirlo en DateTime nuevamente:
+                $dtFinal = new DateTime($fechaFinal);
+
+                $dt_cajas = $this->dbc->query("SELECT * FROM detalle_caja_bancos_pagar WHERE idcuentaspor = '$idcomprobante'");
 
                 if ($dt_cajas->num_rows > 0) {
 
-                    $edicion_dt_cajas=$this->dbc->query("UPDATE detalle_caja_bancos_pagar SET monto='$monto' WHERE idcuentaspor='$idrecibo'");
+                    $edicion_dt_cajas=$this->dbc->query("UPDATE detalle_caja_bancos_pagar SET monto='$monto' WHERE idcuentaspor='$idcomprobante'");
 
                 }else{
                     //no se edita detalle_cajaBancos
                 }
+                // $edicion_comprobante=$this->dbc->query("UPDATE cuentaspof SET lugar = '$lugar',persona = '$persona',ci = '$ci', fecha='$fecha_nueva',monto='$monto' WHERE idcuentaspof='$idcomprobante'");
+                $edicion_comprobante = $this->editar_comprobante($fecha_nueva,$monto,$idcomprobante,$archivo,$tipo_documento,$lugar,$persona,$ci);
 
-                $edicion_recibo=$this->dbc->query("UPDATE cuentaspor SET fecha='$fecha',monto='$monto' WHERE idcuentaspor='$idrecibo'");
+                // $edicion_comprobante=$this->dbc->query("UPDATE cuentaspor SET fecha='$fecha_nueva',monto='$monto' WHERE idcuentaspor='$idcomprobante'");
 
-                $edicion_factura=$this->dbc->query("UPDATE factura SET nfactura = '$nfactura',fecha='$fecha',montofactura='$monto',por_concepto_de='$por_concepto_de',proveedorcliente_idproveedorcliente='$cliente_prov' WHERE idfactura='$resu[idfactura]'");
+                $edicion_recibo=$this->dbc->query("UPDATE recibo SET nro_recibo = '$nro_recibo',fecha='$fecha',monto='$monto',concepto='$concepto',cliente_proveedor='$cliente_prov' WHERE idrecibo='$resu[idrecibo]'");
 
             }
         }
 
-        if($edicion_factura===TRUE){
+        if($edicion_recibo===TRUE){
             $res = array("success", "Se Registro Correctamente", "detalletransaccionnormal");
         }else{
             $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
         }
         echo json_encode($res);
+    }
+
+     private function obtener_fecha_hora_nueva($fecha_actual,$fecha_nueva)
+    {
+        // Crear objeto DateTime desde la fecha original
+        $dtOriginal = new DateTime($fecha_actual);
+
+        // Extraer la hora original
+        $horaOriginal = $dtOriginal->format('H:i:s');
+
+        // Combinar nueva fecha con hora original
+        $fechaFinal = $fecha_nueva . ' ' . $horaOriginal;
+
+        // Si quieres convertirlo en DateTime nuevamente:
+        $dtFinal = new DateTime($fechaFinal);
+
+        return $dtFinal;
+    }
+
+    private function editar_comprobante($fecha,$monto,$idcomprobante,$archivo,$tipo_documento,$lugar,$persona,$ci){
+        //$fecha_nueva,$monto,$idcomprobante,$archivo
+        $fecha_formateada = $fecha->format('Y-m-d'); //  ejemplo de formato
+
+        if($tipo_documento == '1'){ // COBROS
+            if(empty($archivo['name'])){
+
+                if($lugar == "" || $persona == "" || $ci == ""){
+                    $fecha_formateada = $fecha->format('Y-m-d'); //  ejemplo de formato
+                    $update=$this->dbc->query("UPDATE cuentaspof SET fecha='$fecha_formateada',monto='$monto' WHERE idcuentaspof='$idcomprobante'");
+
+                }else{
+                    $update=$this->dbc->query("UPDATE cuentaspof SET fecha='$fecha_formateada',monto='$monto',lugar = '$lugar', persona = '$persona', ci = '$ci' WHERE idcuentaspof='$idcomprobante'");               
+                }
+
+            // $update = $this->dbc->query("UPDATE cuentaspof SET fecha='$fecha',persona='$persona',ci='$ci',lugar='$lugar',transaccion='$idtransaccion' WHERE idcuentaspof='$idrecibo'");
+
+            if ($update === TRUE) {
+                $res = array("success", "Registro Realizado", "registrocobrarfactura");
+                } else {
+                    $res = array("danger", "No se pudo realizar el registro");
+                }
+            }else{
+                // Manejar la carga del archivo
+                $archivo_nombre = "";
+                if ($archivo['error'] == UPLOAD_ERR_OK) {
+                    $archivo_tmp = $archivo['tmp_name'];
+                    $archivo_nombre = basename($archivo['name']);
+                    // ----------------------------------
+                    $unique_name = uniqid("img_", true) . '.' . $archivo_nombre;
+                    // $target_file = $target_dir . $unique_name;
+
+                    // $ruta_destino = __DIR__ . "/archivos/" . $archivo_nombre;
+                    $ruta_destino = "../archivos/" . $unique_name;
+                    // $ruta_destino = "../archivos/" . $archivo_nombre;
+                    // move_uploaded_file($archivo_tmp, $ruta_destino);
+                }
+                    if(move_uploaded_file($archivo_tmp, $ruta_destino)){
+                            //registrar pago, preguntar guardar la anterior transaccion o la nueva
+                            if($lugar == "" || $persona == "" || $ci == ""){
+                                $updateArch=$this->dbc->query("UPDATE cuentaspof SET fecha='$fecha_formateada',monto='$monto',archivo = '$unique_name' WHERE idcuentaspof='$idcomprobante'");
+
+                            }else{
+                                $updateArch=$this->dbc->query("UPDATE cuentaspof SET fecha='$fecha_formateada',monto='$monto',lugar = '$lugar', persona = '$persona', ci = '$ci',archivo = '$unique_name' WHERE idcuentaspof='$idcomprobante'");               
+                            }
+                            // $updateArch=$this->dbc->query("UPDATE cuentaspof SET fecha='$fecha',monto='$monto',archivo = '$unique_name' WHERE idcuentaspof='$idcomprobante'");   
+                        if ($updateArch === TRUE) {
+                            $res = array("success", "Edicion Realizada", "registrocobrarfactura");
+                        } else {
+                            $res = array("danger", "No se pudo realizar el registro");
+                        }
+                        }else{
+                            $res = array("danger", "No se movio el archivo a la carpeta");
+                        }
+            }
+        }else{ // PAGOS
+
+            if(empty($archivo['name'])){
+
+            // $update=$this->dbc->query("UPDATE cuentaspor SET fecha='$fecha',monto='$monto' WHERE idcuentaspor='$idcomprobante'");
+            if($lugar == "" || $persona == "" || $ci == ""){
+                $update=$this->dbc->query("UPDATE cuentaspor SET fecha='$fecha_formateada',monto='$monto' WHERE idcuentaspor='$idcomprobante'");
+
+            }else{
+                $update=$this->dbc->query("UPDATE cuentaspor SET fecha='$fecha_formateada',monto='$monto',lugar = '$lugar', persona = '$persona', ci = '$ci' WHERE idcuentaspor='$idcomprobante'");               
+            }
+            // $update = $this->dbc->query("UPDATE cuentaspof SET fecha='$fecha',persona='$persona',ci='$ci',lugar='$lugar',transaccion='$idtransaccion' WHERE idcuentaspof='$idrecibo'");
+
+            if ($update === TRUE) {
+                $res = array("success", "Registro Realizado", "registrocobrarfactura");
+                } else {
+                    $res = array("danger", "No se pudo realizar el registro");
+                }
+            }else{
+                // Manejar la carga del archivo
+                $archivo_nombre = "";
+                if ($archivo['error'] == UPLOAD_ERR_OK) {
+                    $archivo_tmp = $archivo['tmp_name'];
+                    $archivo_nombre = basename($archivo['name']);
+                    // ----------------------------------
+                    $unique_name = uniqid("img_", true) . '.' . $archivo_nombre;
+                    // $target_file = $target_dir . $unique_name;
+
+                    // $ruta_destino = __DIR__ . "/archivos/" . $archivo_nombre;
+                    $ruta_destino = "../archivos/" . $unique_name;
+                    // $ruta_destino = "../archivos/" . $archivo_nombre;
+                    // move_uploaded_file($archivo_tmp, $ruta_destino);
+                }
+                    if(move_uploaded_file($archivo_tmp, $ruta_destino)){
+                            //registrar pago, preguntar guardar la anterior transaccion o la nueva
+                            // $updateArch=$this->dbc->query("UPDATE cuentaspor SET fecha='$fecha',monto='$monto',archivo = '$unique_name' WHERE idcuentaspor='$idcomprobante'");  
+                            if($lugar == "" || $persona == "" || $ci == ""){
+                                $updateArch=$this->dbc->query("UPDATE cuentaspor SET fecha='$fecha_formateada',monto='$monto',archivo = '$unique_name' WHERE idcuentaspor='$idcomprobante'");
+
+                            }else{
+                                $updateArch=$this->dbc->query("UPDATE cuentaspor SET fecha='$fecha_formateada',monto='$monto',lugar = '$lugar', persona = '$persona', ci = '$ci',archivo = '$unique_name' WHERE idcuentaspor='$idcomprobante'");               
+                            } 
+                        if ($updateArch === TRUE) {
+                            $res = array("success", "Edicion Realizada", "registrocobrarfactura");
+                        } else {
+                            $res = array("danger", "No se pudo realizar el registro");
+                        }
+                        }else{
+                            $res = array("danger", "No se movio el archivo a la carpeta");
+                        }
+            }
+        }
+        return "ejecutado";
+    }
+      public function editar_caja_bancos_facturas_existentes($idcomprobante,$tipo_documento,$fecha,$monto,$archivo,$lugar,$persona,$ci){
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+        $res="";
+        //tipo_documento = 1,2 facturas --> cobrar- pagar
+        //LAS FACTURAS TODAS ESTAN PAGADAS Y COBRADAS, ENTONCES TODAS LAS FACTURAS Q SE EDITARAN YA TIENEN COMPROBANTES
+        if($tipo_documento == '1'){//COBRADO
+           
+                //SE EDITARA FACTURA Y RECIBO
+                $cuentaspof = $this->dbc->query("SELECT * FROM cuentaspof WHERE idcuentaspof = '$idcomprobante'");
+                $resu = $this->dbc->fetch($cuentaspof);
+
+                $fecha_nueva = $this->obtener_fecha_hora_nueva($resu['fecha'],$fecha);
+
+                $dt_cajas = $this->dbc->query("SELECT * FROM detalle_caja_bancos_cobrar WHERE idcuentaspof = '$idcomprobante'");
+
+                if ($dt_cajas->num_rows > 0) {
+
+                    $edicion_dt_cajas=$this->dbc->query("UPDATE detalle_caja_bancos_cobrar SET monto='$monto' WHERE idcuentaspof='$idcomprobante'");
+
+                }else{
+                    //no se edita detalle_cajaBancos
+                }
+
+                 // SE ESTA EDITANDO LA FACTURA Y EL COMPROBANTE
+
+                $edicion_comprobante = $this->editar_comprobante($fecha_nueva,$monto,$idcomprobante,$archivo,$tipo_documento,$lugar,$persona,$ci);
+                // $edicion_recibo=$this->dbc->query("UPDATE cuentaspof SET fecha='$fecha_nueva',monto='$monto' WHERE idcuentaspof='$idcomprobante'");
+
+            
+        }else{ //PAGADO
+           
+                $cuentaspor = $this->dbc->query("SELECT * FROM cuentaspor WHERE idcuentaspor = '$idcomprobante'");
+                $resu = $this->dbc->fetch($cuentaspor);
+
+                $fecha_nueva = $this->obtener_fecha_hora_nueva($resu['fecha'],$fecha);
+
+                $dt_cajas = $this->dbc->query("SELECT * FROM detalle_caja_bancos_pagar WHERE idcuentaspor = '$idcomprobante'");
+
+                if ($dt_cajas->num_rows > 0) {
+
+                    $edicion_dt_cajas=$this->dbc->query("UPDATE detalle_caja_bancos_pagar SET monto='$monto' WHERE idcuentaspor='$idcomprobante'");
+
+                }else{
+                    //no se edita detalle_cajaBancos
+                }
+
+                $edicion_comprobante = $this->editar_comprobante($fecha_nueva,$monto,$idcomprobante,$archivo,$tipo_documento,$lugar,$persona,$ci);
+              
+        }
+
+        if($edicion_comprobante==="ejecutado"){
+            $res = array("success", "Se Registro Correctamente", "detalletransaccionnormal");
+        }else{
+            $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde aaa");
+        }
+        echo json_encode($res);
+        // echo json_encode(array($idcomprobante,$nfactura,$tipo_documento,$fecha,$monto,$por_concepto_de,$cliente_prov,$archivo,$lugar,$persona,$ci));
     }
 
     public function getidusuario($md5){

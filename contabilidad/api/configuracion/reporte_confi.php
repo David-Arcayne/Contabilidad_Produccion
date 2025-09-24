@@ -48,10 +48,29 @@ class Reporte_confi extends DB{
         echo json_encode($res);
     }
 
-    public function eliminar_tipo_reportes($idtipo_reportes) {
+    // public function eliminar_tipo_reportes($idtipo_reportes) {
 
-        $eliminar = $this->dbc->query("DELETE FROM tipo_reportes WHERE idtipo_reportes = '$idtipo_reportes'");
-        if ($eliminar === TRUE) {                                                                                                                                                    
+    //     $eliminar = $this->dbc->query("DELETE FROM tipo_reportes WHERE idtipo_reportes = '$idtipo_reportes'");
+    //     if ($eliminar === TRUE) {                                                                                                                                                    
+    //         $res = array("success", "se elimino exitosamente","rp_eliminar_reporte");
+    //     } else {
+    //         $res = array("danger", "No se pudo eliminar");
+    //     }
+    //     echo json_encode($res);
+    // }
+
+public function eliminar_tipo_reportes($idtipo_reportes) {
+
+        $eliminar_reporte = $this->dbc->query("DELETE FROM tipo_reportes WHERE idtipo_reportes = '$idtipo_reportes'");
+        
+        if ($eliminar_reporte === TRUE) {     
+            $existe_confi_reporte = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE idplantilla_reporte = '$idtipo_reportes'");
+            $existe_pr_plantilla = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla_reporte = '$idtipo_reportes'");
+            if($existe_pr_plantilla->num_rows > 0){
+                $eliminar_plantillas = $this->dbc->query("DELETE FROM pr_plantilla WHERE idplantilla_reporte = '$idtipo_reportes'");
+            }elseif($existe_confi_reporte->num_rows > 0){
+                $eliminar_plantillas = $this->dbc->query("DELETE FROM configuracion_reporte WHERE idplantilla_reporte = '$idtipo_reportes'");
+            }                                                                                                                              
             $res = array("success", "se elimino exitosamente","rp_eliminar_reporte");
         } else {
             $res = array("danger", "No se pudo eliminar");
@@ -59,12 +78,8 @@ class Reporte_confi extends DB{
         echo json_encode($res);
     }
 
-
-
-
-
     //-----------------------------------------------------------------------------
-    public function registrar_configuracion_reporte($idplandecuenta,$reporte,$nombre_cuenta_superior,$nivel,$grupo,$es_calculable,$es_activo_fijo,$empresa){
+    public function registrar_configuracion_reporte($idplandecuenta,$idplantilla_reporte,$reporte,$nombre_cuenta_superior,$nivel,$grupo,$es_calculable,$es_activo_fijo,$empresa){
         // $idempresa = Empresa::getidempresa($empresa);
         $idempresa = $this->getidempresa($empresa);
         // $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM divisa WHERE nombre = '$nombre' AND idempresa = '$idempresa'");
@@ -78,7 +93,8 @@ class Reporte_confi extends DB{
             $orden_ulti = $resultado['total'] + 1;
 
                 // Insertar el nuevo registro
-                $registroProveedor = $this->dbc->query("INSERT INTO configuracion_reporte(idplandecuenta,reporte,nombre_cuenta_superior,nivel_registrado,orden,grupo,es_calculable,es_activo_fijo,idempresa) VALUES ('$idplandecuenta','$reporte','$nombre_cuenta_superior','$nivel','$orden_ulti','$grupo','$es_calculable','$es_activo_fijo','$idempresa')");
+                $registroProveedor = $this->dbc->query("INSERT INTO configuracion_reporte(idplandecuenta,idplantilla_reporte,reporte,nombre_cuenta_superior,nivel_registrado,orden,grupo,es_calculable,es_activo_fijo,idempresa) 
+                VALUES ('$idplandecuenta','$idplantilla_reporte','$reporte','$nombre_cuenta_superior','$nivel','$orden_ulti','$grupo','$es_calculable','$es_activo_fijo','$idempresa')");
                 if ($registroProveedor === TRUE) {                                                                                                                                                                
                     $res = array("success", "Registro exitoso","registroCaracteristicas");
                 } else {
@@ -152,7 +168,7 @@ class Reporte_confi extends DB{
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
 
-    public function listar_configuracion_reporte($empresa) {
+    public function listar_configuracion_reporte($idplantilla_reporte,$empresa) {
         //    ini_set('display_errors', 1); 
         // ini_set('display_startup_errors', 1);
         // error_reporting(E_ALL);
@@ -161,7 +177,7 @@ class Reporte_confi extends DB{
     
         // Preparar la consulta
         // $getPedido = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE nivel_registrado = '1' AND idempresa = '$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
-        $getPedido = $this->dbc->query("SELECT DISTINCT(reporte) FROM configuracion_reporte WHERE idempresa='$idempresa' AND reporte = 'balance_general'");// ACTIVO, PASIVO, PATRIMONIO
+        $getPedido = $this->dbc->query("SELECT DISTINCT(reporte) FROM configuracion_reporte WHERE idempresa='$idempresa' AND reporte = 'balance_general' AND idplantilla_reporte ='$idplantilla_reporte'");// ACTIVO, PASIVO, PATRIMONIO
 
         while ($qwe = $this->dbc->fetch($getPedido)) {
             $res = array(
@@ -173,7 +189,8 @@ class Reporte_confi extends DB{
         
         // $get_nivel_2 = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE nivel_registrado = '2' AND idempresa = '$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
 
-        $get_nivel_2 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '' AND reporte = '$qwe[reporte]' AND idempresa='$idempresa' ORDER BY orden ASC");// ACTIVO, PASIVO, PATRIMONIO
+        $get_nivel_2 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '' AND reporte = '$qwe[reporte]' AND idempresa='$idempresa' 
+        AND idplantilla_reporte ='$idplantilla_reporte' ORDER BY orden ASC");// ACTIVO, PASIVO, PATRIMONIO
         while ($qwe2 = $this->dbc->fetch($get_nivel_2)) {
         $cuenta = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe2[idplandecuenta]'");// ACTIVO, PASIVO, PATRIMONIO
         $nombre_cuenta = $cuenta->fetch_assoc();
@@ -309,9 +326,10 @@ class Reporte_confi extends DB{
     }
     
     public function reporte_balance_general($fecha_ini,$fecha_fin,$empresa) {
-           ini_set('display_errors', 1); 
+        ini_set('display_errors', 1); 
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
+        
         $lista = [];
         $idempresa = $this->getidempresa($empresa);
         $gestion = $this->getidgestion($empresa);
@@ -863,18 +881,63 @@ class Reporte_confi extends DB{
                 if($resultado33['columna_encontrada'] == 'idcuenta'){
                     //SE ELIMINARA LA CUENTA PRINCIPAL Y SU VINCULACION 
 //(elimina la cuenta principal, entonces se eliminara ambas cuetas de la tabla confi_reporte y la vinculacion en la tabla vincu)
+                    
+                    $confi_elim = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE idconfiguracion_reporte = '$id'");
+                    $resu_aux = $confi_elim->fetch_assoc();             
+                    $orden_aux = $resu_aux['orden'] + 1;
+                    $consulta_aux = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE nombre_cuenta_superior ='$resu_aux[nombre_cuenta_superior]'
+                        AND nivel_registrado = '$resu_aux[nivel_registrado]' AND idempresa ='$resu_aux[idempresa]' AND orden > '$orden_aux'");
+                        // $resultado = $consulta->fetch_assoc();             
+                        // $orden_ulti = $resultado['total'] + 1;
+
+                        while ($qwe = $this->dbc->fetch($consulta_aux)) {
+                            $nuevo_orden = $qwe['orden'] - 2;
+                            $edicion_orden = $this->dbc->query("UPDATE configuracion_reporte 
+                                                                    SET orden = '$nuevo_orden' 
+                                                                    WHERE idconfiguracion_reporte = '$qwe[idconfiguracion_reporte]'");
+                        }
+
                     $delete_confi = $this->dbc->query("DELETE FROM configuracion_reporte WHERE idconfiguracion_reporte = '$id'");
                     $delete_confi2 = $this->dbc->query("DELETE FROM configuracion_reporte WHERE idplandecuenta = '$resultado33[idcuenta_depreciacion]'");
    
                     $delete_vincu = $this->dbc->query("DELETE FROM vinculacion_cuenta_depreciacion WHERE idvinculacion_cuenta_depreciacion = '$resultado33[idvinculacion_cuenta_depreciacion]'");
                 }else{
                     // SOLO SE ELIMINARA 2 REGISTROS, OSEA EL REGISTRO DE CONFIGURACION_REPORTE Y DE LA TABLA VINCULACION
-//(aqui elimina la depreciacion de una cuenta, entonces se eliminara de la tabla vinculacion y de la tabla configuracion reporte porque estaba el registro en ambas tablas)
+                    //(aqui elimina la depreciacion de una cuenta, entonces se eliminara de la tabla vinculacion y de la tabla configuracion reporte porque estaba el registro en ambas tablas)
 
+                    $confi_elim = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE idconfiguracion_reporte = '$id'");
+                    $resu_aux = $confi_elim->fetch_assoc();             
+
+                    $consulta_aux = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE nombre_cuenta_superior ='$resu_aux[nombre_cuenta_superior]'
+                        AND nivel_registrado = '$resu_aux[nivel_registrado]' AND idempresa ='$resu_aux[idempresa]' AND orden > '$resu_aux[orden]'");
+                        // $resultado = $consulta->fetch_assoc();             
+                        // $orden_ulti = $resultado['total'] + 1;
+
+                        while ($qwe = $this->dbc->fetch($consulta_aux)) {
+                            $nuevo_orden = $qwe['orden'] - 1;
+                            $edicion_orden = $this->dbc->query("UPDATE configuracion_reporte 
+                                                                    SET orden = '$nuevo_orden' 
+                                                                    WHERE idconfiguracion_reporte = '$qwe[idconfiguracion_reporte]'");
+                        }
                     $delete_confi = $this->dbc->query("DELETE FROM configuracion_reporte WHERE idconfiguracion_reporte = '$id'");
                     $delete_vincu = $this->dbc->query("DELETE FROM vinculacion_cuenta_depreciacion WHERE idvinculacion_cuenta_depreciacion = '$resultado33[idvinculacion_cuenta_depreciacion]'");
                 }   
             }else{ // ESTE REGISTRO NO ES UN ACTIVO FIJO POR ESO LA ELIMINACION ES SIMPLE
+                $confi_elim = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE idconfiguracion_reporte = '$id'");
+                    $resu_aux = $confi_elim->fetch_assoc();             
+
+                    $consulta_aux = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE nombre_cuenta_superior ='$resu_aux[nombre_cuenta_superior]'
+                        AND nivel_registrado = '$resu_aux[nivel_registrado]' AND idempresa ='$resu_aux[idempresa]' AND orden > '$resu_aux[orden]'");
+                        // $resultado = $consulta->fetch_assoc();             
+                        // $orden_ulti = $resultado['total'] + 1;
+
+                        while ($qwe = $this->dbc->fetch($consulta_aux)) {
+                            $nuevo_orden = $qwe['orden'] - 1;
+                            $edicion_orden = $this->dbc->query("UPDATE configuracion_reporte 
+                                                                    SET orden = '$nuevo_orden' 
+                                                                    WHERE idconfiguracion_reporte = '$qwe[idconfiguracion_reporte]'");
+                        }
+                        
                 $delete_confi = $this->dbc->query("DELETE FROM configuracion_reporte WHERE idconfiguracion_reporte = '$id'");
             }
 
@@ -904,7 +967,27 @@ class Reporte_confi extends DB{
                 $get_confi = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE idplandecuenta = '$idcuenta' AND idempresa = '$idempresa'");
                 $confi_aux = $get_confi->fetch_assoc();
 
-                $registro_confi = $this->dbc->query("INSERT INTO configuracion_reporte(idplandecuenta,reporte,nombre_cuenta_superior,nivel_registrado,grupo,es_calculable,es_activo_fijo,idempresa) VALUES ('$iddepreciacion','$confi_aux[reporte]','$confi_aux[nombre_cuenta_superior]','$confi_aux[nivel_registrado]','$confi_aux[grupo]','$confi_aux[es_calculable]','$confi_aux[es_activo_fijo]','$idempresa')");
+            // $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM configuracion_reporte WHERE nombre_cuenta_superior ='$nombre_cuenta_superior'
+            // AND nivel_registrado = '$nivel' AND idempresa ='$idempresa'");
+            // $resultado = $consulta->fetch_assoc();             
+            // $orden_ulti = $resultado['total'] + 1;
+
+            $orden = $confi_aux['orden'] + 1;
+
+            $consulta = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE nombre_cuenta_superior ='$confi_aux[nombre_cuenta_superior]'
+            AND nivel_registrado = '$confi_aux[nivel_registrado]' AND idempresa ='$idempresa' AND orden >= '$orden'");
+            // $resultado = $consulta->fetch_assoc();             
+            // $orden_ulti = $resultado['total'] + 1;
+
+            while ($qwe = $this->dbc->fetch($consulta)) {
+                $nuevo_orden = $qwe['orden'] + 1;
+                $edicion_orden = $this->dbc->query("UPDATE configuracion_reporte 
+                                                        SET orden = '$nuevo_orden' 
+                                                        WHERE idconfiguracion_reporte = '$qwe[idconfiguracion_reporte]'");
+            }
+
+                $registro_confi = $this->dbc->query("INSERT INTO configuracion_reporte(idplandecuenta,idplantilla_reporte,reporte,nombre_cuenta_superior,nivel_registrado,orden,grupo,es_calculable,es_activo_fijo,idempresa) 
+                VALUES ('$iddepreciacion','$confi_aux[idplantilla_reporte]','$confi_aux[reporte]','$confi_aux[nombre_cuenta_superior]','$confi_aux[nivel_registrado]','$orden','$confi_aux[grupo]','$confi_aux[es_calculable]','$confi_aux[es_activo_fijo]','$idempresa')");
                                                                                                                                                                    
                 $res = array("success", "Registro exitoso","registroCaracteristicas");
             } else {
@@ -1876,6 +1959,6 @@ public function select_plantilla_balance_general($empresa)
     //     //$res=array("id"=>,"nombre"=>$qwe['nombre']); listapagarfactura
     //     return $qwe['idgestion'];
     // }
-//activo--1    pasivo --2  patrimonio---3    ingresos---4   egresos_gastos --5  orden ---6
+//activo--1    pasivo --2  patrimonio---3    ingresos---4   egresos_gastos --5  orden ---6  eliminar
 }
 ?>

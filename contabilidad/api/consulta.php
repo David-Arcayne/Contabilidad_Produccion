@@ -22,6 +22,7 @@ require_once "./configuracion/firma_reporte.php";
 require_once "./configuracion/reporte_confi.php";
 require_once "./configuracion/rp_plantilla_reporte.php";
 require_once "./otras_cuentas/forma_pago.php";
+require_once "./configuracion/plantilla_admin.php";
 
 $ver=explode("/",$_GET['ver']); //dividiendo los "/"  ver[0],ver[1],ver[x]  listafacturaapi_pagado eliminarasiento tipo
 if($ver[0]=="verificacion"){
@@ -487,7 +488,7 @@ elseif($ver[0]=="listar_facturas_cobros_sin_transaccion"){
     $cont->filtro_por_nivel($ver[1],$ver[2],$ver[3],$ver[4]);
 }elseif($ver[0]=="listar_configuracion_reporte"){
     $cont=new Reporte_confi();
-    $cont->listar_configuracion_reporte($ver[1]);
+    $cont->listar_configuracion_reporte($ver[1],$ver[2]);
 }elseif($ver[0]=="reporte_balance_general"){
     $cont=new Reporte_confi();
     $cont->reporte_balance_general($ver[1],$ver[2],$ver[3]);
@@ -612,10 +613,19 @@ elseif($ver[0]=="listar_otras_cuentas_cobrar_select"){
 }elseif($ver[0]=="es_cuenta_de_orden"){
     $cont=new PlantillaReporte();
     $cont->es_cuenta_de_orden($ver[1]);
+}elseif($ver[0]=="lista_plande_subcuentas"){
+    $cont=new Transacciones();
+    $cont->lista_plande_subcuentas($ver[1]);
+}elseif($ver[0]=="lista_padres_plandecuentas"){
+    $cont=new Transacciones();
+    $cont->lista_padres_plandecuentas($ver[1]);
+}elseif($ver[0]=="reporte_balance_general_admin"){
+    $cont=new Plantilla_admin();
+    $cont->reporte_balance_general_admin($ver[1]);
 }
 
 // listar_recibo_otras_cuentas listar_factura_otras_cuentas lista_pagar_pagado_factura listar_recibo_por_id_otras_cuentas  factura reporte_balance_general_actualizado
 // caja_banco listatransacciones_comercial alerta reportebalancegeneral listafacturaapi_pagado lista_cobrar_cobrado_factura  listar_recibo_otras_cuentas  listar_recibo_otras_cuentas_pagar
-//  listar_datos_contrataciones_cajas listar_recibo_otras_cuentas listar_recibo_por_caja_bancos
+//  listar_datos_contrataciones_cajas listar_recibo_otras_cuentas listar_recibo_por_caja_bancos listadetalletransaccion
 
 ?>
