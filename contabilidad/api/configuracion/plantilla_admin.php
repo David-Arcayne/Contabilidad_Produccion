@@ -32,7 +32,7 @@ class Plantilla_admin extends DB{
         echo json_encode($lista, JSON_NUMERIC_CHECK); 
     }
 
-    public function registrar_balance_general_admin($idtn,$empresa){
+    public function registrar_balance_general_admin($idplantilla_reporte,$idtn,$empresa){
          ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
@@ -40,22 +40,34 @@ class Plantilla_admin extends DB{
         $url = "http://mistersofts.com/administrador/api/getListaplantillareporterubro/".$idtn;
         $data = json_decode(file_get_contents($url), true);
 
-        // if (isset($data['config'])) {
-        if (isset($data[0]['config']) && !empty($data[0]['config'])) {
-            $ordenPorNivelPadre = [];
-            $listado_admin = $this->procesarListado($data[0]['config'],$idempresa, 1, $ordenPorNivelPadre,'');
-            $res = array("success", "Todos los elementos fueron registrados");
-        } else {
-            $res = array("danger", "No se encontró el campo 'config' en la respuesta.",$data,$data[0]['config']);
+        $cont = 0;
+        foreach($data as $plantilla){
+            if ($plantilla['idctplantilla'] == $idplantilla_reporte) {
+                // ENTRO AL CONFIG DE BALANCE GENERAL
+                if (isset($data[$cont]['config']) && !empty($data[$cont]['config'])) {
+                    $ordenPorNivelPadre = [];
+
+                    $registro_tipo = $this->dbc->query("INSERT INTO tipo_reportes(nombre,descripcion,tipo_reporte,idempresa) 
+                        VALUES ('$plantilla[nombre]','$plantilla[descripcion]','$plantilla[tiporeporte]','$idempresa')");
+
+                    $idtipo_reporte = $this->dbc->insert_id;
+
+                    $listado_admin = $this->procesarListado($data[$cont]['config'],$idempresa, 1, $ordenPorNivelPadre,'',$idtipo_reporte);
+                    $res = array("success", "Todos los elementos fueron registrados");
+                } else {
+                    $res = array("danger", "No se encontró el campo 'config' en la respuesta.",$data,$data[$cont]['config']);
+                }
+            }else{
+                // NO ENTRO AL CONFIG DE BALANCE GENERAL Y SOLO ME SALTO
+            }
+            $cont++;
         }
 
-        // $lista = [];
-       
         echo json_encode($res); 
         // echo json_encode(array($idtn,$empresa)); 
     }
 
-    private function procesarListado($listado,$idempresa, $nivel = 1, &$ordenPorNivelPadre  = [],$nombrePadre = '') {
+    private function procesarListado($listado,$idempresa, $nivel = 1, &$ordenPorNivelPadre  = [],$nombrePadre = '',$idtipo_reporte) {
         foreach ($listado as $item) {
             // Usa el nombre del padre como clave
             $clavePadre = $nombrePadre ?: 'RAIZ';
@@ -66,7 +78,7 @@ class Plantilla_admin extends DB{
 
             $orden = $ordenPorNivelPadre[$nivel][$clavePadre];
 
-            $registrar_config = $this->registrarItem($item,$idempresa, $nivel, $orden,$nombrePadre); // Guarda el item actual
+            $registrar_config = $this->registrarItem($item,$idempresa, $nivel, $orden,$nombrePadre,$idtipo_reporte); // Guarda el item actual
 
              $ordenPorNivelPadre[$nivel][$clavePadre]++; // Incrementa el orden para ese grupo en ese nivel
             if (!empty($item['children'])) {
@@ -79,17 +91,17 @@ class Plantilla_admin extends DB{
 
                 // $listado_admin = $this->procesarListado($item['children'],$idempresa, $nivel + 1,$ordenPorNivelPadre,$item['nombreplan']); // Procesa hijos
                 foreach ($item['children'] as $child) {
-                    if (isset($child['depreciacion']) && $child['depreciacion'] === 'SI') {
+                    if (isset($child['depreciacion']) && $child['depreciacion'] === 'si') {
                         // Registrar el hijo al mismo nivel que el padre
                         $orden = $ordenPorNivelPadre[$nivel][$clavePadre];
-                        $this->registrarItem($child, $idempresa, $nivel, $orden, $nombrePadre);
+                        $this->registrarItem($child, $idempresa, $nivel, $orden, $nombrePadre,$idtipo_reporte);
                         $ordenPorNivelPadre[$nivel][$clavePadre]++;
 
                         // Registrar ambos en tabla especial
                         $this->registrarRelacionDepreciacion($item, $child, $idempresa);
                     }else{
                         // Procesar normalmente como hijo
-                        $this->procesarListado([$child], $idempresa, $nivel + 1, $ordenPorNivelPadre, $item['nombreplan']);
+                        $this->procesarListado([$child], $idempresa, $nivel + 1, $ordenPorNivelPadre, $item['nombreplan'],$idtipo_reporte);
                     }
                 }
             }
@@ -110,11 +122,17 @@ class Plantilla_admin extends DB{
     }
 
 
-    private function registrarItem($item,$idempresa, $nivel,$orden,$nombrePadre) {
-        $tipo_reporte = $this->dbc->query("SELECT * FROM tipo_reportes WHERE tipo_reporte = 'balance_general' AND idempresa ='$idempresa'");
+    private function registrarItem($item,$idempresa, $nivel,$orden,$nombrePadre,$idtipo_reporte) {
+
+        //  $registro_tipo = $this->dbc->query("INSERT INTO tipo_reportes(nombre,descripcion,tipo_reporte,idempresa) 
+        //     VALUES ('$nombre_reporte','$descripcion','$tipo_reporte','$idempresa')");
+
+        // $idtipo_reporte = $this->dbc->insert_id;
+
+        $tipo_reporte = $this->dbc->query("SELECT * FROM tipo_reportes WHERE idtipo_reportes = '$idtipo_reporte' AND idempresa ='$idempresa'");
         $tr_aux = $tipo_reporte->fetch_assoc();
 
-            $plancuenta = $this->dbc->query("SELECT * FROM plandecuenta WHERE numero = '$item[numero]' AND organizacion_idorganizacion ='$idempresa'");
+        $plancuenta = $this->dbc->query("SELECT * FROM plandecuenta WHERE numero = '$item[numero]' AND organizacion_idorganizacion ='$idempresa'");
         $pl_aux = $plancuenta->fetch_assoc();
 
         if($item['grupo'] == 'ACTIVO'){

@@ -99,9 +99,9 @@ public function registrar_anular_eliminar_activar_transaccion($idtransaccion,$mo
 
     public function cambiarEstado_anular_eliminar_activar_transaccion($idsoli,$estado_opcion,$estado_solicitud,$fecha_proceso,$hora_proceso,$idusuario_admin){
         //actualizar esto:
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
         // echo json_encode(array($idtran_espera,$estado,$fecha,$hora));
         $usuario=$this->getidusuario($idusuario_admin);
                 $res="";
@@ -225,6 +225,9 @@ public function registrar_anular_eliminar_activar_transaccion($idtransaccion,$mo
 
                 }else{
                       //NO SE ANULARA NI CAMBIARA ESTADO DE TRANSACCION NI DETALLE TRANSACCION  
+                      $update_trans=$this->dbc->query("UPDATE transacciones SET estado = '1' 
+                        WHERE idtransacciones = '$idtransaccion'");  
+                        
                       $res = array("success", "Se Denego el permiso para eliminar transaccion", "cambiarEstado_anular_eliminar_transaccion");
                 }
             }else{// ACTIVAR --> estado_opcion = 3

@@ -711,11 +711,11 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     $cont=new Plandecuentas();
     $cont->editar_agrupacion_rubro_plandecuenta($_POST['idagrupacion_rubro_plandecuenta'],$_POST['idtipo_plandecuenta'],$_POST['numero'],$_POST['empresa']);
     }elseif($ver=="registrar_balance_general_admin"){
-        if(isset($_POST['idtn'],$_POST['empresa'])){
+        if(isset($_POST['idplantilla_reporte'],$_POST['idtn'],$_POST['empresa'])){
             $cont=new Plantilla_admin();
-            $cont->registrar_balance_general_admin($_POST['idtn'],$_POST['empresa']);
+            $cont->registrar_balance_general_admin($_POST['idplantilla_reporte'],$_POST['idtn'],$_POST['empresa']);
         }else{
-            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idtn'],$_POST['empresa']));
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idplantilla_reporte'],$_POST['idtn'],$_POST['empresa']));
         }
     }
 //  vincula  -- crearfacturasf5 registrar_factura_cobro registrar_factura_cobro_otras_cuentas --> aumentar usuario 
