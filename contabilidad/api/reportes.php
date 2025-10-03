@@ -932,6 +932,7 @@ $totalHaber = 0;
         if($reci['idfactura'] == null || $reci['idfactura'] == '0'){  // PERTENECE A RECIBO
             $recibo_lista=$this->dbc->query("SELECT * FROM recibo WHERE idrecibo ='$reci[idrecibo]'");
             $rec_aux = $recibo_lista->fetch_assoc();
+            $aux_nro_reci_fact = $rec_aux['nro_recibo'];
             if($rec_aux['cobrado'] == '0'){ // ES PAGADO
                   $prov_client=$this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor ='$rec_aux[cliente_proveedor]'");
                   $pv_cl = $prov_client->fetch_assoc();
@@ -943,6 +944,7 @@ $totalHaber = 0;
         }else{    // PERTENECE A FACTURA
             $recibo_lista=$this->dbc->query("SELECT * FROM factura WHERE idfactura ='$reci[idfactura]'");
               $rec_aux = $recibo_lista->fetch_assoc();
+              $aux_nro_reci_fact = $rec_aux['nfactura'];
               if($rec_aux['cobrado'] == '0'){ // ES PAGADO
                     $prov_client=$this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor ='$rec_aux[proveedorcliente_idproveedorcliente]'");
                     $pv_cl = $prov_client->fetch_assoc();
@@ -952,7 +954,7 @@ $totalHaber = 0;
                     $pv_cl = $prov_client->fetch_assoc();
               }
         }
-           $rec=array("idrecibo"=>$reci[0],"fecha"=>$reci[1],"persona"=>$pv_cl['nombre'],"ci"=>$reci[3],"nrecibo"=>$reci[4],"monto"=>$reci[5]);
+           $rec=array("idrecibo"=>$reci[0],"fecha"=>$reci[1],"persona"=>$pv_cl['nombre'],"ci"=>$reci[3],"nrecibo"=>$reci[4],"monto"=>$reci[5],"nro_documento"=>$aux_nro_reci_fact);
            array_push($recibos,$rec);
        
        }
@@ -1814,7 +1816,7 @@ if ($pcuentas->num_rows > 0) {
         echo json_encode($lista); 
        }
   //reportedetallefpt reporteactivodiaponibledos reportedetalletransaccion estado consolidar reporteactivoypasivo resultados reportecomprobantecontable                
-//re mayorcuentacontable reportecomprobantecontable firmas reporteactivoypasivo reportebalancegeneral mayor
+//re mayorcuentacontable reportecomprobantecontable firmas reporteactivoypasivo reportebalancegeneral mayor reportecomprobantecontable 
 
 }
 
