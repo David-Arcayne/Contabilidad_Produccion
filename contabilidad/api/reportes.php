@@ -1807,7 +1807,7 @@ if ($pcuentas->num_rows > 0) {
       }
 
       
-      // Ordenar por "nrecibo" en orden ascendente
+      // Ordenar por "nrecibo" en orden ascendente consolidar
       
       usort($lista, function($a, $b) {
         return intval($a['nrecibo']) - intval($b['nrecibo']);

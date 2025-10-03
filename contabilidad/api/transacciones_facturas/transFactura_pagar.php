@@ -413,7 +413,7 @@ public function listapagos_individuales($idfactura)
 
         echo json_encode($lista);
     }
-    public function registrar_transaccion_recibo_pago($idRecibo,$fecha,$monto,$glosa, $asiento,$empresa,$sucursal){
+    public function registrar_transaccion_recibo_pago($idRecibo,$fecha,$monto,$glosa, $asiento,$idtransaccion,$empresa,$sucursal){
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
@@ -426,7 +426,7 @@ public function listapagos_individuales($idfactura)
         $transi = $this->dbc->query("SELECT * FROM transacciones WHERE organizacion_idorganizacion='$ide' AND idgestion = '$gestion' order by codigotransaccion desc Limit 1");
         $qq = $this->dbc->fetch($transi);
         $codigo = $qq['codigotransaccion'] + 1;
-        if ($asiento != 0) {
+        if ($asiento != "" && $idtransaccion == "") {
             $insertrans = $this->dbc->query("INSERT INTO `transacciones` (`idtransacciones`, `codigotransaccion`, `fechatransaccion`, `tipodecambio`, `ndocumento`, `glosa`, `consolidar`,`estado`, `tipotransaccion_idtipotransaccion`, `organizacion_idorganizacion`, `sucursal`, `idgestion`) 
             VALUES (NULL, '$codigo', '$fecha', '1', '0', '$glosa', '1','1', '$tipotransaccion', '$ide', '$sucursal', '$gestion');");
             //nuevat transaccion
@@ -457,9 +457,9 @@ public function listapagos_individuales($idfactura)
 
                 $orden = $orden + 1;
             }
-        } else {
-            $trans = $qq['idtransacciones'];
-            $editar_recibo = $this->dbc->query("UPDATE cuentaspor SET transaccion = '$trans' WHERE idcuentaspor ='$idRecibo'");
+        }elseif($idtransaccion != "" && $asiento == ""){
+            // $trans = $qq['idtransacciones'];
+            $insertrans = $this->dbc->query("UPDATE cuentaspor SET transaccion = '$idtransaccion' WHERE idcuentaspor ='$idRecibo'");
         }
         if($insertrans == TRUE){
             $res = array("success", "Registro exitoso","registrar_transaccion_recibo");
