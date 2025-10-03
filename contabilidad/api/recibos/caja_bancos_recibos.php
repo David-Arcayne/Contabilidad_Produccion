@@ -3822,6 +3822,6 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
     }    
     // listar_recibo_por_caja_bancos array precio_restante registrar_recibo_pago_cajaBancos_en_facturas res4 registrar_recibo_cobro_cajaBancos_en_otras_cuentas
-//registrar_factura_recibo_cobro_cajaBancos, registrar_factura_recibo_pago_cajaBancos registrar_recibo_cobro_cajaBancos_en_facturas
+//registrar_factura_recibo_cobro_cajaBancos, registrar_factura_recibo_pago_cajaBancos registrar_recibo_cobro_cajaBancos_en_facturas caja_bancos
 }
 ?>

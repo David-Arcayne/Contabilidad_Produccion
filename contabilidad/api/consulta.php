@@ -491,7 +491,7 @@ elseif($ver[0]=="listar_facturas_cobros_sin_transaccion"){
     $cont->listar_configuracion_reporte($ver[1],$ver[2]);
 }elseif($ver[0]=="reporte_balance_general"){
     $cont=new Reporte_confi();
-    $cont->reporte_balance_general($ver[1],$ver[2],$ver[3]);
+    $cont->reporte_balance_general($ver[1],$ver[2],$ver[3],$ver[4]);
 }elseif($ver[0]=="eliminar_configuracion_reporte"){
     $cont=new Reporte_confi();
     $cont->eliminar_configuracion_reporte($ver[1]);
@@ -538,7 +538,7 @@ elseif($ver[0]=="rp_listar_plantilla"){
     $cont->reporte_estado_resultados($ver[1],$ver[2],$ver[3]);
 }elseif($ver[0]=="reporte_estado_resultados_actualizado"){
     $cont=new PlantillaReporte();
-    $cont->reporte_estado_resultados_actualizado($ver[1],$ver[2],$ver[3]);
+    $cont->reporte_estado_resultados_actualizado($ver[1],$ver[2],$ver[3],$ver[4]);
 }elseif($ver[0]=="eliminar_otras_operaciones"){
     $cont=new PlantillaReporte();
     $cont->eliminar_otras_operaciones($ver[1]);
@@ -619,14 +619,21 @@ elseif($ver[0]=="listar_otras_cuentas_cobrar_select"){
 }elseif($ver[0]=="lista_padres_plandecuentas"){
     $cont=new Transacciones();
     $cont->lista_padres_plandecuentas($ver[1]);
+}elseif($ver[0]=="reporte_balance_general_consolidado"){
+    $cont=new Reporte_confi();
+    $cont->reporte_balance_general_consolidado($ver[1],$ver[2],$ver[3],$ver[4]);
+}elseif($ver[0]=="reporte_estado_resultados_actualizado_consolidado"){
+    $cont=new PlantillaReporte();
+    $cont->reporte_estado_resultados_actualizado_consolidado($ver[1],$ver[2],$ver[3],$ver[4]);
 }
+
 // elseif($ver[0]=="reporte_balance_general_admin"){
 //     $cont=new Plantilla_admin();
 //     $cont->reporte_balance_general_admin($ver[1]);
 // }
 
-// listar_recibo_otras_cuentas listar_factura_otras_cuentas lista_pagar_pagado_factura listar_recibo_por_id_otras_cuentas  factura reporte_balance_general_actualizado
+// listar_recibo_otras_cuentas listar_factura_otras_cuentas lista_pagar_pagado_factura listar_recibo_por_id_otras_cuentas  factura reporte_balance_general_actualizado listar_recibo_por_id_otras_cuentas_pagar
 // caja_banco listatransacciones_comercial alerta reportebalancegeneral listafacturaapi_pagado lista_cobrar_cobrado_factura  listar_recibo_otras_cuentas  listar_recibo_otras_cuentas_pagar
-//  listar_datos_contrataciones_cajas listar_recibo_otras_cuentas listar_recibo_por_caja_bancos listadetalletransaccion
+//  listadetalletransaccion listar_firmas listar_recibo_por_id_otras_cuentas listar_documentos_cobros_sin_transaccion listar_recibo_facturas_otras_cuentas listar_tipo_reportes_gestion
 
 ?>

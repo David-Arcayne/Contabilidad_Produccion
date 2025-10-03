@@ -348,7 +348,7 @@ class Cuentaspor extends DB{
     }
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------
-public function listar_recibo_pago_por_id($idrecibo)
+public function listar_recibo_pago_por_id($idrecibo) //COMPROBANTES PARA PAGOS DE FACTURAS
 {
     // ini_set('display_errors', 1);
     // ini_set('display_startup_errors', 1);
@@ -379,7 +379,7 @@ if ($factura_lista->num_rows > 0) {
         $factura= $this->dbc->query("SELECT * FROM factura WHERE idfactura = '$factu[idfactura]'");
         $ft = $factura->fetch_assoc();
 
-        if($ft['cobrado'] != 0){
+        if($ft['pagado'] != 0){
             $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $ft['proveedorcliente_idproveedorcliente'] . "'");
             $cl = $cliente->fetch_assoc();
         }else{
@@ -428,7 +428,7 @@ if ($factura_lista->num_rows > 0) {
         $factura= $this->dbc->query("SELECT * FROM factura WHERE idfactura = '$recib[idfactura]'");
                 $ft = $factura->fetch_assoc();
 
-                if($ft['cobrado'] != 0){
+                if($ft['pagado'] != 0){
                     $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $ft['proveedorcliente_idproveedorcliente'] . "'");
                     $cl = $cliente->fetch_assoc();
                 }else{

@@ -81,7 +81,7 @@ class Plantilla_admin extends DB{
             $registrar_config = $this->registrarItem($item,$idempresa, $nivel, $orden,$nombrePadre,$idtipo_reporte); // Guarda el item actual
 
              $ordenPorNivelPadre[$nivel][$clavePadre]++; // Incrementa el orden para ese grupo en ese nivel
-            if (!empty($item['children'])) {
+            if (!empty($item['children'])) { // ESTO ES PARA REGISTRAR LA DEPRECIACION SISQUE TIENE
                 //if($item['children']['depreciacion'] == 'SI'){
                     // registrara la cuenta 1 y la cuenta depreciacion pero con nivel de la cuenta 1 
                     //habran registros en la tabla configuracion_reporte y vinculacion_depreciacion 
@@ -117,8 +117,14 @@ class Plantilla_admin extends DB{
         $id_original = $cuenta_original->fetch_assoc()['idplandecuenta'];
         $id_depreciacion = $cuenta_depreciacion->fetch_assoc()['idplandecuenta'];
 
-        $registrar_depreciacion = $this->dbc->query("INSERT INTO vinculacion_cuenta_depreciacion(idcuenta, idcuenta_depreciacion, idgestion, idempresa) 
+        // Verificar que ambas cuentas existan
+        if (!$id_original || !$id_depreciacion) {
+             // No registrar si alguna cuenta no existe
+        }else{
+            $registrar_depreciacion = $this->dbc->query("INSERT INTO vinculacion_cuenta_depreciacion(idcuenta, idcuenta_depreciacion, idgestion, idempresa) 
                         VALUES ('$id_original', '$id_depreciacion', '$idgestion', '$idempresa')");
+        }
+
     }
 
 
@@ -142,9 +148,14 @@ class Plantilla_admin extends DB{
         }else{
                 $grup = '3';
         }
+         if (!$pl_aux) {
+            // no ocurrira nada solo saltara
+         }else{
             $registro_confi = $this->dbc->query("INSERT INTO configuracion_reporte(idplandecuenta,idplantilla_reporte,reporte,nombre_cuenta_superior,nivel_registrado,orden,grupo,es_calculable,es_activo_fijo,idempresa) 
             VALUES ('$pl_aux[idplandecuenta]','$tr_aux[idtipo_reportes]','$tr_aux[tipo_reporte]','$nombrePadre','$nivel','$orden','$grup','$item[escalculable]','$item[esactivofijo]','$idempresa')");
 
+         }
+            
     }
     public function getidempresa($md5)
     {
