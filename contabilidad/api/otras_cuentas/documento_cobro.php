@@ -978,7 +978,7 @@ while ($qwe = $this->dbc->fetch($registro)) {
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
 
-     public function asignar_asiento_A_otras_cuentas($data) {
+     public function asignar_asiento_A_recibos($data) {
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
@@ -1007,13 +1007,13 @@ while ($qwe = $this->dbc->fetch($registro)) {
     
         // Editar las facturas seleccionadas
         $montoFacturas = 0;
-        foreach ($data['otras_cuentas'] as $otra_cuenta) {
-            $selectFact = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idotras_cuentas='{$otra_cuenta['idotras_cuentas']}' AND idempresa='$idempresa';");
-            $fact = $selectFact->fetch_assoc();
+        foreach ($data['recibos'] as $recibo) {
+            // $selectFact = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idotras_cuentas='{$otra_cuenta['idotras_cuentas']}' AND idempresa='$idempresa';");
+            // $fact = $selectFact->fetch_assoc();
 
     //------------------------------------------------------------------------------------------------
-            $montoFacturas += $otra_cuenta['monto'];
-            $updatetranscodigo = $this->dbc->query("UPDATE otras_cuentas SET transacciones_idtransacciones = '$idtransaccion' WHERE idotras_cuentas = '{$otra_cuenta['idotras_cuentas']}'");
+            $montoFacturas += $recibo['monto'];
+            $updatetranscodigo = $this->dbc->query("UPDATE recibo SET transaccion = '$idtransaccion' WHERE idrecibo = '{$recibo['idrecibo']}'");
 
      //-----------------------------------------------------------------------------------------------------
         }
@@ -1035,16 +1035,16 @@ while ($qwe = $this->dbc->fetch($registro)) {
             $estado = 1;
     
             // Insertar en detalletransaccion Ocurrio un error al asignar la factura
-            $crear = $this->dbc->query("INSERT INTO detalletransaccion(debe, haber, nota, transacciones_idtransacciones, idplandecuenta, idcuentapresupuestaria, estado, cobrar, pagar, idorganizacion, idsucursal, orden) VALUES ('$debe', '$haber', '$nota', '$idtrans', '$pcuenta', '$ppresupuestario', '$estado', '2', '2', '$idempresa', '$idsucursal', '$orden')");
+            $crear = $this->dbc->query("INSERT INTO detalletransaccion(debe, haber, nota, transacciones_idtransacciones, idplandecuenta, idcuentapresupuestaria, estado, cobrar, pagar, idorganizacion, idsucursal, orden) VALUES ('$debe', '$haber', '$nota', '$idtransaccion', '$pcuenta', '$ppresupuestario', '$estado', '2', '2', '$idempresa', '$idsucursal', '$orden')");
             
             $orden = $orden + 1;
         }
         
     }else{
 
-            foreach ($data['otras_cuentas'] as $otra_cuenta) {
+            foreach ($data['recibos'] as $recibo) {
 
-                $updatetranscodigo = $this->dbc->query("UPDATE otras_cuentas SET transacciones_idtransacciones = '$data[idtrans]' WHERE idotras_cuentas = '{$otra_cuenta['idotras_cuentas']}'");
+                $updatetranscodigo = $this->dbc->query("UPDATE recibo SET transaccion = '$data[idtrans]' WHERE idrecibo = '{$recibo['idrecibo']}'");
 
             }
         }

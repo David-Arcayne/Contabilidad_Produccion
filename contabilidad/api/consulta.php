@@ -631,6 +631,10 @@ elseif($ver[0]=="listar_otras_cuentas_cobrar_select"){
 //     $cont=new Plantilla_admin();
 //     $cont->reporte_balance_general_admin($ver[1]);
 // }
+elseif($ver[0]=="listar_tipo_reportes_activos"){
+    $cont=new Reporte_confi();
+    $cont->listar_tipo_reportes_activos($ver[1]);
+}
 
 // listar_recibo_otras_cuentas listar_factura_otras_cuentas lista_pagar_pagado_factura listar_recibo_por_id_otras_cuentas  factura reporte_balance_general_actualizado listar_recibo_por_id_otras_cuentas_pagar
 // caja_banco listatransacciones_comercial alerta reportebalancegeneral listafacturaapi_pagado lista_cobrar_cobrado_factura  listar_recibo_otras_cuentas  listar_recibo_otras_cuentas_pagar

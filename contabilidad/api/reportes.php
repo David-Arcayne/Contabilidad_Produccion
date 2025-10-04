@@ -478,7 +478,8 @@ public function getidgestion($md5){
         $reporte=$this->dbc->query("SELECT p.numero,p.nombreplan,SUM(d.debe) AS debe,SUM(d.haber) AS haber,SUM(debe)-SUM(haber) AS deudor,SUM(haber)-SUM(debe) AS acreedor FROM plandecuenta AS p
         INNER JOIN transacciones AS t ON t.organizacion_idorganizacion='$ide'
         INNER JOIN detalletransaccion AS d ON d.idplandecuenta=p.idplandecuenta AND t.idtransacciones=d.transacciones_idtransacciones
-        WHERE p.organizacion_idorganizacion='$ide' AND t.fechatransaccion>='$fechai' AND t.fechatransaccion<='$fechaf' AND p.numero<'4.0.0.00.00' AND t.idgestion='$gestion' 
+        WHERE p.organizacion_idorganizacion='$ide' AND t.fechatransaccion>='$fechai' AND t.fechatransaccion<='$fechaf' 
+        AND p.numero<'4.0.0.00.00' AND t.idgestion='$gestion' AND t.estado NOT IN (4, 5, 6)
         GROUP by p.nombreplan 
         ORDER by p.numero ASC;");
 
@@ -504,7 +505,7 @@ $totalHaber = 0;
       /*  if ($totalDebe != $totalHaber) {
           echo json_encode(array("error" => "Hay un error contable: el total del debe y el haber no son iguales desde $fechai hasta $fechaf."));
       } else {
-          echo json_encode($lista);
+          echo json_encode($lista); 
       }*/
     }
 
@@ -515,7 +516,8 @@ $totalHaber = 0;
         $reporte=$this->dbc->query("SELECT p.numero,p.nombreplan,SUM(d.debe) AS debe,SUM(d.haber) as haber,SUM(debe)-SUM(haber) as deudor,SUM(haber)-SUM(debe) as acreedor from plandecuenta as p
         INNER JOIN transacciones AS t ON t.organizacion_idorganizacion='$ide'
         INNER JOIN detalletransaccion AS d ON d.idplandecuenta=p.idplandecuenta AND t.idtransacciones=d.transacciones_idtransacciones
-        WHERE p.organizacion_idorganizacion='$ide' AND t.fechatransaccion<='$fechaf' AND p.numero<'4.0.0.00.00' and t.idgestion='$gestion'  
+        WHERE p.organizacion_idorganizacion='$ide' AND t.fechatransaccion<='$fechaf' 
+        AND p.numero<'4.0.0.00.00' and t.idgestion='$gestion' AND t.estado NOT IN (4, 5, 6)
         GROUP by p.nombreplan 
         ORDER by p.numero ASC;");
         $totalDebe = 0;
@@ -1133,18 +1135,6 @@ $totalHaber = 0;
 
         }
         
-        /*
-        $detalletrans=$this->db->query("SELECT d.iddetalletransaccion,d.debe,d.haber,d.transacciones_idtransacciones from detalletransaccion as d WHERE d.idplandecuenta='$plan';");
-        while($qwe=$this->db->fetch($detalletrans)){
-            $trans=$this->db->query("select t.codigotransaccion,t.fechatransaccion,t.tipotransaccion_idtipotransaccion from transacciones as t where t.organizacion_idorganizacion='$this->emp' and t.fechatransaccion>='$fechai' and t.fechatransaccion<='$fechaf' and t.idtransacciones='$qwe[3]' and t.idgestion='$gestion'  order by t.codigotransaccion asc");
-            $asd=$this->db->fetch($trans);
-            $tipotrans=$this->dba->query("select nombre from tipotransaccion where idtipotransaccion='$asd[2]'");
-            $tipo=$this->dba->fetch($tipotrans);
-            $res=array("codigo"=>$asd[0],"fecha"=>$asd[1],"tipo"=>$tipo[0],"debe"=>$qwe[1],"haber"=>$qwe[2]);
-
-            array_push($lista,$res);
-        }
-        */
         echo json_encode($lista);   
     }
 
@@ -1816,7 +1806,7 @@ if ($pcuentas->num_rows > 0) {
         echo json_encode($lista); 
        }
   //reportedetallefpt reporteactivodiaponibledos reportedetalletransaccion estado consolidar reporteactivoypasivo resultados reportecomprobantecontable                
-//re mayorcuentacontable reportecomprobantecontable firmas reporteactivoypasivo reportebalancegeneral mayor reportecomprobantecontable 
+//re   firmas  reportebalancegeneral mayor reportecomprobantecontable mayorcuentacontable  reporteactivoypasivo
 
 }
 

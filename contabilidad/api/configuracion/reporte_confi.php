@@ -4,6 +4,28 @@ require_once "../../db/db.php";
 
 class Reporte_confi extends DB{
 
+    public function activar_desactivar_tipo_reportes($idtipo_reportes, $tipo_reporte, $empresa){
+        $idempresa = $this->getidempresa($empresa);
+
+        $activar = $this->dbc->query("UPDATE tipo_reportes SET estado = '1' WHERE idtipo_reportes = '$idtipo_reportes'");
+
+        // $desactivar = $this->dbc->query("UPDATE tipo_reportes SET estado = '0' WHERE tipo_reporte = '$tipo_reporte' AND idtipo_reportes != '$idtipo_reportes' AND idempresa = '$idempresa'");
+
+        // $tipo_reporte = $this->dbc->query("SELECT * FROM tipo_reportes WHERE tipo_reporte = '$tipo_reporte' AND idempresa = '$idempresa'");
+
+        // // Insertar el nuevo registro
+        // $registro = $this->dbc->query("INSERT INTO tipo_reportes(nombre, descripcion, tipo_reporte, idempresa) VALUES ('$nombre', '$descripcion', '$tipo_reporte', '$idempresa')");
+       
+        if ($activar === TRUE) {   
+            $desactivar = $this->dbc->query("UPDATE tipo_reportes SET estado = '0' WHERE tipo_reporte = '$tipo_reporte' AND idtipo_reportes != '$idtipo_reportes' AND idempresa = '$idempresa'");
+                                                                                                                                                             
+            $res = array("success", "Registro exitoso","rp_registrar_reporte");
+        } else {
+            $res = array("danger", "No se pudo registrar");
+        }
+        echo json_encode($res);
+    }
+
     public function registrar_tipo_reportes($nombre, $descripcion, $tipo_reporte, $empresa) {
         $idempresa = $this->getidempresa($empresa);
 
@@ -30,6 +52,28 @@ class Reporte_confi extends DB{
                 "tipo_reporte" => $row['tipo_reporte'],
                 "estado" => $row['estado']
             ];
+        }
+    
+        echo json_encode($lista, JSON_PRETTY_PRINT);
+    }
+    public function listar_tipo_reportes_activos($empresa) {
+    $idempresa = $this->getidempresa($empresa);
+        $lista = [];
+        $tipo_reportes = $this->dbc->query("SELECT * FROM tipo_reportes WHERE idempresa='$idempresa'");
+    
+        while ($row = $this->dbc->fetch($tipo_reportes)) {
+            if($row['estado'] == '1'){ // ESTA ACTIVO, MOSTRAR
+                $lista[] = [
+                "idtipo_reportes" => $row['idtipo_reportes'],
+                "nombre"=>$row['nombre'],
+                "descripcion" => $row['descripcion'],
+                "tipo_reporte" => $row['tipo_reporte'],
+                "estado" => $row['estado']
+                ];
+            }else{
+                //NO MOSTRAR 
+            }
+    
         }
     
         echo json_encode($lista, JSON_PRETTY_PRINT);

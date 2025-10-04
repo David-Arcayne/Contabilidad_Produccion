@@ -8,5 +8,5 @@ RewriteCond %{REQUEST_FILENAME} -l
 
 RewriteRule ^ - [L]
 RewriteEngine on
-RewriteBase /vapp/ct/api/
+RewriteBase /app/ct/api/
 RewriteRule ^(.*)$ index.php?ver=$1 

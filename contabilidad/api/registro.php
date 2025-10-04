@@ -449,9 +449,9 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['fecha'],$_POST['clase_otras_cuentas'],$_POST['cobrado'],$_POST['pagado'],$_POST['trans'],$_POST['id_cliente_proveedor'],$_POST['asiento'],$_POST['concepto'],$_POST['precio'],$_POST['idtipo'],$_POST['empresa'],$_POST['sucursal'],$_POST['idcaja_bancos'],$_FILES['archivo'],$_POST['registro_desde']));
         }
-    }elseif($data['ver'] == "asignar_asiento_A_otras_cuentas") {
+    }elseif($data['ver'] == "asignar_asiento_A_recibos") {
         $cont=new Documento_cobro();
-        $cont->asignar_asiento_A_otras_cuentas($data);
+        $cont->asignar_asiento_A_recibos($data);
     }elseif($ver=="registrar_caja_bancos_usuarios"){
         if(isset($_POST['idcaja_bancos'],$_POST['idtrabajador'],$_POST['funcion'],$_POST['permiso_registrar'],$_POST['empresa'])){
             $cont=new Caja_bancos_recibos();
@@ -719,7 +719,16 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     //         echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idplantilla_reporte'],$_POST['idtn'],$_POST['empresa']));
     //     }
     // }
+    elseif($ver=="activar_desactivar_tipo_reportes"){
+        if(isset($_POST['idtipo_reportes'],$_POST['tipo_reporte'],$_POST['empresa'])){
+            $cont=new Reporte_confi();
+            $cont->activar_desactivar_tipo_reportes($_POST['idtipo_reportes'],$_POST['tipo_reporte'],$_POST['empresa']);
+        }else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idtipo_reportes'],$_POST['tipo_reporte'],$_POST['empresa']));
+        }
+    }
+    
 //  vincula  -- crearfacturasf5 registrar_factura_cobro registrar_factura_cobro_otras_cuentas --> aumentar usuario 
 //  registrocobrarfacturaGrupal crearfacturas caja_bancos registrar_factura_pago registrar_otras_cuentas registrar_recibo_otras_cuentas--> aumentar usuario creartransaccion
-}//   editar_recibo_caja registrar_recibo_otras_cuentas editar_recibo_caja editar_caja_bancos registrar_transaccion_recibo asignar_asiento registrar_transaccion_recibo 
+}//   asignar_asiento registrar_transaccion_recibo asignar_asiento
 ?> 
