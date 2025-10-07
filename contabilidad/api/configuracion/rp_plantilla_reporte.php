@@ -628,8 +628,14 @@ class PlantillaReporte extends DB{
     public function registrar_agrupacion_plantilla($idplantilla_padre, $idplantilla_hijo, $tipo_operacion,$monto,$empresa) {
         $idempresa = $this->get_id_empresa($empresa);
 
-        // Insertar el nuevo registro
-        $registro = $this->dbc->query("INSERT INTO agrupacion_plantilla(idplantilla_padre, idplantilla_hijo, tipo_operacion,monto, idempresa) VALUES ('$idplantilla_padre', '$idplantilla_hijo', '$tipo_operacion','$monto', '$idempresa')");
+        if($tipo_operacion == 'porcentaje'){
+            $registro = $this->dbc->query("INSERT INTO agrupacion_plantilla(idplantilla_padre, idplantilla_hijo, tipo_operacion,monto, idempresa) VALUES ('$idplantilla_hijo', '$idplantilla_padre', '$tipo_operacion','$monto', '$idempresa')");
+
+        }else{
+            // Insertar el nuevo registro
+            $registro = $this->dbc->query("INSERT INTO agrupacion_plantilla(idplantilla_padre, idplantilla_hijo, tipo_operacion,monto, idempresa) VALUES ('$idplantilla_padre', '$idplantilla_hijo', '$tipo_operacion','$monto', '$idempresa')");
+        }
+       
         if ($registro === TRUE) {                                                                                                                                                                
             $res = array("success", "Registro exitoso","rp_registrar_reporte");
         } else {
@@ -919,13 +925,18 @@ class PlantillaReporte extends DB{
                     "nivel_2" => [] //activo
                     );  
 
-                $pl_padre = $this->dbc->query("SELECT * from agrupacion_plantilla where idplantilla_padre = '$pl_list[idplantilla]'");// VENTAS->NOMBRE
-            // $es_plant_agrup = $pl_padre->num_rows > 0;
-            $pl_padre_calcu = $this->dbc->query("SELECT * from pr_plantilla where idplantilla_padre = '$pl_list[idplantilla]'");// VENTAS->NOMBRE
+                $pl_padre = $this->dbc->query("SELECT * FROM agrupacion_plantilla WHERE idplantilla_padre = '$pl_list[idplantilla]'
+                AND (tipo_operacion ='porcentaje' || tipo_operacion = 'porcentaje')");// VENTAS->NOMBRE
+                
+                $pl_porcentaje = $this->dbc->query("SELECT * FROM agrupacion_plantilla WHERE idplantilla_hijo = '$pl_list[idplantilla]'
+                AND (tipo_operacion ='porcentaje')");// VENTAS->NOMBRE
+
+                // $es_plant_agrup = $pl_padre->num_rows > 0;
+            $pl_padre_calcu = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla_padre = '$pl_list[idplantilla]'");// VENTAS->NOMBRE
             // $es_plant_calc = $pl_padre_calcu->num_rows > 0;
             if($pl_padre->num_rows > 0){ //SI ES UNA PLANTILLA AGRUPADORA  (utilidad bruta en ventas)
                 $sum_rest = 0;
-                // $lista_aux_buscador[] = $res;
+                // $lista_aux_buscador[] = $res; monto
                 // array_push($lista_aux_buscador,$res);
                 while ($buscarId = $this->dbc->fetch($pl_padre)) { // 2agrupados
                     foreach ($lista as $item) {
@@ -945,7 +956,32 @@ class PlantillaReporte extends DB{
                     }
                 }
                 $res['suma_nivel_2'] = $sum_rest;
-            }elseif($pl_padre_calcu->num_rows > 0){ //ES UNA PLANTILLA CON HIJOS CALCULABLES  (VENTAS)
+            }
+            // elseif($pl_porcentaje->num_rows > 0){
+            //     $resu = 0;
+            //     $porce = $pl_porcentaje->fetch_assoc(); 
+            //     // $lista_aux_buscador[] = $res;
+            //     // array_push($lista_aux_buscador,$res);
+            //     // while ($buscarId2 = $this->dbc->fetch($pl_porcentaje)) { // 2agrupados
+            //         foreach ($lista as $item2) {
+            //             if ($item2['idplantilla'] === $porce['idplantilla_hijo']) {
+            //                 //agarro si es suma o resta y agarro su valor 
+            //                 if($porce['tipo_operacion'] == 'porcentaje'){
+            //                     $resu = ($item2['suma_nivel_2'] * $porce['monto']) / 100;
+            //                 }else{
+            //                     // salto
+            //                 }
+            //                 // $item['suma_nivel_2'];
+            //                 // $encontrado = true;
+            //                 break;
+            //             }else{
+            //                 //seguir buscando
+            //             }
+            //         }
+            //     // }
+            //     $res['suma_nivel_2'] = $resu;
+            // }
+            elseif($pl_padre_calcu->num_rows > 0){ //ES UNA PLANTILLA CON HIJOS CALCULABLES  (VENTAS)
 
             // NIVEL 2 2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222
             $suma_nivel_2 = 0;
