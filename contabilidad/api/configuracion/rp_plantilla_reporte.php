@@ -77,7 +77,7 @@ class PlantillaReporte extends DB{
 
 
     // FUNCIONES PARA PLANTILLAS
-    // ----------------------------------------------------------------
+    // ---------------------------------------------------------------- agrupacion
     private function obtener_nodos($idpadre, $idreporte, $idempresa)
     {
         $filtro_padre = is_null($idpadre) ? "p.idplantilla_padre IS NULL" : "p.idplantilla_padre = $idpadre";
@@ -645,30 +645,61 @@ class PlantillaReporte extends DB{
     }
     public function listar_agrupacion_plantilla($id_plantilla_padre) {
         $lista = [];
-        $registro = $this->dbc->query("SELECT * FROM agrupacion_plantilla WHERE idplantilla_padre='$id_plantilla_padre'");
-    
-        while ($row = $this->dbc->fetch($registro)) {
+        // $registro = $this->dbc->query("SELECT * FROM agrupacion_plantilla WHERE idplantilla_padre='$id_plantilla_padre'");
+        $suma_resta = $this->dbc->query("SELECT * FROM agrupacion_plantilla WHERE idplantilla_padre='$id_plantilla_padre' 
+        AND (tipo_operacion = 'sumar' || tipo_operacion = 'restar')");
 
-        $consul = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla='$row[idplantilla_hijo]'");
-        $pr_plant = $consul->fetch_assoc();
-        if(empty($pr_plant['idplandecuenta'])){//plan de cuenta esta vacio
-            $nombre_hijo = $pr_plant['nombre_personalizado'];
-        }else{//plan de cuenta NO esta vacio
-            $plan_cuenta = $this->dbc->query("SELECT * FROM plandecuenta WHERE idplandecuenta='$pr_plant[idplandecuenta]'");
-            $pl_c = $plan_cuenta->fetch_assoc();
-            $nombre_hijo = $pl_c['nombreplan'];
-        }
+        $porcentaje = $this->dbc->query("SELECT * FROM agrupacion_plantilla WHERE idplantilla_hijo='$id_plantilla_padre' 
+        AND tipo_operacion = 'porcentaje'");
 
-            $lista[] = [
-                "idagrupacion_plantilla" => $row['idagrupacion_plantilla'],
-                "idplantilla_padre"=>$row['idplantilla_padre'],
-                "idplantilla_hijo" => $row['idplantilla_hijo'],
-                "tipo_operacion" => $row['tipo_operacion'],
-                "nombre" => $nombre_hijo,
-                "monto" => $row['monto']
-            ];
+        if($suma_resta->num_rows > 0){
+        
+        while ($row = $this->dbc->fetch($suma_resta)) { // ESTO ES DE SUMAS O RESTAS DE CUENTAS
+
+            $consul = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla='$row[idplantilla_hijo]'");
+            $pr_plant = $consul->fetch_assoc();
+            if(empty($pr_plant['idplandecuenta'])){//plan de cuenta esta vacio
+                $nombre_hijo = $pr_plant['nombre_personalizado'];
+            }else{//plan de cuenta NO esta vacio
+                $plan_cuenta = $this->dbc->query("SELECT * FROM plandecuenta WHERE idplandecuenta='$pr_plant[idplandecuenta]'");
+                $pl_c = $plan_cuenta->fetch_assoc();
+                $nombre_hijo = $pl_c['nombreplan'];
+            }
+
+                $lista[] = [
+                    "idagrupacion_plantilla" => $row['idagrupacion_plantilla'],
+                    "idplantilla_padre"=>$row['idplantilla_padre'],
+                    "idplantilla_hijo" => $row['idplantilla_hijo'],
+                    "tipo_operacion" => $row['tipo_operacion'],
+                    "nombre" => $nombre_hijo,
+                    "monto" => $row['monto']
+                ];
         }
-    
+    }elseif($porcentaje->num_rows > 0){ // ESTO SON LOS PORCENTAJES DE ALGUNA CUENTA
+        while ($row = $this->dbc->fetch($porcentaje)) {
+
+            $consul = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla='$row[idplantilla_padre]'");
+            $pr_plant = $consul->fetch_assoc();
+            if(empty($pr_plant['idplandecuenta'])){//plan de cuenta esta vacio
+                $nombre_hijo = $pr_plant['nombre_personalizado'];
+            }else{//plan de cuenta NO esta vacio
+                $plan_cuenta = $this->dbc->query("SELECT * FROM plandecuenta WHERE idplandecuenta='$pr_plant[idplandecuenta]'");
+                $pl_c = $plan_cuenta->fetch_assoc();
+                $nombre_hijo = $pl_c['nombreplan'];
+            }
+
+                $lista[] = [
+                    "idagrupacion_plantilla" => $row['idagrupacion_plantilla'],
+                    "idplantilla_padre"=>$row['idplantilla_padre'],
+                    "idplantilla_hijo" => $row['idplantilla_hijo'],
+                    "tipo_operacion" => $row['tipo_operacion'],
+                    "nombre" => $nombre_hijo,
+                    "monto" => $row['monto']
+                ];
+        }
+    }else{
+        //NADA 
+    }
         echo json_encode($lista, JSON_PRETTY_PRINT);
     }
 
@@ -926,7 +957,7 @@ class PlantillaReporte extends DB{
                     );  
 
                 $pl_padre = $this->dbc->query("SELECT * FROM agrupacion_plantilla WHERE idplantilla_padre = '$pl_list[idplantilla]'
-                AND (tipo_operacion ='porcentaje' || tipo_operacion = 'porcentaje')");// VENTAS->NOMBRE
+                AND (tipo_operacion ='sumar' || tipo_operacion = 'restar')");// VENTAS->NOMBRE
                 
                 $pl_porcentaje = $this->dbc->query("SELECT * FROM agrupacion_plantilla WHERE idplantilla_hijo = '$pl_list[idplantilla]'
                 AND (tipo_operacion ='porcentaje')");// VENTAS->NOMBRE
@@ -957,30 +988,31 @@ class PlantillaReporte extends DB{
                 }
                 $res['suma_nivel_2'] = $sum_rest;
             }
-            // elseif($pl_porcentaje->num_rows > 0){
-            //     $resu = 0;
-            //     $porce = $pl_porcentaje->fetch_assoc(); 
-            //     // $lista_aux_buscador[] = $res;
-            //     // array_push($lista_aux_buscador,$res);
-            //     // while ($buscarId2 = $this->dbc->fetch($pl_porcentaje)) { // 2agrupados
-            //         foreach ($lista as $item2) {
-            //             if ($item2['idplantilla'] === $porce['idplantilla_hijo']) {
-            //                 //agarro si es suma o resta y agarro su valor 
-            //                 if($porce['tipo_operacion'] == 'porcentaje'){
-            //                     $resu = ($item2['suma_nivel_2'] * $porce['monto']) / 100;
-            //                 }else{
-            //                     // salto
-            //                 }
-            //                 // $item['suma_nivel_2'];
-            //                 // $encontrado = true;
-            //                 break;
-            //             }else{
-            //                 //seguir buscando
-            //             }
-            //         }
-            //     // }
-            //     $res['suma_nivel_2'] = $resu;
-            // }
+            elseif($pl_porcentaje->num_rows > 0){
+                $resu = 0;
+                $porce = $pl_porcentaje->fetch_assoc(); 
+                // $lista_aux_buscador[] = $res;
+                // array_push($lista_aux_buscador,$res);
+                // while ($buscarId2 = $this->dbc->fetch($pl_porcentaje)) { // 2agrupados
+                    foreach ($lista as $item2) {
+                        if ($item2['idplantilla'] === $porce['idplantilla_padre']) {
+                            //agarro si es suma o resta y agarro su valor 
+                            if($porce['tipo_operacion'] == 'porcentaje'){
+                                $resu = ($item2['suma_nivel_2'] * $porce['monto']) / 100;
+                            }else{
+                                // salto
+                            }
+                            // $item['suma_nivel_2'];
+                            // $encontrado = true;
+                            break;
+                        }else{
+                            //seguir buscando
+                        }
+                    }
+                    
+                // }
+                $res['suma_nivel_2'] = $resu;
+            }
             elseif($pl_padre_calcu->num_rows > 0){ //ES UNA PLANTILLA CON HIJOS CALCULABLES  (VENTAS)
 
             // NIVEL 2 2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222
@@ -1311,7 +1343,7 @@ class PlantillaReporte extends DB{
     
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
-    public function select_plantilla_estado_resultados($empresa)
+    public function select_plantilla_estado_resultados($idtipo_reporte,$empresa)
     {
         // ini_set('display_errors', 1); 
         // ini_set('display_startup_errors', 1);
@@ -1327,7 +1359,8 @@ class PlantillaReporte extends DB{
             $aux2 = $this->dbc->query("SELECT * FROM tipo_plandecuenta WHERE idtipo_plandecuenta='$agru[idtipo_plandecuenta]'");
             $tipo_pl = $aux2->fetch_assoc();
 
-            $existe_plantilla = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplandecuenta = '$qwe[idplandecuenta]' AND idempresa='$ide'");
+            $existe_plantilla = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplandecuenta = '$qwe[idplandecuenta]' AND idempresa='$ide'
+            AND idplantilla_reporte = '$idtipo_reporte'");
             if($existe_plantilla->num_rows > 0){
                 $res = array("idplandecuenta" => $qwe['idplandecuenta'], "numero" => $qwe['numero'], "nombre" => $qwe['nombreplan'], "estado" => 'usado',"rubro" => $tipo_pl['nombre']);
 
@@ -1424,8 +1457,12 @@ class PlantillaReporte extends DB{
                     "nivel_2" => [] //activo
                     );  
 
-                $pl_padre = $this->dbc->query("SELECT * from agrupacion_plantilla where idplantilla_padre = '$pl_list[idplantilla]'");// VENTAS->NOMBRE
+                $pl_padre = $this->dbc->query("SELECT * from agrupacion_plantilla where idplantilla_padre = '$pl_list[idplantilla]'
+                AND (tipo_operacion ='sumar' || tipo_operacion = 'restar')");// VENTAS->NOMBRE
             // $es_plant_agrup = $pl_padre->num_rows > 0;
+            $pl_porcentaje = $this->dbc->query("SELECT * FROM agrupacion_plantilla WHERE idplantilla_hijo = '$pl_list[idplantilla]'
+                AND (tipo_operacion ='porcentaje')");
+
             $pl_padre_calcu = $this->dbc->query("SELECT * from pr_plantilla where idplantilla_padre = '$pl_list[idplantilla]'");// VENTAS->NOMBRE
             // $es_plant_calc = $pl_padre_calcu->num_rows > 0;
             if($pl_padre->num_rows > 0){ //SI ES UNA PLANTILLA AGRUPADORA  (utilidad bruta en ventas)
@@ -1641,7 +1678,32 @@ class PlantillaReporte extends DB{
             }
             $res['suma_nivel_2'] = $suma_nivel_2;
             // FIN DEL NIVEL 2 2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222 
-            }else{ //ES UNA PLANTILLA SIN OPERACION (COSTO_PRODUCCION)
+            }elseif($pl_porcentaje->num_rows > 0){
+                $resu = 0;
+                $porce = $pl_porcentaje->fetch_assoc(); 
+                // $lista_aux_buscador[] = $res;
+                // array_push($lista_aux_buscador,$res);
+                // while ($buscarId2 = $this->dbc->fetch($pl_porcentaje)) { // 2agrupados
+                    foreach ($lista as $item2) {
+                        if ($item2['idplantilla'] === $porce['idplantilla_padre']) {
+                            //agarro si es suma o resta y agarro su valor 
+                            if($porce['tipo_operacion'] == 'porcentaje'){
+                                $resu = ($item2['suma_nivel_2'] * $porce['monto']) / 100;
+                            }else{
+                                // salto
+                            }
+                            // $item['suma_nivel_2'];
+                            // $encontrado = true;
+                            break;
+                        }else{
+                            //seguir buscando
+                        }
+                    }
+                    
+                // }
+                $res['suma_nivel_2'] = $resu;
+            }
+            else{ //ES UNA PLANTILLA SIN OPERACION (COSTO_PRODUCCION)
                 
                 $agru = $this->dbc->query("SELECT * from agrupacion_plantilla where idplantilla_hijo = '$pl_list[idplantilla]'");// HIJOS DE LAS PLANTILLAS AGRUPADORAS
                 $agru_aux = $agru->fetch_assoc();

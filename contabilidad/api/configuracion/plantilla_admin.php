@@ -47,8 +47,8 @@ class Plantilla_admin extends DB{
                 if (isset($data[$cont]['config']) && !empty($data[$cont]['config'])) {
                     $ordenPorNivelPadre = [];
 
-                    $registro_tipo = $this->dbc->query("INSERT INTO tipo_reportes(nombre,descripcion,tipo_reporte,idempresa) 
-                        VALUES ('$plantilla[nombre]','$plantilla[descripcion]','$plantilla[tiporeporte]','$idempresa')");
+                    $registro_tipo = $this->dbc->query("INSERT INTO tipo_reportes(nombre,descripcion,tipo_reporte,estado,idempresa) 
+                        VALUES ('$plantilla[nombre]','$plantilla[descripcion]','$plantilla[tiporeporte]','0','$idempresa')");
 
                     $idtipo_reporte = $this->dbc->insert_id;
 
@@ -98,7 +98,7 @@ class Plantilla_admin extends DB{
                         $ordenPorNivelPadre[$nivel][$clavePadre]++;
 
                         // Registrar ambos en tabla especial
-                        $this->registrarRelacionDepreciacion($item, $child, $idempresa);
+                        $this->registrarRelacionDepreciacion($item, $child,$idtipo_reporte, $idempresa);
                     }else{
                         // Procesar normalmente como hijo
                         $this->procesarListado([$child], $idempresa, $nivel + 1, $ordenPorNivelPadre, $item['nombreplan'],$idtipo_reporte);
@@ -108,7 +108,7 @@ class Plantilla_admin extends DB{
         }
     }
 
-    private function registrarRelacionDepreciacion($original, $depreciacion, $idempresa) {
+    private function registrarRelacionDepreciacion($original, $depreciacion,$idtipo_reporte, $idempresa) {
         $idgestion = $this->getidgestionid($idempresa);
 
         $cuenta_original = $this->dbc->query("SELECT idplandecuenta FROM plandecuenta WHERE numero = '$original[numero]' AND organizacion_idorganizacion = '$idempresa'");
@@ -121,8 +121,8 @@ class Plantilla_admin extends DB{
         if (!$id_original || !$id_depreciacion) {
              // No registrar si alguna cuenta no existe
         }else{
-            $registrar_depreciacion = $this->dbc->query("INSERT INTO vinculacion_cuenta_depreciacion(idcuenta, idcuenta_depreciacion, idgestion, idempresa) 
-                        VALUES ('$id_original', '$id_depreciacion', '$idgestion', '$idempresa')");
+            $registrar_depreciacion = $this->dbc->query("INSERT INTO vinculacion_cuenta_depreciacion(idcuenta, idcuenta_depreciacion, idgestion,idtipo_reportes, idempresa) 
+                        VALUES ('$id_original', '$id_depreciacion', '$idgestion','$idtipo_reporte', '$idempresa')");
         }
 
     }

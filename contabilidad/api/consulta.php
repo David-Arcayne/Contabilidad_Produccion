@@ -485,7 +485,7 @@ elseif($ver[0]=="listar_facturas_cobros_sin_transaccion"){
     $cont->busqueda_documentos_contabilidad($ver[1],$ver[2],$ver[3],$ver[4],$ver[5],$ver[6],$ver[7],$ver[8]);
 }elseif($ver[0]=="filtro_por_nivel"){
     $cont=new Reporte_confi();
-    $cont->filtro_por_nivel($ver[1],$ver[2],$ver[3],$ver[4]);
+    $cont->filtro_por_nivel($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
 }elseif($ver[0]=="listar_configuracion_reporte"){
     $cont=new Reporte_confi();
     $cont->listar_configuracion_reporte($ver[1],$ver[2]);
@@ -588,10 +588,10 @@ elseif($ver[0]=="listar_otras_cuentas_cobrar_select"){
     $cont->listar_tipo_reportes_gestion($ver[1]);
 }elseif($ver[0]=="select_plantilla_estado_resultados"){
     $cont=new PlantillaReporte();
-    $cont->select_plantilla_estado_resultados($ver[1]);
+    $cont->select_plantilla_estado_resultados($ver[1],$ver[2]);
 }elseif($ver[0]=="select_plantilla_balance_general"){
     $cont=new Reporte_confi();
-    $cont->select_plantilla_balance_general($ver[1]);
+    $cont->select_plantilla_balance_general($ver[1],$ver[2]);
 }elseif($ver[0]=="listar_nro_tributario_cliente"){
     $cont=new Documento_cobro();
     $cont->listar_nro_tributario_cliente($ver[1],$ver[2]);
@@ -633,11 +633,11 @@ elseif($ver[0]=="listar_otras_cuentas_cobrar_select"){
 // }
 elseif($ver[0]=="listar_tipo_reportes_activos"){
     $cont=new Reporte_confi();
-    $cont->listar_tipo_reportes_activos($ver[1]);
+    $cont->listar_tipo_reportes_activos($ver[1],$ver[2]);
 }
 
 // listar_recibo_otras_cuentas listar_factura_otras_cuentas lista_pagar_pagado_factura listar_recibo_por_id_otras_cuentas  factura reporte_balance_general_actualizado listar_recibo_por_id_otras_cuentas_pagar
 // caja_banco listatransacciones_comercial alerta reportebalancegeneral listafacturaapi_pagado lista_cobrar_cobrado_factura  listar_recibo_otras_cuentas  listar_recibo_otras_cuentas_pagar
-//  listadetalletransaccion listar_firmas listar_recibo_por_id_otras_cuentas listar_documentos_cobros_sin_transaccion listar_recibo_facturas_otras_cuentas listar_tipo_reportes_gestion
+// listar_recibo_facturas_otras_cuentas listar_tipo_reportes_gestion filtro_por_nivel  select_plantilla_balance_general select_plantilla_estado_resultados
 
 ?>
