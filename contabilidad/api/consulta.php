@@ -636,8 +636,8 @@ elseif($ver[0]=="listar_tipo_reportes_activos"){
     $cont->listar_tipo_reportes_activos($ver[1],$ver[2]);
 }
 
-// listar_recibo_otras_cuentas listar_factura_otras_cuentas lista_pagar_pagado_factura listar_recibo_por_id_otras_cuentas  factura reporte_balance_general_actualizado listar_recibo_por_id_otras_cuentas_pagar
-// caja_banco listatransacciones_comercial alerta reportebalancegeneral listafacturaapi_pagado lista_cobrar_cobrado_factura  listar_recibo_otras_cuentas  listar_recibo_otras_cuentas_pagar
-// listar_recibo_facturas_otras_cuentas listar_tipo_reportes_gestion filtro_por_nivel  select_plantilla_balance_general select_plantilla_estado_resultados
+// listar_recibo_por_id_otras_cuentas_pagar
+//    listar_recibo_otras_cuentas  listar_recibo_otras_cuentas_pagar
+// select_plantilla_estado_resultados listar_plantilla listar_recibo_por_id_otras_cuentas
 
 ?>
