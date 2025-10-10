@@ -158,6 +158,7 @@ class Cuentaspor extends DB{
         //TODAVIA NO SE PAGO EL TOTAL DEL SALDO
     }
         echo json_encode($res);
+        // echo json_encode($$idfactura,$lugar, $idtransaccion,$idcaja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$archivo,$zn);
     }
 
     public function registropagarfacturaf5($idrecibo,$lugar,$fecha, $persona, $ci,$idtransaccion,$archivo)

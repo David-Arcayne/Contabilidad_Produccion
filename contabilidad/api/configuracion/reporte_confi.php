@@ -5,24 +5,37 @@ require_once "../../db/db.php";
 class Reporte_confi extends DB{
 
     public function activar_desactivar_tipo_reportes($idtipo_reportes, $tipo_reporte, $empresa){
+         ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
         $idempresa = $this->getidempresa($empresa);
 
-        $activar = $this->dbc->query("UPDATE tipo_reportes SET estado = '1' WHERE idtipo_reportes = '$idtipo_reportes'");
+            $tipo_reporte_lista = $this->dbc->query("SELECT * FROM tipo_reportes WHERE idtipo_reportes = '$idtipo_reportes'");
+            $esta_activo = $tipo_reporte_lista->fetch_assoc();
 
-        // $desactivar = $this->dbc->query("UPDATE tipo_reportes SET estado = '0' WHERE tipo_reporte = '$tipo_reporte' AND idtipo_reportes != '$idtipo_reportes' AND idempresa = '$idempresa'");
+            if($esta_activo['estado'] == '1'){ // ESTA ACTIVO
+                // DEBO DESACTIVARLO Y NO ACTIVAR NINGUNO
+                $desactivar = $this->dbc->query("UPDATE tipo_reportes SET estado = '0' WHERE idtipo_reportes = '$idtipo_reportes'");
 
-        // $tipo_reporte = $this->dbc->query("SELECT * FROM tipo_reportes WHERE tipo_reporte = '$tipo_reporte' AND idempresa = '$idempresa'");
+                if ($desactivar === TRUE){   
+                                                                                                                                                                    
+                    $res = array("success", "Registro exitoso","rp_registrar_reporte");
+                }else {
+                    $res = array("danger", "No se pudo registrar");
+                }
+            }else{ // NO ESTA ACTIVO
+                //ACTIVAR DE FORMA NORMAL Y DESACTIVAR LOS DEMAS
+                $activar = $this->dbc->query("UPDATE tipo_reportes SET estado = '1' WHERE idtipo_reportes = '$idtipo_reportes'");
 
-        // // Insertar el nuevo registro
-        // $registro = $this->dbc->query("INSERT INTO tipo_reportes(nombre, descripcion, tipo_reporte, idempresa) VALUES ('$nombre', '$descripcion', '$tipo_reporte', '$idempresa')");
-       
-        if ($activar === TRUE) {   
-            $desactivar = $this->dbc->query("UPDATE tipo_reportes SET estado = '0' WHERE tipo_reporte = '$tipo_reporte' AND idtipo_reportes != '$idtipo_reportes' AND idempresa = '$idempresa'");
-                                                                                                                                                             
-            $res = array("success", "Registro exitoso","rp_registrar_reporte");
-        } else {
-            $res = array("danger", "No se pudo registrar");
-        }
+                if ($activar === TRUE){   
+                    $desactivado = $this->dbc->query("UPDATE tipo_reportes SET estado = '0' WHERE tipo_reporte = '$tipo_reporte' AND idtipo_reportes != '$idtipo_reportes' AND idempresa = '$idempresa'");
+                                                                                                                                                                    
+                    $res = array("success", "Registro exitoso","rp_registrar_reporte");
+                }else {
+                    $res = array("danger", "No se pudo registrar");
+                }
+            }
+    
         echo json_encode($res);
     }
 

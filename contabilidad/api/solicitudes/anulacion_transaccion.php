@@ -185,7 +185,7 @@ public function registrar_anular_eliminar_activar_transaccion($idtransaccion,$mo
                 $delete_trans_fact=$this->dbc->query("DELETE FROM transaccion_factura_comercial
                 WHERE idtransaccion = '$idtransaccion'");  
 
-                $eliminado=$this->dbc->query("SELECT codigotransaccion,organizacion_idorganizacion FROM transacciones 
+                $eliminado=$this->dbc->query("SELECT codigotransaccion,organizacion_idorganizacion,idgestion FROM transacciones 
                 WHERE idtransacciones = '$idtransaccion'");
     
                  $resElimi = $eliminado->fetch_assoc();
