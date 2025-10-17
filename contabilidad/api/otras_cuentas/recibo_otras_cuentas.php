@@ -250,6 +250,8 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
         // Preparar la consulta
       $listado = $this->dbc->query("SELECT c.idrecibo,c.nro_recibo,c.fecha,c.monto,c.persona,c.ci,c.transaccion,c.archivo,c.lugar FROM recibo as c WHERE c.idotras_cuentas='$idotras_cuentas'");
      while ($qwe = $this->dbc->fetch($listado)) {
+        $comprobante = $this->dbc->query("SELECT * FROM cuentaspof WHERE idrecibo='$qwe[idrecibo]'");
+        $compr = $comprobante->fetch_assoc();
 
         $trans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE idtransacciones='$qwe[transaccion]'");
         $idtr = $trans->fetch_assoc();
@@ -258,7 +260,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
           "fecha" => $qwe[2], "monto" => $qwe[3], "persona" => $qwe[4],
            "ci" => $qwe[5],"transaccion" => $qwe[6],
             "codigotransaccion" => $idtr['codigotransaccion'],
-            "nombre_archivo" => $qwe[7],"lugar" => $qwe[8]);
+            "nombre_archivo" => $qwe[7],"lugar" => $qwe[8], "idcomprobante" => $compr['idcuentaspof']);
          array_push($lista, $res);
      }
     
@@ -277,16 +279,24 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
             $trans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE idtransacciones='$qwe[transaccion]'");
             $idtr = $trans->fetch_assoc();
 
-            if($qwe['cobrado'] == '0' && $qwe['pagado'] > 0){
+            if($qwe['cobrado'] == '0' && $qwe['pagado'] > 0){ // PAGOS
+                $comprobante_recibo_pago = $this->dbc->query("SELECT * FROM cuentaspor WHERE idrecibo='$qwe[idrecibo]'");
+                $compr_rec_pago = $comprobante_recibo_pago->fetch_assoc();
+                $idcomprobante_recibo = $compr_rec_pago['idcuentaspor'];
+
                 $cliente_proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='$qwe[cliente_proveedor]'");
             }else{
+                $comprobante_recibo_cobro = $this->dbc->query("SELECT * FROM cuentaspof WHERE idrecibo='$qwe[idrecibo]'");
+                $compr_rec_cobro = $comprobante_recibo_cobro->fetch_assoc();
+                $idcomprobante_recibo = $compr_rec_cobro['idcuentaspof'];
+
                 $cliente_proveedor = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='$qwe[cliente_proveedor]'");
             }
             $cl_pv = $cliente_proveedor->fetch_assoc();
             $res = array("fecha" => $qwe['fecha'], "nro_documento" => $qwe['nro_recibo'], "codigotransaccion" => $idtr['codigotransaccion'],
                 "cliente_proveedor" => $cl_pv['nombre'],"concepto" => $qwe['concepto'],
                 "monto" => $qwe['monto'],
-                "tipo" => 'recibo');
+                "tipo" => 'recibo',"idcomprobante" => $idcomprobante_recibo);
             array_push($lista, $res);
             }
         // }
@@ -296,9 +306,17 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
             $trans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE idtransacciones='$zxc[transacciones_idtransacciones]'");
             $idtr = $trans->fetch_assoc();
 
-            if($zxc['cobrado'] == '0' && $zxc['pagado'] > 0){
+            if($zxc['cobrado'] == '0' && $zxc['pagado'] > 0){ // PAGOS
+                $comprobante_factura_pago = $this->dbc->query("SELECT * FROM cuentaspor WHERE idfactura='$zxc[idfactura]'");
+                $compr_fact_pago = $comprobante_factura_pago->fetch_assoc();
+                $idcomprobante_factura = $compr_fact_pago['idcuentaspor'];
+
                 $cliente_proveedor2 = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='$zxc[proveedorcliente_idproveedorcliente]'");
             }else{
+                $comprobante_factura_cobro = $this->dbc->query("SELECT * FROM cuentaspof WHERE idfactura='$zxc[idfactura]'");
+                $compr_fact_cobro = $comprobante_factura_cobro->fetch_assoc();
+                $idcomprobante_factura = $compr_fact_cobro['idcuentaspof'];
+
                 $cliente_proveedor2 = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='$zxc[proveedorcliente_idproveedorcliente]'");
             }
             $cl_pv2 = $cliente_proveedor2->fetch_assoc();
@@ -306,7 +324,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
             $res = array("fecha" => $zxc['fecha'], "nro_documento" => $zxc['nfactura'], "codigotransaccion" => $idtr['codigotransaccion'],
                 "cliente_proveedor" => $cl_pv2['nombre'],"concepto" => $zxc['por_concepto_de'],
                 "monto" => $zxc['montofactura'],
-                "tipo" => 'factura');
+                "tipo" => 'factura',"idcomprobante" => $idcomprobante_factura);
             array_push($lista, $res);
             }
         // }     
@@ -824,6 +842,9 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
       $listado = $this->dbc->query("SELECT c.idrecibo,c.nro_recibo,c.fecha,c.monto,c.persona,c.ci,c.transaccion,c.archivo,c.lugar FROM recibo as c WHERE c.idotras_cuentas='$idotras_cuentas'");
      while ($qwe = $this->dbc->fetch($listado)) {
 
+        $comprobante = $this->dbc->query("SELECT * FROM cuentaspor WHERE idrecibo='$qwe[idrecibo]'");
+        $compr = $comprobante->fetch_assoc();
+
         $trans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE idtransacciones='$qwe[transaccion]'");
         $idtr = $trans->fetch_assoc();
 
@@ -831,7 +852,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
           "fecha" => $qwe[2], "monto" => $qwe[3], "persona" => $qwe[4],
            "ci" => $qwe[5],"transaccion" => $qwe[6],
             "codigotransaccion" => $idtr['codigotransaccion'],
-            "nombre_archivo" => $qwe[7],"lugar" => $qwe[8]);
+            "nombre_archivo" => $qwe[7],"lugar" => $qwe[8],"idcomprobante" => $compr['idcuentaspor']);
          array_push($lista, $res);
      }
     
@@ -848,19 +869,31 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
         // Preparar la consulta
       $listado = $this->dbc->query("SELECT * FROM factura WHERE idotras_cuentas='$idotras_cuentas'");
      while ($qwe = $this->dbc->fetch($listado)) {
-    
+
         $trans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE idtransacciones='$qwe[transacciones_idtransacciones]'");
         $idtr = $trans->fetch_assoc();
 
         if($qwe['clasefactura'] == '1'){ //PAGO --> PROVEEDOR
+
+            $comprobante = $this->dbc->query("SELECT * FROM cuentaspor WHERE idfactura='$qwe[idfactura]'");
+            $compr = $comprobante->fetch_assoc();
+
             $cl = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='$qwe[proveedorcliente_idproveedorcliente]'");
             $clientSelect = $cl->fetch_assoc();
+
+            $res = array("idfactura" => $qwe['idfactura'], "fecha" => $qwe['fecha'], "nfactura" => $qwe['nfactura'], "montofactura" => $qwe['montofactura'],"codigotransaccion" => $idtr['codigotransaccion'],"por_concepto_de" => $qwe['por_concepto_de'],"prov_client" => $clientSelect['nombre'],"idcomprobante" => $compr['idcuentaspor']);
+
         }else{
+
+            $comprobante = $this->dbc->query("SELECT * FROM cuentaspof WHERE idfactura='$qwe[idfactura]'");
+            $compr = $comprobante->fetch_assoc();
+
             $cl = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='$qwe[proveedorcliente_idproveedorcliente]'");
             $clientSelect = $cl->fetch_assoc();
-        }
 
-         $res = array("idfactura" => $qwe['idfactura'], "fecha" => $qwe['fecha'], "nfactura" => $qwe['nfactura'], "montofactura" => $qwe['montofactura'],"codigotransaccion" => $idtr['codigotransaccion'],"por_concepto_de" => $qwe['por_concepto_de'],"prov_client" => $clientSelect['nombre']);
+            $res = array("idfactura" => $qwe['idfactura'], "fecha" => $qwe['fecha'], "nfactura" => $qwe['nfactura'], "montofactura" => $qwe['montofactura'],"codigotransaccion" => $idtr['codigotransaccion'],"por_concepto_de" => $qwe['por_concepto_de'],"prov_client" => $clientSelect['nombre'],"idcomprobante" => $compr['idcuentaspof']);
+
+        }
          array_push($lista, $res);
      }
     
@@ -967,7 +1000,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
         $res = "";
         $registro = $this->dbc->query("select * from gestion where idempresa='$empresa' and estado='2' Limit 1");
         $qwe = $this->dbc->fetch($registro);
-        //$res=array("id"=>,"nombre"=>$qwe['nombre']); listar_recibo_otras_cuentas cliente precio_restante
+        //$res=array("id"=>,"nombre"=>$qwe['nombre']); listar_recibo_otras_cuentas cliente precio_restante monto_total
         return $qwe['idgestion'];
     }
 }

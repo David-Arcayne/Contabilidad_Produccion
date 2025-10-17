@@ -516,11 +516,29 @@ while ($qwe = $this->dbc->fetch($registro)) {
 
             $caja= $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '$datos_caja[idcaja_bancos]'");
             $datos = $caja->fetch_assoc();
+
+            $caja_usuarios= $this->dbc->query("SELECT * FROM caja_banco_usuarios WHERE idcaja_bancos = '$datos[idcaja_bancos]' AND funcion = 'responsable'");
+
+            // Array para almacenar los datos completos de cada responsable
+            $responsables = array();
+            while ($usuario = $this->dbc->fetch($caja_usuarios)) {
+
+                $trabajador= $this->dbrh->query("SELECT * FROM trabajador WHERE idtrabajador = '$usuario[idtrabajador]'");
+                $trb = $trabajador->fetch_assoc();  
+
+                $responsables[] = array(
+                    "nombre" => $trb['nombre'],
+                    "apellido" => $trb['apellido'],
+                    "ci" => $trb['ci']
+                );
+            }
+
             $detalle_caja_bancos = array(
                 "idcaja_bancos" => $datos['idcaja_bancos'],
                 "codigo" => $datos['codigo'],
                 "nombre" => $datos['tipo_cuenta'],
                 "monto" => $datos_caja['total_monto'],
+                "responsables" => $responsables
                 
             );
             array_push($res['caja_bancos'], $detalle_caja_bancos);
@@ -830,6 +848,9 @@ while ($qwe = $this->dbc->fetch($registro)) {
             "caja_bancos" => []
         );
 
+        // $registro = $this->dbc->query("SELECT * FROM cuentaspof WHERE idcuentaspof = '$idrecibo'");
+        // $recib = $registro->fetch_assoc();
+
         $registro = $this->dbc->query("SELECT * FROM cuentaspor WHERE idcuentaspor = '$idcomprobante'");
         $comprobante = $registro->fetch_assoc();
 
@@ -838,8 +859,11 @@ while ($qwe = $this->dbc->fetch($registro)) {
         WHERE idcuentaspor = '$idcomprobante';");
 
     if ($factura_lista->num_rows > 0) {
-        while ($factu = $this->dbc->fetch($factura_lista)) {
-            $recibo= $this->dbc->query("SELECT * FROM recibo WHERE idotras_cuentas = '$factu[idotras_cuentas]'");
+        // while ($factu = $this->dbc->fetch($factura_lista)) {
+            // $recibo= $this->dbc->query("SELECT * FROM recibo WHERE idotras_cuentas = '$factu[idotras_cuentas]'");
+            // $rec = $recibo->fetch_assoc();
+
+            $recibo= $this->dbc->query("SELECT * FROM recibo WHERE idrecibo = '$comprobante[idrecibo]'");
             $rec = $recibo->fetch_assoc();
 
             // if($ft['cobrado'] != 0){
@@ -867,7 +891,7 @@ while ($qwe = $this->dbc->fetch($registro)) {
             );
 
             array_push($res['facturas'], $detalle_facturas);
-        }
+        // }
 
                 $caja_banco = $this->dbc->query("SELECT idcaja_bancos, SUM(monto) AS total_monto
                 FROM detalle_caja_bancos_pagar
@@ -878,11 +902,29 @@ while ($qwe = $this->dbc->fetch($registro)) {
 
             $caja= $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '$datos_caja[idcaja_bancos]'");
             $datos = $caja->fetch_assoc();
+    
+            $caja_usuarios= $this->dbc->query("SELECT * FROM caja_banco_usuarios WHERE idcaja_bancos = '$datos[idcaja_bancos]' AND funcion = 'responsable'");
+
+            // Array para almacenar los datos completos de cada responsable
+            $responsables = array();
+            while ($usuario = $this->dbc->fetch($caja_usuarios)) {
+
+                $trabajador= $this->dbrh->query("SELECT * FROM trabajador WHERE idtrabajador = '$usuario[idtrabajador]'");
+                $trb = $trabajador->fetch_assoc();  
+
+                $responsables[] = array(
+                    "nombre" => $trb['nombre'],
+                    "apellido" => $trb['apellido'],
+                    "ci" => $trb['ci']
+                );
+            }
+
             $detalle_caja_bancos = array(
                 "idcaja_bancos" => $datos['idcaja_bancos'],
                 "codigo" => $datos['codigo'],
                 "nombre" => $datos['tipo_cuenta'],
                 "monto" => $datos_caja['total_monto'],
+                "responsables" => $responsables
                 
             );
             array_push($res['caja_bancos'], $detalle_caja_bancos);
@@ -1289,5 +1331,5 @@ while ($qwe = $this->dbc->fetch($registro)) {
         $qwe = $this->dbe->fetch($registro);
         return $qwe['idsucursalcontable'];
     }
-    //listar_recibo_por_id_otras_cuentas_pagar precio_restante editar
+    //listar_recibo_por_id_otras_cuentas_pagar precio_restante editar monto_total
 }

@@ -21,7 +21,7 @@ require_once "./configuracion/firma_reporte.php";
 require_once "./configuracion/reporte_confi.php";
 require_once "./configuracion/rp_plantilla_reporte.php";
 require_once "./otras_cuentas/forma_pago.php";
-// require_once "./configuracion/plantilla_admin.php";
+require_once "./configuracion/plantilla_admin.php";
 // require_once "./recibos/caja_bancos_contrataciones.php";
 
 $ver=$_POST['ver'];
@@ -711,20 +711,28 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     $cont=new Plandecuentas();
     $cont->editar_agrupacion_rubro_plandecuenta($_POST['idagrupacion_rubro_plandecuenta'],$_POST['idtipo_plandecuenta'],$_POST['numero'],$_POST['empresa']);
     }
-    // elseif($ver=="registrar_balance_general_admin"){
-    //     if(isset($_POST['idplantilla_reporte'],$_POST['idtn'],$_POST['empresa'])){
-    //         $cont=new Plantilla_admin();
-    //         $cont->registrar_balance_general_admin($_POST['idplantilla_reporte'],$_POST['idtn'],$_POST['empresa']);
-    //     }else{
-    //         echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idplantilla_reporte'],$_POST['idtn'],$_POST['empresa']));
-    //     }
-    // }
+    elseif($ver=="registrar_balance_general_admin"){
+        if(isset($_POST['idplantilla_reporte'],$_POST['idtn'],$_POST['empresa'])){
+            $cont=new Plantilla_admin();
+            $cont->registrar_balance_general_admin($_POST['idplantilla_reporte'],$_POST['idtn'],$_POST['empresa']);
+        }else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idplantilla_reporte'],$_POST['idtn'],$_POST['empresa']));
+        }
+    }
     elseif($ver=="activar_desactivar_tipo_reportes"){
         if(isset($_POST['idtipo_reportes'],$_POST['tipo_reporte'],$_POST['empresa'])){
             $cont=new Reporte_confi();
             $cont->activar_desactivar_tipo_reportes($_POST['idtipo_reportes'],$_POST['tipo_reporte'],$_POST['empresa']);
         }else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idtipo_reportes'],$_POST['tipo_reporte'],$_POST['empresa']));
+        }
+    }
+    elseif($ver=="registrar_estado_resultados_admin"){
+        if(isset($_POST['idplantilla_reporte'],$_POST['idtn'],$_POST['empresa'])){
+            $cont=new Plantilla_admin();
+            $cont->registrar_estado_resultados_admin($_POST['idplantilla_reporte'],$_POST['idtn'],$_POST['empresa']);
+        }else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idplantilla_reporte'],$_POST['idtn'],$_POST['empresa']));
         }
     }
     

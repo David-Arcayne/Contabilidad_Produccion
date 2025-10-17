@@ -149,12 +149,15 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
 
             $existe_vincu_confi = $this->dbc->query("SELECT * FROM vinculacion_cuenta_depreciacion WHERE idtipo_reportes = '$idtipo_reportes'");
 
+            $existe_agru_plant = $this->dbc->query("SELECT * FROM agrupacion_plantilla WHERE idtipo_reportes = '$idtipo_reportes'");
+
             if($existe_vincu_confi->num_rows > 0){
                 $eliminar_vincu = $this->dbc->query("DELETE FROM vinculacion_cuenta_depreciacion WHERE idtipo_reportes = '$idtipo_reportes'");
 
-            }else{
-
-            }                                                                                                                             
+            }elseif($existe_agru_plant->num_rows > 0){
+                $eliminar_vincu = $this->dbc->query("DELETE FROM agrupacion_plantilla WHERE idtipo_reportes = '$idtipo_reportes'");
+            }   
+                                                                                                                                    
             $res = array("success", "se elimino exitosamente","rp_eliminar_reporte");
         } else {
             $res = array("danger", "No se pudo eliminar");

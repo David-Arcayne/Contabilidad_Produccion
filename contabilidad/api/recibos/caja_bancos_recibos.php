@@ -436,6 +436,7 @@ class Caja_bancos_recibos extends DB{
         $clientSelect = $cl->fetch_assoc();
         // NUNCA ENTRA A ESTA CONDICION
 
+        
         if($trans == "" && $asiento == ""){
             // se crea factura sin transaccion asignada
             //$trans = 0
@@ -3161,10 +3162,10 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             if($contrato_general->num_rows > 0){ // SI EXISTE CONTRATO GENERAL
                 $cg = $contrato_general->fetch_assoc();
                 $id_otras_cuentas_aux = $cg['idotras_cuentas'];
-            }else{ // NO EXISTE CONTRATO GENERAL ENTONCES LO CREAREMOS
+            }else{ // NO EXISTE CONTRATO GENERAL ENTONCES LO CREAREMOS caja_bancos
 
                 $reg_otrs_cuentas = $this->dbc->query("INSERT INTO otras_cuentas(fecha,pagado,cobrado,idempresa,registro_desde) 
-                VALUES ('$fecha','-1','-1','$idempresa',$registro_desde)");
+                VALUES ('$fecha','-1','-1','$idempresa','$registro_desde')");
         
                 $id_otras_cuentas_aux = $this->dbc->insert_id;
             }
@@ -3821,7 +3822,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         return $qwe['idusuario'];
 
     }    
-    // listar_recibo_por_caja_bancos array precio_restante registrar_recibo_pago_cajaBancos_en_facturas res4 registrar_recibo_cobro_cajaBancos_en_otras_cuentas
+    // listar_recibo_por_caja_bancos array precio_restante registrar_recibo_pago_cajaBancos_en_facturas res4 registrar_recibo_cobro_cajaBancos_en_otras_cuentas monto_total
 //registrar_factura_recibo_cobro_cajaBancos, registrar_factura_recibo_pago_cajaBancos registrar_recibo_cobro_cajaBancos_en_facturas caja_bancos listar_recibo_por_caja_bancos
 }
 ?>

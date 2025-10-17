@@ -416,11 +416,29 @@ if ($factura_lista->num_rows > 0) {
 
         $caja= $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '$datos_caja[idcaja_bancos]'");
         $datos = $caja->fetch_assoc();
+
+        $caja_usuarios= $this->dbc->query("SELECT * FROM caja_banco_usuarios WHERE idcaja_bancos = '$datos[idcaja_bancos]' AND funcion = 'responsable'");
+
+                // Array para almacenar los datos completos de cada responsable
+                $responsables = array();
+                while ($usuario = $this->dbc->fetch($caja_usuarios)) {
+
+                    $trabajador= $this->dbrh->query("SELECT * FROM trabajador WHERE idtrabajador = '$usuario[idtrabajador]'");
+                    $trb = $trabajador->fetch_assoc();  
+
+                    $responsables[] = array(
+                        "nombre" => $trb['nombre'],
+                        "apellido" => $trb['apellido'],
+                        "ci" => $trb['ci']
+                    );
+                }
+
         $detalle_caja_bancos = array(
             "idcaja_bancos" => $datos['idcaja_bancos'],
             "codigo" => $datos['codigo'],
             "nombre" => $datos['tipo_cuenta'],
             "monto" => $datos_caja['total_monto'],
+            "responsables" => $responsables
             
         );
         array_push($res['caja_bancos'], $detalle_caja_bancos);
