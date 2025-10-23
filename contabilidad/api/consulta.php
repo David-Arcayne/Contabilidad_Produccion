@@ -22,7 +22,7 @@ require_once "./configuracion/firma_reporte.php";
 require_once "./configuracion/reporte_confi.php";
 require_once "./configuracion/rp_plantilla_reporte.php";
 require_once "./otras_cuentas/forma_pago.php";
-// require_once "./configuracion/plantilla_admin.php";
+require_once "./configuracion/plantilla_admin.php";
 
 $ver=explode("/",$_GET['ver']); //dividiendo los "/"  ver[0],ver[1],ver[x]  listafacturaapi_pagado eliminarasiento tipo
 if($ver[0]=="verificacion"){
@@ -626,17 +626,19 @@ elseif($ver[0]=="listar_otras_cuentas_cobrar_select"){
     $cont=new PlantillaReporte();
     $cont->reporte_estado_resultados_actualizado_consolidado($ver[1],$ver[2],$ver[3],$ver[4]);
 }
-
-// elseif($ver[0]=="reporte_balance_general_admin"){
-//     $cont=new Plantilla_admin();
-//     $cont->reporte_balance_general_admin($ver[1]);
-// }
+elseif($ver[0]=="reporte_balance_general_admin"){
+    $cont=new Plantilla_admin();
+    $cont->reporte_balance_general_admin($ver[1],$ver[2]);
+}
 elseif($ver[0]=="listar_tipo_reportes_activos"){
     $cont=new Reporte_confi();
     $cont->listar_tipo_reportes_activos($ver[1],$ver[2]);
+}elseif($ver[0]=="listar_cuentas_NoVinculadas_subcuentas"){
+    $cont=new Plandecuentas();
+    $cont->listar_cuentas_NoVinculadas_subcuentas($ver[1],$ver[2]);
 }
 
-//   listar_recibo_por_id listar_recibo_facturas listar_factura_otras_cuentas listapagos_individuales listar_recibo_facturas_otras_cuentas
+//   listapagos_individuales listar_recibo_facturas_otras_cuentas listar_cuentas_NoVinculadas lista_plan_cuenta_no_vinculada lista_cobrar_cobrado
 //    listar_recibo_otras_cuentas  listar_recibo_otras_cuentas_pagar                  listar_recibo_pago_por_id        listar_recibo_por_id   --> caja bancos 
 // select_plantilla_estado_resultados listar_plantilla                                listar_recibo_por_id_otras_cuentas      listar_recibo_por_id_otras_cuentas_pagar ---> esos dos son de recibos
 

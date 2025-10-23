@@ -117,6 +117,7 @@ class Plandecuentas extends DB{
     // from plandecuenta where organizacion_idorganizacion='$ide' order by numero asc
         while ($row = $this->dbc->fetch($registro)) {
             // $impuesto = $this->getimpuesto($row['idimpuesto']);
+
             $plan = $this->getplandecuenta($row['idplandecuenta']);
             
             $lista[] = [
@@ -124,6 +125,43 @@ class Plandecuentas extends DB{
                 "numero" => $plan['numero'], //cod_cuenta
                 "nombreplan" => $plan['nombreplan'],// cuenta
             ];
+        }
+    
+        echo json_encode($lista, JSON_PRETTY_PRINT);
+    }
+    public function listar_cuentas_NoVinculadas_subcuentas($ide) {
+        $idempresa = $this->getidempresa($ide);
+        $lista = [];
+        $registro = $this->dbc->query("SELECT p.*
+                FROM plandecuenta p
+                LEFT JOIN vinculacion_cuenta_xcxp vc ON p.idplandecuenta = vc.idplandecuenta
+                WHERE vc.idplandecuenta IS NULL AND p.organizacion_idorganizacion='$idempresa' ORDER BY numero ASC;");
+    // select idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,organizacion_idorganizacion,idp 
+    // from plandecuenta where organizacion_idorganizacion='$ide' order by numero asc
+        while ($row = $this->dbc->fetch($registro)) {
+            // $impuesto = $this->getimpuesto($row['idimpuesto']);
+
+            $array_codigo = explode(".", $row['numero']); 
+            $aux = $this->dbc->query("SELECT nombreplan FROM plandecuenta WHERE numero >= $array_codigo[0] LIMIT 1");
+            $name_plan = $aux->fetch_assoc();
+
+            if($array_codigo[4] == '00' && $array_codigo[3] != '00'){ // 1.1.1.01.00
+                $pl_cuenta_padre = $this->dbc->query("SELECT * FROM plandecuenta WHERE idp = $row[idplandecuenta]");
+
+                if($pl_cuenta_padre->num_rows > 0){
+                    //no muestras la cuenta porque tiene una subcuenta mas
+                }else{
+                    $res = array("id" => $row['idplandecuenta'], "numero" => $row['numero'], "plan" => $row['nombreplan']);
+                    array_push($lista, $res);
+                }
+
+
+            }elseif($array_codigo[4] != '00' && $array_codigo[3] != '00'){ // 1.1.1.01.01
+                $res = array("id" => $row['idplandecuenta'], "numero" => $row['numero'], "plan" => $row['nombreplan']);
+                array_push($lista, $res);
+            }else{
+                //no listara la cuenta porque solo tiene hasta el 3er nivel 1.1.1.00.00
+            }
         }
     
         echo json_encode($lista, JSON_PRETTY_PRINT);

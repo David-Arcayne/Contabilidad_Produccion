@@ -552,12 +552,12 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         }
     }
     elseif($ver=="registrar_configuracion_reporte"){
-        if(isset($_POST['idplandecuenta'],$_POST['idplantilla_reporte'],$_POST['reporte'],$_POST['nombre_cuenta_superior'],$_POST['nivel_registrado'],$_POST['grupo'],$_POST['es_calculable'],$_POST['es_activo_fijo'],$_POST['empresa'])){
+        if(isset($_POST['idplandecuenta'],$_POST['idplantilla_reporte'],$_POST['reporte'],$_POST['nombre_cuenta_superior'],$_POST['nivel_registrado'],$_POST['grupo'],$_POST['es_calculable'],$_POST['es_activo_fijo'],$_POST['negrilla_cursiva'],$_POST['empresa'])){
             $cont=new Reporte_confi();
-            $cont->registrar_configuracion_reporte($_POST['idplandecuenta'],$_POST['idplantilla_reporte'],$_POST['reporte'],$_POST['nombre_cuenta_superior'],$_POST['nivel_registrado'],$_POST['grupo'],$_POST['es_calculable'],$_POST['es_activo_fijo'],$_POST['empresa']);
+            $cont->registrar_configuracion_reporte($_POST['idplandecuenta'],$_POST['idplantilla_reporte'],$_POST['reporte'],$_POST['nombre_cuenta_superior'],$_POST['nivel_registrado'],$_POST['grupo'],$_POST['es_calculable'],$_POST['es_activo_fijo'],$_POST['negrilla_cursiva'],$_POST['empresa']);
         }
         else{
-            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idplandecuenta'],$_POST['idplantilla_reporte'],$_POST['reporte'],$_POST['nombre_cuenta_superior'],$_POST['nivel_registrado'],$_POST['grupo'],$_POST['es_calculable'],$_POST['es_activo_fijo'],$_POST['empresa']));
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idplandecuenta'],$_POST['idplantilla_reporte'],$_POST['reporte'],$_POST['nombre_cuenta_superior'],$_POST['nivel_registrado'],$_POST['grupo'],$_POST['es_calculable'],$_POST['es_activo_fijo'],$_POST['negrilla_cursiva'],$_POST['empresa']));
         }
     }
     elseif($ver=="registrar_vinculacion_depreciacion"){
@@ -569,12 +569,12 @@ if($data['ver'] == "asignar_asiento_A_factura") {
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idcuenta'],$_POST['idcuenta_depreciacion'],$_POST['idtipo_reportes'],$_POST['empresa']));
         }
     }elseif($ver=="editar_configuracion_reporte"){
-        if(isset($_POST['idconfiguracion_reporte'],$_POST['idplandecuenta'],$_POST['es_activo_fijo'],$_POST['es_calculable'],$_POST['empresa'])){
+        if(isset($_POST['idconfiguracion_reporte'],$_POST['idplandecuenta'],$_POST['es_activo_fijo'],$_POST['es_calculable'],$_POST['negrilla_cursiva'],$_POST['empresa'])){
             $cont=new Reporte_confi();
-            $cont->editar_configuracion_reporte($_POST['idconfiguracion_reporte'],$_POST['idplandecuenta'],$_POST['es_activo_fijo'],$_POST['es_calculable'],$_POST['empresa']);
+            $cont->editar_configuracion_reporte($_POST['idconfiguracion_reporte'],$_POST['idplandecuenta'],$_POST['es_activo_fijo'],$_POST['es_calculable'],$_POST['negrilla_cursiva'],$_POST['empresa']);
         }
         else{
-            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idconfiguracion_reporte'],$_POST['idplandecuenta'],$_POST['es_activo_fijo'],$_POST['es_calculable'],$_POST['empresa']));
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idconfiguracion_reporte'],$_POST['idplandecuenta'],$_POST['es_activo_fijo'],$_POST['es_calculable'],$_POST['negrilla_cursiva'],$_POST['empresa']));
         }
     }elseif($ver=="registrar_tipo_reportes"){
         if(isset($_POST['nombre'],$_POST['descripcion'],$_POST['tipo_reporte'],$_POST['empresa'])){
@@ -595,20 +595,20 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     }
 
     elseif($ver=="rp_registrar_plantilla"){
-        if((isset($_POST['idplandecuenta']) || isset($_POST['nombre_personalizado'])) && isset($_POST['idplantilla_reporte'],$_POST['idplantilla_padre'],$_POST['tipo_operacion'],$_POST['nivel'],$_POST['orden'],$_POST['ingreso_egreso'],$_POST['idempresa'])){
+        if((isset($_POST['idplandecuenta']) || isset($_POST['nombre_personalizado'])) && isset($_POST['idplantilla_reporte'],$_POST['idplantilla_padre'],$_POST['tipo_operacion'],$_POST['nivel'],$_POST['orden'],$_POST['ingreso_egreso'],$_POST['negrilla_cursiva'],$_POST['idempresa'])){
             $cont=new PlantillaReporte();
-            $cont->registrar_plantilla($_POST['idplantilla_reporte'],$_POST['idplantilla_padre'],$_POST['idplandecuenta']??NULL,$_POST['nombre_personalizado']??NULL,$_POST['tipo_operacion'],$_POST['nivel'],$_POST['orden'],$_POST['disponible_para_otro_reporte']??NULL,$_POST['ingreso_egreso'],$_POST['idempresa']);
+            $cont->registrar_plantilla($_POST['idplantilla_reporte'],$_POST['idplantilla_padre'],$_POST['idplandecuenta']??NULL,$_POST['nombre_personalizado']??NULL,$_POST['tipo_operacion'],$_POST['nivel'],$_POST['orden'],$_POST['disponible_para_otro_reporte']??NULL,$_POST['ingreso_egreso'],$_POST['negrilla_cursiva'],$_POST['idempresa']);
         }
         else{
-            echo json_encode(array("danger", "Faltan parámetros en la solicitud",($_POST['idplandecuenta'] ?? $_POST['nombre_personalizado']),$_POST['idplantilla_reporte'],$_POST['idplantilla_padre'],$_POST['tipo_operacion'],$_POST['nivel'],$_POST['orden'],$_POST['ingreso_egreso'],$_POST['idempresa']));
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",($_POST['idplandecuenta'] ?? $_POST['nombre_personalizado']),$_POST['idplantilla_reporte'],$_POST['idplantilla_padre'],$_POST['tipo_operacion'],$_POST['nivel'],$_POST['orden'],$_POST['ingreso_egreso'],$_POST['negrilla_cursiva'],$_POST['idempresa']));
         }
     }elseif($ver=="rp_editar_plantilla"){//$idplantilla, $idplandecuenta, $nombre_personalizado, $tipo_operacion, $orden, $idplantilla_padre, $empresa
-        if(isset($_POST['idplantilla'],$_POST['idplandecuenta'],$_POST['nombre_personalizado'],$_POST['tipo_operacion'],$_POST['orden'],$_POST['idplantilla_padre'],$_POST['empresa'])){
+        if(isset($_POST['idplantilla'],$_POST['idplandecuenta'],$_POST['nombre_personalizado'],$_POST['tipo_operacion'],$_POST['orden'],$_POST['idplantilla_padre'],$_POST['negrilla_cursiva'],$_POST['empresa'])){
             $cont=new PlantillaReporte();
-            $cont->rp_editar_plantilla($_POST['idplantilla'],$_POST['idplandecuenta'],$_POST['nombre_personalizado'],$_POST['tipo_operacion'],$_POST['orden'],$_POST['idplantilla_padre'],$_POST['empresa']);
+            $cont->rp_editar_plantilla($_POST['idplantilla'],$_POST['idplandecuenta'],$_POST['nombre_personalizado'],$_POST['tipo_operacion'],$_POST['orden'],$_POST['idplantilla_padre'],$_POST['negrilla_cursiva'],$_POST['empresa']);
         }
         else{
-            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idplantilla'],$_POST['idplandecuenta'],$_POST['nombre_personalizado'],$_POST['tipo_operacion'],$_POST['orden'],$_POST['idplantilla_padre'],$_POST['empresa']));
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idplantilla'],$_POST['idplandecuenta'],$_POST['nombre_personalizado'],$_POST['tipo_operacion'],$_POST['orden'],$_POST['idplantilla_padre'],$_POST['negrilla_cursiva'],$_POST['empresa']));
         }
     }elseif($ver=="registrar_agrupacion_plantilla"){
         if(isset($_POST['idplantilla_padre'],$_POST['idplantilla_hijo'],$_POST['tipo_operacion'],$_POST['monto'],$_POST['idempresa'])){
@@ -736,7 +736,7 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         }
     }
     
-//  vincula  -- crearfacturasf5 registrar_factura_cobro registrar_factura_cobro_otras_cuentas --> aumentar usuario 
+//  vincula  -- crearfacturasf5 registrar_factura_cobro registrar_factura_cobro_otras_cuentas --> aumentar usuario registrar_factura_cobros_tributario
 //  registrocobrarfacturaGrupal crearfacturas caja_bancos registrar_factura_pago registrar_otras_cuentas registrar_recibo_otras_cuentas--> aumentar usuario creartransaccion
 }//   asignar_asiento registrar_transaccion_recibo asignar_asiento registrar_plantilla cierre reasignar registrar_transaccion
 ?> 

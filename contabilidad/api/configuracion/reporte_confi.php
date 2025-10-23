@@ -166,7 +166,8 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
     }
 
     //-----------------------------------------------------------------------------
-    public function registrar_configuracion_reporte($idplandecuenta,$idplantilla_reporte,$reporte,$nombre_cuenta_superior,$nivel,$grupo,$es_calculable,$es_activo_fijo,$empresa){
+    public function registrar_configuracion_reporte($idplandecuenta,$idplantilla_reporte,$reporte,$nombre_cuenta_superior,$nivel,$grupo,$es_calculable,$es_activo_fijo,$negrilla_cursiva,$empresa){
+      
         // $idempresa = Empresa::getidempresa($empresa);
         $idempresa = $this->getidempresa($empresa);
         // $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM divisa WHERE nombre = '$nombre' AND idempresa = '$idempresa'");
@@ -180,8 +181,8 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
             $orden_ulti = $resultado['total'] + 1;
 
                 // Insertar el nuevo registro
-                $registroProveedor = $this->dbc->query("INSERT INTO configuracion_reporte(idplandecuenta,idplantilla_reporte,reporte,nombre_cuenta_superior,nivel_registrado,orden,grupo,es_calculable,es_activo_fijo,idempresa) 
-                VALUES ('$idplandecuenta','$idplantilla_reporte','$reporte','$nombre_cuenta_superior','$nivel','$orden_ulti','$grupo','$es_calculable','$es_activo_fijo','$idempresa')");
+                $registroProveedor = $this->dbc->query("INSERT INTO configuracion_reporte(idplandecuenta,idplantilla_reporte,reporte,nombre_cuenta_superior,nivel_registrado,orden,grupo,es_calculable,es_activo_fijo,negrilla_cursiva,idempresa) 
+                VALUES ('$idplandecuenta','$idplantilla_reporte','$reporte','$nombre_cuenta_superior','$nivel','$orden_ulti','$grupo','$es_calculable','$es_activo_fijo','$negrilla_cursiva','$idempresa')");
                 if ($registroProveedor === TRUE) {                                                                                                                                                                
                     $res = array("success", "Registro exitoso","registroCaracteristicas");
                 } else {
@@ -299,6 +300,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                 "es_calculable" => $qwe2['es_calculable'],
                 "orden" => $qwe2['orden'],
                 "es_depreciacion" => $es_depreciacion,
+                "negrilla_cursiva" => $qwe2['negrilla_cursiva'],
                 "nivel_2" => [] //activo
                 // "nivel_3" => $qwe['nombre'],// 
                 // "estado" => $qwe['estado']
@@ -328,6 +330,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                 "es_calculable" => $qwe3['es_calculable'],
                 "orden" => $qwe3['orden'],
                 "es_depreciacion" => $es_depreciacion,
+                "negrilla_cursiva" => $qwe3['negrilla_cursiva'],
                 "nivel_3" => [] //activo
                 // "nivel_3" => $qwe['nombre'],// 
                 // "estado" => $qwe['estado']
@@ -356,6 +359,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                     "es_calculable" => $qwe4['es_calculable'],
                     "orden" => $qwe4['orden'],
                     "es_depreciacion" => $es_depreciacion,
+                    "negrilla_cursiva" => $qwe4['negrilla_cursiva'],
                     "nivel_4" => [] //activo
                     );
                     $get_nivel_5 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta3[nombreplan]' AND reporte = '$qwe[reporte]' AND idempresa='$idempresa'
@@ -382,6 +386,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                         "es_calculable" => $qwe5['es_calculable'],
                         "orden" => $qwe5['orden'],
                         "es_depreciacion" => $es_depreciacion,
+                        "negrilla_cursiva" => $qwe5['negrilla_cursiva'],
                         "nivel_5" => [] //activo
                         );
                 //----------------------------------------------------------------------------
@@ -400,6 +405,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                         "es_calculable" => $qwe6['es_calculable'],
                         "orden" => $qwe6['orden'],
                         "es_depreciacion" => $es_depreciacion,
+                        "negrilla_cursiva" => $qwe6['negrilla_cursiva'],
                         "nivel_5" => [] //activo
                         );
                         
@@ -921,6 +927,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                     $res2 = array(
                     "idconfiguracion_reporte" => $qwe2['idconfiguracion_reporte'],
                     "grupo" => $qwe2['grupo'],
+                    "negrilla_cursiva" => $qwe2['negrilla_cursiva'],
                     "es_calculable" => $qwe2['es_calculable'],
                     "idplandecuenta" => $nombre_cuenta['idplandecuenta'],
                     "codigo" => $nombre_cuenta['numero'],
@@ -943,6 +950,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                     $res3 = array(
                     "idconfiguracion_reporte" => $qwe3['idconfiguracion_reporte'],
                     "grupo" => $qwe3['grupo'],
+                    "negrilla_cursiva" => $qwe3['negrilla_cursiva'],
                     "es_calculable" => $qwe3['es_calculable'],
                     "idplandecuenta" => $nombre_cuenta2['idplandecuenta'],
                     "codigo" => $nombre_cuenta2['numero'],
@@ -990,6 +998,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                     $res4 = array(
                                 "idconfiguracion_reporte" => $qwe4['idconfiguracion_reporte'],
                                 "grupo" => $qwe4['grupo'],
+                                "negrilla_cursiva" => $qwe4['negrilla_cursiva'],
                                 "es_calculable" => $qwe4['es_calculable'],
                                 "idplandecuenta" => $nombre_cuenta3['idplandecuenta'],   
                                 "codigo" => $nombre_cuenta3['numero'], 
@@ -1017,6 +1026,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                 $res4 = array(
                                 "idconfiguracion_reporte" => $qwe4['idconfiguracion_reporte'],
                                 "grupo" => $qwe4['grupo'],
+                                "negrilla_cursiva" => $qwe4['negrilla_cursiva'],
                                 "es_calculable" => $qwe4['es_calculable'],
                                 "idplandecuenta" => $nombre_cuenta3['idplandecuenta'],  
                                 "codigo" => $nombre_cuenta3['numero'],  
@@ -1045,6 +1055,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                     $res4 = array(
                                     "idconfiguracion_reporte" => $qwe4['idconfiguracion_reporte'],
                                     "grupo" => $qwe4['grupo'],
+                                    "negrilla_cursiva" => $qwe4['negrilla_cursiva'],
                                     "es_calculable" => $qwe4['es_calculable'],
                                     "idplandecuenta" => $nombre_cuenta3['idplandecuenta'], 
                                     "codigo" => $nombre_cuenta3['numero'],   
@@ -1062,6 +1073,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                              $res4 = array(
                         "idconfiguracion_reporte" => $qwe4['idconfiguracion_reporte'],
                         "grupo" => $qwe4['grupo'],
+                        "negrilla_cursiva" => $qwe4['negrilla_cursiva'],
                         "es_calculable" => $qwe4['es_calculable'],
                         "idplandecuenta" => $nombre_cuenta3['idplandecuenta'],  
                         "codigo" => $nombre_cuenta3['numero'], 
@@ -1113,6 +1125,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                     $res5 = array(
                                     "idconfiguracion_reporte" => $qwe5['idconfiguracion_reporte'],
                                     "grupo" => $qwe5['grupo'],
+                                    "negrilla_cursiva" => $qwe5['negrilla_cursiva'],
                                     "es_calculable" => $qwe5['es_calculable'],
                                     "idplandecuenta" => $nombre_cuenta4['idplandecuenta'],   
                                     "codigo" => $nombre_cuenta4['numero'], 
@@ -1138,6 +1151,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                     $res5 = array(
                                     "idconfiguracion_reporte" => $qwe5['idconfiguracion_reporte'],
                                     "grupo" => $qwe5['grupo'],
+                                    "negrilla_cursiva" => $qwe5['negrilla_cursiva'],
                                     "es_calculable" => $qwe5['es_calculable'],
                                     "idplandecuenta" => $nombre_cuenta4['idplandecuenta'],  
                                     "codigo" => $nombre_cuenta4['numero'],  
@@ -1167,6 +1181,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                     $res5 = array(
                                     "idconfiguracion_reporte" => $qwe5['idconfiguracion_reporte'],
                                     "grupo" => $qwe5['grupo'],
+                                    "negrilla_cursiva" => $qwe5['negrilla_cursiva'],
                                     "es_calculable" => $qwe5['es_calculable'],
                                     "idplandecuenta" => $nombre_cuenta4['idplandecuenta'], 
                                     "codigo" => $nombre_cuenta4['numero'],   
@@ -1184,6 +1199,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                          $res5 = array(
                         "idconfiguracion_reporte" => $qwe5['idconfiguracion_reporte'],
                         "grupo" => $qwe5['grupo'],
+                        "negrilla_cursiva" => $qwe5['negrilla_cursiva'],
                         "es_calculable" => $qwe5['es_calculable'],
                         "idplandecuenta" => $nombre_cuenta4['idplandecuenta'],  
                         "codigo" => $nombre_cuenta4['numero'], 
@@ -1214,6 +1230,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                     $res6 = array(
                                 "idconfiguracion_reporte" => $qwe6['idconfiguracion_reporte'],
                                 "grupo" => $qwe6['grupo'],
+                                "negrilla_cursiva" => $qwe6['negrilla_cursiva'],
                                 "es_calculable" => $qwe6['es_calculable'],
                                 "idplandecuenta" => $nombre_cuenta5['idplandecuenta'], 
                                 "codigo" => $nombre_cuenta5['numero'],   
@@ -1267,6 +1284,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                     $res2 = array(
                     "idconfiguracion_reporte" => $qwe2['idconfiguracion_reporte'],
                     "grupo" => $qwe2['grupo'],
+                    "negrilla_cursiva" => $qwe2['negrilla_cursiva'],
                     "es_calculable" => $qwe2['es_calculable'],
                     "idplandecuenta" => $nombre_cuenta['idplandecuenta'],
                     "codigo" => $nombre_cuenta['numero'],
@@ -1290,6 +1308,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                     $res3 = array(
                     "idconfiguracion_reporte" => $qwe3['idconfiguracion_reporte'],
                     "grupo" => $qwe3['grupo'],
+                    "negrilla_cursiva" => $qwe3['negrilla_cursiva'],
                     "es_calculable" => $qwe3['es_calculable'],
                     "idplandecuenta" => $nombre_cuenta2['idplandecuenta'],
                     "codigo" => $nombre_cuenta2['numero'],
@@ -1322,6 +1341,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                     $res4 = array(
                                     "idconfiguracion_reporte" => $qwe4['idconfiguracion_reporte'],
                                     "grupo" => $qwe4['grupo'],
+                                    "negrilla_cursiva" => $qwe4['negrilla_cursiva'],
                                     "es_calculable" => $qwe4['es_calculable'],
                                     "idplandecuenta" => $nombre_cuenta3['idplandecuenta'], 
                                     "codigo" => $nombre_cuenta3['numero'],   
@@ -1337,6 +1357,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                              $res4 = array(
                         "idconfiguracion_reporte" => $qwe4['idconfiguracion_reporte'],
                         "grupo" => $qwe4['grupo'],
+                        "negrilla_cursiva" => $qwe4['negrilla_cursiva'],
                         "es_calculable" => $qwe4['es_calculable'],
                         "idplandecuenta" => $nombre_cuenta3['idplandecuenta'],  
                         "codigo" => $nombre_cuenta3['numero'], 
@@ -1373,6 +1394,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                     $res5 = array(
                                     "idconfiguracion_reporte" => $qwe5['idconfiguracion_reporte'],
                                     "grupo" => $qwe5['grupo'],
+                                    "negrilla_cursiva" => $qwe5['negrilla_cursiva'],
                                     "es_calculable" => $qwe5['es_calculable'],
                                     "idplandecuenta" => $nombre_cuenta4['idplandecuenta'], 
                                     "codigo" => $nombre_cuenta4['numero'],   
@@ -1388,6 +1410,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                          $res5 = array(
                         "idconfiguracion_reporte" => $qwe5['idconfiguracion_reporte'],
                         "grupo" => $qwe5['grupo'],
+                        "negrilla_cursiva" => $qwe5['negrilla_cursiva'],
                         "es_calculable" => $qwe5['es_calculable'],
                         "idplandecuenta" => $nombre_cuenta4['idplandecuenta'],  
                         "codigo" => $nombre_cuenta4['numero'], 
@@ -1418,6 +1441,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                     $res6 = array(
                                 "idconfiguracion_reporte" => $qwe6['idconfiguracion_reporte'],
                                 "grupo" => $qwe6['grupo'],
+                                "negrilla_cursiva" => $qwe6['negrilla_cursiva'],
                                 "es_calculable" => $qwe6['es_calculable'],
                                 "idplandecuenta" => $nombre_cuenta5['idplandecuenta'], 
                                 "codigo" => $nombre_cuenta5['numero'],   
@@ -1470,6 +1494,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                     $res2 = array(
                     "idconfiguracion_reporte" => $qwe2['idconfiguracion_reporte'],
                     "grupo" => $qwe2['grupo'],
+                    "negrilla_cursiva" => $qwe2['negrilla_cursiva'],
                     "es_calculable" => $qwe2['es_calculable'],
                     "idplandecuenta" => $nombre_cuenta['idplandecuenta'],
                     "codigo" => $nombre_cuenta['numero'],
@@ -1500,6 +1525,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                 $res3 = array(
                                 "idconfiguracion_reporte" => $qwe3['idconfiguracion_reporte'],
                                 "grupo" => $qwe3['grupo'],
+                                "negrilla_cursiva" => $qwe3['negrilla_cursiva'],
                                 "es_calculable" => $qwe3['es_calculable'],
                                 "idplandecuenta" => $nombre_cuenta2['idplandecuenta'],
                                 "codigo" => $nombre_cuenta2['numero'],
@@ -1549,6 +1575,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                     $res2 = array(
                     "idconfiguracion_reporte" => $qwe2['idconfiguracion_reporte'],
                     "grupo" => $qwe2['grupo'],
+                    "negrilla_cursiva" => $qwe2['negrilla_cursiva'],
                     "es_calculable" => $qwe2['es_calculable'],
                     "idplandecuenta" => $nombre_cuenta['idplandecuenta'],
                     "codigo" => $nombre_cuenta['numero'],
@@ -1572,6 +1599,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                     $res3 = array(
                     "idconfiguracion_reporte" => $qwe3['idconfiguracion_reporte'],
                     "grupo" => $qwe3['grupo'],
+                    "negrilla_cursiva" => $qwe3['negrilla_cursiva'],
                     "es_calculable" => $qwe3['es_calculable'],
                     "idplandecuenta" => $nombre_cuenta2['idplandecuenta'],
                     "codigo" => $nombre_cuenta2['numero'],
@@ -1619,6 +1647,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                     $res4 = array(
                                 "idconfiguracion_reporte" => $qwe4['idconfiguracion_reporte'],
                                 "grupo" => $qwe4['grupo'],
+                                "negrilla_cursiva" => $qwe4['negrilla_cursiva'],
                                 "es_calculable" => $qwe4['es_calculable'],
                                 "idplandecuenta" => $nombre_cuenta3['idplandecuenta'],   
                                 "codigo" => $nombre_cuenta3['numero'], 
@@ -1646,6 +1675,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                 $res4 = array(
                                 "idconfiguracion_reporte" => $qwe4['idconfiguracion_reporte'],
                                 "grupo" => $qwe4['grupo'],
+                                "negrilla_cursiva" => $qwe4['negrilla_cursiva'],
                                 "es_calculable" => $qwe4['es_calculable'],
                                 "idplandecuenta" => $nombre_cuenta3['idplandecuenta'],  
                                 "codigo" => $nombre_cuenta3['numero'],  
@@ -1674,6 +1704,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                     $res4 = array(
                                     "idconfiguracion_reporte" => $qwe4['idconfiguracion_reporte'],
                                     "grupo" => $qwe4['grupo'],
+                                    "negrilla_cursiva" => $qwe4['negrilla_cursiva'],
                                     "es_calculable" => $qwe4['es_calculable'],
                                     "idplandecuenta" => $nombre_cuenta3['idplandecuenta'], 
                                     "codigo" => $nombre_cuenta3['numero'],   
@@ -1691,6 +1722,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                              $res4 = array(
                         "idconfiguracion_reporte" => $qwe4['idconfiguracion_reporte'],
                         "grupo" => $qwe4['grupo'],
+                        "negrilla_cursiva" => $qwe4['negrilla_cursiva'],
                         "es_calculable" => $qwe4['es_calculable'],
                         "idplandecuenta" => $nombre_cuenta3['idplandecuenta'],  
                         "codigo" => $nombre_cuenta3['numero'], 
@@ -1742,6 +1774,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                     $res5 = array(
                                     "idconfiguracion_reporte" => $qwe5['idconfiguracion_reporte'],
                                     "grupo" => $qwe5['grupo'],
+                                    "negrilla_cursiva" => $qwe5['negrilla_cursiva'],
                                     "es_calculable" => $qwe5['es_calculable'],
                                     "idplandecuenta" => $nombre_cuenta4['idplandecuenta'],   
                                     "codigo" => $nombre_cuenta4['numero'], 
@@ -1767,6 +1800,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                     $res5 = array(
                                     "idconfiguracion_reporte" => $qwe5['idconfiguracion_reporte'],
                                     "grupo" => $qwe5['grupo'],
+                                    "negrilla_cursiva" => $qwe5['negrilla_cursiva'],
                                     "es_calculable" => $qwe5['es_calculable'],
                                     "idplandecuenta" => $nombre_cuenta4['idplandecuenta'],  
                                     "codigo" => $nombre_cuenta4['numero'],  
@@ -1796,6 +1830,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                     $res5 = array(
                                     "idconfiguracion_reporte" => $qwe5['idconfiguracion_reporte'],
                                     "grupo" => $qwe5['grupo'],
+                                    "negrilla_cursiva" => $qwe5['negrilla_cursiva'],
                                     "es_calculable" => $qwe5['es_calculable'],
                                     "idplandecuenta" => $nombre_cuenta4['idplandecuenta'], 
                                     "codigo" => $nombre_cuenta4['numero'],   
@@ -1813,6 +1848,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                          $res5 = array(
                         "idconfiguracion_reporte" => $qwe5['idconfiguracion_reporte'],
                         "grupo" => $qwe5['grupo'],
+                        "negrilla_cursiva" => $qwe5['negrilla_cursiva'],
                         "es_calculable" => $qwe5['es_calculable'],
                         "idplandecuenta" => $nombre_cuenta4['idplandecuenta'],  
                         "codigo" => $nombre_cuenta4['numero'], 
@@ -1843,6 +1879,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                     $res6 = array(
                                 "idconfiguracion_reporte" => $qwe6['idconfiguracion_reporte'],
                                 "grupo" => $qwe5['grupo'],
+                                "negrilla_cursiva" => $qwe5['negrilla_cursiva'],
                                 "es_calculable" => $qwe5['es_calculable'],
                                 "idplandecuenta" => $nombre_cuenta5['idplandecuenta'], 
                                 "codigo" => $nombre_cuenta5['numero'],   
@@ -1896,6 +1933,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                     $res2 = array(
                     "idconfiguracion_reporte" => $qwe2['idconfiguracion_reporte'],
                     "grupo" => $qwe2['grupo'],
+                    "negrilla_cursiva" => $qwe2['negrilla_cursiva'],
                     "es_calculable" => $qwe2['es_calculable'],
                     "idplandecuenta" => $nombre_cuenta['idplandecuenta'],
                     "codigo" => $nombre_cuenta['numero'],
@@ -1920,6 +1958,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                     $res3 = array(
                     "idconfiguracion_reporte" => $qwe3['idconfiguracion_reporte'],
                     "grupo" => $qwe3['grupo'],
+                    "negrilla_cursiva" => $qwe3['negrilla_cursiva'],
                     "es_calculable" => $qwe3['es_calculable'],
                     "idplandecuenta" => $nombre_cuenta2['idplandecuenta'],
                     "codigo" => $nombre_cuenta2['numero'],
@@ -1952,6 +1991,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                     $res4 = array(
                                     "idconfiguracion_reporte" => $qwe4['idconfiguracion_reporte'],
                                     "grupo" => $qwe4['grupo'],
+                                    "negrilla_cursiva" => $qwe4['negrilla_cursiva'],
                                     "es_calculable" => $qwe4['es_calculable'],
                                     "idplandecuenta" => $nombre_cuenta3['idplandecuenta'], 
                                     "codigo" => $nombre_cuenta3['numero'],   
@@ -1967,6 +2007,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                              $res4 = array(
                         "idconfiguracion_reporte" => $qwe4['idconfiguracion_reporte'],
                         "grupo" => $qwe4['grupo'],
+                        "negrilla_cursiva" => $qwe4['negrilla_cursiva'],
                         "es_calculable" => $qwe4['es_calculable'],
                         "idplandecuenta" => $nombre_cuenta3['idplandecuenta'],  
                         "codigo" => $nombre_cuenta3['numero'], 
@@ -2003,6 +2044,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                     $res5 = array(
                                     "idconfiguracion_reporte" => $qwe5['idconfiguracion_reporte'],
                                     "grupo" => $qwe5['grupo'],
+                                    "negrilla_cursiva" => $qwe5['negrilla_cursiva'],
                                     "es_calculable" => $qwe5['es_calculable'],
                                     "idplandecuenta" => $nombre_cuenta4['idplandecuenta'], 
                                     "codigo" => $nombre_cuenta4['numero'],   
@@ -2018,6 +2060,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                          $res5 = array(
                         "idconfiguracion_reporte" => $qwe5['idconfiguracion_reporte'],
                         "grupo" => $qwe5['grupo'],
+                        "negrilla_cursiva" => $qwe5['negrilla_cursiva'],
                         "es_calculable" => $qwe5['es_calculable'],
                         "idplandecuenta" => $nombre_cuenta4['idplandecuenta'],  
                         "codigo" => $nombre_cuenta4['numero'], 
@@ -2048,6 +2091,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                     $res6 = array(
                                 "idconfiguracion_reporte" => $qwe6['idconfiguracion_reporte'],
                                 "grupo" => $qwe6['grupo'],
+                                "negrilla_cursiva" => $qwe6['negrilla_cursiva'],
                                 "es_calculable" => $qwe6['es_calculable'],
                                 "idplandecuenta" => $nombre_cuenta5['idplandecuenta'], 
                                 "codigo" => $nombre_cuenta5['numero'],   
@@ -2100,6 +2144,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                     $res2 = array(
                     "idconfiguracion_reporte" => $qwe2['idconfiguracion_reporte'],
                     "grupo" => $qwe2['grupo'],
+                    "negrilla_cursiva" => $qwe2['negrilla_cursiva'],
                     "es_calculable" => $qwe2['es_calculable'],
                     "idplandecuenta" => $nombre_cuenta['idplandecuenta'],
                     "codigo" => $nombre_cuenta['numero'],
@@ -2130,6 +2175,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                 $res3 = array(
                                 "idconfiguracion_reporte" => $qwe3['idconfiguracion_reporte'],
                                 "grupo" => $qwe3['grupo'],
+                                "negrilla_cursiva" => $qwe3['negrilla_cursiva'],
                                 "es_calculable" => $qwe3['es_calculable'],
                                 "idplandecuenta" => $nombre_cuenta2['idplandecuenta'],
                                 "codigo" => $nombre_cuenta2['numero'],
@@ -2152,7 +2198,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
         // array_push($lista, $res2);
         echo json_encode($lista, JSON_NUMERIC_CHECK);  
     }
-    public function editar_configuracion_reporte($id,$idplandecuenta,$es_activo_fijo,$es_calculable,$empresa) {
+    public function editar_configuracion_reporte($id,$idplandecuenta,$es_activo_fijo,$es_calculable,$negrilla_cursiva,$empresa) {
         $idempresa = $this->getidempresa($empresa);
         
         $confi = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE idconfiguracion_reporte = '$id'");
@@ -2167,12 +2213,13 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                 OR idcuenta_depreciacion = '$res_confi[idplandecuenta]'
                 ");
 
-        $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM configuracion_reporte WHERE idplandecuenta = '$idplandecuenta' AND idempresa = '$idempresa' AND idconfiguracion_reporte != '$id'");
+        $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM configuracion_reporte 
+        WHERE idplandecuenta = '$idplandecuenta' AND idempresa = '$idempresa' AND idconfiguracion_reporte != '$id' AND idplantilla_reporte ='$res_confi[idplantilla_reporte]'");
         $resultado = $consulta->fetch_assoc();
         $totalRegistros = $resultado['total'];
 
         if ($totalRegistros > 0) {
-            $res = array("danger", "El registro ya existe","editarCaracteristicas");
+            $res = array("danger", "El registro ya existe","editarCaracteristicassss");
         }else {
             if($existe_en_vinculacion->num_rows > 0){
                 $res_existe_vincu = $existe_en_vinculacion->fetch_assoc();
@@ -2195,7 +2242,8 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                 $update_confi = $this->dbc->query("UPDATE configuracion_reporte
                                     SET idplandecuenta = '$idplandecuenta',
                                     es_activo_fijo = '$es_activo_fijo',
-                                    es_calculable = '$es_calculable'
+                                    es_calculable = '$es_calculable',
+                                    negrilla_cursiva = '$negrilla_cursiva'
                                     WHERE idconfiguracion_reporte = '$id';");
             }
             // Insertar el nuevo registro

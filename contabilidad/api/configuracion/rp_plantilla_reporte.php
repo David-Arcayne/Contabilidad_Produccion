@@ -82,7 +82,7 @@ class PlantillaReporte extends DB{
     {
         $filtro_padre = is_null($idpadre) ? "p.idplantilla_padre IS NULL" : "p.idplantilla_padre = $idpadre";
 
-        $sql = "SELECT p.idplantilla, p.idplantilla_padre, p.idplandecuenta, p.nombre_personalizado, p.tipo_operacion, p.nivel, p.orden, p.disponible_para_otro_reporte, pc.nombreplan,pc.numero
+        $sql = "SELECT p.idplantilla, p.idplantilla_padre, p.idplandecuenta, p.nombre_personalizado, p.tipo_operacion, p.nivel, p.orden, p.disponible_para_otro_reporte,p.negrilla_cursiva, pc.nombreplan,pc.numero
             FROM pr_plantilla p
             LEFT JOIN plandecuenta pc ON pc.idplandecuenta = p.idplandecuenta
             WHERE p.idplantilla_reporte = $idreporte
@@ -97,6 +97,7 @@ class PlantillaReporte extends DB{
             $nodo = [
                 "idplantilla" => $row['idplantilla'],
                 "tipo_operacion" => $row['tipo_operacion'],
+                "negrilla_cursiva" => $row['negrilla_cursiva'],
                 "idplantilla_padre" => $row['idplantilla_padre'],
                 "nivel" => $row['nivel'],
                 "orden" => $row['orden'],
@@ -133,7 +134,7 @@ class PlantillaReporte extends DB{
         $idempresa = $this->get_id_empresa($idempresa);
         $idreporte = (int) $idplantilla_reporte;
 
-        $sql = "SELECT p.idplantilla, p.idplandecuenta, p.nombre_personalizado, pc.nombreplan
+        $sql = "SELECT p.idplantilla, p.idplandecuenta, p.nombre_personalizado, pc.nombreplan,p.negrilla_cursiva
             FROM pr_plantilla p
             LEFT JOIN plandecuenta pc ON pc.idplandecuenta = p.idplandecuenta
             WHERE p.idplantilla_reporte = $idreporte
@@ -146,6 +147,7 @@ class PlantillaReporte extends DB{
         while ($row = $this->dbc->fetch($res)) {
             $lista[] = [
                 "idplantilla" => $row['idplantilla'],
+                "negrilla_cursiva" => $row['negrilla_cursiva'],
                 "idplandecuenta" => $row['idplandecuenta'],
                 "nombre" => $row['nombre_personalizado'] ? $row['nombre_personalizado'] : $row['nombreplan'],
             ];
@@ -154,7 +156,7 @@ class PlantillaReporte extends DB{
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
 
-    public function registrar_plantilla($idplantilla_reporte, $idplantilla_padre, $idplandecuenta, $nombre_personalizado, $tipo_operacion, $nivel, $orden, $disponible_para_otro_reporte,$ingreso_egreso, $idempresa)
+    public function registrar_plantilla($idplantilla_reporte, $idplantilla_padre, $idplandecuenta, $nombre_personalizado, $tipo_operacion, $nivel, $orden, $disponible_para_otro_reporte,$ingreso_egreso,$negrilla_cursiva, $idempresa)
     {
         $id_empresa = $this->get_id_empresa($idempresa);
 
@@ -168,14 +170,15 @@ class PlantillaReporte extends DB{
         $v8 = $disponible_para_otro_reporte ? 'si' : 'no';
         $v9 = trim($ingreso_egreso) !== '' ? trim($ingreso_egreso) : null;
         $v10 = (int) $id_empresa;
+        $v11 = $negrilla_cursiva;
 
         // Insertar nuevo registro
         // if($ingreso_egreso == ""){
             // $stmt_insert = $this->dbc->prepare("INSERT INTO pr_plantilla (idplantilla_reporte, idplantilla_padre, idplandecuenta, nombre_personalizado, tipo_operacion, nivel, orden, disponible_para_otro_reporte, idempresa) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
             // $stmt_insert->bind_param("iiissiisi", $v1, $v2, $v3, $v4, $v5, $v6, $v7, $v8, $v10);
         // }else{
-            $stmt_insert = $this->dbc->prepare("INSERT INTO pr_plantilla (idplantilla_reporte, idplantilla_padre, idplandecuenta, nombre_personalizado, tipo_operacion, nivel, orden, disponible_para_otro_reporte,ingreso_egreso, idempresa) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt_insert->bind_param("iiissiissi", $v1, $v2, $v3, $v4, $v5, $v6, $v7, $v8, $v9, $v10);
+            $stmt_insert = $this->dbc->prepare("INSERT INTO pr_plantilla (idplantilla_reporte, idplantilla_padre, idplandecuenta, nombre_personalizado, tipo_operacion, nivel, orden, disponible_para_otro_reporte,ingreso_egreso, negrilla_cursiva, idempresa) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt_insert->bind_param("iiissiisssi", $v1, $v2, $v3, $v4, $v5, $v6, $v7, $v8, $v9,$v11, $v10);
         // }
      
         if (!$stmt_insert->execute()) {
@@ -250,7 +253,7 @@ class PlantillaReporte extends DB{
         echo json_encode(["success", "Edición y reordenamiento exitoso", "rp_editar_plantilla"]);
     }
 
-    public function rp_editar_plantilla($idplantilla, $idplandecuenta, $nombre_personalizado, $tipo_operacion, $orden, $idplantilla_padre, $empresa) {
+    public function rp_editar_plantilla($idplantilla, $idplandecuenta, $nombre_personalizado, $tipo_operacion, $orden, $idplantilla_padre,$negrilla_cursiva, $empresa) {
         $idempresa = $this->get_id_empresa($empresa);
 
         $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM pr_plantilla WHERE idplantilla_padre = '$idplantilla'");
@@ -275,7 +278,8 @@ class PlantillaReporte extends DB{
                 $editar = $this->dbc->query("UPDATE pr_plantilla
                                     SET idplandecuenta = '$idplandecuenta',
                                     nombre_personalizado = '$nombre_personalizado',
-                                    tipo_operacion = '$tipo_operacion'
+                                    tipo_operacion = '$tipo_operacion',
+                                    negrilla_cursiva = '$negrilla_cursiva'
                                     WHERE idplantilla = '$idplantilla';");
 
             }elseif($orden > $res_pregunta['orden']){ // SI QUIEREN CAMBIAR EL ORDEN
@@ -297,7 +301,8 @@ class PlantillaReporte extends DB{
                                     SET orden = '$orden',
                                     idplandecuenta = '$idplandecuenta',
                                     nombre_personalizado = '$nombre_personalizado',
-                                    tipo_operacion = '$tipo_operacion'
+                                    tipo_operacion = '$tipo_operacion',
+                                    negrilla_cursiva = '$negrilla_cursiva'
                                     WHERE idplantilla = '$idplantilla';");
 
                 }else{
@@ -319,7 +324,8 @@ class PlantillaReporte extends DB{
                                     SET orden = '$orden',
                                     idplandecuenta = '$idplandecuenta',
                                     nombre_personalizado = '$nombre_personalizado',
-                                    tipo_operacion = '$tipo_operacion'
+                                    tipo_operacion = '$tipo_operacion',
+                                    negrilla_cursiva = '$negrilla_cursiva'
                                     WHERE idplantilla = '$idplantilla';");
 
                 }
@@ -341,7 +347,8 @@ class PlantillaReporte extends DB{
                                     SET orden = '$orden',
                                     idplandecuenta = '$idplandecuenta',
                                     nombre_personalizado = '$nombre_personalizado',
-                                    tipo_operacion = '$tipo_operacion'
+                                    tipo_operacion = '$tipo_operacion',
+                                    negrilla_cursiva = '$negrilla_cursiva'
                                     WHERE idplantilla = '$idplantilla';");
 
                 }else{
@@ -363,7 +370,8 @@ class PlantillaReporte extends DB{
                                     SET orden = '$orden',
                                     idplandecuenta = '$idplandecuenta',
                                     nombre_personalizado = '$nombre_personalizado',
-                                    tipo_operacion = '$tipo_operacion'
+                                    tipo_operacion = '$tipo_operacion',
+                                    negrilla_cursiva = '$negrilla_cursiva'
                                     WHERE idplantilla = '$idplantilla';");
 
                 }
@@ -935,6 +943,7 @@ class PlantillaReporte extends DB{
                     // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
                     "idplantilla" => $pl_list['idplantilla'],
                     "codigo" => $codigo,
+                    "negrilla_cursiva" => $pl_list['negrilla_cursiva'],
                     "nombre_personalizado" => $nombre_cuenta,
                     "tipo_operacion" => $pl_list['tipo_operacion'],
                     "suma_nivel_2" => $valor_auxi,
@@ -950,6 +959,7 @@ class PlantillaReporte extends DB{
                     // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
                     "idplantilla" => $pl_list['idplantilla'],
                     "codigo" => $codigo,
+                    "negrilla_cursiva" => $pl_list['negrilla_cursiva'],                    
                     "nombre_personalizado" => $nombre_cuenta,
                     "tipo_operacion" => $pl_list['tipo_operacion'],
                     "suma_nivel_2" => 0,
@@ -1040,6 +1050,7 @@ class PlantillaReporte extends DB{
                         // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
                         "idplandecuenta" => $nombre_cuenta2['idplandecuenta'],
                         "codigo" => $nombre_cuenta2['numero'],
+                        "negrilla_cursiva" => $aux_nivel_2['negrilla_cursiva'],
                         "nombre_cuenta" => $nombre_cuenta2['nombreplan'],
                         "tipo_operacion" => $aux_nivel_2['tipo_operacion'],
                         // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
@@ -1057,6 +1068,7 @@ class PlantillaReporte extends DB{
                         // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
                         "idplandecuenta" => $nombre_cuenta2['idplandecuenta'],
                         "codigo" => $nombre_cuenta2['numero'],
+                        "negrilla_cursiva" => $aux_nivel_2['negrilla_cursiva'],
                         "nombre_cuenta" => $nombre_cuenta2['nombreplan'],
                         "tipo_operacion" => $aux_nivel_2['tipo_operacion'],
                         // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
@@ -1086,6 +1098,7 @@ class PlantillaReporte extends DB{
                                     // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
                                     "idplandecuenta" => $nombre_cuenta3['idplandecuenta'],
                                     "codigo" => $nombre_cuenta3['numero'],
+                                    "negrilla_cursiva" => $aux_nivel_3['negrilla_cursiva'],
                                     "nombre_cuenta" => $nombre_cuenta3['nombreplan'],
                                     "tipo_operacion" => $aux_nivel_3['tipo_operacion'],
                                     // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
@@ -1102,6 +1115,7 @@ class PlantillaReporte extends DB{
                                     // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
                                     "idplandecuenta" => $nombre_cuenta3['idplandecuenta'],
                                     "codigo" => $nombre_cuenta3['numero'],
+                                    "negrilla_cursiva" => $aux_nivel_3['negrilla_cursiva'],
                                     "nombre_cuenta" => $nombre_cuenta3['nombreplan'],
                                     "tipo_operacion" => $aux_nivel_3['tipo_operacion'],
                                     // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
@@ -1130,6 +1144,7 @@ class PlantillaReporte extends DB{
                                             // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
                                             "idplandecuenta" => $nombre_cuenta4['idplandecuenta'],
                                             "codigo" => $nombre_cuenta4['numero'],
+                                            "negrilla_cursiva" => $aux_nivel_4['negrilla_cursiva'],
                                             "nombre_cuenta" => $nombre_cuenta4['nombreplan'],
                                             "tipo_operacion" => $aux_nivel_4['tipo_operacion'],
                                             // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
@@ -1145,6 +1160,7 @@ class PlantillaReporte extends DB{
                                             // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
                                             "idplandecuenta" => $nombre_cuenta4['idplandecuenta'],
                                             "codigo" => $nombre_cuenta4['numero'],
+                                            "negrilla_cursiva" => $aux_nivel_4['negrilla_cursiva'],
                                             "nombre_cuenta" => $nombre_cuenta4['nombreplan'],
                                             "tipo_operacion" => $aux_nivel_4['tipo_operacion'],
                                             // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
@@ -1172,6 +1188,7 @@ class PlantillaReporte extends DB{
                                                 // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
                                                 "idplandecuenta" => $nombre_cuenta5['idplandecuenta'],
                                                 "codigo" => $nombre_cuenta5['numero'],
+                                                "negrilla_cursiva" => $aux_nivel_5['negrilla_cursiva'],
                                                 "nombre_cuenta" => $nombre_cuenta5['nombreplan'],
                                                 "tipo_operacion" => $aux_nivel_5['tipo_operacion'],
                                                 // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
@@ -1443,6 +1460,7 @@ class PlantillaReporte extends DB{
                     // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
                     "idplantilla" => $pl_list['idplantilla'],
                     "codigo" => $codigo,
+                    "negrilla_cursiva" => $pl_list['negrilla_cursiva'],
                     "nombre_personalizado" => $nombre_cuenta,
                     "tipo_operacion" => $pl_list['tipo_operacion'],
                     "suma_nivel_2" => $valor_auxi,
@@ -1458,6 +1476,7 @@ class PlantillaReporte extends DB{
                     // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
                     "idplantilla" => $pl_list['idplantilla'],
                     "codigo" => $codigo,
+                    "negrilla_cursiva" => $pl_list['negrilla_cursiva'],
                     "nombre_personalizado" => $nombre_cuenta,
                     "tipo_operacion" => $pl_list['tipo_operacion'],
                     "suma_nivel_2" => 0,
@@ -1521,6 +1540,7 @@ class PlantillaReporte extends DB{
                         // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
                         "idplandecuenta" => $nombre_cuenta2['idplandecuenta'],
                         "codigo" => $nombre_cuenta2['numero'],
+                        "negrilla_cursiva" => $aux_nivel_2['negrilla_cursiva'],
                         "nombre_cuenta" => $nombre_cuenta2['nombreplan'],
                         "tipo_operacion" => $aux_nivel_2['tipo_operacion'],
                         // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
@@ -1538,6 +1558,7 @@ class PlantillaReporte extends DB{
                         // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
                         "idplandecuenta" => $nombre_cuenta2['idplandecuenta'],
                         "codigo" => $nombre_cuenta2['numero'],
+                        "negrilla_cursiva" => $aux_nivel_2['negrilla_cursiva'],
                         "nombre_cuenta" => $nombre_cuenta2['nombreplan'],
                         "tipo_operacion" => $aux_nivel_2['tipo_operacion'],
                         // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
@@ -1567,6 +1588,7 @@ class PlantillaReporte extends DB{
                                     // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
                                     "idplandecuenta" => $nombre_cuenta3['idplandecuenta'],
                                     "codigo" => $nombre_cuenta3['numero'],
+                                    "negrilla_cursiva" => $aux_nivel_3['negrilla_cursiva'],
                                     "nombre_cuenta" => $nombre_cuenta3['nombreplan'],
                                     "tipo_operacion" => $aux_nivel_3['tipo_operacion'],
                                     // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
@@ -1583,6 +1605,7 @@ class PlantillaReporte extends DB{
                                     // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
                                     "idplandecuenta" => $nombre_cuenta3['idplandecuenta'],
                                     "codigo" => $nombre_cuenta3['numero'],
+                                    "negrilla_cursiva" => $aux_nivel_3['negrilla_cursiva'],
                                     "nombre_cuenta" => $nombre_cuenta3['nombreplan'],
                                     "tipo_operacion" => $aux_nivel_3['tipo_operacion'],
                                     // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
@@ -1611,6 +1634,7 @@ class PlantillaReporte extends DB{
                                             // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
                                             "idplandecuenta" => $nombre_cuenta4['idplandecuenta'],
                                             "codigo" => $nombre_cuenta4['numero'],
+                                            "negrilla_cursiva" => $aux_nivel_4['negrilla_cursiva'],
                                             "nombre_cuenta" => $nombre_cuenta4['nombreplan'],
                                             "tipo_operacion" => $aux_nivel_4['tipo_operacion'],
                                             // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
@@ -1626,6 +1650,7 @@ class PlantillaReporte extends DB{
                                             // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
                                             "idplandecuenta" => $nombre_cuenta4['idplandecuenta'],
                                             "codigo" => $nombre_cuenta4['numero'],
+                                            "negrilla_cursiva" => $aux_nivel_4['negrilla_cursiva'],
                                             "nombre_cuenta" => $nombre_cuenta4['nombreplan'],
                                             "tipo_operacion" => $aux_nivel_4['tipo_operacion'],
                                             // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
@@ -1653,6 +1678,7 @@ class PlantillaReporte extends DB{
                                                 // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
                                                 "idplandecuenta" => $nombre_cuenta5['idplandecuenta'],
                                                 "codigo" => $nombre_cuenta5['numero'],
+                                                "negrilla_cursiva" => $aux_nivel_5['negrilla_cursiva'],
                                                 "nombre_cuenta" => $nombre_cuenta5['nombreplan'],
                                                 "tipo_operacion" => $aux_nivel_5['tipo_operacion'],
                                                 // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
