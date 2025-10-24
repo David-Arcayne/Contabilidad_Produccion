@@ -14,7 +14,7 @@ class Reporte_confi extends DB{
             $esta_activo = $tipo_reporte_lista->fetch_assoc();
 
             if($esta_activo['estado'] == '1'){ // ESTA ACTIVO
-                // DEBO DESACTIVARLO Y NO ACTIVAR NINGUNO
+                // DEBO DESACTIVARLO Y NO ACTIVAR NINGUNO 
                 $desactivar = $this->dbc->query("UPDATE tipo_reportes SET estado = '0' WHERE idtipo_reportes = '$idtipo_reportes'");
 
                 if ($desactivar === TRUE){   
@@ -3292,7 +3292,7 @@ public function select_plantilla_balance_general($idtipo_reporte,$empresa)
     }
 
     //-----------------------------------------------------------------------------
-    public function insertar_debajo_de($idplandecuenta,$reporte,$nombre_cuenta_superior,$nivel,$orden,$grupo,$es_calculable,$es_activo_fijo,$empresa){
+    public function insertar_debajo_de($idplandecuenta,$idplantilla_reporte,$reporte,$nombre_cuenta_superior,$nivel,$orden,$grupo,$es_calculable,$es_activo_fijo,$negrilla_cursiva,$empresa){
         // $idempresa = Empresa::getidempresa($empresa);
         $idempresa = $this->getidempresa($empresa);
         // $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM divisa WHERE nombre = '$nombre' AND idempresa = '$idempresa'");
@@ -3303,7 +3303,7 @@ public function select_plantilla_balance_general($idtipo_reporte,$empresa)
 
             if ($idplandecuenta != "" && $reporte != "" && $nivel != "") {
             $consulta = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE nombre_cuenta_superior ='$nombre_cuenta_superior'
-            AND nivel_registrado = '$nivel' AND idempresa ='$idempresa' AND orden >= '$orden'");
+            AND idplantilla_reporte = '$idplantilla_reporte' AND nivel_registrado = '$nivel' AND idempresa ='$idempresa' AND orden >= '$orden'");
             // $resultado = $consulta->fetch_assoc();             
             // $orden_ulti = $resultado['total'] + 1;
 
@@ -3314,7 +3314,8 @@ public function select_plantilla_balance_general($idtipo_reporte,$empresa)
                                                         WHERE idconfiguracion_reporte = '$qwe[idconfiguracion_reporte]'");
             }
                 // Insertar el nuevo registro
-                $registro_confi = $this->dbc->query("INSERT INTO configuracion_reporte(idplandecuenta,reporte,nombre_cuenta_superior,nivel_registrado,orden,grupo,es_calculable,es_activo_fijo,idempresa) VALUES ('$idplandecuenta','$reporte','$nombre_cuenta_superior','$nivel','$orden','$grupo','$es_calculable','$es_activo_fijo','$idempresa')");
+                $registro_confi = $this->dbc->query("INSERT INTO configuracion_reporte(idplandecuenta,idplantilla_reporte,reporte,nombre_cuenta_superior,nivel_registrado,orden,grupo,es_calculable,es_activo_fijo,negrilla_cursiva,idempresa) 
+                VALUES ('$idplandecuenta','$idplantilla_reporte','$reporte','$nombre_cuenta_superior','$nivel','$orden','$grupo','$es_calculable','$es_activo_fijo','$negrilla_cursiva','$idempresa')");
                 if ($registro_confi === TRUE) {                                                                                                                                                                
                     $res = array("success", "Registro exitoso","registroCaracteristicas");
                 } else {
@@ -3355,6 +3356,19 @@ public function select_plantilla_balance_general($idtipo_reporte,$empresa)
         }
     
         echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
+    public function editar_registros_padres_BG($id, $negrilla_cursiva) {
+        $editar = $this->dbc->query(
+            "UPDATE configuracion_reporte 
+                SET negrilla_cursiva='$negrilla_cursiva' 
+            WHERE idconfiguracion_reporte = '$id'"
+        );
+        if ($editar === TRUE) {
+            $res = array("success", "se edito exitosamente","rp_editar_reporte");
+        } else {
+            $res = array("danger", "No se pudo editar");
+        }
+        echo json_encode($res);
     }
 
     public function getidempresa($md5)

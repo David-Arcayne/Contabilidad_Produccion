@@ -17,7 +17,19 @@ class PlantillaReporte extends DB{
         return $qwe['idgestion'];
     }
 
-
+    public function editar_registros_padres_ER($id, $negrilla_cursiva) {
+        $editar = $this->dbc->query(
+            "UPDATE pr_plantilla 
+                SET negrilla_cursiva='$negrilla_cursiva' 
+            WHERE idplantilla = '$id'"
+        );
+        if ($editar === TRUE) {
+            $res = array("success", "se edito exitosamente","rp_editar_reporte");
+        } else {
+            $res = array("danger", "No se pudo editar");
+        }
+        echo json_encode($res);
+    }
     // FUNCONES PARA TIPOS DE REPORTES
     // ----------------------------------------------------------------
     public function listar_reporte($id_empresa) {
@@ -633,15 +645,15 @@ class PlantillaReporte extends DB{
         // return $arbol;
         echo json_encode($arbol, JSON_NUMERIC_CHECK);
     }
-    public function registrar_agrupacion_plantilla($idplantilla_padre, $idplantilla_hijo, $tipo_operacion,$monto,$empresa) {
+    public function registrar_agrupacion_plantilla($idplantilla_padre, $idplantilla_hijo, $tipo_operacion,$monto,$idtipo_reportes,$empresa) {
         $idempresa = $this->get_id_empresa($empresa);
 
         if($tipo_operacion == 'porcentaje'){
-            $registro = $this->dbc->query("INSERT INTO agrupacion_plantilla(idplantilla_padre, idplantilla_hijo, tipo_operacion,monto, idempresa) VALUES ('$idplantilla_hijo', '$idplantilla_padre', '$tipo_operacion','$monto', '$idempresa')");
+            $registro = $this->dbc->query("INSERT INTO agrupacion_plantilla(idplantilla_padre, idplantilla_hijo, tipo_operacion,monto,idtipo_reportes, idempresa) VALUES ('$idplantilla_hijo', '$idplantilla_padre', '$tipo_operacion','$monto','$idtipo_reportes', '$idempresa')");
 
         }else{
             // Insertar el nuevo registro
-            $registro = $this->dbc->query("INSERT INTO agrupacion_plantilla(idplantilla_padre, idplantilla_hijo, tipo_operacion,monto, idempresa) VALUES ('$idplantilla_padre', '$idplantilla_hijo', '$tipo_operacion','$monto', '$idempresa')");
+            $registro = $this->dbc->query("INSERT INTO agrupacion_plantilla(idplantilla_padre, idplantilla_hijo, tipo_operacion,monto,idtipo_reportes, idempresa) VALUES ('$idplantilla_padre', '$idplantilla_hijo', '$tipo_operacion','$monto','$idtipo_reportes', '$idempresa')");
         }
        
         if ($registro === TRUE) {                                                                                                                                                                
@@ -711,197 +723,7 @@ class PlantillaReporte extends DB{
         echo json_encode($lista, JSON_PRETTY_PRINT);
     }
 
-    public function reporte_estado_resultados_hasta_nivel_2($fecha_ini,$fecha_fin,$empresa) {
-        //    ini_set('display_errors', 1); 
-        // ini_set('display_startup_errors', 1);
-        // error_reporting(E_ALL);
-
-        // $lista = [];
-        $idempresa = $this->get_id_empresa($empresa);
-        // $gestion = $this->getidgestion($empresa);
-    $gestion = $this->get_id_gestion($empresa);
-        $lista_aux_buscador = [];
-        $lista =[];
-        $tipo_report = $this->dbc->query("SELECT * FROM tipo_reportes WHERE idempresa = '$idempresa' AND tipo_reporte = 'estado_resultado'");
-        $id_pl_reporte = $tipo_report->fetch_assoc();
-
-        $plantilla_lista = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla_reporte = '$id_pl_reporte[idtipo_reportes]' 
-        AND idempresa = '$idempresa' AND idplantilla_padre IS NULL ORDER BY orden ASC");// PLANTILLAS PRINCIPALES
-       
-       while ($pl_list = $this->dbc->fetch($plantilla_lista)) {
-            if($pl_list['nombre_personalizado'] == NULL){
-                $pla_cuen = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$pl_list[idplandecuenta]'");// VENTAS->NOMBRE
-                $nombre_cuen = $pla_cuen->fetch_assoc();
-                $nombre_cuenta = $nombre_cuen['nombreplan'];
-            }else{
-                $nombre_cuenta = $pl_list['nombre_personalizado'];
-            }
-            if($pl_list['tipo_operacion'] == 'calculable'){ // ES CALCULABLE REGISTRO PADREEE
-                $cuenta_plan = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$pl_list[idplandecuenta]'");// VENTAS->NOMBRE
-                $pc = $cuenta_plan->fetch_assoc();
-
-                if($pc['numero'] >= '4.0.0.00.00' && '5.0.0.00.00' > $pc['numero']){ // INGRESOS
-                            $calcu = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(haber) - SUM(debe) AS total FROM transacciones t
-                                INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
-                                INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
-                                where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$pl_list[idplandecuenta]'
-                                AND t.estado NOT IN (4, 5, 6) AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
-
-                    }elseif($pc['numero'] >= '5.0.0.00.00' && '6.0.0.00.00' > $pc['numero']){ // EGRESOS_GASTOS
-                        $calcu = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total FROM transacciones t
-                                INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
-                                INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
-                                where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$pl_list[idplandecuenta]'
-                                AND t.estado NOT IN (4, 5, 6) AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
-
-                    }else{ // las cuentas de 6.0.0.00.00 ORDEN
-                        $calcu = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total FROM transacciones t
-                                INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
-                                INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
-                                where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$pl_list[idplandecuenta]'
-                                AND t.estado NOT IN (4, 5, 6) AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
-
-                    }
-
-                    $valor_auxi = $calcu->fetch_assoc();
-                // $suma_nivel_2 = $valor_auxi + $valor2['total'];
-                if($valor_auxi['total'] == null || $valor_auxi['total'] == '0'){
-                    //-----------------------------------
-                }else{
-                    $res = array(
-                    // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
-                    "idplantilla" => $pl_list['idplantilla'],
-                    "codigo" => $nombre_cuen['numero'],
-                    "nombre_personalizado" => $nombre_cuenta,
-                    "tipo_operacion" => $pl_list['tipo_operacion'],
-                    "suma_nivel_2" => $valor_auxi['total'],
-                    "nivel_2" => [] //activo
-                    );  
-                    // array_push($res['nivel_2'], $res2);  
-                }  
-
-            }else{ //{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
-                // NO ES CALCULABLE
-
-                $res = array(
-                    // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
-                    "idplantilla" => $pl_list['idplantilla'],
-                    "codigo" => $nombre_cuen['numero'],
-                    "nombre_personalizado" => $nombre_cuenta,
-                    "tipo_operacion" => $pl_list['tipo_operacion'],
-                    "suma_nivel_2" => 0,
-                    "nivel_2" => [] //activo
-                    );  
-
-                $pl_padre = $this->dbc->query("SELECT * from agrupacion_plantilla where idplantilla_padre = '$pl_list[idplantilla]'");// VENTAS->NOMBRE
-            // $es_plant_agrup = $pl_padre->num_rows > 0;
-            $pl_padre_calcu = $this->dbc->query("SELECT * from pr_plantilla where idplantilla_padre = '$pl_list[idplantilla]'");// VENTAS->NOMBRE
-            // $es_plant_calc = $pl_padre_calcu->num_rows > 0;
-            if($pl_padre->num_rows > 0){ //SI ES UNA PLANTILLA AGRUPADORA  (utilidad bruta en ventas)
-                $sum_rest = 0;
-                // $lista_aux_buscador[] = $res;
-                // array_push($lista_aux_buscador,$res);
-                while ($buscarId = $this->dbc->fetch($pl_padre)) { // 2agrupados
-                    foreach ($lista as $item) {
-                        if ($item['idplantilla'] === $buscarId['idplantilla_hijo']) {
-                            //agarro si es suma o resta y agarro su valor 
-                            if($buscarId['tipo_operacion'] == 'sumar'){
-                                $sum_rest = $sum_rest + $item['suma_nivel_2'];
-                            }elseif($buscarId['tipo_operacion'] == 'restar'){
-                                $sum_rest = $sum_rest - $item['suma_nivel_2'];
-                            }
-                            // $item['suma_nivel_2'];
-                            // $encontrado = true;
-                            break;
-                        }else{
-                            //seguir buscando
-                        }
-                    }
-                }
-                $res['suma_nivel_2'] = $sum_rest;
-            }elseif($pl_padre_calcu->num_rows > 0){ //ES UNA PLANTILLA CON HIJOS CALCULABLES  (VENTAS)
-
-                $suma_nivel_2 = 0;
-                while ($aux_calculable = $this->dbc->fetch($pl_padre_calcu)) { //CALCULABLES
-
-                $plan_cuenta = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$aux_calculable[idplandecuenta]'");// caja_general, banco
-                $nombre_cuenta = $plan_cuenta->fetch_assoc();
-
-                // $ingreso_egreso = $this->dbc->query("SELECT * FROM plandecuenta WHERE numero >= '5.0.0.00.00' AND numero < '6.0.0.00.00'");// EGRESO_GASTOS
-                // $nombre_cuenta = $ingreso_egreso->fetch_assoc();
-                    //select * from plandecuenta where numero >= '5.0.0.00.00' and numero < '6.0.0.00.00' order by numero desc
-                    if($nombre_cuenta['numero'] >= '4.0.0.00.00' && '5.0.0.00.00' > $nombre_cuenta['numero']){ // INGRESOS
-                            $suma_cuentas2 = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(haber) - SUM(debe) AS total FROM transacciones t
-                                INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
-                                INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
-                                where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$aux_calculable[idplandecuenta]'
-                                AND t.estado NOT IN (4, 5, 6) AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
-
-                    }elseif($nombre_cuenta['numero'] >= '5.0.0.00.00' && '6.0.0.00.00' > $nombre_cuenta['numero']){ // EGRESOS_GASTOS
-                        $suma_cuentas2 = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total FROM transacciones t
-                                INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
-                                INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
-                                where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$aux_calculable[idplandecuenta]'
-                                AND t.estado NOT IN (4, 5, 6) AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
-
-                    }else{ // las cuentas de 6.0.0.00.00 ORDEN
-                        $suma_cuentas2 = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total FROM transacciones t
-                                INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
-                                INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
-                                where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$aux_calculable[idplandecuenta]'
-                                AND t.estado NOT IN (4, 5, 6) AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
-
-                    }
-
-                $valor2 = $suma_cuentas2->fetch_assoc();
-                $suma_nivel_2 = $suma_nivel_2 + $valor2['total'];
-                // if($valor2['total'] == null || $valor2['total'] == '0'){
-                //     //-----------------------------------
-                // }else{
-                    $res2 = array(
-                        // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
-                        "idplandecuenta" => $nombre_cuenta['idplandecuenta'],
-                        "codigo" => $nombre_cuenta['numero'],
-                        "nombre_cuenta" => $nombre_cuenta['nombreplan'],
-                        // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
-                        "valor" => $valor2['total'],
-                        // "nivel_3" => [] //activo
-                        );
-                    array_push($res['nivel_2'], $res2);  
-
-                // }  
-
-                }
-                $res['suma_nivel_2'] = $suma_nivel_2;
-            }else{ //ES UNA PLANTILLA SIN OPERACION (COSTO_PRODUCCION)
-                
-                $agru = $this->dbc->query("SELECT * from agrupacion_plantilla where idplantilla_hijo = '$pl_list[idplantilla]'");// HIJOS DE LAS PLANTILLAS AGRUPADORAS
-                $agru_aux = $agru->fetch_assoc();
-                $res['suma_nivel_2'] = $agru_aux['monto']; //esto en caso de que el monto siempre sea mayor a cero
-            }
-            }//}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}} AQUI TERMINA EL NO ES CALCULABLE
-            // $res = array(
-            //         // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
-            //         "idplantilla" => $pl_list['idplantilla'],
-            //         "nombre_personalizado" => $nombre_cuenta,
-            //         "tipo_operacion" => $pl_list['tipo_operacion'],
-            //         "suma_nivel_2" => 0,
-            //         "nivel_2" => [] //activo
-            //         );
-
-    
-
-            // if($res['suma_nivel_2'] == '0' || $res['suma_nivel_2'] == null){
-            //     //nada
-            // }else{
-                array_push($lista, $res);
-            // }
-            // array_push($lista, $res);  
-            $lista_aux_buscador = [];        
-        }
-        echo json_encode($lista, JSON_NUMERIC_CHECK);
-    }
-
+ 
     public function reporte_estado_resultados_actualizado($idplantilla_reporte,$fecha_ini,$fecha_fin,$empresa) {
         //    ini_set('display_errors', 1); 
         // ini_set('display_startup_errors', 1);
@@ -946,6 +768,7 @@ class PlantillaReporte extends DB{
                     "negrilla_cursiva" => $pl_list['negrilla_cursiva'],
                     "nombre_personalizado" => $nombre_cuenta,
                     "tipo_operacion" => $pl_list['tipo_operacion'],
+                    "disponible_para_otro_reporte" => $pl_list['disponible_para_otro_reporte'],
                     "suma_nivel_2" => $valor_auxi,
                     "nivel_2" => [] //activo
                     );  
@@ -962,6 +785,7 @@ class PlantillaReporte extends DB{
                     "negrilla_cursiva" => $pl_list['negrilla_cursiva'],                    
                     "nombre_personalizado" => $nombre_cuenta,
                     "tipo_operacion" => $pl_list['tipo_operacion'],
+                    "disponible_para_otro_reporte" => $pl_list['disponible_para_otro_reporte'],
                     "suma_nivel_2" => 0,
                     "nivel_2" => [] //activo
                     );  
@@ -974,6 +798,8 @@ class PlantillaReporte extends DB{
 
                 // $es_plant_agrup = $pl_padre->num_rows > 0;
             $pl_padre_calcu = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla_padre = '$pl_list[idplantilla]'");// VENTAS->NOMBRE
+
+            $pl_otro_reporte = $this->dbc->query("SELECT * FROM calculo_otro_reporte WHERE idplantilla = '$pl_list[idplantilla]'");
             // $es_plant_calc = $pl_padre_calcu->num_rows > 0;
             if($pl_padre->num_rows > 0){ //SI ES UNA PLANTILLA AGRUPADORA  (utilidad bruta en ventas)
                 $sum_rest = 0;
@@ -998,7 +824,7 @@ class PlantillaReporte extends DB{
                 }
                 $res['suma_nivel_2'] = $sum_rest;
             }
-            elseif($pl_porcentaje->num_rows > 0){
+            elseif($pl_porcentaje->num_rows > 0){   // ES PORCENTAJE
                 $resu = 0;
                 $porce = $pl_porcentaje->fetch_assoc(); 
                 // $lista_aux_buscador[] = $res;
@@ -1022,6 +848,19 @@ class PlantillaReporte extends DB{
                     
                 // }
                 $res['suma_nivel_2'] = $resu;
+            } elseif($pl_otro_reporte->num_rows > 0){ // ES UNA PLANTILLA QUE OBTIENE RESULTADO DE OTRO REPORTE
+                //  $pl_list['tipo_operacion'] == 'calculo_otro_reporte'
+
+                $calculo_otro_reporte = $pl_otro_reporte->fetch_assoc(); 
+
+                // IR AL OTRO REPORTE PARA OBTENER LO QUE QUIERO
+                $this->reporte_calculo_otro_reporte(    // TENDRIA QUE USAR OTRO REPORTE QUE ME RETORNE DIRECTAMENTE EL RESULTADO DE LA PLANTILLA 
+                $calculo_otro_reporte['idtipo_reporte_referencia'],   // REPORTE DE REFERENCIA
+                $fecha_ini,
+                $fecha_fin,
+                $empresa
+            );
+                // $res['suma_nivel_2'] = $sum_rest;
             }
             elseif($pl_padre_calcu->num_rows > 0){ //ES UNA PLANTILLA CON HIJOS CALCULABLES  (VENTAS)
 
@@ -1053,6 +892,7 @@ class PlantillaReporte extends DB{
                         "negrilla_cursiva" => $aux_nivel_2['negrilla_cursiva'],
                         "nombre_cuenta" => $nombre_cuenta2['nombreplan'],
                         "tipo_operacion" => $aux_nivel_2['tipo_operacion'],
+                        "disponible_para_otro_reporte" => $aux_nivel_2['disponible_para_otro_reporte'],
                         // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
                         "valor" => $valor_total2,
                         "suma_nivel_3" => 0,
@@ -1071,6 +911,7 @@ class PlantillaReporte extends DB{
                         "negrilla_cursiva" => $aux_nivel_2['negrilla_cursiva'],
                         "nombre_cuenta" => $nombre_cuenta2['nombreplan'],
                         "tipo_operacion" => $aux_nivel_2['tipo_operacion'],
+                        "disponible_para_otro_reporte" => $aux_nivel_2['disponible_para_otro_reporte'],
                         // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
                         "valor" => 0,
                         "suma_nivel_3" => 0,
@@ -1101,6 +942,7 @@ class PlantillaReporte extends DB{
                                     "negrilla_cursiva" => $aux_nivel_3['negrilla_cursiva'],
                                     "nombre_cuenta" => $nombre_cuenta3['nombreplan'],
                                     "tipo_operacion" => $aux_nivel_3['tipo_operacion'],
+                                    "disponible_para_otro_reporte" => $aux_nivel_3['disponible_para_otro_reporte'],
                                     // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
                                     "valor" => $valor_total3,
                                     "suma_nivel_4" => 0,
@@ -1118,6 +960,7 @@ class PlantillaReporte extends DB{
                                     "negrilla_cursiva" => $aux_nivel_3['negrilla_cursiva'],
                                     "nombre_cuenta" => $nombre_cuenta3['nombreplan'],
                                     "tipo_operacion" => $aux_nivel_3['tipo_operacion'],
+                                    "disponible_para_otro_reporte" => $aux_nivel_3['disponible_para_otro_reporte'],
                                     // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
                                     "valor" => 0,
                                     "suma_nivel_4" => 0,
@@ -1147,6 +990,7 @@ class PlantillaReporte extends DB{
                                             "negrilla_cursiva" => $aux_nivel_4['negrilla_cursiva'],
                                             "nombre_cuenta" => $nombre_cuenta4['nombreplan'],
                                             "tipo_operacion" => $aux_nivel_4['tipo_operacion'],
+                                            "disponible_para_otro_reporte" => $aux_nivel_4['disponible_para_otro_reporte'],
                                             // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
                                             "valor" => $valor_total4,
                                             "suma_nivel_4" => 0,
@@ -1163,6 +1007,7 @@ class PlantillaReporte extends DB{
                                             "negrilla_cursiva" => $aux_nivel_4['negrilla_cursiva'],
                                             "nombre_cuenta" => $nombre_cuenta4['nombreplan'],
                                             "tipo_operacion" => $aux_nivel_4['tipo_operacion'],
+                                            "disponible_para_otro_reporte" => $aux_nivel_4['disponible_para_otro_reporte'],
                                             // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
                                             "valor" => 0,
                                             "suma_nivel_4" => 0,
@@ -1191,6 +1036,7 @@ class PlantillaReporte extends DB{
                                                 "negrilla_cursiva" => $aux_nivel_5['negrilla_cursiva'],
                                                 "nombre_cuenta" => $nombre_cuenta5['nombreplan'],
                                                 "tipo_operacion" => $aux_nivel_5['tipo_operacion'],
+                                                "disponible_para_otro_reporte" => $aux_nivel_5['disponible_para_otro_reporte'],
                                                 // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
                                                 "valor" => $valor_total5,
                                                 // "suma_nivel_4" => 0,
@@ -1312,6 +1158,414 @@ class PlantillaReporte extends DB{
 
         return $valor_total;
     }
+
+    public function reporte_calculo_otro_reporte($idplantilla_reporte,$fecha_ini,$fecha_fin,$empresa) {
+        //    ini_set('display_errors', 1); 
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
+
+        // $lista = [];
+        $idempresa = $this->get_id_empresa($empresa);
+        // $gestion = $this->getidgestion($empresa);
+    $gestion = $this->get_id_gestion($empresa);
+        $lista_aux_buscador = [];
+        $lista =[];
+        // $tipo_report = $this->dbc->query("SELECT * FROM tipo_reportes WHERE idempresa = '$idempresa' AND tipo_reporte = 'estado_resultado'");
+        // $id_pl_reporte = $tipo_report->fetch_assoc();
+
+        $plantilla_lista = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla_reporte = '$idplantilla_reporte' 
+        AND idempresa = '$idempresa' AND idplantilla_padre IS NULL ORDER BY orden ASC");// PLANTILLAS PRINCIPALES
+       
+       while ($pl_list = $this->dbc->fetch($plantilla_lista)) {
+            if($pl_list['nombre_personalizado'] == NULL){
+                $pla_cuen = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$pl_list[idplandecuenta]'");// VENTAS->NOMBRE
+                $nombre_cuen = $pla_cuen->fetch_assoc();
+                $nombre_cuenta = $nombre_cuen['nombreplan'];
+                $codigo = $nombre_cuen['numero'];
+            }else{
+                $nombre_cuenta = $pl_list['nombre_personalizado'];
+                $codigo = "";
+            }
+            if($pl_list['tipo_operacion'] == 'calculable'){ // ES CALCULABLE REGISTRO PADREEE
+                $cuenta_plan = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$pl_list[idplandecuenta]'");// VENTAS->NOMBRE
+                $pc = $cuenta_plan->fetch_assoc();
+
+                $valor_auxi = $this->calculables_estado_resultados($pc['idagrupacion_rubro_plandecuenta'], $idempresa, $gestion,$pl_list['idplandecuenta'],$fecha_ini,$fecha_fin,$pl_list['idplantilla']);
+
+                // $suma_nivel_2 = $valor_auxi + $valor2['total'];
+                // if($valor_auxi == null || $valor_auxi == '0'){
+                    //-----------------------------------
+                // }else{
+                    $res = array(
+                    // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
+                    "idplantilla" => $pl_list['idplantilla'],
+                    "codigo" => $codigo,
+                    "negrilla_cursiva" => $pl_list['negrilla_cursiva'],
+                    "nombre_personalizado" => $nombre_cuenta,
+                    "tipo_operacion" => $pl_list['tipo_operacion'],
+                    "disponible_para_otro_reporte" => $pl_list['disponible_para_otro_reporte'],
+                    "suma_nivel_2" => $valor_auxi,
+                    "nivel_2" => [] //activo
+                    );  
+                    // array_push($res['nivel_2'], $res2);  
+                // }  
+
+            }else{ //{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+                // NO ES CALCULABLE
+
+                $res = array(
+                    // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
+                    "idplantilla" => $pl_list['idplantilla'],
+                    "codigo" => $codigo,
+                    "negrilla_cursiva" => $pl_list['negrilla_cursiva'],                    
+                    "nombre_personalizado" => $nombre_cuenta,
+                    "tipo_operacion" => $pl_list['tipo_operacion'],
+                    "disponible_para_otro_reporte" => $pl_list['disponible_para_otro_reporte'],
+                    "suma_nivel_2" => 0,
+                    "nivel_2" => [] //activo
+                    );  
+
+                $pl_padre = $this->dbc->query("SELECT * FROM agrupacion_plantilla WHERE idplantilla_padre = '$pl_list[idplantilla]'
+                AND (tipo_operacion ='sumar' || tipo_operacion = 'restar')");// VENTAS->NOMBRE
+                
+                $pl_porcentaje = $this->dbc->query("SELECT * FROM agrupacion_plantilla WHERE idplantilla_hijo = '$pl_list[idplantilla]'
+                AND (tipo_operacion ='porcentaje')");// VENTAS->NOMBRE
+
+                // $es_plant_agrup = $pl_padre->num_rows > 0;
+            $pl_padre_calcu = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla_padre = '$pl_list[idplantilla]'");// VENTAS->NOMBRE
+
+            $pl_otro_reporte = $this->dbc->query("SELECT * FROM calculo_otro_reporte WHERE idplantilla = '$pl_list[idplantilla]'");
+            // $es_plant_calc = $pl_padre_calcu->num_rows > 0;
+            if($pl_padre->num_rows > 0){ //SI ES UNA PLANTILLA AGRUPADORA  (utilidad bruta en ventas)
+                $sum_rest = 0;
+                // $lista_aux_buscador[] = $res; monto
+                // array_push($lista_aux_buscador,$res);
+                while ($buscarId = $this->dbc->fetch($pl_padre)) { // 2agrupados
+                    foreach ($lista as $item) {
+                        if ($item['idplantilla'] === $buscarId['idplantilla_hijo']) {
+                            //agarro si es suma o resta y agarro su valor 
+                            if($buscarId['tipo_operacion'] == 'sumar'){
+                                $sum_rest = $sum_rest + $item['suma_nivel_2'];
+                            }elseif($buscarId['tipo_operacion'] == 'restar'){
+                                $sum_rest = $sum_rest - $item['suma_nivel_2'];
+                            }
+                            // $item['suma_nivel_2'];
+                            // $encontrado = true;
+                            break;
+                        }else{
+                            //seguir buscando
+                        }
+                    }
+                }
+                $res['suma_nivel_2'] = $sum_rest;
+            }
+            elseif($pl_porcentaje->num_rows > 0){   // ES PORCENTAJE
+                $resu = 0;
+                $porce = $pl_porcentaje->fetch_assoc(); 
+                // $lista_aux_buscador[] = $res;
+                // array_push($lista_aux_buscador,$res);
+                // while ($buscarId2 = $this->dbc->fetch($pl_porcentaje)) { // 2agrupados
+                    foreach ($lista as $item2) {
+                        if ($item2['idplantilla'] === $porce['idplantilla_padre']) {
+                            //agarro si es suma o resta y agarro su valor 
+                            if($porce['tipo_operacion'] == 'porcentaje'){
+                                $resu = ($item2['suma_nivel_2'] * $porce['monto']) / 100;
+                            }else{
+                                // salto
+                            }
+                            // $item['suma_nivel_2'];
+                            // $encontrado = true;
+                            break;
+                        }else{
+                            //seguir buscando
+                        }
+                    }
+                    
+                // }
+                $res['suma_nivel_2'] = $resu;
+            }
+            // elseif($pl_otro_reporte->num_rows > 0){ // ES UNA PLANTILLA QUE OBTIENE RESULTADO DE OTRO REPORTE
+            //     //  $pl_list['tipo_operacion'] == 'calculo_otro_reporte'
+
+            //     $calculo_otro_reporte = $pl_otro_reporte->fetch_assoc(); 
+
+            //     // IR AL OTRO REPORTE PARA OBTENER LO QUE QUIERO
+            //     $this->reporte_estado_resultados_actualizado(    // TENDRIA QUE USAR OTRO REPORTE QUE ME RETORNE DIRECTAMENTE EL RESULTADO DE LA PLANTILLA 
+            //     $calculo_otro_reporte['idtipo_reporte_referencia'],   // REPORTE DE REFERENCIA
+            //     $fecha_ini,
+            //     $fecha_fin,
+            //     $empresa
+            // );
+            //     // $res['suma_nivel_2'] = $sum_rest;
+            // }
+            elseif($pl_padre_calcu->num_rows > 0){ //ES UNA PLANTILLA CON HIJOS CALCULABLES  (VENTAS)
+
+            // NIVEL 2 2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222
+            $suma_nivel_2 = 0;
+            // $suma_nivel_3 = 0;
+            while ($aux_nivel_2 = $this->dbc->fetch($pl_padre_calcu)) { //CALCULABLES o TALVES TAMBIEN NO CALCULABLES
+
+                $plan_cuenta2 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$aux_nivel_2[idplandecuenta]'");// caja_general, banco
+                $nombre_cuenta2 = $plan_cuenta2->fetch_assoc();
+                if($aux_nivel_2['tipo_operacion'] == 'calculable'){ //SI ES CALCULABLE
+                    // recargo, descuento
+                    //--------------------------------------------------------------------------------------------------------------------------------------------------------------
+                //     $plan_cuenta = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$aux_nivel_2[idplandecuenta]'");// caja_general, banco
+                // $nombre_cuenta = $plan_cuenta->fetch_assoc();
+
+                $valor_total2 = $this->calculables_estado_resultados($nombre_cuenta2['idagrupacion_rubro_plandecuenta'], $idempresa, $gestion,$aux_nivel_2['idplandecuenta'],$fecha_ini,$fecha_fin,$aux_nivel_2['idplantilla']);
+
+                // $valor2 = $suma_cuentas2->fetch_assoc();
+                $suma_nivel_2 = $suma_nivel_2 + $valor_total2;
+
+                if($valor_total2 == null || $valor_total2 == '0'){
+                    //-----------------------------------
+                }else{
+                    $res2 = array(
+                        // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
+                        "idplandecuenta" => $nombre_cuenta2['idplandecuenta'],
+                        "codigo" => $nombre_cuenta2['numero'],
+                        "negrilla_cursiva" => $aux_nivel_2['negrilla_cursiva'],
+                        "nombre_cuenta" => $nombre_cuenta2['nombreplan'],
+                        "tipo_operacion" => $aux_nivel_2['tipo_operacion'],
+                        "disponible_para_otro_reporte" => $aux_nivel_2['disponible_para_otro_reporte'],
+                        // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
+                        "valor" => $valor_total2,
+                        "suma_nivel_3" => 0,
+                        // "nivel_3" => [] //activo
+                        );
+                    array_push($res['nivel_2'], $res2);  
+
+                } 
+                    //----------------------------------------------------------------------------------------------------------------------------------------------------------------
+                }else{ // NO ES CALCULABLE
+                    // NIVEL 3 333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333
+                    $res2 = array(
+                        // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
+                        "idplandecuenta" => $nombre_cuenta2['idplandecuenta'],
+                        "codigo" => $nombre_cuenta2['numero'],
+                        "negrilla_cursiva" => $aux_nivel_2['negrilla_cursiva'],
+                        "nombre_cuenta" => $nombre_cuenta2['nombreplan'],
+                        "tipo_operacion" => $aux_nivel_2['tipo_operacion'],
+                        "disponible_para_otro_reporte" => $aux_nivel_2['disponible_para_otro_reporte'],
+                        // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
+                        "valor" => 0,
+                        "suma_nivel_3" => 0,
+                        "nivel_3" => [] //activo
+                        );
+
+                    $nivel_3 = $this->dbc->query("SELECT * from pr_plantilla WHERE idplantilla_padre = '$aux_nivel_2[idplantilla]'");// vents_cafe_yungs, vnts cafe_nueva esperanza
+                    
+                    $suma_nivel_3 = 0;
+                    while ($aux_nivel_3 = $this->dbc->fetch($nivel_3)) {
+                        
+                        $plan_cuenta3 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$aux_nivel_3[idplandecuenta]'");// caja_general, banco
+                        $nombre_cuenta3 = $plan_cuenta3->fetch_assoc();
+
+                        if($aux_nivel_3['tipo_operacion'] == 'calculable'){ //SI ES CALCULABLE   
+                            // venta cafe yungas y venta cafe nueva esperanza
+
+                            $valor_total3 = $this->calculables_estado_resultados($nombre_cuenta3['idagrupacion_rubro_plandecuenta'], $idempresa, $gestion,$aux_nivel_3['idplandecuenta'],$fecha_ini,$fecha_fin,$aux_nivel_3['idplantilla']);
+
+                            $suma_nivel_3 = $suma_nivel_3 + $valor_total3;
+                            if($valor_total3 == null || $valor_total3 == '0'){
+                                //-----------------------------------
+                            }else{
+                                $res3 = array(
+                                    // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
+                                    "idplandecuenta" => $nombre_cuenta3['idplandecuenta'],
+                                    "codigo" => $nombre_cuenta3['numero'],
+                                    "negrilla_cursiva" => $aux_nivel_3['negrilla_cursiva'],
+                                    "nombre_cuenta" => $nombre_cuenta3['nombreplan'],
+                                    "tipo_operacion" => $aux_nivel_3['tipo_operacion'],
+                                    "disponible_para_otro_reporte" => $aux_nivel_3['disponible_para_otro_reporte'],
+                                    // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
+                                    "valor" => $valor_total3,
+                                    "suma_nivel_4" => 0,
+                                    // "nivel_4" => [] //activo
+                                    );
+                                array_push($res2['nivel_3'], $res3);  
+
+                            }
+                        }else{ // NO ES CALCULABLE
+                            // NIVEL 4 4444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444
+                            $res3 = array(
+                                    // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
+                                    "idplandecuenta" => $nombre_cuenta3['idplandecuenta'],
+                                    "codigo" => $nombre_cuenta3['numero'],
+                                    "negrilla_cursiva" => $aux_nivel_3['negrilla_cursiva'],
+                                    "nombre_cuenta" => $nombre_cuenta3['nombreplan'],
+                                    "tipo_operacion" => $aux_nivel_3['tipo_operacion'],
+                                    "disponible_para_otro_reporte" => $aux_nivel_3['disponible_para_otro_reporte'],
+                                    // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
+                                    "valor" => 0,
+                                    "suma_nivel_4" => 0,
+                                    "nivel_4" => [] //activo
+                                    );
+
+                            $nivel_4 = $this->dbc->query("SELECT * from pr_plantilla WHERE idplantilla_padre = '$aux_nivel_3[idplantilla]'");// vents_cafe_yungs, vnts cafe_nueva esperanza
+
+                            $suma_nivel_4 = 0;
+
+                            while ($aux_nivel_4 = $this->dbc->fetch($nivel_4)) {
+
+                                $plan_cuenta4 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$aux_nivel_4[idplandecuenta]'");// caja_general, banco
+                                $nombre_cuenta4 = $plan_cuenta4->fetch_assoc();
+
+                                if($aux_nivel_4['tipo_operacion'] == 'calculable'){ //SI ES CALCULABLE   
+                                    $valor_total4 = $this->calculables_estado_resultados($nombre_cuenta4['idagrupacion_rubro_plandecuenta'], $idempresa, $gestion,$aux_nivel_4['idplandecuenta'],$fecha_ini,$fecha_fin,$aux_nivel_4['idplantilla']);
+
+                                    $suma_nivel_4 = $suma_nivel_4 + $valor_total4;
+                                    if($valor_total4 == null || $valor_total4 == '0'){
+                                        //-----------------------------------
+                                    }else{
+                                        $res4 = array(
+                                            // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
+                                            "idplandecuenta" => $nombre_cuenta4['idplandecuenta'],
+                                            "codigo" => $nombre_cuenta4['numero'],
+                                            "negrilla_cursiva" => $aux_nivel_4['negrilla_cursiva'],
+                                            "nombre_cuenta" => $nombre_cuenta4['nombreplan'],
+                                            "tipo_operacion" => $aux_nivel_4['tipo_operacion'],
+                                            "disponible_para_otro_reporte" => $aux_nivel_4['disponible_para_otro_reporte'],
+                                            // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
+                                            "valor" => $valor_total4,
+                                            "suma_nivel_4" => 0,
+                                            // "nivel_4" => [] //activo
+                                            );
+                                        array_push($res3['nivel_4'], $res4); 
+                                    } 
+                                }else{ // NO ES CALCULABLE
+                                    // NIVEL 5 55555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555
+                                    $res4 = array(
+                                            // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
+                                            "idplandecuenta" => $nombre_cuenta4['idplandecuenta'],
+                                            "codigo" => $nombre_cuenta4['numero'],
+                                            "negrilla_cursiva" => $aux_nivel_4['negrilla_cursiva'],
+                                            "nombre_cuenta" => $nombre_cuenta4['nombreplan'],
+                                            "tipo_operacion" => $aux_nivel_4['tipo_operacion'],
+                                            "disponible_para_otro_reporte" => $aux_nivel_4['disponible_para_otro_reporte'],
+                                            // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
+                                            "valor" => 0,
+                                            "suma_nivel_4" => 0,
+                                            "nivel_5" => [] //activo
+                                            );
+
+                                    $nivel_5 = $this->dbc->query("SELECT * from pr_plantilla WHERE idplantilla_padre = '$aux_nivel_4[idplantilla]'");// vents_cafe_yungs, vnts cafe_nueva esperanza
+
+                                    $suma_nivel_5 = 0;
+
+                                    while ($aux_nivel_5 = $this->dbc->fetch($nivel_5)) { // ENTRANDO AL NIVEL 555555555
+
+                                        $plan_cuenta5 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$aux_nivel_5[idplandecuenta]'");// caja_general, banco
+                                        $nombre_cuenta5 = $plan_cuenta5->fetch_assoc();
+
+                                        $valor_total5 = $this->calculables_estado_resultados($nombre_cuenta5['idagrupacion_rubro_plandecuenta'], $idempresa, $gestion,$aux_nivel_5['idplandecuenta'],$fecha_ini,$fecha_fin,$aux_nivel_5['idplantilla']);
+
+                                        $suma_nivel_5 = $suma_nivel_5 + $valor_total5;
+                                        if($valor_total5 == null || $valor_total5 == '0'){
+                                            //-----------------------------------
+                                        }else{
+                                            $res5 = array(
+                                                // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
+                                                "idplandecuenta" => $nombre_cuenta5['idplandecuenta'],
+                                                "codigo" => $nombre_cuenta5['numero'],
+                                                "negrilla_cursiva" => $aux_nivel_5['negrilla_cursiva'],
+                                                "nombre_cuenta" => $nombre_cuenta5['nombreplan'],
+                                                "tipo_operacion" => $aux_nivel_5['tipo_operacion'],
+                                                "disponible_para_otro_reporte" => $aux_nivel_5['disponible_para_otro_reporte'],
+                                                // "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
+                                                "valor" => $valor_total5,
+                                                // "suma_nivel_4" => 0,
+                                                // "nivel_4" => [] //activo
+                                                );
+                                            array_push($res4['nivel_5'], $res5); 
+                                            }
+                                    } 
+                                    // FIN DEL NIVEL 5 55555555555555555555555555555555555555555555555555555555555555555555555555555555
+                                    // array_push($res3['nivel_4'], $res4);  
+
+                                    //ESTO AUMENTE ANTES DE IR A ALMORZAR,,,,,,,
+                                    // $res4['suma_nivel_5'] = $suma_nivel_5;
+                                    $res4['valor'] = $suma_nivel_5;
+                                    $suma_nivel_4 = $suma_nivel_4 + $res4['valor'];
+                                    array_push($res3['nivel_4'], $res4); 
+
+                                }     
+                            }
+                            //ESTO AUMENTE ANTES DE IR A ALMORZAR,,,,,,,
+                            $res3['suma_nivel_4'] = $suma_nivel_4;
+                            $res3['valor'] = $suma_nivel_4;
+                            $suma_nivel_3 = $suma_nivel_3 + $res3['valor'];
+
+                            array_push($res2['nivel_3'], $res3);  
+                            // FIN DEL NIVEL 4 4444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444        
+                        }     
+                    }
+                    $res2['suma_nivel_3'] = $suma_nivel_3;
+                    $res2['valor'] = $suma_nivel_3;
+                    $suma_nivel_2 = $suma_nivel_2 + $res2['valor'];
+                    // FIN DEL NIVEL 3 333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333
+                array_push($res['nivel_2'], $res2);  
+                }
+            }
+            $res['suma_nivel_2'] = $suma_nivel_2;
+            // FIN DEL NIVEL 2 2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222 
+            }else{ //ES UNA PLANTILLA SIN OPERACION (COSTO_PRODUCCION)
+                
+                $agru = $this->dbc->query("SELECT * from agrupacion_plantilla where idplantilla_hijo = '$pl_list[idplantilla]'");// HIJOS DE LAS PLANTILLAS AGRUPADORAS
+                $agru_aux = $agru->fetch_assoc();
+                $res['suma_nivel_2'] = $agru_aux['monto']; //esto en caso de que el monto siempre sea mayor a cero
+            }
+            }// AQUI TERMINA EL NO ES CALCULABLE }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+           
+            // if($res['suma_nivel_2'] == '0' || $res['suma_nivel_2'] == null){
+            //     //nada
+            // }else{
+                array_push($lista, $res);
+            // }
+            // array_push($lista, $res);  
+            $lista_aux_buscador = [];        
+        }
+
+        // Buscar el primer elemento con disponible_para_otro_reporte = "si"
+        function buscarDisponible($lista) {
+            foreach ($lista as $item) {
+                if (isset($item['disponible_para_otro_reporte']) && strtolower($item['disponible_para_otro_reporte']) == 'si') {
+                    // Si tiene suma_nivel_2, devolverlo
+                    if (isset($item['suma_nivel_2'])) {
+                        return $item['suma_nivel_2'];
+                    }
+                    // Si tiene valor (por ejemplo, niveles inferiores)
+                    if (isset($item['valor'])) {
+                        return $item['valor'];
+                    }
+                }
+
+                // Buscar recursivamente en niveles inferiores
+                foreach ($item as $clave => $subnivel) {
+                    if (is_array($subnivel)) {
+                        $resultado = buscarDisponible($subnivel);
+                        if ($resultado !== null) {
+                            return $resultado;
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        $valor_encontrado = buscarDisponible($lista);
+
+        // Si no encuentra nada, devuelve 0 o null
+        if ($valor_encontrado === null) {
+            $valor_encontrado = 0;
+        }
+
+        echo json_encode($valor_encontrado, JSON_NUMERIC_CHECK);
+    }
+
+    
+
     public function editar_otras_operaciones($idagrupacion_plantilla, $idplantilla_hijo, $operacion, $monto)
     {
         // $id_empresa = $this->get_id_empresa($idempresa);

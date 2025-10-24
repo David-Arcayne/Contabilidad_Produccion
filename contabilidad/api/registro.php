@@ -611,12 +611,12 @@ if($data['ver'] == "asignar_asiento_A_factura") {
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idplantilla'],$_POST['idplandecuenta'],$_POST['nombre_personalizado'],$_POST['tipo_operacion'],$_POST['orden'],$_POST['idplantilla_padre'],$_POST['negrilla_cursiva'],$_POST['empresa']));
         }
     }elseif($ver=="registrar_agrupacion_plantilla"){
-        if(isset($_POST['idplantilla_padre'],$_POST['idplantilla_hijo'],$_POST['tipo_operacion'],$_POST['monto'],$_POST['idempresa'])){
+        if(isset($_POST['idplantilla_padre'],$_POST['idplantilla_hijo'],$_POST['tipo_operacion'],$_POST['monto'],$_POST['idtipo_reportes'],$_POST['idempresa'])){
             $cont=new PlantillaReporte();
-            $cont->registrar_agrupacion_plantilla($_POST['idplantilla_padre'],$_POST['idplantilla_hijo'],$_POST['tipo_operacion'],$_POST['monto'],$_POST['idempresa']);
+            $cont->registrar_agrupacion_plantilla($_POST['idplantilla_padre'],$_POST['idplantilla_hijo'],$_POST['tipo_operacion'],$_POST['monto'],$_POST['idtipo_reportes'],$_POST['idempresa']);
         }
         else{
-            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idplantilla_padre'],$_POST['idplantilla_hijo'],$_POST['tipo_operacion'],$_POST['monto'],$_POST['idempresa']));
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idplantilla_padre'],$_POST['idplantilla_hijo'],$_POST['tipo_operacion'],$_POST['monto'],$_POST['idtipo_reportes'],$_POST['idempresa']));
         }  
     }
     elseif($ver=="registrar_recibo_cobro_cajaBancos_en_facturas"){
@@ -692,12 +692,12 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     $cont=new Recibo_otras_cuentas();
     $cont->registrar_recibo_comprobantes_clonacion($_POST['nro_recibo'],$_POST['fecha'],$_POST['lugar'],$_POST['cliente_proveedor'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['cobrado'],$_POST['pagado'],$_POST['idotras_cuentas'],$_POST['transaccion'],$_POST['concepto'],$_POST['registro_desde'],$_POST['idempresa']);
     }elseif($ver=="insertar_debajo_de"){
-        if(isset($_POST['idplandecuenta'],$_POST['reporte'],$_POST['nombre_cuenta_superior'],$_POST['nivel_registrado'],$_POST['orden'],$_POST['grupo'],$_POST['es_calculable'],$_POST['es_activo_fijo'],$_POST['empresa'])){
+        if(isset($_POST['idplandecuenta'],$_POST['idplantilla_reporte'],$_POST['reporte'],$_POST['nombre_cuenta_superior'],$_POST['nivel_registrado'],$_POST['orden'],$_POST['grupo'],$_POST['es_calculable'],$_POST['es_activo_fijo'],$_POST['negrilla_cursiva'],$_POST['empresa'])){
             $cont=new Reporte_confi();
-            $cont->insertar_debajo_de($_POST['idplandecuenta'],$_POST['reporte'],$_POST['nombre_cuenta_superior'],$_POST['nivel_registrado'],$_POST['orden'],$_POST['grupo'],$_POST['es_calculable'],$_POST['es_activo_fijo'],$_POST['empresa']);
+            $cont->insertar_debajo_de($_POST['idplandecuenta'],$_POST['idplantilla_reporte'],$_POST['reporte'],$_POST['nombre_cuenta_superior'],$_POST['nivel_registrado'],$_POST['orden'],$_POST['grupo'],$_POST['es_calculable'],$_POST['es_activo_fijo'],$_POST['negrilla_cursiva'],$_POST['empresa']);
         }
         else{
-            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idplandecuenta'],$_POST['reporte'],$_POST['nombre_cuenta_superior'],$_POST['nivel_registrado'],$_POST['orden'],$_POST['grupo'],$_POST['es_calculable'],$_POST['es_activo_fijo'],$_POST['empresa']));
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idplandecuenta'],$_POST['idplantilla_reporte'],$_POST['reporte'],$_POST['nombre_cuenta_superior'],$_POST['nivel_registrado'],$_POST['orden'],$_POST['grupo'],$_POST['es_calculable'],$_POST['es_activo_fijo'],$_POST['negrilla_cursiva'],$_POST['empresa']));
         }
     }elseif($ver=="registrar_agrupacion_rubro_plandecuenta"){
         if(isset($_POST['idtipo_plandecuenta'],$_POST['numero'],$_POST['empresa'])){
@@ -733,6 +733,20 @@ if($data['ver'] == "asignar_asiento_A_factura") {
             $cont->registrar_estado_resultados_admin($_POST['idplantilla_reporte'],$_POST['idtn'],$_POST['empresa']);
         }else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idplantilla_reporte'],$_POST['idtn'],$_POST['empresa']));
+        }
+    }elseif($ver=="editar_registros_padres_BG"){
+        if(isset($_POST['idconfiguracion_reporte'],$_POST['negrilla_cursiva'])){
+            $cont=new Reporte_confi();
+            $cont->editar_registros_padres_BG($_POST['idconfiguracion_reporte'],$_POST['negrilla_cursiva']);
+        }else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idconfiguracion_reporte'],$_POST['negrilla_cursiva']));
+        }
+    }elseif($ver=="editar_registros_padres_ER"){
+        if(isset($_POST['idplantilla'],$_POST['negrilla_cursiva'])){
+            $cont=new PlantillaReporte();
+            $cont->editar_registros_padres_ER($_POST['idplantilla'],$_POST['negrilla_cursiva']);
+        }else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idplantilla'],$_POST['negrilla_cursiva']));
         }
     }
     
