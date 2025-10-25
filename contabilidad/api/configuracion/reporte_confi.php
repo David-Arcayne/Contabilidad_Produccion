@@ -1327,7 +1327,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                          if($qwe4['es_calculable'] == 'si'){ // ES CALCULABLE
                             //ESTO ES NIVEL 3
                 
-                                $suma_cuentas = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total FROM transacciones t
+                                $suma_cuentas = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(haber) - SUM(debe) AS total FROM transacciones t
                                 INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
                                 INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
                                 where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$nombre_cuenta3[idplandecuenta]'
@@ -1379,7 +1379,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                             if($qwe5['es_calculable'] == 'si'){ // ES CALCULABLE
                                 
                             //ESTO ES NIVEL 4
-                                $suma_cuentas = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total FROM transacciones t
+                                $suma_cuentas = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(haber) - SUM(debe) AS total FROM transacciones t
                                 INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
                                 INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
                                 where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$nombre_cuenta4[idplandecuenta]'
@@ -1425,7 +1425,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                         while ($qwe6 = $this->dbc->fetch($get_nivel_6)) { //esto ya es nivel 5 = CALCULABLE
                             $cuenta5 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe6[idplandecuenta]'");// caja_general, banco
                             $nombre_cuenta5 = $cuenta5->fetch_assoc();
-                            $suma_cuentas2 = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total FROM transacciones t
+                            $suma_cuentas2 = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(haber) - SUM(debe) AS total FROM transacciones t
                                 INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
                                 INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
                                 where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$nombre_cuenta5[idplandecuenta]'

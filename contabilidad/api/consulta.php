@@ -639,6 +639,15 @@ elseif($ver[0]=="listar_tipo_reportes_activos"){
 }elseif($ver[0]=="reporte_calculo_otro_reporte"){
     $cont=new PlantillaReporte();
     $cont->reporte_calculo_otro_reporte($ver[1],$ver[2],$ver[3],$ver[4]);
+}elseif($ver[0]=="listar_reportes_referencia"){
+    $cont=new PlantillaReporte();
+    $cont->listar_reportes_referencia($ver[1]);
+}elseif($ver[0]=="listar_reportes_referencia_select"){
+    $cont=new PlantillaReporte();
+    $cont->listar_reportes_referencia_select($ver[1]);
+}elseif($ver[0]=="eliminar_reportes_referencia"){
+    $cont=new PlantillaReporte();
+    $cont->eliminar_reportes_referencia($ver[1]);
 }
 
 //   listapagos_individuales listar_recibo_facturas_otras_cuentas listar_cuentas_NoVinculadas lista_plan_cuenta_no_vinculada lista_cobrar_cobrado

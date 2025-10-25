@@ -748,8 +748,14 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         }else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idplantilla'],$_POST['negrilla_cursiva']));
         }
+    }elseif($ver=="registrar_reportes_referencia"){
+        if(isset($_POST['idtipo_reporte'],$_POST['idplantilla'],$_POST['idtipo_reporte_referencia'],$_POST['idplantilla_referencia'],$_POST['empresa'])){
+            $cont=new PlantillaReporte();
+            $cont->registrar_reportes_referencia($_POST['idtipo_reporte'],$_POST['idplantilla'],$_POST['idtipo_reporte_referencia'],$_POST['idplantilla_referencia'],$_POST['empresa']);
+        }else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idtipo_reporte'],$_POST['idplantilla'],$_POST['idtipo_reporte_referencia'],$_POST['idplantilla_referencia'],$_POST['empresa']));
+        }
     }
-    
 //  vincula  -- crearfacturasf5 registrar_factura_cobro registrar_factura_cobro_otras_cuentas --> aumentar usuario registrar_factura_cobros_tributario
 //  registrocobrarfacturaGrupal crearfacturas caja_bancos registrar_factura_pago registrar_otras_cuentas registrar_recibo_otras_cuentas--> aumentar usuario creartransaccion
 }//   asignar_asiento registrar_transaccion_recibo asignar_asiento registrar_plantilla cierre reasignar registrar_transaccion

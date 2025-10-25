@@ -851,16 +851,17 @@ class PlantillaReporte extends DB{
             } elseif($pl_otro_reporte->num_rows > 0){ // ES UNA PLANTILLA QUE OBTIENE RESULTADO DE OTRO REPORTE
                 //  $pl_list['tipo_operacion'] == 'calculo_otro_reporte'
 
-                $calculo_otro_reporte = $pl_otro_reporte->fetch_assoc(); 
+                $calc_otr_rep = $pl_otro_reporte->fetch_assoc(); 
 
                 // IR AL OTRO REPORTE PARA OBTENER LO QUE QUIERO
-                $this->reporte_calculo_otro_reporte(    // TENDRIA QUE USAR OTRO REPORTE QUE ME RETORNE DIRECTAMENTE EL RESULTADO DE LA PLANTILLA 
-                $calculo_otro_reporte['idtipo_reporte_referencia'],   // REPORTE DE REFERENCIA
+
+                $total_otro_reporte =$this->reporte_calculo_otro_reporte(    // TENDRIA QUE USAR OTRO REPORTE QUE ME RETORNE DIRECTAMENTE EL RESULTADO DE LA PLANTILLA 
+                $calc_otr_rep['idtipo_reporte_referencia'],   // REPORTE DE REFERENCIA
                 $fecha_ini,
                 $fecha_fin,
                 $empresa
             );
-                // $res['suma_nivel_2'] = $sum_rest;
+                 $res['suma_nivel_2'] = $total_otro_reporte;
             }
             elseif($pl_padre_calcu->num_rows > 0){ //ES UNA PLANTILLA CON HIJOS CALCULABLES  (VENTAS)
 
@@ -1159,7 +1160,7 @@ class PlantillaReporte extends DB{
         return $valor_total;
     }
 
-    public function reporte_calculo_otro_reporte($idplantilla_reporte,$fecha_ini,$fecha_fin,$empresa) {
+    private function reporte_calculo_otro_reporte($idplantilla_reporte,$fecha_ini,$fecha_fin,$empresa) {
         //    ini_set('display_errors', 1); 
         // ini_set('display_startup_errors', 1);
         // error_reporting(E_ALL);
@@ -1535,7 +1536,7 @@ class PlantillaReporte extends DB{
                     if (isset($item['suma_nivel_2'])) {
                         return $item['suma_nivel_2'];
                     }
-                    // Si tiene valor (por ejemplo, niveles inferiores)
+                    // Si tiene valor (por ejemplo, niveles inferiores) calculo_otro_reporte
                     if (isset($item['valor'])) {
                         return $item['valor'];
                     }
@@ -2080,6 +2081,87 @@ class PlantillaReporte extends DB{
         }
 
         return $valor_total;
+    }
+
+    public function registrar_reportes_referencia($idtipo_reporte,$idplantilla,$idtipo_reporte_referencia,$idplantilla_referencia,$empresa){
+        // $idempresa = Empresa::getidempresa($empresa);
+        $idempresa = $this->get_id_empresa($empresa);
+        // $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM divisa WHERE nombre = '$nombre' AND idempresa = '$idempresa'");
+        // $resultado = $consulta->fetch_assoc();
+        // $totalRegistros = $resultado['total'];
+
+        if (0 > 0) {
+            $res = array("danger", "El registro ya existe","Error");
+        } else {
+            // Insertar el nuevo registro
+            $registroProveedor = $this->dbc->query("INSERT INTO calculo_otro_reporte(idtipo_reporte,idplantilla,idtipo_reporte_referencia,idplantilla_referencia,idempresa) 
+            VALUES ('$idtipo_reporte','$idplantilla','$idtipo_reporte_referencia','$idplantilla_referencia','$idempresa')");
+            if ($registroProveedor === TRUE) {                                                                                                                                                                
+                $res = array("success", "Registro exitoso","registroCaracteristicas");
+            } else {
+                $res = array("danger", "No se pudo registrar");
+            }
+        }
+        echo json_encode($res);
+        
+    }
+
+    public function listar_reportes_referencia_select($empresa) {
+        $lista = [];
+        $idempresa = $this->get_id_empresa($empresa);
+    
+        // Preparar la consulta
+        $getPedido = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idempresa = '$idempresa' AND disponible_para_otro_reporte ='si'");
+    
+        while ($qwe = $this->dbc->fetch($getPedido)) {
+            
+            $tipo_reporte = $this->dbc->query("SELECT * FROM tipo_reportes WHERE idtipo_reportes = '$qwe[idplantilla_reporte]'");
+            $tr = $tipo_reporte->fetch_assoc();
+            $res = array(
+                "idplantilla_referencia" => $qwe['idplantilla'],
+                "idtipo_reportes_referencia" => $qwe['idplantilla_reporte'],
+                "nombre" => $tr['nombre']
+            );
+            array_push($lista, $res);
+        }
+    
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
+    public function listar_reportes_referencia($idplantilla) {
+        $lista = [];
+        // $idempresa = $this->get_id_empresa($empresa);
+    
+        // Preparar la consulta
+        $getPedido = $this->dbc->query("SELECT * FROM calculo_otro_reporte WHERE idplantilla = '$idplantilla'");
+    
+        while ($qwe = $this->dbc->fetch($getPedido)) {
+            $tipo_reporte = $this->dbc->query("SELECT * FROM tipo_reportes WHERE idtipo_reportes = '$qwe[idtipo_reporte_referencia]'");
+            $tr = $tipo_reporte->fetch_assoc();
+
+            // $plantilla = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla_referencia = '$qwe[idplantilla_referencia]'");
+            // $pl = $plantilla->fetch_assoc();
+            $res = array(
+                "idcalculo_otro_reporte" => $qwe['idcalculo_otro_reporte'],
+                // "idtipo_reportes_referencia" => $pl['idplantilla_reporte'],
+                "nombre" => $tr['nombre']
+            );
+            array_push($lista, $res);
+        }
+    
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
+
+    public function eliminar_reportes_referencia($id){
+
+                // Insertar el nuevo registro
+                $registroProveedor = $this->dbc->query("DELETE FROM calculo_otro_reporte WHERE idcalculo_otro_reporte = '$id'");
+                if ($registroProveedor === TRUE) {                                                                                                                                                    
+                    $res = array("success", "se elimino exitosamente","eliminarCaracteristica",$id);
+                } else {
+                    $res = array("danger", "No se pudo registrar");
+                }
+            
+            echo json_encode($res);
     }
 }
 ?>
