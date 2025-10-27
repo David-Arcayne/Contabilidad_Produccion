@@ -848,9 +848,9 @@ class PlantillaReporte extends DB{
                     
                 // }
                 $res['suma_nivel_2'] = $resu;
-            } elseif($pl_otro_reporte->num_rows > 0){ // ES UNA PLANTILLA QUE OBTIENE RESULTADO DE OTRO REPORTE
+            }elseif($pl_otro_reporte->num_rows > 0){ // ES UNA PLANTILLA QUE OBTIENE RESULTADO DE OTRO REPORTE
                 //  $pl_list['tipo_operacion'] == 'calculo_otro_reporte'
-
+                $total_otro_reporte = 0;
                 $calc_otr_rep = $pl_otro_reporte->fetch_assoc(); 
 
                 // IR AL OTRO REPORTE PARA OBTENER LO QUE QUIERO
@@ -1561,8 +1561,8 @@ class PlantillaReporte extends DB{
         if ($valor_encontrado === null) {
             $valor_encontrado = 0;
         }
-
-        echo json_encode($valor_encontrado, JSON_NUMERIC_CHECK);
+        return $valor_encontrado;
+        // echo json_encode($valor_encontrado, JSON_NUMERIC_CHECK);
     }
 
     

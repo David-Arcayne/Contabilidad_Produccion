@@ -636,10 +636,12 @@ elseif($ver[0]=="listar_tipo_reportes_activos"){
 }elseif($ver[0]=="listar_cuentas_NoVinculadas_subcuentas"){
     $cont=new Plandecuentas();
     $cont->listar_cuentas_NoVinculadas_subcuentas($ver[1],$ver[2]);
-}elseif($ver[0]=="reporte_calculo_otro_reporte"){
-    $cont=new PlantillaReporte();
-    $cont->reporte_calculo_otro_reporte($ver[1],$ver[2],$ver[3],$ver[4]);
-}elseif($ver[0]=="listar_reportes_referencia"){
+}
+// elseif($ver[0]=="reporte_calculo_otro_reporte"){
+//     $cont=new PlantillaReporte();
+//     $cont->reporte_calculo_otro_reporte($ver[1],$ver[2],$ver[3],$ver[4]);
+// }
+elseif($ver[0]=="listar_reportes_referencia"){
     $cont=new PlantillaReporte();
     $cont->listar_reportes_referencia($ver[1]);
 }elseif($ver[0]=="listar_reportes_referencia_select"){
