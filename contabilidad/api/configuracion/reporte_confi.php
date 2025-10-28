@@ -936,7 +936,8 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                     "nivel_2" => [] //activo
                     );
                 $suma_nivel_2 = 0;
-                $get_nivel_3 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta[nombreplan]' AND idempresa='$idempresa' ORDER BY orden ASC");// ACTIVO, PASIVO, PATRIMONIO
+                $get_nivel_3 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '$nombre_cuenta[nombreplan]' AND reporte ='balance_general' AND idempresa='$idempresa'
+                AND idplantilla_reporte ='$idplantilla_reporte' ORDER BY orden ASC");// ACTIVO, PASIVO, PATRIMONIO
                 while ($qwe3 = $this->dbc->fetch($get_nivel_3)) {
                     // ACTIVO_CIRCULANTE, ACTIVO_FIJO
                     // if($qwe3['es_activo_fijo'] == '1'){ // TRUE

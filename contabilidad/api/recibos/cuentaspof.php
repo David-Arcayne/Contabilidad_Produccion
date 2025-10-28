@@ -2,7 +2,7 @@
 require_once "../../db/db.php";
 class Cuentaspof extends DB{
 
-    public function registrocobrarfactura($idfactura,$lugar, $idtransaccion,$idcaja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$archivo,$zn)
+    public function registrocobrarfactura($idfactura,$lugar, $idtransaccion,$idcaja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$concepto,$archivo,$zn)
     {
         // echo json_encode(array($idfactura, $idtransaccion,$caja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$archivo));
 
@@ -91,8 +91,8 @@ class Cuentaspof extends DB{
         //------------------------------------------------------------------------------------
 
         if(empty($archivo['name'])){
-            $registropago = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
-            VALUES(NULL,'$nrecibo','$fecha_completa','$lugar','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$idcuenta',NULL)");
+            $registropago = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,concepto,archivo)
+            VALUES(NULL,'$nrecibo','$fecha_completa','$lugar','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$idcuenta','$concepto',NULL)");
 
         if ($registropago === TRUE) {
 
@@ -127,8 +127,8 @@ class Cuentaspof extends DB{
         }
         if(move_uploaded_file($archivo_tmp, $ruta_destino)){
              //registrar pago, preguntar guardar la anterior transaccion o la nueva
-        $registropago2 = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
-        VALUES(NULL,'$nrecibo','$fecha_completa','$lugar','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$idcuenta','$unique_name')");
+        $registropago2 = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,concepto,archivo)
+        VALUES(NULL,'$nrecibo','$fecha_completa','$lugar','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$idcuenta','$concepto','$unique_name')");
 
         
         if ($registropago2 === TRUE) {
@@ -342,6 +342,12 @@ $caja_bancos = json_decode($cajasBancos, true);
                 $factura= $this->dbc->query("SELECT * FROM factura WHERE idfactura = '$factu[idfactura]'");
                 $ft = $factura->fetch_assoc();
     
+                if($recib['concepto'] == null){
+                    $concepto_comprobante = "Factura N°: ".$ft['nfactura']. " ". $ft['fecha'];
+                }else{
+                    $concepto_comprobante = $recib['concepto'];
+                }
+
                 if($ft['cobrado'] != 0){
                     $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $ft['proveedorcliente_idproveedorcliente'] . "'");
                     $cl = $cliente->fetch_assoc();
@@ -363,7 +369,8 @@ $caja_bancos = json_decode($cajasBancos, true);
                     "nombre" => $cl['nombre'],
                     "direccion" => $cl['direccion'],
                     "nit" => $cl['nit'],
-                    "por_concepto_de" => $ft['por_concepto_de']
+                    "por_concepto_de" => $concepto_comprobante
+                    // "por_concepto_de" => $ft['por_concepto_de']
                 
                 );
     
@@ -410,6 +417,12 @@ $caja_bancos = json_decode($cajasBancos, true);
             $factura= $this->dbc->query("SELECT * FROM factura WHERE idfactura = '$recib[idfactura]'");
             $ft = $factura->fetch_assoc();
 
+            if($recib['concepto'] == null){
+                $concepto_comprobante = "Factura N°: ".$ft['nfactura']. " ". $ft['fecha'];
+            }else{
+                $concepto_comprobante = $recib['concepto'];
+            }
+
             if($ft['cobrado'] != 0){
                 $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $ft['proveedorcliente_idproveedorcliente'] . "'");
                 $cl = $cliente->fetch_assoc();
@@ -431,8 +444,8 @@ $caja_bancos = json_decode($cajasBancos, true);
                 "nombre" => $cl['nombre'],
                 "direccion" => $cl['direccion'],
                 "nit" => $cl['nit'],
-                "por_concepto_de" => $ft['por_concepto_de']
-            
+                "por_concepto_de" => $concepto_comprobante
+                // "por_concepto_de" => $ft['por_concepto_de']
             );
 
             array_push($res['facturas'], $detalle_facturas);

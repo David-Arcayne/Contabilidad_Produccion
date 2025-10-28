@@ -99,6 +99,7 @@ class Caja_bancos_recibos extends DB{
             $id_otras_cuentas_aux = $idotras_cuentas;
         }
         
+        $concepto = 'Facura Nro: ';
         if($trans == "" && $asiento == ""){
             // se crea factura sin transaccion asignada
             //$trans = 0
@@ -106,8 +107,8 @@ class Caja_bancos_recibos extends DB{
         
             $idfact = $this->dbc->insert_id;
 
-            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','0','$trans','0',NULL,'$registro_desde')");
+            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,concepto,archivo,registro_desde)
+            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','0','$trans','0',$concepto,NULL,'$registro_desde')");
 
             $idrecibo = $this->dbc->insert_id;
         }elseif($trans > 0 && $asiento == 0){
@@ -116,8 +117,8 @@ class Caja_bancos_recibos extends DB{
         
             $idfact = $this->dbc->insert_id;
 
-            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','0','$trans','0',NULL,'$registro_desde')");
+            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,concepto,archivo,registro_desde)
+            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','0','$trans','0',$concepto,NULL,'$registro_desde')");
 
             $idrecibo = $this->dbc->insert_id;
         }else{
@@ -160,8 +161,8 @@ class Caja_bancos_recibos extends DB{
         
         $idfact = $this->dbc->insert_id;
 
-        $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','0','$idtrans','0',NULL,'$registro_desde')");
+        $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,concepto,archivo,registro_desde)
+            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','0','$idtrans','0',$concepto,NULL,'$registro_desde')");
 
         $idrecibo = $this->dbc->insert_id;
         }
@@ -2799,7 +2800,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         // echo json_encode(array);
     }  
 
-    public function registrar_recibo_cobro_cajaBancos_en_facturas($idfact,$fecha,$lugar,$persona, $ci,$monto, $asiento,$trans,$idcaja_bancos,$archivo,$registro_desde,$sucursal,$empresa,$zn)
+    public function registrar_recibo_cobro_cajaBancos_en_facturas($idfact,$fecha,$lugar,$persona, $ci,$monto, $asiento,$trans,$idcaja_bancos,$concepto,$archivo,$registro_desde,$sucursal,$empresa,$zn)
     { // nueva apiiiiiiiiiii
 
         ini_set('display_errors', 1);
@@ -2850,17 +2851,15 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             // se crea factura sin transaccion asignada
             //$trans = 0
 
-            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha_completa','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','0','$trans','0',NULL,'$registro_desde')");
+            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,concepto,archivo,registro_desde)
+            VALUES('$nroRecibo','$fecha_completa','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','0','$trans','0','$concepto',NULL,'$registro_desde')");
 
             $idrecibo = $this->dbc->insert_id;
         }elseif($trans > 0 && $asiento == 0){
             //SE CREA LA FACTURA CON LA TRANSACCION EXISTENTE QUE YA TE PASARON
-        
-            $idfact = $this->dbc->insert_id;
 
-            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha_completa','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','0','$trans','0',NULL,'$registro_desde')");
+            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,concepto,archivo,registro_desde)
+            VALUES('$nroRecibo','$fecha_completa','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','0','$trans','0','$concepto',NULL,'$registro_desde')");
 
             $idrecibo = $this->dbc->insert_id;
         }else{
@@ -2903,8 +2902,8 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         
         // $idfact = $this->dbc->insert_id;
 
-        $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha_completa','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','0','$idtrans','0',NULL,'$registro_desde')");
+        $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,concepto,archivo,registro_desde)
+            VALUES('$nroRecibo','$fecha_completa','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','0','$idtrans','0','$concepto',NULL,'$registro_desde')");
 
         $idrecibo = $this->dbc->insert_id;
         }
@@ -2956,7 +2955,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
     //esta api esta en la opcion caja_bancos donde podemos crear recibos asignando directamente a una factura existente
 
-    public function registrar_recibo_pago_cajaBancos_en_facturas($idfact,$fecha,$lugar,$persona, $ci,$monto, $asiento,$trans,$idcaja_bancos,$archivo,$registro_desde,$sucursal,$empresa,$zn)
+    public function registrar_recibo_pago_cajaBancos_en_facturas($idfact,$fecha,$lugar,$persona, $ci,$monto, $asiento,$trans,$idcaja_bancos,$concepto,$archivo,$registro_desde,$sucursal,$empresa,$zn)
     { // nueva apiiiiiiiiiii
 
         ini_set('display_errors', 1);
@@ -3008,8 +3007,8 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             // se crea factura sin transaccion asignada
             //$trans = 0
 
-            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha_completa','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','0','$trans','0',NULL,'$registro_desde')");
+            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,concepto,archivo,registro_desde)
+            VALUES('$nroRecibo','$fecha_completa','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','0','$trans','0','$concepto',NULL,'$registro_desde')");
 
             $idrecibo = $this->dbc->insert_id;
         }elseif($trans > 0 && $asiento == 0){
@@ -3017,8 +3016,8 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         
             $idfact = $this->dbc->insert_id;
 
-            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha_completa','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','0','$trans','0',NULL,'$registro_desde')");
+            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,concepto,archivo,registro_desde)
+            VALUES('$nroRecibo','$fecha_completa','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','0','$trans','0','$concepto',NULL,'$registro_desde')");
 
             $idrecibo = $this->dbc->insert_id;
         }else{
@@ -3061,8 +3060,8 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         
         // $idfact = $this->dbc->insert_id;
 
-        $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha_completa','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','0','$idtrans','0',NULL,'$registro_desde')");
+        $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,concepto,archivo,registro_desde)
+            VALUES('$nroRecibo','$fecha_completa','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','0','$idtrans','0','$concepto',NULL,'$registro_desde')");
 
         $idrecibo = $this->dbc->insert_id;
         }
@@ -3471,28 +3470,28 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
     }
 
-    public function listar_monto_factura_cajas($idfactura,$cobro_pago) {
-        $lista = [];
-        // $idempresa = $this->getidempresa($empresa);
+    // public function listar_monto_factura_cajas($idfactura,$cobro_pago) {
+    //     $lista = [];
+    //     // $idempresa = $this->getidempresa($empresa);
     
-        // Preparar la consulta
+    //     // Preparar la consulta
 
-        $fact = $this->dbc->query("SELECT montofactura FROM factura WHERE idfactura = '$idfactura'");
-        $fact_monto = $this->dbc->fetch($fact);
+    //     $fact = $this->dbc->query("SELECT montofactura FROM factura WHERE idfactura = '$idfactura'");
+    //     $fact_monto = $this->dbc->fetch($fact);
 
-        if($cobro_pago == '1'){ //COBRO
-            $suma = $this->dbc->query("SELECT SUM(monto) AS monto_suma FROM cuentaspof WHERE idfactura = '$idfactura'");
-        }else{ // PAGO
-            $suma = $this->dbc->query("SELECT SUM(monto) AS monto_suma FROM cuentaspor WHERE idfactura = '$idfactura'");
-        }
+    //     if($cobro_pago == '1'){ //COBRO
+    //         $suma = $this->dbc->query("SELECT SUM(monto) AS monto_suma FROM cuentaspof WHERE idfactura = '$idfactura'");
+    //     }else{ // PAGO
+    //         $suma = $this->dbc->query("SELECT SUM(monto) AS monto_suma FROM cuentaspor WHERE idfactura = '$idfactura'");
+    //     }
         
-        $suma_monto = $this->dbc->fetch($suma);
+    //     $suma_monto = $this->dbc->fetch($suma);
 
-        $resp =$fact_monto['montofactura'] - $suma_monto['monto_suma']; 
-        array_push($lista, $resp);
+    //     $resp =$fact_monto['montofactura'] - $suma_monto['monto_suma']; 
+    //     array_push($lista, $resp);
     
-        echo json_encode($lista, JSON_NUMERIC_CHECK);
-    }
+    //     echo json_encode($lista, JSON_NUMERIC_CHECK);
+    // }
 
     public function listar_datos_contrataciones_cajas($idotras_cuentas,$cobro_pago) {
         $lista = [];
@@ -3518,6 +3517,41 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                 "persona" => $oc['contacto'],
                 "ci" => $oc['nro_doc_identidad'],
                 "id_cliente_proveedor" => $oc['id_cliente_proveedor'],
+                "concepto" => "(".$aux_concepto.")",
+                "precio_restante" => $precio_restante
+            );
+        array_push($lista, $resp);
+    
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
+
+    public function listar_datos_facturas_cajas($idfactura,$cobro_pago) {
+        $lista = [];
+        // $idempresa = $this->getidempresa($empresa);
+    
+        // Preparar la consulta
+
+        $factura = $this->dbc->query("SELECT * FROM factura WHERE idfactura = '$idfactura'");
+        $ft = $this->dbc->fetch($factura);
+
+        if($cobro_pago == '1'){ //COBRO
+            $suma = $this->dbc->query("SELECT SUM(monto) AS monto_suma FROM cuentaspof WHERE idfactura = '$idfactura'");
+        }else{ // PAGO
+            $suma = $this->dbc->query("SELECT SUM(monto) AS monto_suma FROM cuentaspor WHERE idfactura = '$idfactura'");
+        }
+        
+        $suma_monto = $this->dbc->fetch($suma);
+        // $aux_concepto = "s/g Contrato: ". $ft['concepto'].", N° ".$ft['nro_otras_cuentas'].", ".$ft['fecha'];
+        
+        $aux_concepto = "Factura N°: ". $ft['nfactura']. " ".$ft['fecha'];
+
+        $precio_restante =$ft['montofactura'] - $suma_monto['monto_suma']; 
+        //s/g Contrato: "concepto",  N°, fecha
+        $resp = array(
+                // "lugar" => $ft['lugar'],
+                // "persona" => $oc['contacto'],
+                // "ci" => $oc['nro_doc_identidad'],
+                // "id_cliente_proveedor" => $oc['id_cliente_proveedor'],
                 "concepto" => "(".$aux_concepto.")",
                 "precio_restante" => $precio_restante
             );
@@ -3823,6 +3857,6 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
     }    
     // listar_recibo_por_caja_bancos array precio_restante registrar_recibo_pago_cajaBancos_en_facturas res4 registrar_recibo_cobro_cajaBancos_en_otras_cuentas monto_total
-//registrar_factura_recibo_cobro_cajaBancos, registrar_factura_recibo_pago_cajaBancos registrar_recibo_cobro_cajaBancos_en_facturas caja_bancos listar_recibo_por_caja_bancos
+//registrar_factura_recibo_cobro_cajaBancos, registrar_factura_recibo_pago_cajaBancos registrar_recibo_cobro_cajaBancos_en_facturas caja_bancos listar_recibo_por_caja_bancos datos
 }
 ?>

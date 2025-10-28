@@ -556,10 +556,12 @@ elseif($ver[0]=="listar_otras_cuentas_cobrar_select"){
 }elseif($ver[0]=="lista_pagar_pagado_factura_select"){
     $cont=new Contabilidad();
     $cont->lista_pagar_pagado_factura_select($ver[1]);
-}elseif($ver[0]=="listar_monto_factura_cajas"){
-    $cont=new Caja_bancos_recibos();
-    $cont->listar_monto_factura_cajas($ver[1],$ver[2]);
-}elseif($ver[0]=="listar_datos_contrataciones_cajas"){
+}
+// elseif($ver[0]=="listar_monto_factura_cajas"){
+//     $cont=new Caja_bancos_recibos();
+//     $cont->listar_monto_factura_cajas($ver[1],$ver[2]);
+// }
+elseif($ver[0]=="listar_datos_contrataciones_cajas"){
     $cont=new Caja_bancos_recibos();
     $cont->listar_datos_contrataciones_cajas($ver[1],$ver[2]);
 }elseif($ver[0]=="listar_forma_pago"){
@@ -650,9 +652,12 @@ elseif($ver[0]=="listar_reportes_referencia"){
 }elseif($ver[0]=="eliminar_reportes_referencia"){
     $cont=new PlantillaReporte();
     $cont->eliminar_reportes_referencia($ver[1]);
+}elseif($ver[0]=="listar_datos_facturas_cajas"){
+    $cont=new Caja_bancos_recibos();
+    $cont->listar_datos_facturas_cajas($ver[1],$ver[2]);
 }
 
-//   listapagos_individuales listar_recibo_facturas_otras_cuentas listar_cuentas_NoVinculadas lista_plan_cuenta_no_vinculada lista_cobrar_cobrado listar_datos
+// lista_cobrar_cobrado listar_datos listar_monto_factura_cajas listar_recibo_por_id listar_recibo_por_id_otras_cuentas
 //    listar_recibo_otras_cuentas  listar_recibo_otras_cuentas_pagar                  listar_recibo_pago_por_id        listar_recibo_por_id   --> caja bancos 
 // select_plantilla_estado_resultados listar_plantilla                                listar_recibo_por_id_otras_cuentas      listar_recibo_por_id_otras_cuentas_pagar ---> esos dos son de recibos
 

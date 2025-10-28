@@ -476,8 +476,14 @@ while ($qwe = $this->dbc->fetch($registro)) {
             // $factura= $this->dbc->query("SELECT * FROM otras_cuentas WHERE idotras_cuentas = '$factu[idotras_cuentas]'");
             // $ft = $factura->fetch_assoc();
 
-            $recibo= $this->dbc->query("SELECT * FROM recibo WHERE idrecibo = '$recib[idrecibo]'");
-            $rec = $recibo->fetch_assoc();
+        $recibo= $this->dbc->query("SELECT * FROM recibo WHERE idrecibo = '$recib[idrecibo]'");
+        $rec = $recibo->fetch_assoc();
+
+        if($recib['concepto'] == null){
+            $concepto_comprobante = "Recibo N°: ".$rec['nro_recibo']. " ". $rec['fecha'];
+        }else{
+            $concepto_comprobante = $recib['concepto'];
+        }
 
             // if($ft['cobrado'] != 0){
                 $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $rec['cliente_proveedor'] . "'");
@@ -500,7 +506,7 @@ while ($qwe = $this->dbc->fetch($registro)) {
                 "direccion" => $cl['direccion'], // rec
                 "nit" => $cl['nit'], // rec
                 //nombre del q registra
-                "concepto" => $rec['concepto'] // concepto del recibo
+                "concepto" => $concepto_comprobante // concepto del Comprobante
             
             );
 
@@ -547,10 +553,16 @@ while ($qwe = $this->dbc->fetch($registro)) {
         //   $factura= $this->dbc->query("SELECT * FROM otras_cuentas WHERE idotras_cuentas = '$recib[idotras_cuentas]'");
         // $ft = $factura->fetch_assoc();
 
-        $factura= $this->dbc->query("SELECT * FROM recibo WHERE idrecibo = '$recib[idrecibo]'");
-        $ft = $factura->fetch_assoc();
+        $recibo_n= $this->dbc->query("SELECT * FROM recibo WHERE idrecibo = '$recib[idrecibo]'");
+        $rec = $recibo_n->fetch_assoc();
 
-        $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $ft['id_cliente_proveedor'] . "'");
+        if($recib['concepto'] == null){
+            $concepto_comprobante = "Recibo N°: ".$rec['nro_recibo']. " ". $rec['fecha'];
+        }else{
+            $concepto_comprobante = $recib['concepto'];
+        }
+
+        $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $rec['id_cliente_proveedor'] . "'");
         $cl = $cliente->fetch_assoc();
         
         $detalle_facturas = array(
@@ -560,13 +572,13 @@ while ($qwe = $this->dbc->fetch($registro)) {
             "lugar" => $recib['lugar'],
             "fecha" => $recib['fecha'],
             "persona" => $recib['persona'],
-            "idfactura" => $ft['idrecibo'],
-            "fecha_factura" => $ft['fecha'],
-            "nro_factura" => $ft['nro_recibo'],
+            "idfactura" => $rec['idrecibo'],
+            "fecha_factura" => $rec['fecha'],
+            "nro_factura" => $rec['nro_recibo'],
             "nombre" => $cl['nombre'],
             "direccion" => $cl['direccion'],
             "nit" => $cl['nit'],
-            "por_concepto_de" => $ft['concepto']
+            "por_concepto_de" => $concepto_comprobante
         
         );
 
@@ -866,6 +878,11 @@ while ($qwe = $this->dbc->fetch($registro)) {
             $recibo= $this->dbc->query("SELECT * FROM recibo WHERE idrecibo = '$comprobante[idrecibo]'");
             $rec = $recibo->fetch_assoc();
 
+            if($comprobante['concepto'] == null){
+                $concepto_comprobante = "Recibo N°: ".$rec['nro_recibo']. " ". $rec['fecha'];
+            }else{
+                $concepto_comprobante = $comprobante['concepto'];
+            }
             // if($ft['cobrado'] != 0){
             //     $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $ft['proveedorcliente_idproveedorcliente'] . "'");
             //     $cl = $cliente->fetch_assoc();
@@ -934,6 +951,12 @@ while ($qwe = $this->dbc->fetch($registro)) {
         $recibo= $this->dbc->query("SELECT * FROM recibo WHERE idotras_cuentas = '$comprobante[idotras_cuentas]'");
         $rec = $recibo->fetch_assoc();
 
+        if($comprobante['concepto'] == null){
+            $concepto_comprobante = "Recibo N°: ".$rec['nro_recibo']. " ". $rec['fecha'];
+        }else{
+            $concepto_comprobante = $comprobante['concepto'];
+        }
+
         $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='" . $rec['cliente_proveedor'] . "'");
         $cl = $proveedor->fetch_assoc();
         
@@ -950,7 +973,7 @@ while ($qwe = $this->dbc->fetch($registro)) {
             "nombre" => $cl['nombre'],
             "direccion" => $cl['direccion'],
             "nit" => $cl['nit'],
-            "por_concepto_de" => $rec['concepto']
+            "por_concepto_de" => $concepto_comprobante
         
         );
 

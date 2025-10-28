@@ -2,7 +2,7 @@
 require_once "../../db/db.php";
 class Cuentaspor extends DB{
 
-    public function registropagarfactura($idfactura,$lugar, $idtransaccion,$idcaja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$archivo,$zn)
+    public function registropagarfactura($idfactura,$lugar, $idtransaccion,$idcaja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$concepto,$archivo,$zn)
     {
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
@@ -88,8 +88,8 @@ class Cuentaspor extends DB{
 // -------------------------------------------------------------------------------------------
 
     if(empty($archivo['name'])){
-        $registropago = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
-        VALUES(NULL,'$nrecibo','$fecha_completa','$lugar','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$idcuenta',NULL)");
+        $registropago = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,concepto,archivo)
+        VALUES(NULL,'$nrecibo','$fecha_completa','$lugar','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$idcuenta','$concepto',NULL)");
 
     if ($registropago === TRUE) {
         $idcuentaspor = $this->dbc->insert_id;
@@ -123,8 +123,8 @@ class Cuentaspor extends DB{
     }
     if(move_uploaded_file($archivo_tmp, $ruta_destino)){
          //registrar pago, preguntar guardar la anterior transaccion o la nueva
-    $registropago2 = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo)
-    VALUES(NULL,'$nrecibo','$fecha_completa','$lugar','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$idcuenta','$unique_name')");
+    $registropago2 = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,concepto,archivo)
+    VALUES(NULL,'$nrecibo','$fecha_completa','$lugar','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$idcuenta','$concepto','$unique_name')");
 
     if ($registropago2 === TRUE) {
         $idcuentaspor = $this->dbc->insert_id;
@@ -380,6 +380,12 @@ if ($factura_lista->num_rows > 0) {
         $factura= $this->dbc->query("SELECT * FROM factura WHERE idfactura = '$factu[idfactura]'");
         $ft = $factura->fetch_assoc();
 
+        if($recib['concepto'] == null){
+            $concepto_comprobante = "Factura N°: ".$ft['nfactura']. " ". $ft['fecha'];
+        }else{
+            $concepto_comprobante = $recib['concepto'];
+        }
+
         if($ft['pagado'] != 0){
             $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $ft['proveedorcliente_idproveedorcliente'] . "'");
             $cl = $cliente->fetch_assoc();
@@ -400,7 +406,7 @@ if ($factura_lista->num_rows > 0) {
             "nombre" => $cl['nombre'],
             "direccion" => $cl['direccion'],
             "nit" => $cl['nit'],
-            "por_concepto_de" => $ft['por_concepto_de']
+            "por_concepto_de" => $concepto_comprobante
         
         );
 
@@ -445,8 +451,13 @@ if ($factura_lista->num_rows > 0) {
        }
     }else{
         $factura= $this->dbc->query("SELECT * FROM factura WHERE idfactura = '$recib[idfactura]'");
-                $ft = $factura->fetch_assoc();
+        $ft = $factura->fetch_assoc();
 
+        if($recib['concepto'] == null){
+            $concepto_comprobante = "Factura N°: ".$ft['nfactura']. " ". $ft['fecha'];
+        }else{
+            $concepto_comprobante = $recib['concepto'];
+        }
                 if($ft['pagado'] != 0){
                     $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $ft['proveedorcliente_idproveedorcliente'] . "'");
                     $cl = $cliente->fetch_assoc();
@@ -468,7 +479,7 @@ if ($factura_lista->num_rows > 0) {
                     "nombre" => $cl['nombre'],
                     "direccion" => $cl['direccion'],
                     "nit" => $cl['nit'],
-                    "por_concepto_de" => $ft['por_concepto_de']
+                    "por_concepto_de" => $concepto_comprobante
                 
                 );
 
