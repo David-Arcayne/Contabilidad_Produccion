@@ -652,7 +652,7 @@ elseif($ver[0]=="listar_reportes_referencia"){
     $cont->eliminar_reportes_referencia($ver[1]);
 }
 
-//   listapagos_individuales listar_recibo_facturas_otras_cuentas listar_cuentas_NoVinculadas lista_plan_cuenta_no_vinculada lista_cobrar_cobrado
+//   listapagos_individuales listar_recibo_facturas_otras_cuentas listar_cuentas_NoVinculadas lista_plan_cuenta_no_vinculada lista_cobrar_cobrado listar_datos
 //    listar_recibo_otras_cuentas  listar_recibo_otras_cuentas_pagar                  listar_recibo_pago_por_id        listar_recibo_por_id   --> caja bancos 
 // select_plantilla_estado_resultados listar_plantilla                                listar_recibo_por_id_otras_cuentas      listar_recibo_por_id_otras_cuentas_pagar ---> esos dos son de recibos
 
