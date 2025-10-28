@@ -1364,7 +1364,7 @@ WHERE
                     
                     $cobras = $this->dbc->query("SELECT SUM(monto) FROM cuentaspof WHERE idfactura='$qwe[0]'"); //173
                     $asd = $this->dbc->fetch($cobras);
-                    $saldo = $qwe[4] - $asd[0];
+                    $saldo = $qwe[3] - $asd[0];
                     $cuentacobrar2 = $this->dbc->query("SELECT nrecibo,fecha,persona,ci,monto,idcuentaspof FROM cuentaspof WHERE idfactura='$qwe[0]'");
                             while ($zxc = $this->dbc->fetch($cuentacobrar2)) {
                                 $pes = array("nrecibo" => $zxc[0], "fechar" => $zxc[1], "persona" => $zxc[2], "ci" => $zxc[3], "monto" => $zxc[4], "id" => $zxc[5]);
@@ -1387,8 +1387,8 @@ WHERE
                 $res = array("id" => $qwe[0], "fecha" => $qwe[1], "numero" => $qwe[2], "codigo" => $cod_transaccion['codigotransaccion'], "idproveedor" => $qwe[4], "nombrep" => $pro['nombre'], "monto" => $qwe[3], "pagado" => $resultado3['monto'], "saldo" => 0, "transaccion" => $qwe[5], "cuenta" => $qwe[6],"por_concepto_de" => $qwe['por_concepto_de'], "detalle" => $pagados);
                 array_push($lista, $res);
             }
-            elseif($qwe[7] == 2){
-                //FACTURAS Q NO TIENEN NINGUN RECIBO pero si estan pagados
+            elseif($qwe[7] == 2){ // ESTA COBRADO
+                //FACTURAS Q NO TIENEN NINGUN RECIBO pero si estan COBRADOS
                 $nombrep = isset($pro['nombre']) ? $pro['nombre'] : 'Desconocido';
             $pagados = [];
             $res = array("id" => $qwe[0], "fecha" => $qwe[1], "numero" => $qwe[2],

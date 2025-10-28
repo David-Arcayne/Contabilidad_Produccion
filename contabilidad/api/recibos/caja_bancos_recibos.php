@@ -22,7 +22,7 @@ class Caja_bancos_recibos extends DB{
         $res = "";
         $registro = $this->dbc->query("select * from gestion where idempresa='$empresa' and estado='2' Limit 1");
         $qwe = $this->dbc->fetch($registro);
-        //$res=array("id"=>,"nombre"=>$qwe['nombre']);
+        //$res=array("id"=>,"nombre"=>$qwe['nombre']); registrar_factura_recibo_pago_cajaBancos
         return $qwe['idgestion'];
     }
     public function registrar_factura_recibo_cobro_cajaBancos($idotras_cuentas,$por_concepto_de,$fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento,$clasefactura,$cobro, $pagar, $espesificacion,$trans, $cliente, $empresa, $cuenta,  $sucursal,$asiento,$idcaja_bancos,$archivo,$registro_desde,$zn)
