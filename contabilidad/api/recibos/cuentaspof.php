@@ -91,8 +91,8 @@ class Cuentaspof extends DB{
         //------------------------------------------------------------------------------------
 
         if(empty($archivo['name'])){
-            $registropago = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,concepto,archivo)
-            VALUES(NULL,'$nrecibo','$fecha_completa','$lugar','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$idcuenta','$concepto',NULL)");
+            $registropago = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,concepto,archivo,registro_desde)
+            VALUES(NULL,'$nrecibo','$fecha_completa','$lugar','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$idcuenta','$concepto',NULL,'facturas_x_cobrar')");
 
         if ($registropago === TRUE) {
 
@@ -127,8 +127,8 @@ class Cuentaspof extends DB{
         }
         if(move_uploaded_file($archivo_tmp, $ruta_destino)){
              //registrar pago, preguntar guardar la anterior transaccion o la nueva
-        $registropago2 = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,concepto,archivo)
-        VALUES(NULL,'$nrecibo','$fecha_completa','$lugar','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$idcuenta','$concepto','$unique_name')");
+        $registropago2 = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,concepto,archivo,registro_desde)
+        VALUES(NULL,'$nrecibo','$fecha_completa','$lugar','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$idcuenta','$concepto','$unique_name','facturas_x_cobrar')");
 
         
         if ($registropago2 === TRUE) {
