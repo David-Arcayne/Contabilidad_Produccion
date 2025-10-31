@@ -67,46 +67,76 @@ class Plantilla_admin extends DB{
         // echo json_encode(array($idtn,$empresa)); 
     }
 
-    private function procesarListado($listado,$idempresa, $nivel = 1, &$ordenPorNivelPadre  = [],$nombrePadre = '',$idtipo_reporte) {
-        foreach ($listado as $item) {
-            // Usa el nombre del padre como clave
-            $clavePadre = $nombrePadre ?: 'RAIZ';
-           // Inicializa el contador si no existe para este nivel y padre
-            if (!isset($ordenPorNivelPadre[$nivel][$clavePadre])) {
-                $ordenPorNivelPadre[$nivel][$clavePadre] = 1;
-            }
+    private function procesarListado($listado, $idempresa, $nivel = 1, &$ordenPorNivelPadre = [], $idPadrePlan = null, $idtipo_reporte) {
+    foreach ($listado as $item) {
+        $clavePadre = $idPadrePlan ?: 'RAIZ';
+        if (!isset($ordenPorNivelPadre[$nivel][$clavePadre])) {
+            $ordenPorNivelPadre[$nivel][$clavePadre] = 1;
+        }
 
-            $orden = $ordenPorNivelPadre[$nivel][$clavePadre];
+        $orden = $ordenPorNivelPadre[$nivel][$clavePadre];
 
-            $registrar_config = $this->registrarItem($item,$idempresa, $nivel, $orden,$nombrePadre,$idtipo_reporte); // Guarda el item actual
+        // Registrar el ítem y obtener su idplandecuenta
+        $idPlanActual = $this->registrarItem($item, $idempresa, $nivel, $orden, $idPadrePlan, $idtipo_reporte);
 
-             $ordenPorNivelPadre[$nivel][$clavePadre]++; // Incrementa el orden para ese grupo en ese nivel
-            if (!empty($item['children'])) { // ESTO ES PARA REGISTRAR LA DEPRECIACION SISQUE TIENE
-                //if($item['children']['depreciacion'] == 'SI'){
-                    // registrara la cuenta 1 y la cuenta depreciacion pero con nivel de la cuenta 1 
-                    //habran registros en la tabla configuracion_reporte y vinculacion_depreciacion 
-                // }else{
-                
-                //}
+        $ordenPorNivelPadre[$nivel][$clavePadre]++;
 
-                // $listado_admin = $this->procesarListado($item['children'],$idempresa, $nivel + 1,$ordenPorNivelPadre,$item['nombreplan']); // Procesa hijos
-                foreach ($item['children'] as $child) {
-                    if (isset($child['depreciacion']) && $child['depreciacion'] === 'si') {
-                        // Registrar el hijo al mismo nivel que el padre
-                        $orden = $ordenPorNivelPadre[$nivel][$clavePadre];
-                        $this->registrarItem($child, $idempresa, $nivel, $orden, $nombrePadre,$idtipo_reporte);
-                        $ordenPorNivelPadre[$nivel][$clavePadre]++;
-
-                        // Registrar ambos en tabla especial
-                        $this->registrarRelacionDepreciacion($item, $child,$idtipo_reporte, $idempresa);
-                    }else{
-                        // Procesar normalmente como hijo
-                        $this->procesarListado([$child], $idempresa, $nivel + 1, $ordenPorNivelPadre, $item['nombreplan'],$idtipo_reporte);
-                    }
+        // Procesar hijos si existen
+        if (!empty($item['children'])) {
+            foreach ($item['children'] as $child) {
+                if (isset($child['depreciacion']) && $child['depreciacion'] === 'si') {
+                    $orden = $ordenPorNivelPadre[$nivel][$clavePadre];
+                    $this->registrarItem($child, $idempresa, $nivel, $orden, $idPlanActual, $idtipo_reporte);
+                    $ordenPorNivelPadre[$nivel][$clavePadre]++;
+                    $this->registrarRelacionDepreciacion($item, $child, $idtipo_reporte, $idempresa);
+                } else {
+                    // Ahora pasamos el id del plan actual, no el nombre
+                    $this->procesarListado([$child], $idempresa, $nivel + 1, $ordenPorNivelPadre, $idPlanActual, $idtipo_reporte);
                 }
             }
         }
     }
+}
+    // private function procesarListado($listado,$idempresa, $nivel = 1, &$ordenPorNivelPadre  = [],$nombrePadre = '',$idtipo_reporte) {
+    //     foreach ($listado as $item) {
+    //         // Usa el nombre del padre como clave
+    //         $clavePadre = $nombrePadre ?: 'RAIZ';
+    //        // Inicializa el contador si no existe para este nivel y padre
+    //         if (!isset($ordenPorNivelPadre[$nivel][$clavePadre])) {
+    //             $ordenPorNivelPadre[$nivel][$clavePadre] = 1;
+    //         }
+
+    //         $orden = $ordenPorNivelPadre[$nivel][$clavePadre];
+
+    //         $registrar_config = $this->registrarItem($item,$idempresa, $nivel, $orden,$nombrePadre,$idtipo_reporte); // Guarda el item actual
+
+    //          $ordenPorNivelPadre[$nivel][$clavePadre]++; // Incrementa el orden para ese grupo en ese nivel
+    //         if (!empty($item['children'])) { // ESTO ES PARA REGISTRAR LA DEPRECIACION SISQUE TIENE
+    //             //if($item['children']['depreciacion'] == 'SI'){
+    //                 // registrara la cuenta 1 y la cuenta depreciacion pero con nivel de la cuenta 1 
+    //                 //habran registros en la tabla configuracion_reporte y vinculacion_depreciacion 
+    //             // }else{
+                
+    //             //}
+
+    //             // $listado_admin = $this->procesarListado($item['children'],$idempresa, $nivel + 1,$ordenPorNivelPadre,$item['nombreplan']); // Procesa hijos
+    //             foreach ($item['children'] as $child) {
+    //                 if (isset($child['depreciacion']) && $child['depreciacion'] === 'si') {
+    //                     // Registrar el hijo al mismo nivel que el padre
+    //                     $orden = $ordenPorNivelPadre[$nivel][$clavePadre];
+    //                     $this->registrarItem($child, $idempresa, $nivel, $orden, $nombrePadre,$idtipo_reporte);
+    //                     $ordenPorNivelPadre[$nivel][$clavePadre]++;
+
+    //                     // Registrar ambos en tabla especial
+    //                     $this->registrarRelacionDepreciacion($item, $child,$idtipo_reporte, $idempresa);
+    //                 }else{
+    //                     // Procesar normalmente como hijo
+    //                     $this->procesarListado([$child], $idempresa, $nivel + 1, $ordenPorNivelPadre, $item['nombreplan'],$idtipo_reporte);
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
 
     private function registrarRelacionDepreciacion($original, $depreciacion,$idtipo_reporte, $idempresa) {
         $idgestion = $this->getidgestionid($idempresa);
@@ -128,35 +158,74 @@ class Plantilla_admin extends DB{
     }
 
 
-    private function registrarItem($item,$idempresa, $nivel,$orden,$nombrePadre,$idtipo_reporte) {
+    private function registrarItem($item, $idempresa, $nivel, $orden, $idPadrePlan, $idtipo_reporte) {
+    $tipo_reporte = $this->dbc->query("SELECT * FROM tipo_reportes WHERE idtipo_reportes = '$idtipo_reporte' AND idempresa ='$idempresa'");
+    $tr_aux = $tipo_reporte->fetch_assoc();
 
-        //  $registro_tipo = $this->dbc->query("INSERT INTO tipo_reportes(nombre,descripcion,tipo_reporte,idempresa) 
-        //     VALUES ('$nombre_reporte','$descripcion','$tipo_reporte','$idempresa')");
+    $plancuenta = $this->dbc->query("SELECT * FROM plandecuenta WHERE numero = '$item[numero]' AND organizacion_idorganizacion ='$idempresa'");
+    $pl_aux = $plancuenta->fetch_assoc();
 
-        // $idtipo_reporte = $this->dbc->insert_id;
-
-        $tipo_reporte = $this->dbc->query("SELECT * FROM tipo_reportes WHERE idtipo_reportes = '$idtipo_reporte' AND idempresa ='$idempresa'");
-        $tr_aux = $tipo_reporte->fetch_assoc();
-
-        $plancuenta = $this->dbc->query("SELECT * FROM plandecuenta WHERE numero = '$item[numero]' AND organizacion_idorganizacion ='$idempresa'");
-        $pl_aux = $plancuenta->fetch_assoc();
-
-        if($item['grupo'] == 'ACTIVO'){
-                $grup = '1';
-        }elseif($item['grupo'] == 'PASIVO'){
-                $grup = '2';
-        }else{
-                $grup = '3';
-        }
-         if (!$pl_aux) {
-            // no ocurrira nada solo saltara
-         }else{
-            $registro_confi = $this->dbc->query("INSERT INTO configuracion_reporte(idplandecuenta,idplantilla_reporte,reporte,nombre_cuenta_superior,nivel_registrado,orden,grupo,es_calculable,es_activo_fijo,idempresa) 
-            VALUES ('$pl_aux[idplandecuenta]','$tr_aux[idtipo_reportes]','$tr_aux[tipo_reporte]','$nombrePadre','$nivel','$orden','$grup','$item[escalculable]','$item[esactivofijo]','$idempresa')");
-
-         }
-            
+    if (!$pl_aux) {
+        return null; // si no existe, salimos
     }
+
+    if ($item['grupo'] == 'ACTIVO') {
+        $grup = '1';
+    } elseif ($item['grupo'] == 'PASIVO') {
+        $grup = '2';
+    } else {
+        $grup = '3';
+    }
+
+    // Obtener el nombre del plan padre (si existe)
+    $nombreCuentaSuperior = '';
+    if (!empty($idPadrePlan)) {
+        $padre = $this->dbc->query("SELECT nombreplan FROM plandecuenta WHERE idplandecuenta = '$idPadrePlan'");
+        if ($padre && $padre->num_rows > 0) {
+            $padre_aux = $padre->fetch_assoc();
+            $nombreCuentaSuperior = $padre_aux['nombreplan'];
+        }
+    }
+
+    $this->dbc->query("INSERT INTO configuracion_reporte(
+        idplandecuenta, idplantilla_reporte, reporte, nombre_cuenta_superior, nivel_registrado, orden, grupo, es_calculable, es_activo_fijo, idempresa
+    ) VALUES (
+        '$pl_aux[idplandecuenta]', '$tr_aux[idtipo_reportes]', '$tr_aux[tipo_reporte]', '$nombreCuentaSuperior', 
+        '$nivel', '$orden', '$grup', '$item[escalculable]', '$item[esactivofijo]', '$idempresa'
+    )");
+
+    // Devuelvo el idplandecuenta actual para que los hijos sepan quién es su padre
+    return $pl_aux['idplandecuenta'];
+}
+    // private function registrarItem($item,$idempresa, $nivel,$orden,$nombrePadre,$idtipo_reporte) {
+
+    //     //  $registro_tipo = $this->dbc->query("INSERT INTO tipo_reportes(nombre,descripcion,tipo_reporte,idempresa) 
+    //     //     VALUES ('$nombre_reporte','$descripcion','$tipo_reporte','$idempresa')");
+
+    //     // $idtipo_reporte = $this->dbc->insert_id;
+
+    //     $tipo_reporte = $this->dbc->query("SELECT * FROM tipo_reportes WHERE idtipo_reportes = '$idtipo_reporte' AND idempresa ='$idempresa'");
+    //     $tr_aux = $tipo_reporte->fetch_assoc();
+
+    //     $plancuenta = $this->dbc->query("SELECT * FROM plandecuenta WHERE numero = '$item[numero]' AND organizacion_idorganizacion ='$idempresa'");
+    //     $pl_aux = $plancuenta->fetch_assoc();
+
+    //     if($item['grupo'] == 'ACTIVO'){
+    //             $grup = '1';
+    //     }elseif($item['grupo'] == 'PASIVO'){
+    //             $grup = '2';
+    //     }else{
+    //             $grup = '3';
+    //     }
+    //      if (!$pl_aux) {
+    //         // no ocurrira nada solo saltara
+    //      }else{
+    //         $registro_confi = $this->dbc->query("INSERT INTO configuracion_reporte(idplandecuenta,idplantilla_reporte,reporte,nombre_cuenta_superior,nivel_registrado,orden,grupo,es_calculable,es_activo_fijo,idempresa) 
+    //         VALUES ('$pl_aux[idplandecuenta]','$tr_aux[idtipo_reportes]','$tr_aux[tipo_reporte]','$nombrePadre','$nivel','$orden','$grup','$item[escalculable]','$item[esactivofijo]','$idempresa')");
+
+    //      }
+            
+    // }
 
     // public function registrar_agrupacion_plantilla($idplantilla_padre, $idplantilla_hijo, $tipo_operacion,$monto,$empresa) {
     //     $idempresa = $this->get_id_empresa($empresa);

@@ -740,7 +740,7 @@ if($data['ver'] == "asignar_asiento_A_factura") {
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idtipo_reporte'],$_POST['idplantilla'],$_POST['idtipo_reporte_referencia'],$_POST['idplantilla_referencia'],$_POST['empresa']));
         }
     }
-//editar_caja_bancos_facturas editar_caja_bancos_facturas_existentes   editar_recibo_caja_bancos   registrar_factura_recibo_pago_cajaBancos
+//editar_caja_bancos_facturas editar_caja_bancos_facturas_existentes   editar_recibo_caja_bancos   registrar_factura_recibo_pago_cajaBancos registrar_agrupacion_plantilla
 //  vincula  -- crearfacturasf5 registrar_factura_cobro registrar_factura_cobro_otras_cuentas --> aumentar usuario registrar_factura_cobros_tributario registrocobrarfactura registropagarfactura registrar_recibo
 //  registrocobrarfacturaGrupal crearfacturas caja_bancos registrar_factura_pago registrar_otras_cuentas registrar_recibo_otras_cuentas--> aumentar usuario creartransaccion
 }// registrar_factura_cobros_tributario registrar_recibo_otras_cuentas registrar_recibo_cobro_cajaBancos_en_otras_cuentas registrar_factura_cobro_otras_cuentas   registrar_otras_cuentas_recibo_cajaBancos_cobro
