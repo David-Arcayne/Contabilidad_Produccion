@@ -175,7 +175,7 @@ $cont=new Contabilidad();
 $cont->listapagoscobros($ver[1]);
 }elseif($ver[0]=="mayorcuentacontable"){
 $rep=new Reportes();
-$rep->mayorcuentacontable($ver[1],$ver[2],$ver[3],$ver[4]);
+$rep->mayorcuentacontable($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
 }elseif($ver[0]=="eliminarcliente"){
 $cont=new Contabilidad();
 $cont->eliminarcliente($ver[1]);

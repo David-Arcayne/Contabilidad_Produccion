@@ -1070,7 +1070,7 @@ $totalHaber = 0;
         echo json_encode($lista);
     }
 
-    public function mayorcuentacontable($fechai,$fechaf,$plan,$empresa){
+    public function mayorcuentacontable_antiguo($fechai,$fechaf,$plan,$empresa){
       ini_set('display_errors', 1);
       ini_set('display_startup_errors', 1);
       error_reporting(E_ALL);
@@ -1080,6 +1080,9 @@ $totalHaber = 0;
 
     $planCuenta=$this->dbc->query("SELECT saldonormal FROM plandecuenta WHERE idplandecuenta='$plan'"); //antes era dba
     $tipo_cuenta = $this->dbc->fetch($planCuenta);    
+    
+    $planCuenta=$this->dbc->query("SELECT * FROM plandecuenta WHERE numero >= '$numero_ini' AND numero <= '$numero_fin' AND organizacion_idorganizacion ='$ide'"); //antes era dba
+    $tipo_cuenta = $this->dbc->fetch($planCuenta);  
     //reconfigurar consulta para que solo se muestre solo la gestion.
         $registro=$this->dbc->query("SELECT
         t.codigotransaccion,
@@ -1136,6 +1139,86 @@ $totalHaber = 0;
         }
         
         echo json_encode($lista);   
+    }
+
+    
+    public function mayorcuentacontable($fechai,$fechaf,$numero_ini,$numero_fin,$empresa){
+      ini_set('display_errors', 1);
+      ini_set('display_startup_errors', 1);
+      error_reporting(E_ALL);
+        $lista=[];
+        $ide=$this->getidempresa($empresa);
+        $gestion=$this->getidgestion($empresa);
+
+    // $planCuenta=$this->dbc->query("SELECT saldonormal FROM plandecuenta WHERE idplandecuenta='$plan'"); //antes era dba
+    // $tipo_cuenta = $this->dbc->fetch($planCuenta);    
+    
+    $planCuenta=$this->dbc->query("SELECT * FROM plandecuenta WHERE numero >= '$numero_ini' AND numero <= '$numero_fin' AND organizacion_idorganizacion ='$ide'"); //antes era dba
+    // $tipo_cuenta = $this->dbc->fetch($planCuenta);  
+    while($pl=$this->dbc->fetch($planCuenta)){
+      $res_plan=array("nombre_plan"=>$pl['nombreplan'],
+                      "codigo_cuenta"=>$pl['numero'],
+                    "cuentas"=>[]);
+
+                
+    //reconfigurar consulta para que solo se muestre solo la gestion.
+        $registro=$this->dbc->query("SELECT
+        t.codigotransaccion,
+        t.fechatransaccion,
+        t.tipotransaccion_idtipotransaccion,
+        t.idtransacciones
+      FROM
+        transacciones AS t
+      WHERE
+        t.organizacion_idorganizacion = '$ide'
+        AND t.fechatransaccion >= '$fechai'
+        AND t.fechatransaccion <= '$fechaf'
+        AND t.estado NOT IN (4, 5, 6)
+        AND t.idgestion = '$gestion'
+      ORDER BY
+        t.codigotransaccion ASC");
+        while($qwe=$this->dbc->fetch($registro)){
+            $tipotrans=$this->dbc->query("SELECT nombre FROM tipotransaccion WHERE idtipotransaccion='$qwe[2]'"); //antes era dba
+            $tipo=$this->dbc->fetch($tipotrans);
+            $detalle=[];
+
+            $detallet=$this->dbc->query("SELECT
+            d.iddetalletransaccion,
+            d.debe,
+            d.haber,
+            d.transacciones_idtransacciones
+          FROM
+            detalletransaccion AS d
+          WHERE
+            d.idplandecuenta = '$pl[idplandecuenta]'
+            AND d.transacciones_idtransacciones='$qwe[3]'");
+            while($asd=$this->dbc->fetch($detallet)){
+                $res=array("debe"=>$asd[1],"haber"=>$asd[2]);
+                array_push($detalle,$res);
+            }
+
+            if($tipotrans->num_rows > 0 ){
+              $red=array("codigo"=>$qwe[0],
+            "fecha"=>$qwe[1],
+            "tipo"=>$tipo[0],
+            "tipo_cuenta"=>$pl['saldonormal'],
+            "detalle"=>$detalle);
+            array_push($lista,$red);
+            }else{
+              $red=array("codigo"=>$qwe[0],
+              "fecha"=>$qwe[1],
+              "tipo"=> 0,
+              "tipo_cuenta"=>$pl['saldonormal'],
+              "detalle"=>$detalle);
+              array_push($lista,$red);
+            }
+         
+
+        }
+        array_push($lista_completa,$lista);
+    }
+        
+        echo json_encode($lista_completa);   
     }
 
     public function obtenereportefacturacobrar($ini,$fin,$sucursal){
