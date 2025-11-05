@@ -108,7 +108,7 @@ class Caja_bancos_recibos extends DB{
             $idfact = $this->dbc->insert_id;
 
             $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,concepto,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','0','$trans','0',$concepto,NULL,'$registro_desde')");
+            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','0','$trans','0','$concepto',NULL,'$registro_desde')");
 
             $idrecibo = $this->dbc->insert_id;
         }elseif($trans > 0 && $asiento == 0){
@@ -118,7 +118,7 @@ class Caja_bancos_recibos extends DB{
             $idfact = $this->dbc->insert_id;
 
             $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,concepto,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','0','$trans','0',$concepto,NULL,'$registro_desde')");
+            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','0','$trans','0','$concepto',NULL,'$registro_desde')");
 
             $idrecibo = $this->dbc->insert_id;
         }else{
@@ -163,7 +163,7 @@ class Caja_bancos_recibos extends DB{
         $idfact = $this->dbc->insert_id;
 
         $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,concepto,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','0','$idtrans','0',$concepto,NULL,'$registro_desde')");
+            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','0','$idtrans','0','$concepto',NULL,'$registro_desde')");
 
         $idrecibo = $this->dbc->insert_id;
         }
