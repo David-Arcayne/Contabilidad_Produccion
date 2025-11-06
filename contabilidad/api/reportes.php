@@ -1146,7 +1146,8 @@ $totalHaber = 0;
       ini_set('display_errors', 1);
       ini_set('display_startup_errors', 1);
       error_reporting(E_ALL);
-        $lista=[];
+        
+        $lista_completa=[];
         $ide=$this->getidempresa($empresa);
         $gestion=$this->getidgestion($empresa);
 
@@ -1156,6 +1157,8 @@ $totalHaber = 0;
     $planCuenta=$this->dbc->query("SELECT * FROM plandecuenta WHERE numero >= '$numero_ini' AND numero <= '$numero_fin' AND organizacion_idorganizacion ='$ide'"); //antes era dba
     // $tipo_cuenta = $this->dbc->fetch($planCuenta);  
     while($pl=$this->dbc->fetch($planCuenta)){
+      $lista=[];
+
       $res_plan=array("nombre_plan"=>$pl['nombreplan'],
                       "codigo_cuenta"=>$pl['numero'],
                     "cuentas"=>[]);
@@ -1215,7 +1218,8 @@ $totalHaber = 0;
          
 
         }
-        array_push($lista_completa,$lista);
+        $res_plan['cuentas'] = $lista;
+        array_push($lista_completa,$res_plan);
     }
         
         echo json_encode($lista_completa);   

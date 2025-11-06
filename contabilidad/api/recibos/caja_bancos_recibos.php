@@ -99,7 +99,7 @@ class Caja_bancos_recibos extends DB{
             $id_otras_cuentas_aux = $idotras_cuentas;
         }
         
-        $concepto = 'Facura Nro: ';
+        // $concepto = 'Facura Nro: ';
         if($trans == "" && $asiento == ""){
             // se crea factura sin transaccion asignada
             //$trans = 0
@@ -107,8 +107,8 @@ class Caja_bancos_recibos extends DB{
         
             $idfact = $this->dbc->insert_id;
 
-            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,concepto,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','0','$trans','0','$concepto',NULL,'$registro_desde')");
+            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
+            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','0','$trans','0',NULL,'$registro_desde')");
 
             $idrecibo = $this->dbc->insert_id;
         }elseif($trans > 0 && $asiento == 0){
@@ -117,8 +117,8 @@ class Caja_bancos_recibos extends DB{
         
             $idfact = $this->dbc->insert_id;
 
-            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,concepto,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','0','$trans','0','$concepto',NULL,'$registro_desde')");
+            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
+            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','0','$trans','0',NULL,'$registro_desde')");
 
             $idrecibo = $this->dbc->insert_id;
         }else{
@@ -162,8 +162,8 @@ class Caja_bancos_recibos extends DB{
         
         $idfact = $this->dbc->insert_id;
 
-        $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,concepto,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','0','$idtrans','0','$concepto',NULL,'$registro_desde')");
+        $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
+            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','0','$idtrans','0',NULL,'$registro_desde')");
 
         $idrecibo = $this->dbc->insert_id;
         }
@@ -1543,8 +1543,10 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
                 if($fact['tipo_factura'] == 'contado'){ //factura al contado
                     $aux_descripcion = $fact['por_concepto_de'];
+                    $nro_documento = $fact['nfactura'];
                 }else{ // factura a credito
                     $aux_descripcion = $qwe['concepto'];
+                    $nro_documento = '-';
                 }
 
                 // $fecha_nueva = date("d/m/Y", strtotime($fact['fecha']));
@@ -1577,7 +1579,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         "persona" => $qwe['persona'],
                         "ci" => $qwe['ci'],
                         "factura_recibo" => "factura",
-                        "nro_documento" => "$fact[nfactura]",
+                        "nro_documento" => "$nro_documento",
                         "por_concepto_de" => "$fact[por_concepto_de]",
                         "codigotransaccion" => $tr['codigotransaccion'],
                         "id_cliente" => $cl['id_cliente'],
@@ -1609,7 +1611,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                     "persona" => $qwe['persona'],
                     "ci" => $qwe['ci'],
                     "factura_recibo" => "factura",
-                    "nro_documento" => "$fact[nfactura]",
+                    "nro_documento" => "$nro_documento",
                     "por_concepto_de" => "$fact[por_concepto_de]",
                     "codigotransaccion" => $tr['codigotransaccion'],
                     "id_cliente" => $cl['id_cliente'],
@@ -1818,8 +1820,10 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
                     if($fact['tipo_factura'] == 'contado'){ //factura al contado
                         $aux_descripcion = $fact['por_concepto_de'];
+                        $nro_documento = $fact['nfactura'];
                     }else{ // factura a credito
                         $aux_descripcion = $qwe['concepto'];
+                        $nro_documento = '-';
                     }
 
                      $aux_factura = "cero $fact[nfactura]";
@@ -1848,7 +1852,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "persona" => $qwe['persona'],
                             "ci" => $qwe['ci'],
                             "factura_recibo" => "factura",
-                            "nro_documento" => "$fact[nfactura]",
+                            "nro_documento" => "$nro_documento",
                             "por_concepto_de" => $fact['por_concepto_de'],
                             "codigotransaccion" => $tr['codigotransaccion'],
                             "id_cliente" => $prov['id_proveedor'],
@@ -1879,7 +1883,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         "persona" => $qwe['persona'],
                         "ci" => $qwe['ci'],
                         "factura_recibo" => "factura",
-                        "nro_documento" => "$fact[nfactura]",
+                        "nro_documento" => "$nro_documento",
                         "por_concepto_de" => "$fact[por_concepto_de]",
                         "codigotransaccion" => $tr['codigotransaccion'],
                         "id_cliente" => $prov['id_proveedor'],
@@ -2192,8 +2196,10 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         
                         if($fact['tipo_factura'] == 'contado'){ //factura al contado
                             $aux_descripcion = $fact['por_concepto_de'];
+                            $nro_documento = $fact['nfactura'];
                         }else{ // factura a credito
                             $aux_descripcion = $qwe['concepto'];
+                            $nro_documento = '-';
                         }
 
                          $aux_factura = "cero $fact[nfactura]";
@@ -2207,7 +2213,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "persona" => $qwe['persona'],
                             "ci" => $qwe['ci'],
                             "factura_recibo" => "factura",
-                            "nro_documento" => $factu,
+                            "nro_documento" => $nro_documento,
                             "por_concepto_de" => $fact['por_concepto_de'],
                             "codigotransaccion" => $tr['codigotransaccion'],
                             "id_cliente" => $cl['id_cliente'],
@@ -2290,8 +2296,10 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         
                         if($fact['tipo_factura'] == 'contado'){ //factura al contado
                             $aux_descripcion = $fact['por_concepto_de'];
+                            $nro_documento = $fact['nfactura'];
                         }else{ // factura a credito
                             $aux_descripcion = $qwe['concepto'];
+                            $nro_documento = '-';
                         }
 
                          $aux_factura = "cero $fact[nfactura]";
@@ -2305,7 +2313,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "persona" => $qwe['persona'],
                             "ci" => $qwe['ci'],
                             "factura_recibo" => "factura",
-                            "nro_documento" => $factu,
+                            "nro_documento" => $nro_documento,
                             "por_concepto_de" => $fact['por_concepto_de'],
                             "codigotransaccion" => $tr['codigotransaccion'],
                             "id_cliente" => $cl['id_proveedor'],
@@ -3635,7 +3643,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         }
         return "ejecutado";
     }
-      public function editar_caja_bancos_facturas_existentes($idcomprobante,$tipo_documento,$fecha,$monto,$archivo,$lugar,$persona,$ci){
+      public function editar_caja_bancos_facturas_existentes($idcomprobante,$tipo_documento,$fecha,$monto,$archivo,$lugar,$persona,$ci,$concepto){
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
@@ -3662,6 +3670,8 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
                  // SE ESTA EDITANDO LA FACTURA Y EL COMPROBANTE
 
+                $edicion_concepto=$this->dbc->query("UPDATE cuentaspof SET concepto='$concepto' WHERE idcuentaspof='$idcomprobante'");
+
                 $edicion_comprobante = $this->editar_comprobante($fecha_nueva,$monto,$idcomprobante,$archivo,$tipo_documento,$lugar,$persona,$ci);
                 // $edicion_recibo=$this->dbc->query("UPDATE cuentaspof SET fecha='$fecha_nueva',monto='$monto' WHERE idcuentaspof='$idcomprobante'");
 
@@ -3682,6 +3692,8 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                 }else{
                     //no se edita detalle_cajaBancos
                 }
+
+                $edicion_concepto=$this->dbc->query("UPDATE cuentaspor SET concepto='$concepto' WHERE idcuentaspor='$idcomprobante'");
 
                 $edicion_comprobante = $this->editar_comprobante($fecha_nueva,$monto,$idcomprobante,$archivo,$tipo_documento,$lugar,$persona,$ci);
               

@@ -480,7 +480,7 @@ while ($qwe = $this->dbc->fetch($registro)) {
         $rec = $recibo->fetch_assoc();
 
         if($recib['concepto'] == null){
-            $concepto_comprobante = "Recibo N°: ".$rec['nro_recibo']. " ". $rec['fecha'];
+            $concepto_comprobante = "Recibo N°: ".$rec['nro_recibo']. " Fecha: ". $rec['fecha'].", ".$rec['concepto'];
         }else{
             $concepto_comprobante = $recib['concepto'];
         }
@@ -879,7 +879,7 @@ while ($qwe = $this->dbc->fetch($registro)) {
             $rec = $recibo->fetch_assoc();
 
             if($comprobante['concepto'] == null){
-                $concepto_comprobante = "Recibo N°: ".$rec['nro_recibo']. " ". $rec['fecha'];
+                $concepto_comprobante = "Recibo N°: ".$rec['nro_recibo']. " Fecha: ". $rec['fecha'].", ".$rec['concepto'];
             }else{
                 $concepto_comprobante = $comprobante['concepto'];
             }

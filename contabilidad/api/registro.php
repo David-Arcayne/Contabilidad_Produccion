@@ -462,12 +462,12 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         }
     }
     elseif($ver=="editar_caja_bancos_facturas_existentes"){
-        if(isset($_POST['idcomprobante'],$_POST['tipo_documento'],$_POST['fecha'],$_POST['monto'],$_FILES['archivo'],$_POST ['lugar'],$_POST ['persona'],$_POST ['ci'])){
+        if(isset($_POST['idcomprobante'],$_POST['tipo_documento'],$_POST['fecha'],$_POST['monto'],$_FILES['archivo'],$_POST ['lugar'],$_POST ['persona'],$_POST ['ci'],$_POST ['concepto'])){
             $cont=new caja_bancos_recibos(); 
-            $cont->editar_caja_bancos_facturas_existentes($_POST['idcomprobante'],$_POST['tipo_documento'],$_POST['fecha'],$_POST['monto'],$_FILES['archivo'],$_POST ['lugar'],$_POST ['persona'],$_POST ['ci']);
+            $cont->editar_caja_bancos_facturas_existentes($_POST['idcomprobante'],$_POST['tipo_documento'],$_POST['fecha'],$_POST['monto'],$_FILES['archivo'],$_POST ['lugar'],$_POST ['persona'],$_POST ['ci'],$_POST ['concepto']);
         }                        
         else{
-            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idcomprobante'],$_POST['tipo_documento'],$_POST['fecha'],$_POST['monto'],$_FILES['archivo'],$_POST ['lugar'],$_POST ['persona'],$_POST ['ci']));
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idcomprobante'],$_POST['tipo_documento'],$_POST['fecha'],$_POST['monto'],$_FILES['archivo'],$_POST ['lugar'],$_POST ['persona'],$_POST ['ci'],$_POST ['concepto']));
         }
     }
     elseif($ver=="registrar_cuenta_pre_cierre"){
@@ -742,6 +742,6 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     }
 //editar_caja_bancos_facturas editar_caja_bancos_facturas_existentes   editar_recibo_caja_bancos   registrar_factura_recibo_pago_cajaBancos registrar_agrupacion_plantilla registrar_factura_recibo_cobro
 //  vincula  -- crearfacturasf5 registrar_factura_cobro registrar_factura_cobro_otras_cuentas --> aumentar usuario registrar_factura_cobros_tributario registrocobrarfactura registropagarfactura registrar_recibo
-//  registrocobrarfacturaGrupal crearfacturas caja_bancos registrar_factura_pago registrar_otras_cuentas registrar_recibo_otras_cuentas--> aumentar usuario creartransaccion
-}// registrar_factura_cobros_tributario registrar_recibo_otras_cuentas registrar_recibo_cobro_cajaBancos_en_otras_cuentas registrar_factura_cobro_otras_cuentas   registrar_otras_cuentas_recibo_cajaBancos_cobro
+//  registrocobrarfacturaGrupal crearfacturas caja_bancos registrar_factura_pago registrar_otras_cuentas registrar_recibo_otras_cuentas--> aumentar usuario creartransaccion editar_caja_bancos_facturas_existentes 
+}// registrar_factura_cobros_tributario registrar_recibo_otras_cuentas registrar_recibo_cobro_cajaBancos_en_otras_cuentas registrar_factura_cobro_otras_cuentas   registrar_otras_cuentas_recibo_cajaBancos_cobro registrar_recibo_cobro
 ?> 

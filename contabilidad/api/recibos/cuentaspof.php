@@ -343,7 +343,8 @@ $caja_bancos = json_decode($cajasBancos, true);
                 $ft = $factura->fetch_assoc();
     
                 if($recib['concepto'] == null){
-                    $concepto_comprobante = "Factura N°: ".$ft['nfactura']. " ". $ft['fecha'];
+
+                    $concepto_comprobante = "Factura N°: ".$ft['nfactura']. " Fecha: ". $ft['fecha'].", ".$ft['por_concepto_de'];
                 }else{
                     $concepto_comprobante = $recib['concepto'];
                 }

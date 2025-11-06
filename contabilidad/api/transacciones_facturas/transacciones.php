@@ -1167,6 +1167,40 @@ if($filtrado->num_rows > 0){
         }
         echo json_encode($lista);
     }
+    public function lista_plande_subcuentas_final($codigo_ini,$empresa)
+    {
+        $ide = $this->getidempresa($empresa);
+        $lista = [];
+        $registro = $this->dbc->query("SELECT idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,organizacion_idorganizacion,idp,idagrupacion_rubro_plandecuenta FROM plandecuenta WHERE numero >= '$codigo_ini' AND organizacion_idorganizacion='$ide' ORDER BY numero ASC");
+        while ($qwe = $this->dbc->fetch($registro)) {
+
+            $array_codigo = explode(".", $qwe[1]); 
+            $aux = $this->dbc->query("SELECT nombreplan FROM plandecuenta WHERE numero >= $array_codigo[0] LIMIT 1");
+            $name_plan = $aux->fetch_assoc();
+
+            if($array_codigo[4] == '00' && $array_codigo[3] != '00'){ // 1.1.1.01.00
+                $pl_cuenta_padre = $this->dbc->query("SELECT * FROM plandecuenta WHERE idp = $qwe[0]");
+
+                if($pl_cuenta_padre->num_rows > 0){
+                    //no muestras la cuenta porque tiene una subcuenta mas
+                }else{
+                    $res = array("id" => $qwe[0], "numero" => $qwe[1], "plan" => $qwe[2], "descripcion" => $qwe[3], "rubro" => $name_plan['nombreplan'], "tipo" => $qwe[4], "consolidar" => $qwe[5], "empresa" => $qwe[6], "idp" => $qwe[7],"idagrupacion_rubro_plandecuenta" => $qwe[8]);
+                    array_push($lista, $res);
+                }
+
+
+            }elseif($array_codigo[4] != '00' && $array_codigo[3] != '00'){ // 1.1.1.01.01
+                $res = array("id" => $qwe[0], "numero" => $qwe[1], "plan" => $qwe[2], "descripcion" => $qwe[3], "rubro" => $name_plan['nombreplan'], "tipo" => $qwe[4], "consolidar" => $qwe[5], "empresa" => $qwe[6], "idp" => $qwe[7],"idagrupacion_rubro_plandecuenta" => $qwe[8]);
+                array_push($lista, $res);
+            }else{
+                //no listara la cuenta porque solo tiene hasta el 3er nivel 1.1.1.00.00
+            }
+            
+            // array_push($lista, $res);
+        }
+        echo json_encode($lista);
+    }
+
     public function lista_padres_plandecuentas($idplandecuenta)
 {
     $lista = [];

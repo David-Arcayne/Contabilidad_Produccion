@@ -1973,9 +1973,9 @@ WHERE
         $lista = [];
         $cf = 2;
         $idsucursal = $this->getidsucursal($sucursal);
-        $registro = $this->dbc->query("SELECT f.idfactura,f.fecha,f.nfactura,t.codigotransaccion, f.montofactura,f.proveedorcliente_idproveedorcliente,f.transacciones_idtransacciones,f.cuenta,f.cobrado,f.por_concepto_de
-         FROM factura f,transacciones t
-         WHERE f.clasefactura='$cf' AND f.sucursal='$idsucursal' AND f.transacciones_idtransacciones=t.idtransacciones ORDER BY f.idfactura DESC");
+        $registro = $this->dbc->query("SELECT f.idfactura,f.fecha,f.nfactura,f.tipo_factura, f.montofactura,f.proveedorcliente_idproveedorcliente,f.transacciones_idtransacciones,f.cuenta,f.cobrado,f.por_concepto_de
+         FROM factura f
+         WHERE f.clasefactura='$cf' AND f.sucursal='$idsucursal' ORDER BY f.idfactura DESC");
         while ($qwe = $this->dbc->fetch($registro)) {
 
             // CONSULTA PARA SABER SI HAY INDIVIDUALES

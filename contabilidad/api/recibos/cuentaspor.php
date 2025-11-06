@@ -381,7 +381,7 @@ if ($factura_lista->num_rows > 0) {
         $ft = $factura->fetch_assoc();
 
         if($recib['concepto'] == null){
-            $concepto_comprobante = "Factura N°: ".$ft['nfactura']. " ". $ft['fecha'];
+            $concepto_comprobante = "Factura N°: ".$ft['nfactura']. " Fecha: ". $ft['fecha'].", ".$ft['por_concepto_de'];
         }else{
             $concepto_comprobante = $recib['concepto'];
         }
