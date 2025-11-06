@@ -903,7 +903,7 @@ while ($qwe = $this->dbc->fetch($registro)) {
                 "nombre" => $cl['nombre'],
                 "direccion" => $cl['direccion'],
                 "nit" => $cl['nit'],
-                "concepto" => $rec['concepto']
+                "concepto" => $concepto_comprobante
             
             );
 
