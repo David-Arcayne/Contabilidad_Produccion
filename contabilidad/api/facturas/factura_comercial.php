@@ -83,6 +83,36 @@ class Factura_comercial extends DB{
         echo json_encode($lista);
     }
     
+    public function listar_factura_comercial_por_id($idventa)
+    {
+         ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+        // $idempresa = $this->verificar->verificarIDEMPRESAMD5($idmd5);
+        // $idempresa = $this->getidempresa($idmd5);
+        $lista = [];
+
+        $listaFactura = [];
+        $estado_cobro = $this->dbcm->query("SELECT * FROM estado_cobro WHERE venta_id_venta = '$idventa'");
+        $ec = $estado_cobro->fetch_assoc();
+
+        $detalle_cobro = $this->dbcm->query("SELECT * FROM detalle_cobro WHERE estado_cobro_id_estado_cobro = '$ec[id_estado_cobro]'");
+        // $dc = $detalle_cobro->fetch_assoc();
+
+        while ($zxc = $this->dbcm->fetch($detalle_cobro)) {
+            $res = array(
+                "iddetalle_cobro" => $zxc['iddetalle_cobro'],
+                "fecha_actual" => $zxc['fecha_actual'],
+                "ncuotas" => $zxc['ncuotas'],
+                "valor_cuotas" => $zxc['valor_cuotas'],
+                "monto" => $zxc['monto']
+            );
+            array_push($lista, $res);
+        }
+
+        echo json_encode($lista);
+    }
+
     public function listar_factura_comercial_comprobante($idmd5)
     {
         // $idempresa = $this->verificar->verificarIDEMPRESAMD5($idmd5);

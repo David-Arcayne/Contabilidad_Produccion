@@ -658,6 +658,9 @@ elseif($ver[0]=="listar_reportes_referencia"){
 }elseif($ver[0]=="lista_plande_subcuentas_final"){
     $cont=new Transacciones();
     $cont->lista_plande_subcuentas_final($ver[1],$ver[2]);
+}elseif($ver[0]=="listar_factura_comercial_por_id"){
+    $cont=new Factura_comercial();
+    $cont->listar_factura_comercial_por_id($ver[1]);
 }
 
 // lista_cobrar_cobrado listar_datos listar_monto_factura_cajas listar_recibo_por_id listar_recibo_por_id_otras_cuentas   eliminarcobrados lista_cobrar lista_plande

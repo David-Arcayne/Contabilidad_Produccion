@@ -268,21 +268,23 @@ class PlantillaReporte extends DB{
     public function rp_editar_plantilla($idplantilla, $idplandecuenta, $nombre_personalizado, $tipo_operacion, $orden, $idplantilla_padre,$negrilla_cursiva, $empresa) {
         $idempresa = $this->get_id_empresa($empresa);
 
-        $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM pr_plantilla WHERE idplantilla_padre = '$idplantilla'");
-        $resultado = $consulta->fetch_assoc();
-        $existe_plantilla = $resultado['total'];
+        // $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM pr_plantilla WHERE idplantilla_padre = '$idplantilla'");
+        // $resultado = $consulta->fetch_assoc();
+        // $existe_plantilla = $resultado['total'];
 
 
-        $consulta2 = $this->dbc->query("SELECT COUNT(*) AS total FROM agrupacion_plantilla WHERE idplantilla_padre = '$idplantilla'");
-        $resultado2 = $consulta2->fetch_assoc();
-        $existe_agrupacion = $resultado2['total'];
+        // $consulta2 = $this->dbc->query("SELECT COUNT(*) AS total FROM agrupacion_plantilla WHERE idplantilla_padre = '$idplantilla'");
+        // $resultado2 = $consulta2->fetch_assoc();
+        // $existe_agrupacion = $resultado2['total'];
 
         // if()//tipo operacion es diferente de lo q ya existe en la base de datos  entonces ir abajo
-        if ($existe_plantilla > 0 || $existe_agrupacion > 0) { // EL REGISTRO TIENE DEPENDENCIAS
-            //NO SE PODRA EDITAR EL TIPO_OPERACION PERO SI EL ORDEN (EN DUDA)
+        
+        
+        // if ($existe_plantilla > 0 || $existe_agrupacion > 0) { // EL REGISTRO TIENE DEPENDENCIAS
+        //     //NO SE PODRA EDITAR EL TIPO_OPERACION PERO SI EL ORDEN (EN DUDA)
 
-            $res = array("danger", "El registro no puede editarse","editarCaracteristicas");
-        }else {
+        //     $res = array("danger", "El registro no puede editarse","editarCaracteristicas");
+        // }else {
             // se editara
             $pregunta = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla = '$idplantilla'");
             $res_pregunta = $pregunta->fetch_assoc();
@@ -396,7 +398,7 @@ class PlantillaReporte extends DB{
             } else {
                 $res = array("danger", "No se pudo editar");
             }
-        }
+        // }
         echo json_encode($res);
     }
     public function eliminar_plantilla($idplantilla, $idplantilla_padre, $nivel, $idplantilla_reporte, $idempresa)
