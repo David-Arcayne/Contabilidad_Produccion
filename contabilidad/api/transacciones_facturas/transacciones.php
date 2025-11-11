@@ -1238,7 +1238,32 @@ if($filtrado->num_rows > 0){
     echo json_encode($lista);
 }
 
+public function asignar_facturas_A_cuentas($data) {
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+    
+        $idempresa = $this->getidempresa($data['idempresa']);
+        $idsucursal = $this->getidsucursal($data['idsucursal']); 
+        $gestion = $this->getgestionactualid($idempresa);
 
+            foreach ($data['facturas'] as $factura) {
+
+                $updatetranscodigo = $this->dbc->query("UPDATE factura SET cuenta = '$data[cuenta]' WHERE idfactura = '{$factura['idfactura']}'");
+
+            }
+        
+
+    
+        // Respuesta
+        if ($updatetranscodigo === TRUE) {
+            $res = array("success", "Se Registro Correctamente", "cobrofacturasaasientomodelo");
+        } else {
+            $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde");
+        }
+    
+        echo json_encode($res);
+    }
 
     // public function lista_padres_plandecuentas($idplandecuenta)
     // {
