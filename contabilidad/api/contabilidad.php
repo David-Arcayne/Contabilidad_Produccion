@@ -1604,9 +1604,18 @@ WHERE
     {
         $lista = [];
         $ide = $this->getidempresa($empresa);
-        $registro = $this->dbc->query("select idgestion,nombre,fechaini,fechafin,estado,fecha,idempresa from gestion where idempresa='$ide'");
+        $registro = $this->dbc->query("select idgestion,nombre,fechaini,fechafin,estado,fecha,formato_transaccion,idempresa from gestion where idempresa='$ide'");
         while ($qwe = $this->dbc->fetch($registro)) {
-            $res = array("id" => $qwe[0], "nombre" => $qwe[1], "fechaini" => $qwe[2], "fechafin" => $qwe[3], "estado" => $qwe[4], "fecha" => $qwe[5]);
+
+            $existe_trans = $this->dbc->query("SELECT * FROM transacciones WHERE idgestion='$qwe[0]' and organizacion_idorganizacion='$ide'");
+
+            if($existe_trans->num_rows > 0){      
+                $tiene_trans = "si";
+            }else{
+                $tiene_trans = "no";
+            }
+
+            $res = array("id" => $qwe[0], "nombre" => $qwe[1], "fechaini" => $qwe[2], "fechafin" => $qwe[3], "estado" => $qwe[4], "fecha" => $qwe[5],"formato_transaccion" => $qwe[6], "tiene_transaccion" => $tiene_trans);
             array_push($lista, $res);
         }
         echo json_encode($lista);
@@ -1641,12 +1650,12 @@ WHERE
         return $qwe['idgestion'];
     }
 
-    public function  registrogestion($nombre, $fechaini, $fechafin, $empresa)
+     public function  registrogestion($nombre, $fechaini, $fechafin, $formato_trans, $empresa)
     {
         $res = "";
         $ide = $this->getidempresa($empresa);
         $fecha = date("Y-m-d");
-        $registro = $this->dbc->query("insert into gestion(idgestion,nombre,fechaini,fechafin,fecha,idempresa)value(NULL,'$nombre','$fechaini','$fechafin','$fecha','$ide')");
+        $registro = $this->dbc->query("insert into gestion(idgestion,nombre,fechaini,fechafin,fecha,formato_transaccion,idempresa)value(NULL,'$nombre','$fechaini','$fechafin','$fecha','$formato_trans','$ide')");
         if ($registro === TRUE) {
             $res = array("success", "registro Correcto", "registrogestion");
         } else {
@@ -1655,19 +1664,24 @@ WHERE
         echo json_encode($res);
     }
 
-    public function registrogestionf5($nombre, $idgestion, $empresa, $fechaini, $fechafin)
+    public function registrogestionf5($nombre, $idgestion, $empresa, $fechaini, $fechafin,$formato_trans)
     {
         $res = "";
         $fecha = date("Y-m-d");
         $ide = $this->getidempresa($empresa);
-        $registro = $this->dbc->query("update gestion set nombre='$nombre',fechaini='$fechaini',fechafin='$fechafin',fecha='$fecha' where idgestion='$idgestion' and idempresa='$ide'");
-        if ($registro === TRUE) {
-            $res = array("success", "registro Correcto", "registrogestionf5");
-        } else {
-            $res = array("danger", "No se pudo realizar el Actualizar $idgestion");
-        }
+
+       
+            $editar = $this->dbc->query("update gestion set nombre='$nombre',fechaini='$fechaini',fechafin='$fechafin',fecha='$fecha',formato_transaccion='$formato_trans' where idgestion='$idgestion' and idempresa='$ide'");
+            
+            if ($editar === TRUE) {
+                $res = array("success", "registro Correcto", "registrogestionf5");
+            } else {
+                $res = array("danger", "No se pudo realizar el Actualizar $idgestion");
+            }        
+    
         echo json_encode($res);
     }
+    
 
     public function creartransaccion($numero, $gestion)
     {

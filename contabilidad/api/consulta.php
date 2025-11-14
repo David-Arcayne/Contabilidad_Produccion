@@ -23,8 +23,10 @@ require_once "./configuracion/reporte_confi.php";
 require_once "./configuracion/rp_plantilla_reporte.php";
 require_once "./otras_cuentas/forma_pago.php";
 require_once "./configuracion/plantilla_admin.php";
+require_once "./facturas/factura_cobros.php";
+require_once "./facturas/factura_pagos.php";
 
-$ver=explode("/",$_GET['ver']); //dividiendo los "/"  ver[0],ver[1],ver[x]  listafacturaapi_pagado eliminarasiento tipo
+$ver=explode("/",$_GET['ver']); //dividiendo los "/"  ver[0],ver[1],ver[x]  listafacturaapi_pagado eliminarasiento tipo 
 if($ver[0]=="verificacion"){
 $ad=new Admin();
 $ad->verificacion();
@@ -661,10 +663,22 @@ elseif($ver[0]=="listar_reportes_referencia"){
 }elseif($ver[0]=="listar_factura_comercial_por_id"){
     $cont=new Factura_comercial();
     $cont->listar_factura_comercial_por_id($ver[1]);
+}elseif($ver[0]=="listar_factura_cobro_sin_cuentas"){
+    $cont=new Factura_cobros();
+    $cont->listar_factura_cobro_sin_cuentas($ver[1]);
+}elseif($ver[0]=="listar_factura_pago_sin_cuentas"){
+    $cont=new Factura_pagos();
+    $cont->listar_factura_pago_sin_cuentas($ver[1]);
+}elseif($ver[0]=="listafactura_cobro_cuenta"){
+    $cont=new Factura_cobros();
+    $cont->listafactura_cobro_cuenta($ver[1]);
+}elseif($ver[0]=="listafactura_pago_cuenta"){
+    $cont=new Factura_pagos();
+    $cont->listafactura_pago_cuenta($ver[1]);
 }
 
-// lista_cobrar_cobrado listar_datos listar_monto_factura_cajas listar_recibo_por_id listar_recibo_por_id_otras_cuentas   eliminarcobrados lista_cobrar lista_plande
+// lista_cobrar_cobrado listar_datos listar_monto_factura_cajas listar_recibo_por_id listar_recibo_por_id_otras_cuentas   eliminarcobrados lista_cobrar lista_plande listafactura
 //    listar_recibo_otras_cuentas  listar_recibo_otras_cuentas_pagar                  listar_recibo_pago_por_id                                             listar_recibo_por_id   --> caja bancos 
-// select_plantilla_estado_resultados listar_plantilla                                listar_recibo_por_id_otras_cuentas      listar_recibo_por_id_otras_cuentas_pagar ---> esos dos son de recibos
+// select_plantilla_estado_resultados listar_plantilla     listadegestion                           listar_recibo_por_id_otras_cuentas      listar_recibo_por_id_otras_cuentas_pagar ---> esos dos son de recibos
 
 ?>

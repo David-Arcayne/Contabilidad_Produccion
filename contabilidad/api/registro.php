@@ -142,10 +142,10 @@ else{
     $cont->registropagarfacturaf5($_POST['idrecibo'],$_POST['lugar'],$_POST['fecha'],$_POST['persona'],$_POST['ci'],$_POST['idtransaccion'],$_POST['archivo']);
 }elseif($ver=="registrogestion"){
 $cont=new Contabilidad();
-$cont->registrogestion($_POST['nombre'],$_POST['fechaini'],$_POST['fechafin'],$_POST['empresa']);
+$cont->registrogestion($_POST['nombre'],$_POST['fechaini'],$_POST['fechafin'],$_POST['formato_transaccion'],$_POST['empresa']);
 }elseif($ver=="registrogestionf5"){
 $cont=new Contabilidad();
-$cont->registrogestionf5($_POST['nombre'],$_POST['idgestion'],$_POST['empresa'],$_POST['fechaini'],$_POST['fechafin']);
+$cont->registrogestionf5($_POST['nombre'],$_POST['idgestion'],$_POST['empresa'],$_POST['fechaini'],$_POST['fechafin'],$_POST['formato_transaccion']);
 }elseif($ver=="creartransaccion"){
 $cont=new Contabilidad();
 $cont->creartransaccion($_POST['numero'],$_POST['gestion']);
