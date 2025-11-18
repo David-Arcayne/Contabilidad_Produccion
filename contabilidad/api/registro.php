@@ -739,12 +739,16 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         }else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idtipo_reporte'],$_POST['idplantilla'],$_POST['idtipo_reporte_referencia'],$_POST['idplantilla_referencia'],$_POST['empresa']));
         }
+    }elseif($ver == "registrotransaccion_por_asiento") {
+        if(isset($_POST['fecha'],$_POST['idasiento'],$_POST['monto'],$_POST['empresa'],$_POST['sucursal'])){
+        $cont=new Transacciones();
+        $cont->registrotransaccion_por_asiento($_POST['fecha'],$_POST['idasiento'],$_POST['monto'],$_POST['empresa'],$_POST['sucursal']);
+        }else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['fecha'],$_POST['idasiento'],$_POST['monto'],$_POST['empresa'],$_POST['sucursal']));
+        }
     }elseif($data['ver'] == "asignar_facturas_A_cuentas") {
         $cont=new Transacciones();
         $cont->asignar_facturas_A_cuentas($data);
-    }elseif($data['ver'] == "registrotransaccion_por_asiento") {
-        $cont=new Transacciones();
-        $cont->registrotransaccion_por_asiento($_POST['fecha'],$_POST['idasiento'],$_POST['monto'],$_POST['empresa'],$_POST['sucursal']);
     }
 //editar_caja_bancos_facturas editar_caja_bancos_facturas_existentes   editar_recibo_caja_bancos   registrar_factura_recibo_pago_cajaBancos registrar_agrupacion_plantilla registrar_factura_recibo_cobro asignar asiento
 //  vincula  -- crearfacturasf5 registrar_factura_cobro registrar_factura_cobro_otras_cuentas --> aumentar usuario registrar_factura_cobros_tributario registrocobrarfactura registropagarfactura registrar_recibo

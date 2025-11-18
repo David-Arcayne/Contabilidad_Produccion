@@ -4,84 +4,6 @@ session_start();
 require_once "../../db/db.php";
 class Transacciones extends DB{
     
-    public function registrotransaccion_por_asiento($fecha,$idasiento,$monto,$empresa,$sucursal)
-    {
-        $ndocumento = "0";
-        $ide = $this->getidempresa($empresa);
-        $idsucursal = $this->getidsucursal($sucursal);
-        $gestion = $this->getgestionactualC($empresa);
-        $idgestion = $gestion["id"];
-        $res = "";
-        // aqui la condicional si hay una nueva gestion
-
-        $nroTransa = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE organizacion_idorganizacion='$ide' AND idgestion='$idgestion' ORDER BY codigotransaccion DESC LIMIT 1;");
-        $resultado122 = $nroTransa->fetch_assoc();
-        $nroTransaccion = $resultado122['codigotransaccion'] + 1;
-
-        // echo json_encode(array($fecha, $tipocambio, $tipotransaccion, $glosa, $empresa,$ide, $sucursal,$ufv,$dolar,$idgestion,$nroTransaccion,$resultado122['codigotransaccion']));
-
-        $asiento_tipo = $this->dbc->query("SELECT * FROM asientotipo WHERE idasientotipo='$idasiento'");
-        $at = $asiento_tipo->fetch_assoc();
-
-        $tipo_trans = $this->dbc->query("SELECT * FROM tipotransaccion WHERE idtipotransaccion='$at[tipo]'");
-        $tt = $tipo_trans->fetch_assoc();
-
-        $tipo_cambio = $this->dbc->query("SELECT * FROM tipodecambio WHERE idorganizacion='$ide' AND fecha='$fecha'");
-
-        if($tipo_cambio->num_rows > 0){
-            $tc = $tipo_cambio->fetch_assoc();
-    
-            // EXISTE TIPO DE CAMBIO PARA LA FECHA DE HOY O SE SELECCIONARA UNA Q YA EXISTE
-            $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
-        VALUE(NULL,'$nroTransaccion','$fecha','$tc[idtipodecambio]','$ndocumento','-','1','1','$tt[idtipotransaccion]','$ide','$idsucursal','$idgestion')");
-
-        $idtransaccion = $this->dbc->insert_id;
-
-        }else{ //PONER EL ULTIMO TIPO DE CAMBIO REGISTRADO
-
-            $tipo_cambio_ult = $this->dbc->query("SELECT * FROM tipodecambio WHERE idorganizacion='$ide' ORDER BY idtipodecambio DESC LIMIT 1");
-            $tcu = $tipo_cambio_ult->fetch_assoc();
-
-            $idtipo_cambio = $this->dbc->insert_id;   
-        
-        $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
-        VALUE(NULL,'$nroTransaccion','$fecha','$tcu[idtipodecambio]','$ndocumento','-','1','1','$tt[idtipotransaccion]','$ide','$idsucursal','$idgestion')");
-
-        $idtransaccion = $this->dbc->insert_id;
-        }
-        
-
-        if ($writetrans === TRUE) {
-            //CREAMOS EL ASIENTO DE LA TRANSACCION
-            $debe = 0;
-            $haber = 0;
-            $tasiento = $this->dbc->query("SELECT * FROM asiento WHERE idasientotipo='$idasiento'");
-            $orden = 1;
-            while ($qwe = $this->dbc->fetch($tasiento)) {
-                $pcuenta = $qwe['idcuenta'];
-                if ($qwe['tipo'] == "DEBE") {
-                    $debe = $monto * ($qwe['porciento'] / 100);
-                    $haber = 0;
-                } elseif ($qwe['tipo'] == "HABER") {
-                    $debe = 0;
-                    $haber = $monto * ($qwe['porciento'] / 100);
-                }
-                //$pcuenta=$_POST['plandecuenta'];
-                $ppresupuestario = 0; //$_POST['planpresupuestario'];
-                $nota = "-";
-                $estado = 1; //$_POST['estado'];
-                $crear = $this->dbc->query("INSERT INTO detalletransaccion(debe,haber,nota,transacciones_idtransacciones,idplandecuenta,idcuentapresupuestaria,estado,cobrar,pagar,idorganizacion,idsucursal,orden)
-                VALUES ('$debe','$haber','$nota','$idtransaccion','$pcuenta','$ppresupuestario','$estado','2','2','$ide','$idsucursal','$orden')");
-                $orden = $orden + 1;
-            }
-
-            $res = array("success", "Se Registro Correctamente", "registrotransaccion");
-        } else {
-            $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
-        }
-        echo json_encode($res);
-    }
-
     public function registrotransaccion($fecha, $tipocambio, $tipotransaccion, $glosa, $empresa, $sucursal,$ufv,$dolar)
     {
         $ndocumento = "0";
@@ -90,18 +12,52 @@ class Transacciones extends DB{
         $gestion = $this->getgestionactualC($empresa);
         $idgestion = $gestion["id"];
         $res = "";
+
+        // Construir rango dinámico (primer y último día del mes)
+        $fecha_inicio = date("Y-m-01", strtotime($fecha)); // "2025-03-01"
+        $fecha_fin    = date("Y-m-t", strtotime($fecha));  // "2025-03-31"
+
         // aqui la condicional si hay una nueva gestion
 
-         $nroTransa = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE organizacion_idorganizacion='$ide' AND idgestion='$idgestion' ORDER BY codigotransaccion DESC LIMIT 1;");
-        $resultado122 = $nroTransa->fetch_assoc();
-        $nroTransaccion = $resultado122['codigotransaccion'] + 1;
+        $gestion_sel = $this->dbc->query("SELECT * FROM gestion WHERE idgestion='$idgestion'");
+        $gc = $gestion_sel->fetch_assoc();
+
+        if($gc['formato_transaccion'] == 'por_tipo_mes') {
+            $nroTransa = $this->dbc->query("
+                SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+            FROM transacciones
+            WHERE tipotransaccion_idtipotransaccion = '$tipotransaccion'
+            and fechatransaccion BETWEEN '$fecha_inicio' AND '$fecha_fin'
+            AND idgestion = '$idgestion'
+            AND organizacion_idorganizacion = '$ide'
+            ");
+        } elseif($gc['formato_transaccion'] == 'por_tipo_gestion') {
+            $nroTransa = $this->dbc->query("
+                SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                FROM transacciones 
+                WHERE tipotransaccion_idtipotransaccion = '$tipotransaccion'
+                AND idgestion = '$idgestion'
+                AND organizacion_idorganizacion = '$ide'
+            ");
+        } else { // POR_GESTION
+            $nroTransa = $this->dbc->query("
+                SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                FROM transacciones 
+                WHERE organizacion_idorganizacion = '$ide'
+                AND idgestion = '$idgestion'
+            ");
+        }
+
+$resultado122 = $nroTransa->fetch_assoc();
+$nroTransaccion = $resultado122['siguiente'];
+
 
         // echo json_encode(array($fecha, $tipocambio, $tipotransaccion, $glosa, $empresa,$ide, $sucursal,$ufv,$dolar,$idgestion,$nroTransaccion,$resultado122['codigotransaccion']));
 
         if($tipocambio != ""){
             // EXISTE TIPO DE CAMBIO PARA LA FECHA DE HOY O SE SELECCIONARA UNA Q YA EXISTE
             $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
-        VALUE(NULL,'$nroTransaccion','$fecha','$tipocambio','$ndocumento','$glosa','1','1','$tipotransaccion','$ide','$idsucursal','$idgestion')");
+            VALUE(NULL,'$nroTransaccion','$fecha','$tipocambio','$ndocumento','$glosa','1','1','$tipotransaccion','$ide','$idsucursal','$idgestion')");
 
         $idtransaccion = $this->dbc->insert_id;
 
@@ -122,7 +78,7 @@ class Transacciones extends DB{
             $tt = $this->dbc->query("SELECT * FROM tipotransaccion WHERE idtipotransaccion='" . $tipotransaccion . "'");
             $asd = $this->dbc->fetch($tt);
 
-            $res = array("success", "Se Registro Correctamente", "registrotransaccion",$idtransaccion,$nroTransaccion,$fecha,$glosa,'1',$asd['nombre'],$tipotransaccion,$idgestion,'1', $tipocambio);
+            $res = array("success", "Se Registro Correctamente", "registrotransaccion",$idtransaccion,$nroTransaccion,$fecha,$glosa,'1',$asd['nombre'],$tipotransaccion,$fecha_inicio,$fecha_fin);
         } else {
             $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
         }
@@ -153,8 +109,56 @@ class Transacciones extends DB{
         $getG = $this->getgestionactualC($empresa);
         $gestion = $getG['id'];
 
+        $gestion_sel = $this->dbc->query("SELECT * FROM gestion WHERE idgestion='$gestion'");
+        $gc = $gestion_sel->fetch_assoc();
 
-        $registro = $this->dbc->query("SELECT
+        if($gc['formato_transaccion'] == 'por_tipo_mes') {
+        $registro = $this->dbc->query("SELECT idtransacciones,
+            codigotransaccion,
+            fechatransaccion,
+            glosa,
+            consolidar,
+            tipotransaccion_idtipotransaccion,
+            idgestion,
+            estado,
+            tipodecambio
+        FROM transacciones
+        WHERE idgestion = '$gestion'
+        AND organizacion_idorganizacion = '$ide'
+        ORDER BY 
+        YEAR(fechatransaccion) ASC,
+        MONTH(fechatransaccion) ASC,
+        tipotransaccion_idtipotransaccion ASC,
+        codigotransaccion ASC;");
+
+        }elseif($gc['formato_transaccion'] == 'por_tipo_gestion'){
+              $registro = $this->dbc->query("SELECT 
+                t.idtransacciones,
+        t.codigotransaccion,
+        t.fechatransaccion,
+        t.glosa,
+        t.consolidar,
+        t.tipotransaccion_idtipotransaccion,
+        t.idgestion,
+        t.estado,
+        t.tipodecambio,
+                -- g.gestion AS gestion_anio,
+                tt.nombre AS tipo_nombre
+            FROM transacciones t
+            LEFT JOIN gestion g ON g.idgestion = t.idgestion
+            LEFT JOIN tipotransaccion tt ON tt.idtipotransaccion = t.tipotransaccion_idtipotransaccion
+            WHERE 
+                t.organizacion_idorganizacion = '$ide'
+                AND t.idgestion = '$gestion'
+            ORDER BY 
+                t.idgestion ASC,           -- Agrupar por gestión
+                t.tipotransaccion_idtipotransaccion ASC,  -- Agrupar y ordenar por tipo
+                t.fechatransaccion ASC,        -- Orden cronológico dentro del tipo
+                t.codigotransaccion ASC;       -- Correlativo correcto
+            ");
+
+        }else{ //POR GESTION
+            $registro = $this->dbc->query("SELECT
         t.idtransacciones,
         t.codigotransaccion,
         t.fechatransaccion,
@@ -172,6 +176,7 @@ class Transacciones extends DB{
         AND t.estado != 6 
       order by
         t.codigotransaccion desc;");
+        }
 
         $existe = $this->dbc->query("SELECT * FROM cierre_transacciones WHERE (nombre_operacion = 'precierre' OR nombre_operacion = 'cierre') AND idempresa = '$ide' AND idgestion ='$gestion'");
 
@@ -1360,6 +1365,85 @@ public function asignar_facturas_A_cuentas($data) {
             $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde");
         }
     
+        echo json_encode($res);
+    }
+
+    public function registrotransaccion_por_asiento($fecha,$idasiento,$monto,$empresa,$sucursal)
+    {
+        // echo json_encode(array("hola",$fecha,$idasiento,$monto,$empresa,$sucursal));
+        $ndocumento = "0";
+        $ide = $this->getidempresa($empresa);
+        $idsucursal = $this->getidsucursal($sucursal);
+        $gestion = $this->getgestionactualC($empresa);
+        $idgestion = $gestion["id"];
+        $res = "";
+        // aqui la condicional si hay una nueva gestion
+
+        $nroTransa = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE organizacion_idorganizacion='$ide' AND idgestion='$idgestion' ORDER BY codigotransaccion DESC LIMIT 1;");
+        $resultado122 = $nroTransa->fetch_assoc();
+        $nroTransaccion = $resultado122['codigotransaccion'] + 1;
+
+        // echo json_encode(array($fecha, $tipocambio, $tipotransaccion, $glosa, $empresa,$ide, $sucursal,$ufv,$dolar,$idgestion,$nroTransaccion,$resultado122['codigotransaccion']));
+
+        $asiento_tipo = $this->dbc->query("SELECT * FROM asientotipo WHERE idasientotipo='$idasiento'");
+        $at = $asiento_tipo->fetch_assoc();
+
+        $tipo_trans = $this->dbc->query("SELECT * FROM tipotransaccion WHERE idtipotransaccion='$at[tipo]'");
+        $tt = $tipo_trans->fetch_assoc();
+
+        $tipo_cambio = $this->dbc->query("SELECT * FROM tipodecambio WHERE idorganizacion='$ide' AND fecha='$fecha'");
+
+        if($tipo_cambio->num_rows > 0){
+            $tc = $tipo_cambio->fetch_assoc();
+    
+            // EXISTE TIPO DE CAMBIO PARA LA FECHA DE HOY O SE SELECCIONARA UNA Q YA EXISTE
+            $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
+        VALUE(NULL,'$nroTransaccion','$fecha','$tc[idtipodecambio]','$ndocumento','-','1','1','$tt[idtipotransaccion]','$ide','$idsucursal','$idgestion')");
+
+        $idtransaccion = $this->dbc->insert_id;
+
+        }else{ //PONER EL ULTIMO TIPO DE CAMBIO REGISTRADO
+
+            $tipo_cambio_ult = $this->dbc->query("SELECT * FROM tipodecambio WHERE idorganizacion='$ide' ORDER BY idtipodecambio DESC LIMIT 1");
+            $tcu = $tipo_cambio_ult->fetch_assoc();
+
+            $idtipo_cambio = $this->dbc->insert_id;   
+        
+        $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
+        VALUE(NULL,'$nroTransaccion','$fecha','$tcu[idtipodecambio]','$ndocumento','-','1','1','$tt[idtipotransaccion]','$ide','$idsucursal','$idgestion')");
+
+        $idtransaccion = $this->dbc->insert_id;
+        }
+        
+
+        if ($writetrans === TRUE) {
+            //CREAMOS EL ASIENTO DE LA TRANSACCION
+            $debe = 0;
+            $haber = 0;
+            $tasiento = $this->dbc->query("SELECT * FROM asiento WHERE idasientotipo='$idasiento'");
+            $orden = 1;
+            while ($qwe = $this->dbc->fetch($tasiento)) {
+                $pcuenta = $qwe['idcuenta'];
+                if ($qwe['tipo'] == "DEBE") {
+                    $debe = $monto * ($qwe['porciento'] / 100);
+                    $haber = 0;
+                } elseif ($qwe['tipo'] == "HABER") {
+                    $debe = 0;
+                    $haber = $monto * ($qwe['porciento'] / 100);
+                }
+                //$pcuenta=$_POST['plandecuenta'];
+                $ppresupuestario = 0; //$_POST['planpresupuestario'];
+                $nota = "-";
+                $estado = 1; //$_POST['estado'];
+                $crear = $this->dbc->query("INSERT INTO detalletransaccion(debe,haber,nota,transacciones_idtransacciones,idplandecuenta,idcuentapresupuestaria,estado,cobrar,pagar,idorganizacion,idsucursal,orden)
+                VALUES ('$debe','$haber','$nota','$idtransaccion','$pcuenta','$ppresupuestario','$estado','2','2','$ide','$idsucursal','$orden')");
+                $orden = $orden + 1;
+            }
+
+            $res = array("success", "Se Registro Correctamente", "registrotransaccion");
+        } else {
+            $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
+        }
         echo json_encode($res);
     }
 

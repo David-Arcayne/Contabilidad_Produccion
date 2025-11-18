@@ -190,35 +190,75 @@ public function registrar_anular_eliminar_activar_transaccion($idtransaccion,$mo
     
                  $resElimi = $eliminado->fetch_assoc();
                  $codig = $resElimi['codigotransaccion'];
+                 $tipo_trans = $resElimi['tipotransaccion_idtipotransaccion'];
+                 $fecha_trans = $resElimi['fechatransaccion'];
                  $idempresa = $resElimi['organizacion_idorganizacion'];
                  $idgestion = $resElimi['idgestion'];
 
                 $delete_transaccion=$this->dbc->query("DELETE FROM transacciones
                     WHERE idtransacciones = '$idtransaccion'");  
                 // -----------------------------------------------------------------------------
-                $transs=$this->dbc->query("SELECT * FROM transacciones 
+                $gestion_sel = $this->dbc->query("SELECT * FROM gestion WHERE idgestion='$idgestion'");
+                $gc = $gestion_sel->fetch_assoc();
+
+                if($gc['formato_transaccion'] == 'por_tipo_mes'){
+
+                    // Construir rango dinámico (primer y último día del mes)
+                    $fecha_inicio = date("Y-m-01", strtotime($fecha_trans)); // "2025-03-01"
+                    $fecha_fin    = date("Y-m-t", strtotime($fecha_trans));  // "2025-03-31"
+
+                    $transs=$this->dbc->query(" SELECT * FROM transacciones 
+                    WHERE codigotransaccion > '$codig' AND organizacion_idorganizacion = '$idempresa' 
+                    AND idgestion = '$idgestion' AND tipotransaccion_idtipotransaccion ='$tipo_trans'
+                    AND fechatransaccion BETWEEN '$fecha_inicio' AND '$fecha_fin'");
+                    $aux=0;
+                    if ($transs->num_rows === 0){
+                        // $res = array("success", "Se Elimino correctamente");
+                    }else{
+                        while($qwe2=$this->dbc->fetch($transs)){
+                            $codigo =  $qwe2['codigotransaccion'];
+                            $codigo = $codigo - 1;
+                            
+                                $descTRan=$this->dbc->query("UPDATE transacciones SET codigotransaccion = '$codigo' 
+                                WHERE idtransacciones = '$qwe2[idtransacciones]'");
+                            $aux++;
+                            }  
+                    }
+                }elseif($gc['formato_transaccion'] == 'por_tipo_gestion'){
+                    $transs=$this->dbc->query(" SELECT * FROM transacciones 
+                    WHERE codigotransaccion > '$codig' AND organizacion_idorganizacion = '$idempresa' 
+                    AND idgestion = '$idgestion' AND tipotransaccion_idtipotransaccion ='$tipo_trans'");
+                    $aux=0;
+                    if ($transs->num_rows === 0){
+                        // $res = array("success", "Se Elimino correctamente");
+                    }else{
+                        while($qwe2=$this->dbc->fetch($transs)){
+                            $codigo =  $qwe2['codigotransaccion'];
+                            $codigo = $codigo - 1;
+                            
+                                $descTRan=$this->dbc->query("UPDATE transacciones SET codigotransaccion = '$codigo' 
+                                WHERE idtransacciones = '$qwe2[idtransacciones]'");
+                            $aux++;
+                            }  
+                    }
+                }else{// POR GESTION
+                    $transs=$this->dbc->query("SELECT * FROM transacciones 
                     WHERE codigotransaccion > '$codig' AND organizacion_idorganizacion = '$idempresa' AND idgestion = '$idgestion'");
                     $aux=0;
                     if ($transs->num_rows === 0){
                         // $res = array("success", "Se Elimino correctamente");
                     }else{
-                while($qwe2=$this->dbc->fetch($transs)){
-                    $codigo =  $qwe2['codigotransaccion'];
-                    $codigo = $codigo - 1;
-                    
-                        $descTRan=$this->dbc->query("UPDATE transacciones SET codigotransaccion = '$codigo' 
-                        WHERE idtransacciones = '$qwe2[idtransacciones]'");
-                    $aux++;
+                        while($qwe2=$this->dbc->fetch($transs)){
+                            $codigo =  $qwe2['codigotransaccion'];
+                            $codigo = $codigo - 1;
+                            
+                                $descTRan=$this->dbc->query("UPDATE transacciones SET codigotransaccion = '$codigo' 
+                                WHERE idtransacciones = '$qwe2[idtransacciones]'");
+                            $aux++;
+                            }  
                     }
-                    
-                    // if ($descTRan ==TRUE){
-                    //     $res = array("success", "Se Elimino correctamente");
-
-                    // }else{
-                    //     $res = array("danger", "Se elimino pero no se actualiza");
-
-                    // }
                 }
+
                 // -------------------------------------------------------------------------------------
 
                 $res = array("success", "Se Acepto la eliminacion de transaccion", "cambiarEstado_anular_eliminar_transaccion");
@@ -236,7 +276,7 @@ public function registrar_anular_eliminar_activar_transaccion($idtransaccion,$mo
                 hora_proceso = '$hora_proceso',
                 fecha_proceso = '$fecha_proceso',
                 idusuario_admin = '$idusuario_admin'
-                    WHERE idsolicitud_anular_eliminar = '$idsoli'");   
+                WHERE idsolicitud_anular_eliminar = '$idsoli'");   
 
             if($estado_solicitud == 2){ //ACEPTADO
                 $consulta_detalle=$this->dbc->query("SELECT * FROM detalletransaccion WHERE transacciones_idtransacciones='$idtransaccion'");
