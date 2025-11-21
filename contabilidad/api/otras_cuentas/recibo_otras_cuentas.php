@@ -23,6 +23,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
         $res = "";
         $sucursal = $this->getidsucursal($sucursal);
         $ide = $this->getidempresa($empresa);
+        $gestion = $this->getgestionactualid($ide);
 
         $recibo_trans = $this->dbc->query("SELECT count(*) AS cant1 FROM cuentaspof cp 
         INNER JOIN transacciones t ON t.idtransacciones=cp.transaccion 
@@ -41,15 +42,6 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
 
         $nrecibo = $res1['cant1'] + $res2['cant2']+ $res3['cant3'] + 1;
 
-        // $empresa = $this->emp; registropagarfactura nrecibo
-        $transi = $this->dbc->query("SELECT * FROM transacciones WHERE organizacion_idorganizacion='$ide' and sucursal='$sucursal' order by codigotransaccion desc Limit 1");
-        $qq = $this->dbc->fetch($transi);
-        $codigo = $qq['codigotransaccion'] + 1;
-        $glosa = "Registro cobro $nrecibo";
-        $gestion = $this->getgestionactualid($ide);
-        $tipotransaccion = 1; //ingreso
-        $trans = "";
-
         if($idtransaccion == "" && $asiento == ""){
             // se crea factura sin transaccion asignada
             //$trans = 0
@@ -63,7 +55,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
 
             $idrecibo = $this->dbc->insert_id;
 
-        }elseif($idtransaccion > 0 && $asiento == 0){
+        }elseif($idtransaccion > 0 && $asiento == ""){
             //SE CREA LA FACTURA CON LA TRANSACCION EXISTENTE QUE YA TE PASARON
              $nuevo_recibo = $this->dbc->query("INSERT INTO recibo(nro_recibo,fecha,lugar,cliente_proveedor,persona,ci,monto,cobrado,pagado,idotras_cuentas,transaccion,concepto,archivo,registro_desde,idempresa)
             VALUES('$nro_recibo','$fecha','$lugar','$client_prov','$persona','$ci','$monto','1','0','$idotras_cuentas','$idtransaccion','$concepto',NULL,'cobrado_recibo_otras_cuentas','$ide')");
@@ -76,9 +68,53 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
             $idrecibo = $this->dbc->insert_id;
         }else{
             
-            $insertrans = $this->dbc->query("INSERT INTO `transacciones` (`idtransacciones`, `codigotransaccion`, `fechatransaccion`, `tipodecambio`, `ndocumento`, `glosa`, `consolidar`, `tipotransaccion_idtipotransaccion`, `organizacion_idorganizacion`, `sucursal`, `idgestion`) VALUES (NULL, '$codigo', '$fecha', '1', '0', '$glosa', '1', '$tipotransaccion', '$ide', '$sucursal', '$gestion');");
+            // Construir rango dinámico (primer y último día del mes)
+            $fecha_inicio = date("Y-m-01", strtotime($fecha)); // "2025-03-01"
+            $fecha_fin    = date("Y-m-t", strtotime($fecha));  // "2025-03-31"
+
+            $asiento_tipo = $this->dbc->query("SELECT * FROM asientotipo WHERE idasientotipo='$asiento'");
+            $at = $asiento_tipo->fetch_assoc();
+
+            $tipo_trans = $this->dbc->query("SELECT * FROM tipotransaccion WHERE idtipotransaccion='$at[tipo]'");
+            $tt = $tipo_trans->fetch_assoc();
+
+            $gestion_sel = $this->dbc->query("SELECT * FROM gestion WHERE idgestion='$gestion'");
+            $gc = $gestion_sel->fetch_assoc();
+
+            if($gc['formato_transaccion'] == 'por_tipo_mes') {
+                $nroTransa = $this->dbc->query("
+                    SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                FROM transacciones
+                WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]'
+                and fechatransaccion BETWEEN '$fecha_inicio' AND '$fecha_fin'
+                AND idgestion = '$gestion'
+                AND organizacion_idorganizacion = '$ide'
+                ");
+            } elseif($gc['formato_transaccion'] == 'por_tipo_gestion') {
+                $nroTransa = $this->dbc->query("
+                    SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                    FROM transacciones 
+                    WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]'
+                    AND idgestion = '$gestion'
+                    AND organizacion_idorganizacion = '$ide'
+                ");
+            } else { // POR_GESTION
+                $nroTransa = $this->dbc->query("
+                    SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                    FROM transacciones 
+                    WHERE organizacion_idorganizacion = '$ide'
+                    AND idgestion = '$gestion'
+                ");
+            }
+
+        $resultado122 = $nroTransa->fetch_assoc();
+        $nroTransaccion = $resultado122['siguiente'];
+        $glosa = "Registro cobro $nrecibo";
+
+            $insertrans = $this->dbc->query("INSERT INTO `transacciones` (`idtransacciones`, `codigotransaccion`, `fechatransaccion`, `tipodecambio`, `ndocumento`, `glosa`, `consolidar`, `tipotransaccion_idtipotransaccion`, `organizacion_idorganizacion`, `sucursal`, `idgestion`) 
+            VALUES (NULL, '$nroTransaccion', '$fecha', '1', '0', '$glosa', '1', '$tt[idtipotransaccion]', '$ide', '$sucursal', '$gestion');");
             //nuevat transaccion
-            $transis = $this->dbc->query("SELECT * FROM transacciones WHERE codigotransaccion='$codigo' AND  organizacion_idorganizacion='$ide' ORDER BY idtransacciones DESC LIMIT 1");
+            $transis = $this->dbc->query("SELECT * FROM transacciones WHERE codigotransaccion='$nroTransaccion' AND  organizacion_idorganizacion='$ide' ORDER BY idtransacciones DESC LIMIT 1");
             $ww = $this->dbc->fetch($transis);
             $trans = $ww['idtransacciones'];
             //$detallepago
@@ -361,6 +397,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
         $res = "";
         $sucursal = $this->getidsucursal($sucursal);
         $ide = $this->getidempresa($empresa);
+        $gestion = $this->getgestionactualid($ide);
 
        $recibo_trans = $this->dbc->query("SELECT count(*) AS cant1 FROM cuentaspor cp 
         INNER JOIN transacciones t ON t.idtransacciones=cp.transaccion 
@@ -379,15 +416,6 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
 
         $nrecibo = $res1['cant1'] + $res2['cant2']+ $res3['cant3'] + 1;
 
-        // $empresa = $this->emp; registropagarfactura nrecibo
-        $transi = $this->dbc->query("SELECT * FROM transacciones WHERE organizacion_idorganizacion='$ide' and sucursal='$sucursal' order by codigotransaccion desc Limit 1");
-        $qq = $this->dbc->fetch($transi);
-        $codigo = $qq['codigotransaccion'] + 1;
-        $glosa = "Registro cobro $nrecibo";
-        $gestion = $this->getgestionactualid($ide);
-        $tipotransaccion = 1; //ingreso
-        $trans = "";
-
         if($idtransaccion == "" && $asiento == ""){
             // se crea factura sin transaccion asignada
             //$trans = 0
@@ -401,7 +429,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
 
             $idrecibo = $this->dbc->insert_id;
 
-        }elseif($idtransaccion > 0 && $asiento == 0){
+        }elseif($idtransaccion > 0 && $asiento == ""){
             //SE CREA LA FACTURA CON LA TRANSACCION EXISTENTE QUE YA TE PASARON
              $nuevo_recibo = $this->dbc->query("INSERT INTO recibo(nro_recibo,fecha,lugar,cliente_proveedor,persona,ci,monto,cobrado,pagado,idotras_cuentas,transaccion,concepto,archivo,registro_desde,idempresa)
             VALUES('$nro_recibo','$fecha','$lugar','$client_prov','$persona','$ci','$monto','0','1','$idotras_cuentas','$idtransaccion','$concepto',NULL,'pagado_recibo_otras_cuentas','$ide')");
@@ -413,9 +441,54 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
 
             $idrecibo = $this->dbc->insert_id;
         }else{
-            $insertrans = $this->dbc->query("INSERT INTO `transacciones` (`idtransacciones`, `codigotransaccion`, `fechatransaccion`, `tipodecambio`, `ndocumento`, `glosa`, `consolidar`, `tipotransaccion_idtipotransaccion`, `organizacion_idorganizacion`, `sucursal`, `idgestion`) VALUES (NULL, '$codigo', '$fecha', '1', '0', '$glosa', '1', '$tipotransaccion', '$ide', '$sucursal', '$gestion');");
+
+            // Construir rango dinámico (primer y último día del mes)
+            $fecha_inicio = date("Y-m-01", strtotime($fecha)); // "2025-03-01"
+            $fecha_fin    = date("Y-m-t", strtotime($fecha));  // "2025-03-31"
+
+            $asiento_tipo = $this->dbc->query("SELECT * FROM asientotipo WHERE idasientotipo='$asiento'");
+            $at = $asiento_tipo->fetch_assoc();
+
+            $tipo_trans = $this->dbc->query("SELECT * FROM tipotransaccion WHERE idtipotransaccion='$at[tipo]'");
+            $tt = $tipo_trans->fetch_assoc();
+
+            $gestion_sel = $this->dbc->query("SELECT * FROM gestion WHERE idgestion='$gestion'");
+            $gc = $gestion_sel->fetch_assoc();
+
+            if($gc['formato_transaccion'] == 'por_tipo_mes') {
+                $nroTransa = $this->dbc->query("
+                    SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                FROM transacciones
+                WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]'
+                and fechatransaccion BETWEEN '$fecha_inicio' AND '$fecha_fin'
+                AND idgestion = '$gestion'
+                AND organizacion_idorganizacion = '$ide'
+                ");
+            } elseif($gc['formato_transaccion'] == 'por_tipo_gestion') {
+                $nroTransa = $this->dbc->query("
+                    SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                    FROM transacciones 
+                    WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]'
+                    AND idgestion = '$gestion'
+                    AND organizacion_idorganizacion = '$ide'
+                ");
+            } else { // POR_GESTION
+                $nroTransa = $this->dbc->query("
+                    SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                    FROM transacciones 
+                    WHERE organizacion_idorganizacion = '$ide'
+                    AND idgestion = '$gestion'
+                ");
+            }
+
+        $resultado122 = $nroTransa->fetch_assoc();
+        $nroTransaccion = $resultado122['siguiente'];
+        $glosa = "Registro Pago $nrecibo";
+
+            $insertrans = $this->dbc->query("INSERT INTO `transacciones` (`idtransacciones`, `codigotransaccion`, `fechatransaccion`, `tipodecambio`, `ndocumento`, `glosa`, `consolidar`, `tipotransaccion_idtipotransaccion`, `organizacion_idorganizacion`, `sucursal`, `idgestion`) 
+            VALUES (NULL, '$nroTransaccion', '$fecha', '1', '0', '$glosa', '1', '$tt[idtipotransaccion]', '$ide', '$sucursal', '$gestion');");
             //nuevat transaccion
-            $transis = $this->dbc->query("SELECT * FROM transacciones WHERE codigotransaccion='$codigo' AND  organizacion_idorganizacion='$ide' ORDER BY idtransacciones DESC LIMIT 1");
+            $transis = $this->dbc->query("SELECT * FROM transacciones WHERE codigotransaccion='$nroTransaccion' AND  organizacion_idorganizacion='$ide' ORDER BY idtransacciones DESC LIMIT 1");
             $ww = $this->dbc->fetch($transis);
             $trans = $ww['idtransacciones'];
             //$detallepago
@@ -596,7 +669,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
             VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$trans','0',NULL,'cobrado_factura_otras_cuentas')");
 
             $idrecibo = $this->dbc->insert_id;
-        }elseif($trans > 0 && $asiento == 0){
+        }elseif($trans > 0 && $asiento == ""){
             //SE CREA LA FACTURA CON LA TRANSACCION EXISTENTE QUE YA TE PASARON
             $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`,`tipo_factura`, `clasefactura`, `cobrado`, `pagado`,`idotras_cuentas`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) 
             VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento','contado', '$clasefactura', '2', '0','$idotras_cuentas', '$espesificacion', '1', '1', '$trans', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de','cobrado_factura_otras_cuentas');");
@@ -608,17 +681,53 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
 
             $idrecibo = $this->dbc->insert_id;
         }else{
-            // Obtener el número de transacción más reciente y sumar 1
-        $nroTrans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE organizacion_idorganizacion=$idempresa AND idgestion='$gestion' ORDER BY codigotransaccion DESC LIMIT 1;");
-        $resultado12 = $nroTrans->fetch_assoc();
-        $nroTransaccion = $resultado12['codigotransaccion'] + 1;
+            
+         // Construir rango dinámico (primer y último día del mes)
+            $fecha_inicio = date("Y-m-01", strtotime($fecha)); // "2025-03-01"
+            $fecha_fin    = date("Y-m-t", strtotime($fecha));  // "2025-03-31"
 
-        //el asiento es diferente a cero, se debe crear una transaccion
-        $idAsientoTipo = $this->dbc->query("SELECT * FROM asientotipo WHERE idasientotipo='$asiento' AND idorganizacion='$idempresa';");
-        $asiento_aux2 = $idAsientoTipo->fetch_assoc();  // Cambiado $nroTrans->fetch_assoc() a $idAsientoTipo->fetch_assoc()
-        $tipotransaccion = $asiento_aux2['tipo'];
+            $asiento_tipo = $this->dbc->query("SELECT * FROM asientotipo WHERE idasientotipo='$asiento'");
+            $at = $asiento_tipo->fetch_assoc();
+
+            $tipo_trans = $this->dbc->query("SELECT * FROM tipotransaccion WHERE idtipotransaccion='$at[tipo]'");
+            $tt = $tipo_trans->fetch_assoc();
+
+            $gestion_sel = $this->dbc->query("SELECT * FROM gestion WHERE idgestion='$gestion'");
+            $gc = $gestion_sel->fetch_assoc();
+
+            if($gc['formato_transaccion'] == 'por_tipo_mes') {
+                $nroTransa = $this->dbc->query("
+                    SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                FROM transacciones
+                WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]'
+                and fechatransaccion BETWEEN '$fecha_inicio' AND '$fecha_fin'
+                AND idgestion = '$gestion'
+                AND organizacion_idorganizacion = '$idempresa'
+                ");
+            } elseif($gc['formato_transaccion'] == 'por_tipo_gestion') {
+                $nroTransa = $this->dbc->query("
+                    SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                    FROM transacciones 
+                    WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]'
+                    AND idgestion = '$gestion'
+                    AND organizacion_idorganizacion = '$idempresa'
+                ");
+            } else { // POR_GESTION
+                $nroTransa = $this->dbc->query("
+                    SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                    FROM transacciones 
+                    WHERE organizacion_idorganizacion = '$idempresa'
+                    AND idgestion = '$gestion'
+                ");
+            }
+
+        $resultado122 = $nroTransa->fetch_assoc();
+        $nroTransaccion = $resultado122['siguiente'];
+
         // Insertar en transacciones
-        $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion, fechatransaccion, tipodecambio, ndocumento, glosa, consolidar,estado, tipotransaccion_idtipotransaccion, organizacion_idorganizacion, sucursal, idgestion) VALUES ('$nroTransaccion', '$fecha', '1', '0', 'Registro Cobro Caja Bancos', '1','1', '$tipotransaccion', '$idempresa', '$idsucursal', '$gestion')");
+        $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion, fechatransaccion, tipodecambio, ndocumento, glosa, consolidar,estado, tipotransaccion_idtipotransaccion, organizacion_idorganizacion, sucursal, idgestion) 
+        VALUES ('$nroTransaccion', '$fecha', '1', '0', 'Registro Cobro Caja Bancos', '1','1', '$tt[idtipotransaccion]', '$idempresa', '$idsucursal', '$gestion')");
+        
         $idtrans = $this->dbc->insert_id;
 // -----------------------------------------------------------------------------------------------------------------
              // Obtener los asientos relacionados y calcular debe y haber
@@ -742,7 +851,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
             VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$trans','0',NULL,'pagado_factura_otras_cuentas')");
 
             $idrecibo = $this->dbc->insert_id;
-        }elseif($trans > 0 && $asiento == 0){
+        }elseif($trans > 0 && $asiento == ""){
             //SE CREA LA FACTURA CON LA TRANSACCION EXISTENTE QUE YA TE PASARON
             $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`,`tipo_factura`, `clasefactura`, `cobrado`, `pagado`,`idotras_cuentas`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento','contado', '$clasefactura', '0', '2','$idotras_cuentas', '$espesificacion', '1', '1', '$trans', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de','pagado_factura_otras_cuentas');");
         
@@ -753,17 +862,51 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
 
             $idrecibo = $this->dbc->insert_id;
         }else{
-            // Obtener el número de transacción más reciente y sumar 1
-        $nroTrans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE organizacion_idorganizacion=$idempresa AND idgestion='$gestion' ORDER BY codigotransaccion DESC LIMIT 1;");
-        $resultado12 = $nroTrans->fetch_assoc();
-        $nroTransaccion = $resultado12['codigotransaccion'] + 1;
+             // Construir rango dinámico (primer y último día del mes)
+            $fecha_inicio = date("Y-m-01", strtotime($fecha)); // "2025-03-01"
+            $fecha_fin    = date("Y-m-t", strtotime($fecha));  // "2025-03-31"
 
-        //el asiento es diferente a cero, se debe crear una transaccion
-        $idAsientoTipo = $this->dbc->query("SELECT * FROM asientotipo WHERE idasientotipo='$asiento' AND idorganizacion='$idempresa';");
-        $asiento_aux2 = $idAsientoTipo->fetch_assoc();  // Cambiado $nroTrans->fetch_assoc() a $idAsientoTipo->fetch_assoc()
-        $tipotransaccion = $asiento_aux2['tipo'];
+            $asiento_tipo = $this->dbc->query("SELECT * FROM asientotipo WHERE idasientotipo='$asiento'");
+            $at = $asiento_tipo->fetch_assoc();
+
+            $tipo_trans = $this->dbc->query("SELECT * FROM tipotransaccion WHERE idtipotransaccion='$at[tipo]'");
+            $tt = $tipo_trans->fetch_assoc();
+
+            $gestion_sel = $this->dbc->query("SELECT * FROM gestion WHERE idgestion='$gestion'");
+            $gc = $gestion_sel->fetch_assoc();
+
+            if($gc['formato_transaccion'] == 'por_tipo_mes') {
+                $nroTransa = $this->dbc->query("
+                    SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                FROM transacciones
+                WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]'
+                and fechatransaccion BETWEEN '$fecha_inicio' AND '$fecha_fin'
+                AND idgestion = '$gestion'
+                AND organizacion_idorganizacion = '$idempresa'
+                ");
+            } elseif($gc['formato_transaccion'] == 'por_tipo_gestion') {
+                $nroTransa = $this->dbc->query("
+                    SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                    FROM transacciones 
+                    WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]'
+                    AND idgestion = '$gestion'
+                    AND organizacion_idorganizacion = '$idempresa'
+                ");
+            } else { // POR_GESTION
+                $nroTransa = $this->dbc->query("
+                    SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                    FROM transacciones 
+                    WHERE organizacion_idorganizacion = '$idempresa'
+                    AND idgestion = '$gestion'
+                ");
+            }
+
+        $resultado122 = $nroTransa->fetch_assoc();
+        $nroTransaccion = $resultado122['siguiente'];
+
         // Insertar en transacciones
-        $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion, fechatransaccion, tipodecambio, ndocumento, glosa, consolidar,estado, tipotransaccion_idtipotransaccion, organizacion_idorganizacion, sucursal, idgestion) VALUES ('$nroTransaccion', '$fecha', '1', '0', 'Registro Cobro Caja Bancos', '1','1', '$tipotransaccion', '$idempresa', '$idsucursal', '$gestion')");
+        $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion, fechatransaccion, tipodecambio, ndocumento, glosa, consolidar,estado, tipotransaccion_idtipotransaccion, organizacion_idorganizacion, sucursal, idgestion) 
+        VALUES ('$nroTransaccion', '$fecha', '1', '0', 'Registro Cobro Caja Bancos', '1','1', '$tt[idtipotransaccion]', '$idempresa', '$idsucursal', '$gestion')");
         $idtrans = $this->dbc->insert_id;
 // -----------------------------------------------------------------------------------------------------------------
              // Obtener los asientos relacionados y calcular debe y haber

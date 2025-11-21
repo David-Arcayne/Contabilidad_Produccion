@@ -84,13 +84,13 @@ $nroTransaccion = $resultado122['siguiente'];
         }
         echo json_encode($res);
     }
-    public function registrotransaccionf5($idt, $fecha, $tipocambio, $tipotransaccion, $glosa, $gestion)
+    public function registrotransaccionf5($idt, $fecha, $tipocambio, $tipotransaccion, $glosa)
     {
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
         $res = "";
-        $writetrans = $this->dbc->query("UPDATE transacciones SET fechatransaccion='$fecha',tipodecambio='$tipocambio',glosa='$glosa',tipotransaccion_idtipotransaccion='$tipotransaccion',idgestion='$gestion' where idtransacciones='$idt'");
+        $writetrans = $this->dbc->query("UPDATE transacciones SET fechatransaccion='$fecha',tipodecambio='$tipocambio',glosa='$glosa',tipotransaccion_idtipotransaccion='$tipotransaccion' where idtransacciones='$idt'");
         if ($writetrans === TRUE) {
             $res = array("success", "Se Registro Correctamente", "registrotransaccionf5");
         } else {
@@ -192,7 +192,7 @@ $nroTransaccion = $resultado122['siguiente'];
                 array_push($detalle, $ress);
             }
 
-            $res = array("id" => $qwe[0], "ntransaccion" => $qwe[1], "fecha" => $qwe[2], "glosa" => $qwe[3], "consolidar" => $qwe[4], "ttransaccion" => $asd['nombre'],"idtipotransaccion"=>$qwe[5], "gestion" => $qwe[6],"estado" => $qwe[7], "detalle" => $detalle, "tipocambio" => $qwe[8],"existe" => 1);
+            $res = array("id" => $qwe[0], "ntransaccion" => $qwe[1], "fecha" => $qwe[2], "glosa" => $qwe[3], "consolidar" => $qwe[4], "ttransaccion" => $asd['nombre'],"idtipotransaccion"=>$qwe[5], "gestion" => $qwe[6],"estado" => $qwe[7], "detalle" => $detalle, "tipocambio" => $qwe[8],"existe" => 1,"formato_transaccion" => $gc['formato_transaccion']);
             array_push($lista, $res);
         }
         }else{
@@ -207,7 +207,7 @@ $nroTransaccion = $resultado122['siguiente'];
                 array_push($detalle, $ress);
             }
 
-            $res = array("id" => $qwe[0], "ntransaccion" => $qwe[1], "fecha" => $qwe[2], "glosa" => $qwe[3], "consolidar" => $qwe[4], "ttransaccion" => $asd['nombre'],"idtipotransaccion"=>$qwe[5], "gestion" => $qwe[6],"estado" => $qwe[7], "detalle" => $detalle, "tipocambio" => $qwe[8],"existe" => 0);
+            $res = array("id" => $qwe[0], "ntransaccion" => $qwe[1], "fecha" => $qwe[2], "glosa" => $qwe[3], "consolidar" => $qwe[4], "ttransaccion" => $asd['nombre'],"idtipotransaccion"=>$qwe[5], "gestion" => $qwe[6],"estado" => $qwe[7], "detalle" => $detalle, "tipocambio" => $qwe[8],"existe" => 0,"formato_transaccion" => $gc['formato_transaccion']);
             array_push($lista, $res);
         }
         }

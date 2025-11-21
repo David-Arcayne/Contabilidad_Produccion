@@ -47,7 +47,7 @@ $cont->registrotransaccion($_POST['fecha'],$_POST['tipodecambio'],$_POST['tipotr
     $cont->insertartransaccionen($_POST['codigo'],$_POST['fecha'],$_POST['tipodecambio'],$_POST['tipotransaccion'],$_POST['descripcion'],$_POST['empresa'],$_POST['sucursal']);
 }elseif($ver=="registrotransaccionf5"){
 $cont=new Transacciones();
-$cont->registrotransaccionf5($_POST['idt'],$_POST['fecha'],$_POST['tipodecambio'],$_POST['tipotransaccion'],$_POST['descripcion'],$_POST['gestion']);
+$cont->registrotransaccionf5($_POST['idt'],$_POST['fecha'],$_POST['tipodecambio'],$_POST['tipotransaccion'],$_POST['descripcion']);
 }elseif($ver=="detalletransaccionnormal"){
 $cont=new Transacciones();
 $cont->detalletransaccionnormal($_POST['trans'],$_POST['plandecuenta'],$_POST['debe'],$_POST['haber'],$_POST['nota'],$_POST['empresa'],$_POST['sucursal'],$_POST['iddetalletransaccion']);
@@ -219,13 +219,13 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         echo json_encode(array("danger", "Faltan parámetros en la solicitud", $_POST['fecha'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['idtransaccion'],$_POST['cajasBancos'],$_POST['idasientotipo'],$_POST['empresa'],$_POST['sucursal'],$_FILES['archivo'],$_POST['facturas'],$_POST['zona_horaria']));
     }
 }elseif($ver == "registropagarfacturaGrupal"){
-    if(isset($_POST['fecha'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['idasientotipo'],$_POST['cajasBancos'],$_POST['empresa'],$_POST['sucursal'],$_FILES['archivo'],$_POST['facturas'],$_POST['zona_horaria'])){
+    if(isset($_POST['fecha'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['idasientotipo'],$_POST['idtransaccion'],$_POST['cajasBancos'],$_POST['empresa'],$_POST['sucursal'],$_FILES['archivo'],$_POST['facturas'],$_POST['zona_horaria'])){
         // decode echo json_encode(array("danger", "Faltan parámetros en la solicitud", $_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$facturas));
         $cont=new TransFactura_pagar();
-        $cont->registropagarfacturaGrupal($_POST['fecha'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['idasientotipo'],$_POST['cajasBancos'],$_POST['empresa'],$_POST['sucursal'],$_FILES['archivo'],$_POST['facturas'],$_POST['zona_horaria']);
+        $cont->registropagarfacturaGrupal($_POST['fecha'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['idasientotipo'],$_POST['idtransaccion'],$_POST['cajasBancos'],$_POST['empresa'],$_POST['sucursal'],$_FILES['archivo'],$_POST['facturas'],$_POST['zona_horaria']);
     }
     else{
-        echo json_encode(array("danger", "Faltan parámetros en la solicitud", $_POST['fecha'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['idasientotipo'],$_POST['cajasBancos'],$_POST['empresa'],$_POST['sucursal'],$_FILES['archivo'],$_POST['facturas'],$_POST['zona_horaria']));
+        echo json_encode(array("danger", "Faltan parámetros en la solicitud", $_POST['fecha'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['idasientotipo'],$_POST['idtransaccion'],$_POST['cajasBancos'],$_POST['empresa'],$_POST['sucursal'],$_FILES['archivo'],$_POST['facturas'],$_POST['zona_horaria']));
     }
 }elseif($ver == "registrar_anular_eliminar_activar_transaccion"){
     if(isset($_POST['transacciones_idtransacciones'],$_POST['motivo'],$_POST['estado_opcion'],$_POST['estado_solicitud'],$_POST['hora'],$_POST['fecha'],$_POST['idusuario'],$_POST['idempresa'])){
@@ -752,6 +752,6 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     }
 //editar_caja_bancos_facturas editar_caja_bancos_facturas_existentes   editar_recibo_caja_bancos   registrar_factura_recibo_pago_cajaBancos registrar_agrupacion_plantilla registrar_factura_recibo_cobro asignar asiento
 //  vincula  -- crearfacturasf5 registrar_factura_cobro registrar_factura_cobro_otras_cuentas --> aumentar usuario registrar_factura_cobros_tributario registrocobrarfactura registropagarfactura registrar_recibo
-//  registrocobrarfacturaGrupal crearfacturas caja_bancos registrar_factura_pago registrar_otras_cuentas registrar_recibo_otras_cuentas--> aumentar usuario creartransaccion editar_caja_bancos_facturas_existentes asignar 
-}// detalletransaccion registrar_recibo_otras_cuentas registrar_recibo_cobro_cajaBancos_en_otras_cuentas registrar_factura_cobro_otras_cuentas   registrar_otras_cuentas_recibo_cajaBancos_cobro registrar_recibo_cobro
+//  registrar_factura_recibo_cobro_cajaBancos  registrar_recibo_cobro_cajaBancos_en_facturas registrar_recibo_cobro_cajaBancos_en_otras_cuentas  registrar_recibo_otras_cuentas 
+}//   registrar_factura_cobros_tributario registrocobrarfacturaGrupal registrar_transaccion_recibo gestion
 ?> 

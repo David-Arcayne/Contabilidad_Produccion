@@ -42,18 +42,61 @@ class Cuentaspor extends DB{
 
         $nrecibo = $res1['cant1'] + $res2['cant2']+ $res3['cant3'] + 1;
 
-        // $empresa = $this->emp;
-        $transi = $this->dbc->query("SELECT * FROM transacciones WHERE organizacion_idorganizacion='$ide' AND idgestion='$idgestion' ORDER BY codigotransaccion DESC LIMIT 1");
-        $qq = $this->dbc->fetch($transi);
-        $codigo = $qq['codigotransaccion'] + 1;
-        $glosa = "Registro de Pago $nrecibo";
-        $gestion = $this->getgestionactualid($ide);
-        $tipotransaccion = 2; //ingreso
+        
+                // Construir rango dinámico (primer y último día del mes)
+        $fecha_inicio = date("Y-m-01", strtotime($fecha)); // "2025-03-01"
+        $fecha_fin    = date("Y-m-t", strtotime($fecha));  // "2025-03-31"
+
+        $asiento_tipo = $this->dbc->query("SELECT * FROM asientotipo WHERE idasientotipo='$asiento'");
+        $at = $asiento_tipo->fetch_assoc();
+
+        $tipo_trans = $this->dbc->query("SELECT * FROM tipotransaccion WHERE idtipotransaccion='$at[tipo]'");
+        $tt = $tipo_trans->fetch_assoc();
+
+        $gestion_sel = $this->dbc->query("SELECT * FROM gestion WHERE idgestion='$idgestion'");
+        $gc = $gestion_sel->fetch_assoc();
+
+        if($gc['formato_transaccion'] == 'por_tipo_mes') {
+            $nroTransa = $this->dbc->query("
+                SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+            FROM transacciones
+            WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]'
+            and fechatransaccion BETWEEN '$fecha_inicio' AND '$fecha_fin'
+            AND idgestion = '$idgestion'
+            AND organizacion_idorganizacion = '$ide'
+            ");
+        } elseif($gc['formato_transaccion'] == 'por_tipo_gestion') {
+            $nroTransa = $this->dbc->query("
+                SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                FROM transacciones 
+                WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]'
+                AND idgestion = '$idgestion'
+                AND organizacion_idorganizacion = '$ide'
+            ");
+        } else { // POR_GESTION
+            $nroTransa = $this->dbc->query("
+                SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                FROM transacciones 
+                WHERE organizacion_idorganizacion = '$ide'
+                AND idgestion = '$idgestion'
+            ");
+        }
+
+    $resultado122 = $nroTransa->fetch_assoc();
+    $nroTransaccion = $resultado122['siguiente'];
+
+        // $empresa = $this->emp; registropagarfactura nrecibo
+        // $transi = $this->dbc->query("SELECT * FROM transacciones WHERE organizacion_idorganizacion='$ide' AND idgestion='$idgestion' order by codigotransaccion desc Limit 1");
+        // $qq = $this->dbc->fetch($transi);
+        // $codigo = $qq['codigotransaccion'] + 1;
+        $glosa = "Registro cobro $nrecibo";
+
 
         if ($asiento != "" && $idtransaccion == "") {
-        $insertrans = $this->dbc->query("INSERT INTO `transacciones` (`idtransacciones`, `codigotransaccion`, `fechatransaccion`, `tipodecambio`, `ndocumento`, `glosa`, `consolidar`,`estado`, `tipotransaccion_idtipotransaccion`, `organizacion_idorganizacion`, `sucursal`, `idgestion`) VALUES (NULL, '$codigo', '$fecha', '1', '0', '$glosa', '1','1', '$tipotransaccion', '$ide', '$sucursal', '$gestion');");
+        $insertrans = $this->dbc->query("INSERT INTO `transacciones` (`idtransacciones`, `codigotransaccion`, `fechatransaccion`, `tipodecambio`, `ndocumento`, `glosa`, `consolidar`,`estado`, `tipotransaccion_idtipotransaccion`, `organizacion_idorganizacion`, `sucursal`, `idgestion`) 
+        VALUES (NULL, '$nroTransaccion', '$fecha', '1', '0', '$glosa', '1','1', '$tt[idtipotransaccion]', '$ide', '$sucursal', '$idgestion');");
         //nuevat transaccion
-        $transis = $this->dbc->query("select * from transacciones where codigotransaccion='$codigo' and  organizacion_idorganizacion='$ide' order by idtransacciones desc Limit 1");
+        $transis = $this->dbc->query("select * from transacciones where codigotransaccion='$nroTransaccion' and  organizacion_idorganizacion='$ide' order by idtransacciones desc Limit 1");
         $ww = $this->dbc->fetch($transis);
         $trans = $ww['idtransacciones'];
         //$detallepago

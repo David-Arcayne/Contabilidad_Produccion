@@ -4,7 +4,7 @@ class Cuentaspof extends DB{
 
     public function registrocobrarfactura($idfactura,$lugar, $idtransaccion,$idcaja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$concepto,$archivo,$zn)
     {
-        // echo json_encode(array($idfactura, $idtransaccion,$caja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$archivo));
+        // echo json_encode(array($idfactura,$lugar, $idtransaccion,$idcaja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$concepto,$archivo,$zn));
 
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
@@ -43,6 +43,7 @@ class Cuentaspof extends DB{
         $res3 = $recibo_oc->fetch_assoc();
 
         $nrecibo = $res1['cant1'] + $res2['cant2']+ $res3['cant3'] + 1;
+//----------------------------------------------------------------------------------------------------------------
 
         // Construir rango dinámico (primer y último día del mes)
         $fecha_inicio = date("Y-m-01", strtotime($fecha)); // "2025-03-01"
@@ -83,20 +84,16 @@ class Cuentaspof extends DB{
             ");
         }
 
-    $resultado122 = $nroTransa->fetch_assoc();
-    $nroTransaccion = $resultado122['siguiente'];
+        $resultado122 = $nroTransa->fetch_assoc();
+        $nroTransaccion = $resultado122['siguiente'];
 
-        // $empresa = $this->emp; registropagarfactura nrecibo
-        // $transi = $this->dbc->query("SELECT * FROM transacciones WHERE organizacion_idorganizacion='$ide' AND idgestion='$idgestion' order by codigotransaccion desc Limit 1");
-        // $qq = $this->dbc->fetch($transi);
-        // $codigo = $qq['codigotransaccion'] + 1;
         $glosa = "Registro cobro $nrecibo";
     
         
         $trans = "";
         if ($asiento != "" && $idtransaccion == "") {
             $insertrans = $this->dbc->query("INSERT INTO `transacciones` (`idtransacciones`, `codigotransaccion`, `fechatransaccion`, `tipodecambio`, `ndocumento`, `glosa`, `consolidar`, `estado`, `tipotransaccion_idtipotransaccion`, `organizacion_idorganizacion`, `sucursal`, `idgestion`) 
-            VALUES (NULL, '$nroTransaccion', '$fecha', '1', '0', '$glosa', '1', '1', '$tt[idtipotransaccion]', '$ide', '$sucursal', '$gestion');");
+            VALUES (NULL, '$nroTransaccion', '$fecha', '1', '0', '$glosa', '1', '1', '$tt[idtipotransaccion]', '$ide', '$sucursal', '$idgestion');");
             //nuevat transaccion
             $transis = $this->dbc->query("SELECT * FROM transacciones WHERE codigotransaccion='$nroTransaccion' AND  organizacion_idorganizacion='$ide' ORDER BY idtransacciones DESC LIMIT 1");
             $ww = $this->dbc->fetch($transis);

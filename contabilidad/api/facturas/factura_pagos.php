@@ -89,23 +89,57 @@ class Factura_pagos extends DB{
                 $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`,`tipo_factura`, `clasefactura`, `cobrado`, `pagado`,`idotras_cuentas`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) 
                 VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento','$tipo_factura', '$clasefactura', '$co', '$pa','0', '$espesificacion', '1', '1', '0', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de','tributario_x_pagar');");
     
-            }elseif($trans > 0 && $asiento == 0){
+            }elseif($trans > 0 && $asiento == ""){
                 //SE CREA LA FACTURA CON LA TRANSACCION EXISTENTE QUE YA TE PASARON
                 $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`,`tipo_factura`, `clasefactura`, `cobrado`, `pagado`,`idotras_cuentas`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) 
                 VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento','$tipo_factura', '$clasefactura', '$co', '$pa','0', '$espesificacion', '1', '1', '$trans', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de','tributario_x_pagar');");
 
             }else{
-                // Obtener el número de transacción más reciente y sumar 1
-            $nroTrans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE organizacion_idorganizacion=$idempresa AND idgestion='$gestion' ORDER BY codigotransaccion DESC LIMIT 1;");
-            $resultado12 = $nroTrans->fetch_assoc();
-            $nroTransaccion = $resultado12['codigotransaccion'] + 1;
+                // Construir rango dinámico (primer y último día del mes)
+            $fecha_inicio = date("Y-m-01", strtotime($fecha)); // "2025-03-01"
+            $fecha_fin    = date("Y-m-t", strtotime($fecha));  // "2025-03-31"
 
-            //el asiento es diferente a cero, se debe crear una transaccion
-            $idAsientoTipo = $this->dbc->query("SELECT * FROM asientotipo WHERE idasientotipo='$asiento' AND idorganizacion='$idempresa';");
-            $asiento_aux = $idAsientoTipo->fetch_assoc();  // Cambiado $nroTrans->fetch_assoc() a $idAsientoTipo->fetch_assoc()
-            $tipotransaccion = $asiento_aux['tipo'];
+            $asiento_tipo = $this->dbc->query("SELECT * FROM asientotipo WHERE idasientotipo='$asiento'");
+            $at = $asiento_tipo->fetch_assoc();
+
+            $tipo_trans = $this->dbc->query("SELECT * FROM tipotransaccion WHERE idtipotransaccion='$at[tipo]'");
+            $tt = $tipo_trans->fetch_assoc();
+
+            $gestion_sel = $this->dbc->query("SELECT * FROM gestion WHERE idgestion='$gestion'");
+            $gc = $gestion_sel->fetch_assoc();
+
+            if($gc['formato_transaccion'] == 'por_tipo_mes') {
+                $nroTransa = $this->dbc->query("
+                    SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                FROM transacciones
+                WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]'
+                and fechatransaccion BETWEEN '$fecha_inicio' AND '$fecha_fin'
+                AND idgestion = '$gestion'
+                AND organizacion_idorganizacion = '$idempresa'
+                ");
+            } elseif($gc['formato_transaccion'] == 'por_tipo_gestion') {
+                $nroTransa = $this->dbc->query("
+                    SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                    FROM transacciones 
+                    WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]'
+                    AND idgestion = '$gestion'
+                    AND organizacion_idorganizacion = '$idempresa'
+                ");
+            } else { // POR_GESTION
+                $nroTransa = $this->dbc->query("
+                    SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                    FROM transacciones 
+                    WHERE organizacion_idorganizacion = '$idempresa'
+                    AND idgestion = '$gestion'
+                ");
+            }
+
+        $resultado122 = $nroTransa->fetch_assoc();
+        $nroTransaccion = $resultado122['siguiente'];
+
             // Insertar en transacciones
-            $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion, fechatransaccion, tipodecambio, ndocumento, glosa, consolidar,estado, tipotransaccion_idtipotransaccion, organizacion_idorganizacion, sucursal, idgestion) VALUES ('$nroTransaccion', '$fecha', '1', '0', 'Registro Cobro Caja Bancos', '1','1', '$tipotransaccion', '$idempresa', '$idsucursal', '$gestion')");
+            $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion, fechatransaccion, tipodecambio, ndocumento, glosa, consolidar,estado, tipotransaccion_idtipotransaccion, organizacion_idorganizacion, sucursal, idgestion) 
+            VALUES ('$nroTransaccion', '$fecha', '1', '0', 'Registro pago Caja Bancos', '1','1', '$tt[idtipotransaccion]', '$idempresa', '$idsucursal', '$gestion')");
             $idtrans = $this->dbc->insert_id;
     // -----------------------------------------------------------------------------------------------------------------
                 // Obtener los asientos relacionados y calcular debe y haber
@@ -150,7 +184,7 @@ class Factura_pagos extends DB{
                 VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$trans','0',NULL,'tributario_pagado')");
 
                 $idrecibo = $this->dbc->insert_id;
-            }elseif($trans > 0 && $asiento == 0){
+            }elseif($trans > 0 && $asiento == ""){
                 //SE CREA LA FACTURA CON LA TRANSACCION EXISTENTE QUE YA TE PASARON
                 $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`,`tipo_factura`, `clasefactura`, `cobrado`, `pagado`,`idotras_cuentas`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) 
                 VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento','$tipo_factura', '$clasefactura', '$co', '$pa','0', '$espesificacion', '1', '1', '$trans', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de','tributario_pagado');");
@@ -162,17 +196,52 @@ class Factura_pagos extends DB{
 
                 $idrecibo = $this->dbc->insert_id;
             }else{
-                // Obtener el número de transacción más reciente y sumar 1
-            $nroTrans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE organizacion_idorganizacion=$idempresa AND idgestion='$gestion' ORDER BY codigotransaccion DESC LIMIT 1;");
-            $resultado12 = $nroTrans->fetch_assoc();
-            $nroTransaccion = $resultado12['codigotransaccion'] + 1;
+                
+                // Construir rango dinámico (primer y último día del mes)
+            $fecha_inicio = date("Y-m-01", strtotime($fecha)); // "2025-03-01"
+            $fecha_fin    = date("Y-m-t", strtotime($fecha));  // "2025-03-31"
 
-            //el asiento es diferente a cero, se debe crear una transaccion
-            $idAsientoTipo = $this->dbc->query("SELECT * FROM asientotipo WHERE idasientotipo='$asiento' AND idorganizacion='$idempresa';");
-            $asiento_aux2 = $idAsientoTipo->fetch_assoc();  // Cambiado $nroTrans->fetch_assoc() a $idAsientoTipo->fetch_assoc()
-            $tipotransaccion = $asiento_aux2['tipo'];
+            $asiento_tipo = $this->dbc->query("SELECT * FROM asientotipo WHERE idasientotipo='$asiento'");
+            $at = $asiento_tipo->fetch_assoc();
+
+            $tipo_trans = $this->dbc->query("SELECT * FROM tipotransaccion WHERE idtipotransaccion='$at[tipo]'");
+            $tt = $tipo_trans->fetch_assoc();
+
+            $gestion_sel = $this->dbc->query("SELECT * FROM gestion WHERE idgestion='$gestion'");
+            $gc = $gestion_sel->fetch_assoc();
+
+            if($gc['formato_transaccion'] == 'por_tipo_mes') {
+                $nroTransa = $this->dbc->query("
+                    SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                FROM transacciones
+                WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]'
+                and fechatransaccion BETWEEN '$fecha_inicio' AND '$fecha_fin'
+                AND idgestion = '$gestion'
+                AND organizacion_idorganizacion = '$idempresa'
+                ");
+            } elseif($gc['formato_transaccion'] == 'por_tipo_gestion') {
+                $nroTransa = $this->dbc->query("
+                    SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                    FROM transacciones 
+                    WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]'
+                    AND idgestion = '$gestion'
+                    AND organizacion_idorganizacion = '$idempresa'
+                ");
+            } else { // POR_GESTION
+                $nroTransa = $this->dbc->query("
+                    SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                    FROM transacciones 
+                    WHERE organizacion_idorganizacion = '$idempresa'
+                    AND idgestion = '$gestion'
+                ");
+            }
+
+        $resultado122 = $nroTransa->fetch_assoc();
+        $nroTransaccion = $resultado122['siguiente'];
+
             // Insertar en transacciones
-            $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion, fechatransaccion, tipodecambio, ndocumento, glosa, consolidar,estado, tipotransaccion_idtipotransaccion, organizacion_idorganizacion, sucursal, idgestion) VALUES ('$nroTransaccion', '$fecha', '1', '0', 'Registro Cobro Caja Bancos', '1','1', '$tipotransaccion', '$idempresa', '$idsucursal', '$gestion')");
+            $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion, fechatransaccion, tipodecambio, ndocumento, glosa, consolidar,estado, tipotransaccion_idtipotransaccion, organizacion_idorganizacion, sucursal, idgestion) 
+            VALUES ('$nroTransaccion', '$fecha', '1', '0', 'Registro Pago Caja Bancos', '1','1', '$tt[idtipotransaccion]', '$idempresa', '$idsucursal', '$gestion')");
             $idtrans = $this->dbc->insert_id;
     // -----------------------------------------------------------------------------------------------------------------
                 // Obtener los asientos relacionados y calcular debe y haber
