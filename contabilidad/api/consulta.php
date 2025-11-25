@@ -677,7 +677,7 @@ elseif($ver[0]=="listar_reportes_referencia"){
     $cont->listafactura_pago_cuenta($ver[1]);
 }
 
-// reportedetalle listar_recibo_por_id listar_recibo_por_id_otras_cuentas   eliminarcobrados lista_cobrar lista_plande listafactura listaproveedores getgestionactual -- 
+// reportedetalle listar_recibo_por_id listar_recibo_por_id_otras_cuentas   eliminarcobrados lista_cobrar lista_plande listafactura listaproveedores getgestionactual -- listar_facturas
 //    listar_recibo_otras_cuentas  listar_recibo_otras_cuentas_pagar                  listar_recibo_pago_por_id                                             listar_recibo_por_id   --> caja bancos 
 // select_plantilla_estado_resultados listar_plantilla     listadegestion                           listar_recibo_por_id_otras_cuentas      listar_recibo_por_id_otras_cuentas_pagar ---> esos dos son de recibos
 

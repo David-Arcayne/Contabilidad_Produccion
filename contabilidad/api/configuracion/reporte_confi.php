@@ -1,6 +1,6 @@
 <?php
 require_once "../../db/db.php";
-// require_once "../configuracion/empresa.php";
+// require_once "../configuracion/empresa.php"; editar
 
 class Reporte_confi extends DB{
 

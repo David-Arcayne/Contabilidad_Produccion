@@ -84,15 +84,27 @@ class Plantilla_admin extends DB{
         // Procesar hijos si existen
         if (!empty($item['children'])) {
             foreach ($item['children'] as $child) {
+                // if (isset($child['depreciacion']) && $child['depreciacion'] === 'si') {
+                //     $orden = $ordenPorNivelPadre[$nivel][$clavePadre];
+                //     $this->registrarItem($child, $idempresa, $nivel, $orden, $idPlanActual, $idtipo_reporte);
+                //     $ordenPorNivelPadre[$nivel][$clavePadre]++;
+                //     $this->registrarRelacionDepreciacion($item, $child, $idtipo_reporte, $idempresa);
+                // } else {
+                //     // Ahora pasamos el id del plan actual, no el nombre
+                //     $this->procesarListado([$child], $idempresa, $nivel + 1, $ordenPorNivelPadre, $idPlanActual, $idtipo_reporte);
+                // }
                 if (isset($child['depreciacion']) && $child['depreciacion'] === 'si') {
                     $orden = $ordenPorNivelPadre[$nivel][$clavePadre];
-                    $this->registrarItem($child, $idempresa, $nivel, $orden, $idPlanActual, $idtipo_reporte);
+                    
+                    // 👇 Cambiamos $idPlanActual por $idPadrePlan
+                    $this->registrarItem($child, $idempresa, $nivel, $orden, $idPadrePlan, $idtipo_reporte);
+                    
                     $ordenPorNivelPadre[$nivel][$clavePadre]++;
                     $this->registrarRelacionDepreciacion($item, $child, $idtipo_reporte, $idempresa);
                 } else {
-                    // Ahora pasamos el id del plan actual, no el nombre
                     $this->procesarListado([$child], $idempresa, $nivel + 1, $ordenPorNivelPadre, $idPlanActual, $idtipo_reporte);
                 }
+
             }
         }
     }
