@@ -1636,7 +1636,7 @@ WHERE
         $res = "";
         $registro = $this->dbc->query("select * from gestion where idempresa='$orga' and estado='2' Limit 1");
         $qwe = $this->dbc->fetch($registro);
-        $res = array("id" => $qwe['idgestion'], "nombre" => $qwe['nombre'], "fechaini" => $qwe['fechaini'], "fechafin" => $qwe['fechafin']);
+        $res = array("id" => $qwe['idgestion'], "nombre" => $qwe['nombre'], "fechaini" => $qwe['fechaini'], "fechafin" => $qwe['fechafin'],"formato_transaccion" =>$qwe['formato_transaccion']);
         echo json_encode($res);
     }
 

@@ -3913,6 +3913,29 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         echo json_encode($res);
         // echo json_encode(array($idcomprobante,$nfactura,$tipo_documento,$fecha,$monto,$por_concepto_de,$cliente_prov,$archivo,$lugar,$persona,$ci));
     }
+    public function eliminar_archivo_adjunto($id,$simbolo,$nombre,$empresa) {
+        $idempresa = $this->getidempresa($empresa);
+
+        $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM divisa WHERE nombre = '$nombre' AND idempresa = '$idempresa' AND iddivisa != '$id'");
+        $resultado = $consulta->fetch_assoc();
+        $totalRegistros = $resultado['total'];
+
+        if ($totalRegistros > 0) {
+            $res = array("danger", "El registro ya existe","editarCaracteristicas");
+        }else {
+            // Insertar el nuevo registro
+            $registroListaCompra = $this->dbc->query("UPDATE divisa
+                                    SET simbolo = '$simbolo',
+                                    nombre = '$nombre'
+                                    WHERE iddivisa = '$id';");
+            if ($registroListaCompra === TRUE) {                                                                                                                                                                
+                $res = array("success", "Edición exitosa","editarCaracteristicas");
+            } else {
+                $res = array("danger", "No se pudo editar",$id,$nombre,$empresa);
+            }
+        }
+        echo json_encode($res);
+    }
 
     public function getidusuario($md5){
         $registro=$this->dbrh->query("select * from usuario where md5(idusuario)='$md5'");
