@@ -675,6 +675,9 @@ elseif($ver[0]=="listar_reportes_referencia"){
 }elseif($ver[0]=="listafactura_pago_cuenta"){
     $cont=new Factura_pagos();
     $cont->listafactura_pago_cuenta($ver[1]);
+}elseif($ver[0]=="eliminar_archivo_adjunto"){
+    $cont=new Caja_bancos_recibos();
+    $cont->eliminar_archivo_adjunto($ver[1],$ver[2]);
 }
 
 // reportedetalle listar_recibo_por_id listar_recibo_por_id_otras_cuentas   eliminarcobrados lista_cobrar lista_plande listafactura listaproveedores getgestionactual -- listar_facturas

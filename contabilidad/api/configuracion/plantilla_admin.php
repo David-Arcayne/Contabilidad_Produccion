@@ -298,6 +298,7 @@ class Plantilla_admin extends DB{
             // Extraer nombre_personalizado y tipo_operacion desde el item
         $nombre_personalizado = $item['nombre'] ?? '';
         $tipo_operacion = $item['tipooperacion'] ?? '';
+        $tipo_asiento = $item['tipoasiento'];
 
             // Agrupar orden por idplantilla_padre
         if (!isset($ordenPorNivelPadre[$idplantilla_padre])) {
@@ -308,7 +309,7 @@ class Plantilla_admin extends DB{
     
             
 
-            $idplantilla_actual = $this->registrarItem_estado_resultados($item,$idempresa, $nivel, $orden,$nombre_personalizado,$tipo_operacion,$idtipo_reporte, $idplantilla_padre); // Guarda el item actual
+            $idplantilla_actual = $this->registrarItem_estado_resultados($item,$idempresa, $nivel, $orden,$nombre_personalizado,$tipo_operacion,$idtipo_reporte, $idplantilla_padre,$tipo_asiento); // Guarda el item actual
 
              // Solo incrementar el orden si se insertó correctamente
             if ($idplantilla_actual != false && $idplantilla_actual > 0) {
@@ -354,7 +355,7 @@ class Plantilla_admin extends DB{
         }
     }
 
-    private function registrarItem_estado_resultados($item,$idempresa, $nivel,$orden,$nombre_personalizado,$tipo_operacion,$idtipo_reporte, $idplantilla_padre = 0) {
+    private function registrarItem_estado_resultados($item,$idempresa, $nivel,$orden,$nombre_personalizado,$tipo_operacion,$idtipo_reporte, $idplantilla_padre = 0, $tipo_asiento) {
 
         $tipo_reporte = $this->dbc->query("SELECT * FROM tipo_reportes WHERE idtipo_reportes = '$idtipo_reporte' AND idempresa ='$idempresa'");
         $tr_aux = $tipo_reporte->fetch_assoc();
@@ -365,11 +366,11 @@ class Plantilla_admin extends DB{
         if($item['numero'] == ""){ // ES UN REGISTRO CON NOMBRE PERSONALIZADO
              if($idplantilla_padre == '0'){
                 $registro_confi = $this->dbc->query("INSERT INTO pr_plantilla(idplantilla_reporte,nombre_personalizado,tipo_operacion,nivel,orden,disponible_para_otro_reporte,ingreso_egreso,idempresa) 
-                VALUES ('$tr_aux[idtipo_reportes]','$nombre_personalizado','$tipo_operacion','$nivel','$orden','no','null','$idempresa')");
+                VALUES ('$tr_aux[idtipo_reportes]','$nombre_personalizado','$tipo_operacion','$nivel','$orden','no','$tipo_asiento','$idempresa')");
 
             }else{
                 $registro_confi = $this->dbc->query("INSERT INTO pr_plantilla(idplantilla_reporte,idplantilla_padre,nombre_personalizado,tipo_operacion,nivel,orden,disponible_para_otro_reporte,ingreso_egreso,idempresa) 
-                VALUES ('$tr_aux[idtipo_reportes]','$idplantilla_padre','$nombre_personalizado','$tipo_operacion','$nivel','$orden','no','null','$idempresa')");
+                VALUES ('$tr_aux[idtipo_reportes]','$idplantilla_padre','$nombre_personalizado','$tipo_operacion','$nivel','$orden','no','$tipo_asiento','$idempresa')");
 
             }
             
@@ -381,7 +382,7 @@ class Plantilla_admin extends DB{
                 $respuesta = false;
             }else{
                 $registro_confi = $this->dbc->query("INSERT INTO pr_plantilla(idplantilla_reporte,idplantilla_padre,idplandecuenta,nombre_personalizado,tipo_operacion,nivel,orden,disponible_para_otro_reporte,ingreso_egreso,idempresa) 
-                VALUES ('$tr_aux[idtipo_reportes]','$idplantilla_padre','$pl_aux[idplandecuenta]','$nombre_personalizado','$tipo_operacion','$nivel','$orden','no','null','$idempresa')");
+                VALUES ('$tr_aux[idtipo_reportes]','$idplantilla_padre','$pl_aux[idplandecuenta]','$nombre_personalizado','$tipo_operacion','$nivel','$orden','no','$tipo_asiento','$idempresa')");
             
                 $respuesta = $this->dbc->insert_id;
             }
