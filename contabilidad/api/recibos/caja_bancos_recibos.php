@@ -3922,44 +3922,44 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
     public function eliminar_archivo_adjunto($idregistro,$tipo_registro) {
         // $idempresa = $this->getidempresa($empresa);
 
-        if($tipo_registro == 'contrato'){ //solo contrato
-            $delete_img = $this->dbc->query("UPDATE otras_cuentas
-                                SET archivo = NULL
-                                WHERE idotras_cuentas = '$idregistro';");
-        }elseif($tipo_registro =='comprobante_cobro'){
-            $delete_img = $this->dbc->query("UPDATE cuentaspof
-                                SET archivo = NULL
-                                WHERE idcuentaspof = '$idregistro';");
-        }elseif($tipo_registro =='comprobante_pago'){
-            $delete_img = $this->dbc->query("UPDATE cuentaspor
-                                SET archivo = NULL
-                                WHERE idcuentaspor = '$idregistro';");
-        }elseif($tipo_registro =='recibo'){
-            $delete_img = $this->dbc->query("UPDATE recibo
-                                SET archivo = NULL
-                                WHERE idrecibo = '$idregistro';");
+        // if($tipo_registro == 'contrato'){ //solo contrato
+        //     $delete_img = $this->dbc->query("UPDATE otras_cuentas
+        //                         SET archivo = NULL
+        //                         WHERE idotras_cuentas = '$idregistro';");
+        // }elseif($tipo_registro =='comprobante_cobro'){
+        //     $delete_img = $this->dbc->query("UPDATE cuentaspof
+        //                         SET archivo = NULL
+        //                         WHERE idcuentaspof = '$idregistro';");
+        // }elseif($tipo_registro =='comprobante_pago'){
+        //     $delete_img = $this->dbc->query("UPDATE cuentaspor
+        //                         SET archivo = NULL
+        //                         WHERE idcuentaspor = '$idregistro';");
+        // }elseif($tipo_registro =='recibo'){
+        //     $delete_img = $this->dbc->query("UPDATE recibo
+        //                         SET archivo = NULL
+        //                         WHERE idrecibo = '$idregistro';");
 
-            $consulta = $this->dbc->query("SELECT * FROM recibo WHERE idrecibo = '$idregistro'");
-            $resultado = $consulta->fetch_assoc();
-            if($resultado['pagado'] == '0'){ //COBROS
-                $delete_img_compr = $this->dbc->query("UPDATE cuentaspof
-                                SET archivo = NULL
-                                WHERE idrecibo = '$idregistro';");
-            }else{ //PAGOS
-                $delete_img_compr = $this->dbc->query("UPDATE cuentaspor
-                                SET archivo = NULL
-                                WHERE idrecibo = '$idregistro';");
-            }
+        //     $consulta = $this->dbc->query("SELECT * FROM recibo WHERE idrecibo = '$idregistro'");
+        //     $resultado = $consulta->fetch_assoc();
+        //     if($resultado['pagado'] == '0'){ //COBROS
+        //         $delete_img_compr = $this->dbc->query("UPDATE cuentaspof
+        //                         SET archivo = NULL
+        //                         WHERE idrecibo = '$idregistro';");
+        //     }else{ //PAGOS
+        //         $delete_img_compr = $this->dbc->query("UPDATE cuentaspor
+        //                         SET archivo = NULL
+        //                         WHERE idrecibo = '$idregistro';");
+        //     }
            
-        }
+        // }
         
-            if ($delete_img === TRUE) {                                                                                                                                                                
-                $res = array("success", "Edición exitosa","eliminar archivo adjunto");
-            } else {
-                $res = array("danger", "No se pudo eliminar");
-            }
-        
-        echo json_encode($res);
+        //     if ($delete_img === TRUE) {                                                                                                                                                                
+        //         $res = array("success", "Edición exitosa","eliminar archivo adjunto");
+        //     } else {
+        //         $res = array("danger", "No se pudo eliminar");
+        //     }
+        echo json_encode(array("hola","como"));
+        // echo json_encode($res);
     }
 
     public function getidusuario($md5){
