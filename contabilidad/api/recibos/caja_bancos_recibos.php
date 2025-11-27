@@ -3919,27 +3919,46 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         echo json_encode($res);
         // echo json_encode(array($idcomprobante,$nfactura,$tipo_documento,$fecha,$monto,$por_concepto_de,$cliente_prov,$archivo,$lugar,$persona,$ci));
     }
-    public function eliminar_archivo_adjunto($id,$simbolo,$nombre,$empresa) {
-        $idempresa = $this->getidempresa($empresa);
+    public function eliminar_archivo_adjunto($idregistro,$tipo_registro) {
+        // $idempresa = $this->getidempresa($empresa);
 
-        $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM divisa WHERE nombre = '$nombre' AND idempresa = '$idempresa' AND iddivisa != '$id'");
-        $resultado = $consulta->fetch_assoc();
-        $totalRegistros = $resultado['total'];
+        if($tipo_registro == 'contrato'){ //solo contrato
+            $delete_img = $this->dbc->query("UPDATE otras_cuentas
+                                SET archivo = NULL
+                                WHERE idotras_cuentas = '$idregistro';");
+        }elseif($tipo_registro =='comprobante_cobro'){
+            $delete_img = $this->dbc->query("UPDATE cuentaspof
+                                SET archivo = NULL
+                                WHERE idcuentaspof = '$idregistro';");
+        }elseif($tipo_registro =='comprobante_pago'){
+            $delete_img = $this->dbc->query("UPDATE cuentaspor
+                                SET archivo = NULL
+                                WHERE idcuentaspor = '$idregistro';");
+        }elseif($tipo_registro =='recibo'){
+            $delete_img = $this->dbc->query("UPDATE recibo
+                                SET archivo = NULL
+                                WHERE idrecibo = '$idregistro';");
 
-        if ($totalRegistros > 0) {
-            $res = array("danger", "El registro ya existe","editarCaracteristicas");
-        }else {
-            // Insertar el nuevo registro
-            $registroListaCompra = $this->dbc->query("UPDATE divisa
-                                    SET simbolo = '$simbolo',
-                                    nombre = '$nombre'
-                                    WHERE iddivisa = '$id';");
-            if ($registroListaCompra === TRUE) {                                                                                                                                                                
-                $res = array("success", "Edición exitosa","editarCaracteristicas");
-            } else {
-                $res = array("danger", "No se pudo editar",$id,$nombre,$empresa);
+            $consulta = $this->dbc->query("SELECT * FROM recibo WHERE idrecibo = '$idregistro'");
+            $resultado = $consulta->fetch_assoc();
+            if($resultado['pagado'] == '0'){ //COBROS
+                $delete_img_compr = $this->dbc->query("UPDATE cuentaspof
+                                SET archivo = NULL
+                                WHERE idrecibo = '$idregistro';");
+            }else{ //PAGOS
+                $delete_img_compr = $this->dbc->query("UPDATE cuentaspor
+                                SET archivo = NULL
+                                WHERE idrecibo = '$idregistro';");
             }
+           
         }
+        
+            if ($delete_img === TRUE) {                                                                                                                                                                
+                $res = array("success", "Edición exitosa","eliminar archivo adjunto");
+            } else {
+                $res = array("danger", "No se pudo eliminar");
+            }
+        
         echo json_encode($res);
     }
 
