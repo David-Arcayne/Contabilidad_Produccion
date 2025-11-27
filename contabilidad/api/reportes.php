@@ -92,6 +92,7 @@ public function getidgestion($md5){
     }
 
     public function reportedetalletransaccion($fechai,$fechaf,$mes_año,$cadena_tipo,$empresa){
+    //  echo json_encode(array($fechai,$fechaf,$mes_año,$cadena_tipo,$empresa));
       ini_set('display_errors', 1);
       ini_set('display_startup_errors', 1);
       error_reporting(E_ALL);
@@ -109,7 +110,7 @@ public function getidgestion($md5){
         if(empty($tipos)){
           $tipo_aux = "";
         }else{
-          $tipo_aux = "AND tipotransaccion_idtransaccion IN ($tipos)";
+          $tipo_aux = "t.tipotransaccion_idtipotransaccion IN ('$tipos')";
         }
         if($gc['formato_transaccion'] == 'por_tipo_mes') {
           //
@@ -214,11 +215,13 @@ public function getidgestion($md5){
         FROM
           transacciones AS t
         WHERE
-          t.organizacion_idorganizacion = '$ide'
+        $tipo_aux
+          AND t.organizacion_idorganizacion = '$ide'
           AND t.fechatransaccion >= '$fechai'
           AND t.fechatransaccion <= '$fechaf'
           AND t.estado NOT IN (4, 5, 6)
           AND t.idgestion='$gestion'
+          -- $tipo_aux
           ORDER BY codigotransaccion DESC");
         }
 

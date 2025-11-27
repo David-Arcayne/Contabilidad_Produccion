@@ -78,7 +78,7 @@ $rep->reportedetallefpt($ver[1],$ver[2],$ver[3]);
     $rep->reportedetallefptclasefactura($ver[1],$ver[2],$ver[3],$ver[4]);
 }elseif($ver[0]=="reportedetalletransaccion"){
 $rep=new Reportes();
-$rep->reportedetalletransaccion($ver[1],$ver[2],$ver[3]);
+$rep->reportedetalletransaccion($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
 }elseif($ver[0]=="reporteactivodisponible"){
 $rep=new Reportes();
 $rep->reporteactivodisponible($ver[1],$ver[2],$ver[3],$ver[4]);
@@ -681,7 +681,7 @@ elseif($ver[0]=="listar_reportes_referencia"){
 }
 
 // reportedetalle listar_recibo_por_id listar_recibo_por_id_otras_cuentas   eliminarcobrados lista_cobrar lista_plande listafactura listaproveedores getgestionactual -- listar_facturas
-//    listar_recibo_otras_cuentas  listar_recibo_otras_cuentas_pagar                  listar_recibo_pago_por_id                                             listar_recibo_por_id   --> caja bancos 
-// select_plantilla_estado_resultados listar_plantilla     listadegestion   getgestion              listar_recibo_por_id_otras_cuentas      listar_recibo_por_id_otras_cuentas_pagar ---> esos dos son de recibos
+//    listar_recibo_otras_cuentas  listar_recibo_otras_cuentas_pagar       listar_factura           listar_recibo_pago_por_id                                             listar_recibo_por_id   --> caja bancos 
+// select_plantilla_estado_resultados listar_plantilla     listadegestion   getgestion "archivo" => $qwe['archivo'],             listar_recibo_por_id_otras_cuentas      listar_recibo_por_id_otras_cuentas_pagar ---> esos dos son de recibos
 
 ?>
