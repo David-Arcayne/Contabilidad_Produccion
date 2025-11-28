@@ -680,8 +680,8 @@ elseif($ver[0]=="listar_reportes_referencia"){
     $cont->eliminar_archivo_adjunto($ver[1],$ver[2]);
 }
 
-// reportedetalle listar_recibo_por_id listar_recibo_por_id_otras_cuentas   eliminarcobrados lista_cobrar lista_plande listafactura listaproveedores getgestionactual -- listar_facturas
+// reportedetalle listar_recibo_por_id listar_recibo_por_id_otras_cuentas   eliminarcobrados lista_cobrar lista_plande listafactura listaproveedores getgestionactual -- listar_facturas   reportedetallefptclasefactura
 //    listar_recibo_otras_cuentas  listar_recibo_otras_cuentas_pagar       listar_factura           listar_recibo_pago_por_id                                             listar_recibo_por_id   --> caja bancos 
-// select_plantilla_estado_resultados listar_plantilla     listadegestion   getgestion "archivo" => $qwe['archivo'],             listar_recibo_por_id_otras_cuentas      listar_recibo_por_id_otras_cuentas_pagar ---> esos dos son de recibos
+// reportecomprobantecontable listar_plantilla     listadegestion   getgestion "archivo" => $qwe['archivo'],             listar_recibo_por_id_otras_cuentas      listar_recibo_por_id_otras_cuentas_pagar ---> esos dos son de recibos
 
 ?>

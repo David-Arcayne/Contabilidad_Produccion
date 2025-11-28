@@ -752,6 +752,6 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     }
 //editar_caja_bancos_facturas editar_caja_bancos_facturas_existentes   editar_recibo_caja_bancos   registrar_factura_recibo_pago_cajaBancos registrar_agrupacion_plantilla registrar_factura_recibo_cobro asignar asiento
 //  vincula  -- crearfacturasf5 registrar_factura_cobro registrar_factura_cobro_otras_cuentas --> aumentar usuario registrar_factura_cobros_tributario registrocobrarfactura registropagarfactura registrar_recibo
-//  registrar_factura_recibo_cobro_cajaBancos  registrar_recibo_cobro_cajaBancos_en_facturas registrar_recibo_cobro_cajaBancos_en_otras_cuentas  registrar_recibo_otras_cuentas 
+//  registrar_factura_recibo_cobro_cajaBancos  registrar_recibo_cobro_cajaBancos_en_facturas registrar_recibo_cobro_cajaBancos_en_otras_cuentas  registrar_recibo_otras_cuentas reportedetalletransaccion
 }//   registrar_factura_cobros_tributario registrocobrarfacturaGrupal registrar_transaccion_recibo gestion registrar_recibo_otras_cuentas registrar_factura_otras_cuentas
 ?> 
