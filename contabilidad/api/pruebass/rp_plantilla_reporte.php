@@ -146,7 +146,7 @@ class PlantillaReporte extends DB{
         $idempresa = $this->get_id_empresa($idempresa);
         $idreporte = (int) $idplantilla_reporte;
 
-        $sql = "SELECT p.idplantilla, p.idplandecuenta, p.nombre_personalizado, pc.nombreplan,p.negrilla_cursiva,pc.numero
+        $sql = "SELECT p.idplantilla, p.idplandecuenta, p.nombre_personalizado, pc.nombreplan,p.negrilla_cursiva
             FROM pr_plantilla p
             LEFT JOIN plandecuenta pc ON pc.idplandecuenta = p.idplandecuenta
             WHERE p.idplantilla_reporte = $idreporte
@@ -161,7 +161,6 @@ class PlantillaReporte extends DB{
                 "idplantilla" => $row['idplantilla'],
                 "negrilla_cursiva" => $row['negrilla_cursiva'],
                 "idplandecuenta" => $row['idplandecuenta'],
-                "codigo" => $row['numero'],
                 "nombre" => $row['nombre_personalizado'] ? $row['nombre_personalizado'] : $row['nombreplan'],
             ];
         }
@@ -825,13 +824,7 @@ class PlantillaReporte extends DB{
                         }
                     }
                 }
-
-                if($sum_rest < '0'){
-                    $res['suma_nivel_2'] = 0;
-                }else{
-                    $res['suma_nivel_2'] = $sum_rest;
-                }
-                // $res['suma_nivel_2'] = $sum_rest;
+                $res['suma_nivel_2'] = $sum_rest;
             }
             elseif($pl_porcentaje->num_rows > 0){   // ES PORCENTAJE
                 $resu = 0;
@@ -856,13 +849,7 @@ class PlantillaReporte extends DB{
                     }
                     
                 // }
-
-                if($resu < '0'){
-                    $res['suma_nivel_2'] = 0;
-                }else{
-                    $res['suma_nivel_2'] = $resu;
-                }
-
+                $res['suma_nivel_2'] = $resu;
             }elseif($pl_otro_reporte->num_rows > 0){ // ES UNA PLANTILLA QUE OBTIENE RESULTADO DE OTRO REPORTE
                 //  $pl_list['tipo_operacion'] == 'calculo_otro_reporte'
                 $total_otro_reporte = 0;
@@ -876,12 +863,7 @@ class PlantillaReporte extends DB{
                 $fecha_fin,
                 $empresa
             );
-
-                 if($total_otro_reporte < '0'){
-                    $res['suma_nivel_2'] = 0;
-                }else{
-                    $res['suma_nivel_2'] = $total_otro_reporte;
-                }
+                 $res['suma_nivel_2'] = $total_otro_reporte;
             }
             elseif($pl_padre_calcu->num_rows > 0){ //ES UNA PLANTILLA CON HIJOS CALCULABLES  (VENTAS)
 
@@ -903,7 +885,7 @@ class PlantillaReporte extends DB{
                 // $valor2 = $suma_cuentas2->fetch_assoc();
                 $suma_nivel_2 = $suma_nivel_2 + $valor_total2;
 
-                if($valor_total2 == null || $valor_total2 <= '0'){
+                if($valor_total2 == null || $valor_total2 == '0'){
                     //-----------------------------------
                 }else{
                     $res2 = array(
@@ -953,7 +935,7 @@ class PlantillaReporte extends DB{
                             $valor_total3 = $this->calculables_estado_resultados($nombre_cuenta3['idagrupacion_rubro_plandecuenta'], $idempresa, $gestion,$aux_nivel_3['idplandecuenta'],$fecha_ini,$fecha_fin,$aux_nivel_3['idplantilla']);
 
                             $suma_nivel_3 = $suma_nivel_3 + $valor_total3;
-                            if($valor_total3 == null || $valor_total3 <= '0'){
+                            if($valor_total3 == null || $valor_total3 == '0'){
                                 //-----------------------------------
                             }else{
                                 $res3 = array(
@@ -1001,7 +983,7 @@ class PlantillaReporte extends DB{
                                     $valor_total4 = $this->calculables_estado_resultados($nombre_cuenta4['idagrupacion_rubro_plandecuenta'], $idempresa, $gestion,$aux_nivel_4['idplandecuenta'],$fecha_ini,$fecha_fin,$aux_nivel_4['idplantilla']);
 
                                     $suma_nivel_4 = $suma_nivel_4 + $valor_total4;
-                                    if($valor_total4 == null || $valor_total4 <= '0'){
+                                    if($valor_total4 == null || $valor_total4 == '0'){
                                         //-----------------------------------
                                     }else{
                                         $res4 = array(
@@ -1047,7 +1029,7 @@ class PlantillaReporte extends DB{
                                         $valor_total5 = $this->calculables_estado_resultados($nombre_cuenta5['idagrupacion_rubro_plandecuenta'], $idempresa, $gestion,$aux_nivel_5['idplandecuenta'],$fecha_ini,$fecha_fin,$aux_nivel_5['idplantilla']);
 
                                         $suma_nivel_5 = $suma_nivel_5 + $valor_total5;
-                                        if($valor_total5 == null || $valor_total5 <= '0'){
+                                        if($valor_total5 == null || $valor_total5 == '0'){
                                             //-----------------------------------
                                         }else{
                                             $res5 = array(
@@ -1339,7 +1321,7 @@ class PlantillaReporte extends DB{
                 // $valor2 = $suma_cuentas2->fetch_assoc();
                 $suma_nivel_2 = $suma_nivel_2 + $valor_total2;
 
-                if($valor_total2 == null || $valor_total2 <= '0'){
+                if($valor_total2 == null || $valor_total2 == '0'){
                     //-----------------------------------
                 }else{
                     $res2 = array(
@@ -1389,7 +1371,7 @@ class PlantillaReporte extends DB{
                             $valor_total3 = $this->calculables_estado_resultados($nombre_cuenta3['idagrupacion_rubro_plandecuenta'], $idempresa, $gestion,$aux_nivel_3['idplandecuenta'],$fecha_ini,$fecha_fin,$aux_nivel_3['idplantilla']);
 
                             $suma_nivel_3 = $suma_nivel_3 + $valor_total3;
-                            if($valor_total3 == null || $valor_total3 <= '0'){
+                            if($valor_total3 == null || $valor_total3 == '0'){
                                 //-----------------------------------
                             }else{
                                 $res3 = array(
@@ -1437,7 +1419,7 @@ class PlantillaReporte extends DB{
                                     $valor_total4 = $this->calculables_estado_resultados($nombre_cuenta4['idagrupacion_rubro_plandecuenta'], $idempresa, $gestion,$aux_nivel_4['idplandecuenta'],$fecha_ini,$fecha_fin,$aux_nivel_4['idplantilla']);
 
                                     $suma_nivel_4 = $suma_nivel_4 + $valor_total4;
-                                    if($valor_total4 == null || $valor_total4 <= '0'){
+                                    if($valor_total4 == null || $valor_total4 == '0'){
                                         //-----------------------------------
                                     }else{
                                         $res4 = array(
@@ -1483,7 +1465,7 @@ class PlantillaReporte extends DB{
                                         $valor_total5 = $this->calculables_estado_resultados($nombre_cuenta5['idagrupacion_rubro_plandecuenta'], $idempresa, $gestion,$aux_nivel_5['idplandecuenta'],$fecha_ini,$fecha_fin,$aux_nivel_5['idplantilla']);
 
                                         $suma_nivel_5 = $suma_nivel_5 + $valor_total5;
-                                        if($valor_total5 == null || $valor_total5 <= '0'){
+                                        if($valor_total5 == null || $valor_total5 == '0'){
                                             //-----------------------------------
                                         }else{
                                             $res5 = array(

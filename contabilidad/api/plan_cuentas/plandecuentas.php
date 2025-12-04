@@ -397,7 +397,90 @@ class Plandecuentas extends DB{
             }
             echo json_encode($res);
     }
-    
+    public function listar_select_rango_codigos($empresa) {
+        $lista = [];
+        $idempresa = $this->getidempresa($empresa);
+        
+        $numeros = [
+            '1.0.0.00.00',
+            '2.0.0.00.00',
+            '3.0.0.00.00',
+            '4.0.0.00.00',
+            '5.0.0.00.00',
+            '6.0.0.00.00'
+        ];
+
+        // Convertir array a lista SQL
+        $lista_array = "'" . implode("','", $numeros) . "'";
+
+        // Preparar la consulta
+        $get = $this->dbc->query("SELECT *
+            FROM plandecuenta
+            WHERE numero IN ($lista_array)
+            AND organizacion_idorganizacion = '$idempresa'
+            ORDER BY numero ASC;");
+        
+        while ($qwe = $this->dbc->fetch($get)) {
+            // Extraer el primer número antes del punto
+            $partes = explode('.', $qwe['numero']);
+            $primer_numero = (int)$partes[0];
+
+            // Calcular el siguiente
+            $siguiente = ($primer_numero + 1) . '.0.0.00.00';
+
+            $res = array(
+                "idplandecuenta" => $qwe['idplandecuenta'],
+                "numero" => $qwe['numero'],
+                "nombreplan" => $qwe['nombreplan'],
+                "numero_final" => $siguiente
+            );
+            array_push($lista, $res);
+        }
+
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
+
+    public function vincular_rubro_plandecuentas($numero_ini,$numero_fin,$idrubro,$empresa){
+        // $idempresa = Empresa::getidempresa($empresa);
+        $idempresa = $this->getidempresa($empresa);
+
+        $asignar = $this->dbc->query("UPDATE plandecuenta SET idagrupacion_rubro_plandecuenta ='$idrubro' WHERE numero >='$numero_ini' 
+        AND numero <'$numero_fin' AND organizacion_idorganizacion='$idempresa'");
+
+            if ($asignar === TRUE) {                                                                                                                                                                
+                $res = array("success", "Registro exitoso","registroCaracteristicas");
+            } else {
+                $res = array("danger", "No se pudo registrar");
+            }
+        
+        echo json_encode($res);
+        
+    }
+    public function descargar_listarubroscontables($empresa){
+        $url = "https://mistersofts.com/administrador/api/listarubroscontables";
+        $data = json_decode(file_get_contents($url), true);
+        $idempresa = $this->getidempresa($empresa);
+        // $lista = [];
+        //preguntar si existe rubro en esta empresa
+         $existe_rubro = $this->dbc->query("SELECT * FROM agrupacion_rubro_plandecuenta WHERE idempresa ='$idempresa'");
+        if($existe_rubro->num_rows > 0){
+            //YA NO DESCARGARA PORQUE EXISTE
+            $res = array("danger", "Ya existen registros en esta empresa");
+        }else{
+            foreach ($data as $item) {
+                $registro=$this->dbc->query("INSERT INTO agrupacion_rubro_plandecuenta(tipo_plandecuenta,numero,idempresa)VALUES('$item[tipo_plandecuenta]','$item[numero]','$idempresa')");
+            }
+            $res = array("success", "Todos los elementos fueron registrados");
+        }
+
+        // if($registro ===TRUE){
+        //     $res = array("success", "Todos los elementos fueron registrados");
+        // }else{
+        //     $res = array("danger", "ocurrio un error");
+        // }
+
+        echo json_encode($res, JSON_NUMERIC_CHECK); 
+    }
     public function getidusuario($md5){
         $registro=$this->dbrh->query("select * from usuario where md5(idusuario)='$md5'");
         $qwe=$this->dbrh->fetch($registro);

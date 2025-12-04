@@ -749,9 +749,23 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     }elseif($data['ver'] == "asignar_facturas_A_cuentas") {
         $cont=new Transacciones();
         $cont->asignar_facturas_A_cuentas($data);
+    }elseif($ver == "vincular_rubro_plandecuentas") {
+        if(isset($_POST['numero_ini'],$_POST['numero_fin'],$_POST['idrubro'],$_POST['empresa'])){
+        $cont=new Plandecuentas();
+        $cont->vincular_rubro_plandecuentas($_POST['numero_ini'],$_POST['numero_fin'],$_POST['idrubro'],$_POST['empresa']);
+        }else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['numero_ini'],$_POST['numero_fin'],$_POST['idrubro'],$_POST['empresa']));
+        }
+    }elseif($ver == "descargar_listarubroscontables") {
+        if(isset($_POST['empresa'])){
+        $cont=new Plandecuentas();
+        $cont->descargar_listarubroscontables($_POST['empresa']);
+        }else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['empresa']));
+        }
     }
 //editar_caja_bancos_facturas editar_caja_bancos_facturas_existentes   editar_recibo_caja_bancos   registrar_factura_recibo_pago_cajaBancos registrar_agrupacion_plantilla registrar_factura_recibo_cobro asignar asiento
 //  vincula  -- crearfacturasf5 registrar_factura_cobro registrar_factura_cobro_otras_cuentas --> aumentar usuario registrar_factura_cobros_tributario registrocobrarfactura registropagarfactura registrar_recibo
 //  registrotransaccion_por_asiento  registrar_recibo_cobro_cajaBancos_en_facturas registrar_recibo_cobro_cajaBancos_en_otras_cuentas  registrar_recibo_otras_cuentas 
-}//   gestion_tipo registrocobrarfacturaGrupal registrar_transaccion_recibo gestion registrar_recibo_otras_cuentas registrar_factura_otras_cuentas
+}//   gestion_tipo registrocobrarfacturaGrupal registrar_transaccion_recibo gestion registrar_recibo_otras_cuentas registrar_factura_otras_cuentas asignar_asiento_A_factura activar
 ?> 

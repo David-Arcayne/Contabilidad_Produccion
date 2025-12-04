@@ -25,6 +25,7 @@ require_once "./otras_cuentas/forma_pago.php";
 require_once "./configuracion/plantilla_admin.php";
 require_once "./facturas/factura_cobros.php";
 require_once "./facturas/factura_pagos.php";
+require_once "./transacciones_facturas/cuentas_transacciones.php";
 
 $ver=explode("/",$_GET['ver']); //dividiendo los "/"  ver[0],ver[1],ver[x]  listafacturaapi_pagado eliminarasiento tipo 
 if($ver[0]=="verificacion"){
@@ -678,20 +679,25 @@ elseif($ver[0]=="listar_reportes_referencia"){
 }elseif($ver[0]=="eliminar_archivo_adjunto"){
     $cont=new Caja_bancos_recibos();
     $cont->eliminar_archivo_adjunto($ver[1],$ver[2]);
+}elseif($ver[0]=="listar_facturas_asignado_cuentas"){
+    $cont=new Cuentas_transacciones();
+    $cont->listar_facturas_asignado_cuentas($ver[1]);
+}elseif($ver[0]=="listar_select_rango_codigos"){
+    $cont=new Plandecuentas();
+    $cont->listar_select_rango_codigos($ver[1]);
 }
 
-<<<<<<< HEAD
+
 // reportedetalle listar_recibo_por_id listar_recibo_por_id_otras_cuentas   eliminarcobrados lista_cobrar lista_plande listafactura listaproveedores getgestionactual -- listar_facturas
 //    listadetalle  listar_recibo_otras_cuentas_pagar       listar_factura           listar_recibo_pago_por_id                                             listar_recibo_por_id   --> caja bancos 
 // reemplazar listar_plantilla     listadegestion   getgestion "archivo" => $qwe['archivo'],             listar_recibo_por_id_otras_cuentas      listar_recibo_por_id_otras_cuentas_pagar ---> esos dos son de recibos
-=======
+
 // reportedetalle listar_recibo_por_id listar_recibo_por_id_otras_cuentas   eliminarcobrados lista_cobrar lista_plande listafactura listaproveedores getgestionactual -- listar_facturas   reportedetallefptclasefactura
 //    listar_recibo_otras_cuentas  listar_recibo_otras_cuentas_pagar       listar_factura           listar_recibo_pago_por_id                                             listar_recibo_por_id   --> caja bancos 
-<<<<<<< HEAD
-// reportedetallefpt listar_plantilla     listadegestion   getgestion "archivo" => $qwe['archivo'],             listar_recibo_por_id_otras_cuentas      listar_recibo_por_id_otras_cuentas_pagar ---> esos dos son de recibos
->>>>>>> 85ff679de8efcc3df94b0d88d189ca86ef308448
-=======
-// reportedetallefpt reportecomprobantecontable     listadegestion   getgestion "archivo" => $qwe['archivo'],             listar_recibo_por_id_otras_cuentas      listar_recibo_por_id_otras_cuentas_pagar ---> esos dos son de recibos
->>>>>>> 7bc11ad7432ede4cb623ad1a62a47fafbfbf065a
+
+//       listar_recibo_por_id_otras_cuentas_pagar ---> esos dos son de recibos listar_tipo_plandecuenta
+
+// reportedetallefpt reportecomprobantecontable     listadegestion   getgestion "archivo" => $qwe['archivo'],           listar_recibo_por_id_otras_cuentas_pagar ---> esos dos son de recibos rp_listar_plantilla_normal
+
 
 ?>

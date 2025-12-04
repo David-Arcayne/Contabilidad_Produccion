@@ -28,7 +28,7 @@ class Reporte_confi extends DB{
                 $activar = $this->dbc->query("UPDATE tipo_reportes SET estado = '1' WHERE idtipo_reportes = '$idtipo_reportes'");
 
                 if ($activar === TRUE){   
-                    $desactivado = $this->dbc->query("UPDATE tipo_reportes SET estado = '0' WHERE tipo_reporte = '$tipo_reporte' AND idtipo_reportes != '$idtipo_reportes' AND idempresa = '$idempresa'");
+                    // $desactivado = $this->dbc->query("UPDATE tipo_reportes SET estado = '0' WHERE tipo_reporte = '$tipo_reporte' AND idtipo_reportes != '$idtipo_reportes' AND idempresa = '$idempresa'");
                                                                                                                                                                     
                     $res = array("success", "Registro exitoso","rp_registrar_reporte");
                 }else {
