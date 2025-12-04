@@ -110,7 +110,7 @@ public function getidgestion($md5){
         if(empty($tipos) || $tipos == '0'){
           $tipo_aux = "";
         }else{
-          $tipo_aux = "AND t.tipotransaccion_idtipotransaccion IN ($tipos)";
+          $tipo_aux = "AND t.tipotransaccion_idtipotransaccion IN ('$tipos')";
         }
         if($gc['formato_transaccion'] == 'por_tipo_mes') {
           //
@@ -271,7 +271,7 @@ public function getidgestion($md5){
         if(empty($tipos) || $tipos == '0'){
           $tipo_aux = "";
         }else{
-          $tipo_aux = "AND t.tipotransaccion_idtipotransaccion IN ($tipos)";
+          $tipo_aux = "AND t.tipotransaccion_idtipotransaccion IN ('$tipos')";
         }
         if($gc['formato_transaccion'] == 'por_tipo_mes') {
           //
@@ -416,32 +416,8 @@ public function getidgestion($md5){
                 "facturas"=>$facturas
             );
             array_push($lista,$res);
-          }elseif($clase_factura == '2'){ //COBROSSSSS
-            $factu=$this->dbc->query("SELECT * FROM factura WHERE transacciones_idtransacciones='$qwe[3]' 
-            AND clasefactura = '2'
-            ORDER by fecha asc");
-            while($asd=$this->dbc->fetch($factu)){
-                $nit=0;$cliente="";
-    
-                $proveedor=$this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='".$asd['proveedorcliente_idproveedorcliente']."'");
-                $zxc=$this->dbcm->fetch($proveedor);
-                $nit=$zxc['nit'];
-                $cliente=$zxc['nombre'];
-                
+          }elseif($clase_factura == '2'){
 
-                $fac=array("fecha"=>$asd['fecha'],"nfactura"=>$asd['nfactura'],"monto"=>$asd['montofactura'],"clasefactura"=>$asd['clasefactura'],"nit"=>$nit,"proveedor"=>$cliente
-                );
-                array_push($facturas,$fac);
-            }
-            
-          
-            $res=array(
-                "transaccion"=>$qwe[0],
-                "fechat"=>$qwe[1],
-                "estado"=>$qwe[4],
-                "facturas"=>$facturas
-            );
-            array_push($lista,$res);
           }else{// CLASE FACTURA = 3 --> TODOS
               
             $factu=$this->dbc->query("SELECT * FROM factura WHERE transacciones_idtransacciones='".$qwe[3]."' ORDER by fecha asc");
@@ -1191,195 +1167,53 @@ $totalHaber = 0;
       echo json_encode($lista);
   }
 
-  public function reportecomprobantecontable($numeroIni,$numeroFin,$fechaIni,$fechaFin,$mes_año,$cadena_tipo,$empresa,$factura){
+  public function reportecomprobantecontable($numeroIni,$numeroFin,$fechaIni,$fechaFin,$empresa,$factura){
 //reporteactivodiaponible          La fecha, persona, ci, Nro comprobante y el monto
 // echo json_encode(array($fechaIni,$fechaFin,$numeroIni,$numeroFin,$empresa,$factura));
     $lista=[];
     $ide=$this->getidempresa($empresa);
     $gestion=$this->getidgestion($empresa);
-
-    $gestion_sel = $this->dbc->query("SELECT * FROM gestion WHERE idgestion='$gestion'");
-        $gc = $gestion_sel->fetch_assoc();
-      
-        $array_tipos = array_map('intval', explode(",", $cadena_tipo));
-        $tipos = implode(",", $array_tipos);
-
-        if(empty($tipos) || $tipos == '0'){
-          $tipo_aux = "";
-        }else{
-          $tipo_aux = "AND t.tipotransaccion_idtipotransaccion IN ($tipos)";
-        }
-        if($gc['formato_transaccion'] == 'por_tipo_mes') {
-          if($fechaIni != "null" && $fechaIni != "null"){
-          //   $registro=$this->dbc->query("SELECT
-          //   t.codigotransaccion,
-          //   t.fechatransaccion,
-          //   t.ndocumento,
-          //   t.glosa,
-          //   t.tipotransaccion_idtipotransaccion,
-          //   t.idtransacciones,
-          //   t.estado
-          // FROM
-          //   transacciones AS t
-          // WHERE
-          //   t.fechatransaccion >= '$fechaIni'
-          //   AND t.fechatransaccion <= '$fechaFin'
-          //   AND t.organizacion_idorganizacion = '$ide'
-          //   AND t.estado NOT IN (4, 5, 6)
-          //   AND t.idgestion='$gestion'
-          // ORDER BY
-          //   t.codigotransaccion ASC;
-          // ");
-
-        //-----------------------------------------------------------------------
-      //   t.codigotransaccion,
-      // t.fechatransaccion,
-      // t.ndocumento,
-      // t.glosa,
-      // t.tipotransaccion_idtipotransaccion,
-      // t.idtransacciones,
-      // t.estado
-          $registro=$this->dbc->query("SELECT 
-                t.codigotransaccion,
-                t.fechatransaccion,
-                t.ndocumento,
-                t.glosa,
-                t.tipotransaccion_idtipotransaccion,
-                t.idtransacciones,
-                t.estado,
-                t.consolidar,
-                t.idgestion,
-                t.tipodecambio
-            FROM transacciones t
-            WHERE t.idgestion = '$gestion'
-            AND t.organizacion_idorganizacion = '$ide'
-            AND t.fechatransaccion >= '$fechaIni'
-            AND t.fechatransaccion <= '$fechaFin'
-            AND t.estado NOT IN (4, 5, 6)
-            $tipo_aux
-            ORDER BY 
-            YEAR(t.fechatransaccion) ASC,
-            MONTH(t.fechatransaccion) ASC,
-            t.tipotransaccion_idtipotransaccion ASC,
-            t.codigotransaccion ASC;");
-          }elseif($mes_año != "0"){
-            // Crear objeto DateTime con el primer día del mes
-                  $fechaInicio = DateTime::createFromFormat('Y-m', $mes_año);
-                  $fechaInicio->modify('first day of this month');
-
-                  // Clonar y calcular último día del mes
-                  $fechaFini = clone $fechaInicio;
-                  $fechaFini->modify('last day of this month');
-
-                  // Formatear a YYYY-MM-DD
-                  $inicio = $fechaInicio->format('Y-m-d');
-                  $fin    = $fechaFini->format('Y-m-d');
-
-                  $registro=$this->dbc->query("SELECT 
-                      t.codigotransaccion,
-                      t.fechatransaccion,
-                      t.ndocumento,
-                      t.glosa,
-                      t.tipotransaccion_idtipotransaccion,
-                      t.idtransacciones,
-                      t.estado,
-                      t.consolidar,
-                      t.idgestion,
-                      t.tipodecambio
-                  FROM transacciones t
-                  WHERE t.idgestion = '$gestion'
-                  AND t.organizacion_idorganizacion = '$ide'
-                  AND t.fechatransaccion >= '$inicio'
-                  AND t.fechatransaccion <= '$fin'
-                  AND t.estado NOT IN (4, 5, 6)
-                  $tipo_aux
-                  ORDER BY 
-                  YEAR(t.fechatransaccion) ASC,
-                  MONTH(t.fechatransaccion) ASC,
-                  t.tipotransaccion_idtipotransaccion ASC,
-                  t.codigotransaccion ASC;");
-
-          }
-        }elseif($gc['formato_transaccion'] == 'por_tipo_gestion') {
-          $registro = $this->dbc->query("SELECT 
-              t.codigotransaccion,
-                t.fechatransaccion,
-                t.ndocumento,
-                t.glosa,
-                t.tipotransaccion_idtipotransaccion,
-                t.idtransacciones,
-                t.estado,
-                t.consolidar,
-                t.idgestion,
-                t.tipodecambio
-                -- g.gestion AS gestion_anio,
-              tt.nombre AS tipo_nombre
-            FROM transacciones t
-            LEFT JOIN gestion g ON g.idgestion = t.idgestion
-            LEFT JOIN tipotransaccion tt ON tt.idtipotransaccion = t.tipotransaccion_idtipotransaccion
-            WHERE t.organizacion_idorganizacion = '$ide'
-                AND t.idgestion = '$gestion'
-                AND t.fechatransaccion >= '$fechaIni'
-                AND t.fechatransaccion <= '$fechaFin'
-                AND t.estado NOT IN (4, 5, 6)
-                $tipo_aux
-            ORDER BY 
-                t.idgestion ASC,           -- Agrupar por gestión
-                t.tipotransaccion_idtipotransaccion ASC,  -- Agrupar y ordenar por tipo
-                t.fechatransaccion ASC,        -- Orden cronológico dentro del tipo
-                t.codigotransaccion ASC;       -- Correlativo correcto
-            ");
-        }else{ //POR GESTIONNNN
-          if($fechaIni != "null" && $fechaIni != "null"){
-            $registro=$this->dbc->query("SELECT
-                t.codigotransaccion,
-                t.fechatransaccion,
-                t.ndocumento,
-                t.glosa,
-                t.tipotransaccion_idtipotransaccion,
-                t.idtransacciones,
-                t.estado,
-                t.consolidar,
-                t.idgestion,
-                t.tipodecambio
-          FROM
-            transacciones AS t
-          WHERE
-            t.fechatransaccion >= '$fechaIni'
-            AND t.fechatransaccion <= '$fechaFin'
-            AND t.organizacion_idorganizacion = '$ide'
-            AND t.estado NOT IN (4, 5, 6)
-            AND t.idgestion='$gestion'
-            $tipo_aux
-          ORDER BY
-            t.codigotransaccion ASC;
-          ");
-          }else{
-            $registro=$this->dbc->query("SELECT
-                t.codigotransaccion,
-                t.fechatransaccion,
-                t.ndocumento,
-                t.glosa,
-                t.tipotransaccion_idtipotransaccion,
-                t.idtransacciones,
-                t.estado,
-                t.consolidar,
-                t.idgestion,
-                t.tipodecambio
-          FROM
-            transacciones AS t
-          WHERE
-            t.codigotransaccion >= '$numeroIni'
-            AND t.codigotransaccion <= '$numeroFin'
-            AND t.organizacion_idorganizacion = '$ide'
-            AND t.idgestion='$gestion'
-            $tipo_aux
-          ORDER BY
-            t.codigotransaccion ASC;
-          ");
-          }
-          
-        }
+    // if($numeroIni == '0' && $numeroFin == '0'){
+      if($fechaIni != "null" && $fechaIni != "null"){
+      $registro=$this->dbc->query("SELECT
+      t.codigotransaccion,
+      t.fechatransaccion,
+      t.ndocumento,
+      t.glosa,
+      t.tipotransaccion_idtipotransaccion,
+      t.idtransacciones,
+      t.estado
+    FROM
+      transacciones AS t
+    WHERE
+      t.fechatransaccion >= '$fechaIni'
+      AND t.fechatransaccion <= '$fechaFin'
+      AND t.organizacion_idorganizacion = '$ide'
+      AND t.estado NOT IN (4, 5, 6)
+      AND t.idgestion='$gestion'
+    ORDER BY
+      t.codigotransaccion ASC;
+    ");
+    }else{
+      $registro=$this->dbc->query("SELECT
+      t.codigotransaccion,
+      t.fechatransaccion,
+      t.ndocumento,
+      t.glosa,
+      t.tipotransaccion_idtipotransaccion,
+      t.idtransacciones,
+      t.estado
+    FROM
+      transacciones AS t
+    WHERE
+      t.codigotransaccion >= '$numeroIni'
+      AND t.codigotransaccion <= '$numeroFin'
+      AND t.organizacion_idorganizacion = '$ide'
+      AND t.idgestion='$gestion'
+    ORDER BY
+      t.codigotransaccion ASC;
+    ");
+    }
 
     while($qwe=$this->dbc->fetch($registro)){
 
