@@ -72,7 +72,7 @@ $cont=new Transacciones();
 $cont->eliminardetalle($ver[1]);
 }elseif($ver[0]=="reportedetallefpt"){
 $rep=new Reportes();
-$rep->reportedetallefpt($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
+$rep->reportedetallefpt($ver[1],$ver[2],$ver[3],$ver[4],$ver[5],$ver[6]);
 }elseif($ver[0]=="reportedetallefptclasefactura"){
     $rep=new Reportes();
     $rep->reportedetallefptclasefactura($ver[1],$ver[2],$ver[3],$ver[4]);
@@ -117,7 +117,7 @@ $rep->reportebalancegeneralhasta($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
     $rep->reportebalancegeneralhastapp($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
 }elseif($ver[0]=="reportecomprobantecontable"){
 $rep=new Reportes();
-$rep->reportecomprobantecontable($ver[1],$ver[2],$ver[3],$ver[4],$ver[5],$ver[6]);
+$rep->reportecomprobantecontable($ver[1],$ver[2],$ver[3],$ver[4],$ver[5],$ver[6],$ver[7],$ver[8]);
 }elseif($ver[0]=="reporteactivodiaponibledos"){
 $rep=new Reportes();
 $rep->reporteactivodiaponibledos($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
@@ -682,6 +682,6 @@ elseif($ver[0]=="listar_reportes_referencia"){
 
 // reportedetalle listar_recibo_por_id listar_recibo_por_id_otras_cuentas   eliminarcobrados lista_cobrar lista_plande listafactura listaproveedores getgestionactual -- listar_facturas   reportedetallefptclasefactura
 //    listar_recibo_otras_cuentas  listar_recibo_otras_cuentas_pagar       listar_factura           listar_recibo_pago_por_id                                             listar_recibo_por_id   --> caja bancos 
-// reportedetallefpt listar_plantilla     listadegestion   getgestion "archivo" => $qwe['archivo'],             listar_recibo_por_id_otras_cuentas      listar_recibo_por_id_otras_cuentas_pagar ---> esos dos son de recibos
+// reportedetallefpt reportecomprobantecontable     listadegestion   getgestion "archivo" => $qwe['archivo'],             listar_recibo_por_id_otras_cuentas      listar_recibo_por_id_otras_cuentas_pagar ---> esos dos son de recibos
 
 ?>
