@@ -1368,7 +1368,7 @@ public function asignar_facturas_A_cuentas($data) {
         echo json_encode($res);
     }
 
-    public function registrotransaccion_por_asiento($fecha,$idasiento,$monto,$empresa,$sucursal)
+    public function registrotransaccion_por_asiento($fecha,$idasiento,$monto,$glosa,$empresa,$sucursal)
     {
         // echo json_encode(array("hola",$fecha,$idasiento,$monto,$empresa,$sucursal));
         $ndocumento = "0";
@@ -1398,7 +1398,7 @@ public function asignar_facturas_A_cuentas($data) {
     
             // EXISTE TIPO DE CAMBIO PARA LA FECHA DE HOY O SE SELECCIONARA UNA Q YA EXISTE
             $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
-        VALUE(NULL,'$nroTransaccion','$fecha','$tc[idtipodecambio]','$ndocumento','-','1','1','$tt[idtipotransaccion]','$ide','$idsucursal','$idgestion')");
+        VALUE(NULL,'$nroTransaccion','$fecha','$tc[idtipodecambio]','$ndocumento','$glosa','1','1','$tt[idtipotransaccion]','$ide','$idsucursal','$idgestion')");
 
         $idtransaccion = $this->dbc->insert_id;
 

@@ -1546,7 +1546,8 @@ $totalHaber = 0;
         t.codigotransaccion,
         t.fechatransaccion,
         t.tipotransaccion_idtipotransaccion,
-        t.idtransacciones
+        t.idtransacciones,
+        t.glosa
       FROM
         transacciones AS t
       WHERE
@@ -1566,14 +1567,15 @@ $totalHaber = 0;
             d.iddetalletransaccion,
             d.debe,
             d.haber,
-            d.transacciones_idtransacciones
+            d.transacciones_idtransacciones,
+            d.nota
           FROM
             detalletransaccion AS d
           WHERE
             d.idplandecuenta = '$pl[idplandecuenta]'
             AND d.transacciones_idtransacciones='$qwe[3]'");
             while($asd=$this->dbc->fetch($detallet)){
-                $res=array("debe"=>$asd[1],"haber"=>$asd[2]);
+                $res=array("debe"=>$asd[1],"haber"=>$asd[2],"nota"=>$asd[4]);
                 array_push($detalle,$res);
             }
 
@@ -1582,6 +1584,7 @@ $totalHaber = 0;
             "fecha"=>$qwe[1],
             "tipo"=>$tipo[0],
             "tipo_cuenta"=>$pl['saldonormal'],
+            "glosa"=>$qwe['glosa'],
             "detalle"=>$detalle);
             array_push($lista,$red);
             }else{
@@ -1592,7 +1595,7 @@ $totalHaber = 0;
               "detalle"=>$detalle);
               array_push($lista,$red);
             }
-         
+
 
         }
         $res_plan['cuentas'] = $lista;
