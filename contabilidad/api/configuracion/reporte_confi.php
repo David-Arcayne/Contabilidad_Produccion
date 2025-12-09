@@ -2546,7 +2546,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
         // array_push($lista, $res2);
         echo json_encode($lista, JSON_NUMERIC_CHECK);  
     }
-    public function editar_configuracion_reporte($id,$idplandecuenta,$es_activo_fijo,$es_calculable,$negrilla_cursiva,$empresa) {
+    public function editar_configuracion_reporte($id,$idplandecuenta,$es_activo_fijo,$es_calculable,$orden,$negrilla_cursiva,$empresa) {
         $idempresa = $this->getidempresa($empresa);
         
         $confi = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE idconfiguracion_reporte = '$id'");
@@ -3740,6 +3740,6 @@ public function select_plantilla_balance_general($idtipo_reporte,$empresa)
     //     //$res=array("id"=>,"nombre"=>$qwe['nombre']); listapagarfactura
     //     return $qwe['idgestion'];
     // }
-//activo--1    pasivo --2  patrimonio---3    ingresos---4   egresos_gastos --5  orden ---6  eliminar
+//activo--1    pasivo --2  patrimonio---3    ingresos---4   egresos_gastos --5  orden ---6  eliminar    editar
 }
 ?>

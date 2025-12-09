@@ -485,7 +485,7 @@ if($filtrado->num_rows > 0){
             }
             $facturas=$this->dbc->query("SELECT COUNT(*) as listafactura
                     FROM factura AS f 
-                    WHERE f.cuenta = $qwe[7]");
+                    WHERE f.cuenta = $qwe[0]");
             $fa=$this->dbc->fetch($facturas);
             $res = array(
                 "id" => $qwe['iddetalletransaccion'],
