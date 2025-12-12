@@ -311,7 +311,7 @@ class Plantilla_admin extends DB{
 
             $idplantilla_actual = $this->registrarItem_estado_resultados($item,$idempresa, $nivel, $orden,$nombre_personalizado,$tipo_operacion,$idtipo_reporte, $idplantilla_padre,$tipo_asiento); // Guarda el item actual
 
-             // Solo incrementar el orden si se insertó correctamente
+             // Solo incrementar el orden si se insertó correctamente   
             if ($idplantilla_actual != false && $idplantilla_actual > 0) {
                 $ordenPorNivelPadre[$idplantilla_padre]++;
             }
@@ -392,6 +392,31 @@ class Plantilla_admin extends DB{
             
     }
 
+    public function importar_todo_admin($idtn,$empresa){
+        //  ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
+        // $idempresa = $this->getidempresa($empresa);
+        $url = "http://mistersofts.com/administrador/api/getListaplantillareporterubro/".$idtn;
+        $data = json_decode(file_get_contents($url), true);
+        
+        foreach($data as $plantilla){
+            if($plantilla['tiporeporte'] == 'estado_resultado'){
+                $listado_admin = $this->registrar_estado_resultados_admin($plantilla['idctplantilla'], $idtn,$empresa);
+                
+            }elseif($plantilla['tiporeporte'] == 'balance_general'){
+                $listado_admin = $this->registrar_balance_general_admin($plantilla['idctplantilla'],$idtn, $empresa);
+            }
+        }
+        if($listado_admin === TRUE){
+            $res = array("success", "Todos los elementos fueron registrados");
+        }else{
+            $res = array("danger", "No se encontró el campo 'config' en la respuesta.");
+        }
+
+        echo json_encode($res); 
+        // echo json_encode(array($idplantilla_reporte,$idtn,$empresa)); 
+    }
     public function getidempresa($md5)
     {
         $registro = $this->dbe->query("select * from organizacion where md5(idorganizacion)='$md5'");

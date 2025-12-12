@@ -763,9 +763,21 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         }else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['empresa']));
         }
+    }elseif($ver=="importar_todo_admin"){
+        if(isset($_POST['idtn'],$_POST['empresa'])){
+            $cont=new Plantilla_admin();
+            $cont->importar_todo_admin($_POST['idtn'],$_POST['empresa']);
+        }else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idtn'],$_POST['empresa']));
+        }
     }
 //editar_caja_bancos_facturas editar_caja_bancos_facturas_existentes   editar_recibo_caja_bancos   registrar_factura_recibo_pago_cajaBancos registrar_agrupacion_plantilla registrar_factura_recibo_cobro asignar asiento
 //  vincula  -- crearfacturasf5 registrar_factura_cobro registrar_factura_cobro_otras_cuentas --> aumentar usuario registrar_factura_cobros_tributario registrocobrarfactura registropagarfactura registrar_recibo
+<<<<<<< HEAD
 //   registrar_recibo_otras_cuentas 
 }// asignar_asiento_A_factura activar registroplanes
+=======
+//  registrotransaccion_por_asiento  registrar_recibo_cobro_cajaBancos_en_facturas registrar_recibo_cobro_cajaBancos_en_otras_cuentas  registrar_recibo_otras_cuentas  registrar_estado_resultados_admin
+}//   gestion_tipo registrocobrarfacturaGrupal registrar_transaccion_recibo gestion registrar_recibo_otras_cuentas registrar_factura_otras_cuentas asignar_asiento_A_factura activar
+>>>>>>> e0b6fd6032bac4ae403cc00cc530ae6040e4b1b1
 ?> 

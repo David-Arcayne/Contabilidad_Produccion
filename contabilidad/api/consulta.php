@@ -685,8 +685,10 @@ elseif($ver[0]=="listar_reportes_referencia"){
 }elseif($ver[0]=="listar_select_rango_codigos"){
     $cont=new Plandecuentas();
     $cont->listar_select_rango_codigos($ver[1]);
+}elseif($ver[0]=="listar_facturas_cobro_pago"){
+    $cont=new Cuentas_transacciones();
+    $cont->listar_facturas_cobro_pago($ver[1],$ver[2]);
 }
-
 
 // reportedetalle listar_recibo_por_id listar_recibo_por_id_otras_cuentas   eliminarcobrados lista_cobrar lista_plande listafactura listaproveedores getgestionactual -- listar_facturas
 //    listadetalle  listar_recibo_otras_cuentas_pagar       listar_factura           listar_recibo_pago_por_id                                             listar_recibo_por_id   --> caja bancos 
@@ -695,7 +697,11 @@ elseif($ver[0]=="listar_reportes_referencia"){
 // reportedetalle listar_recibo_por_id listar_recibo_por_id_otras_cuentas   eliminarcobrados lista_cobrar lista_plande listafactura listaproveedores getgestionactual -- listar_facturas   reportedetallefptclasefactura
 //    listar_recibo_otras_cuentas  listar_recibo_otras_cuentas_pagar       listar_factura           listar_recibo_pago_por_id                                             listar_recibo_por_id   --> caja bancos 
 
+<<<<<<< HEAD
 // listar_tipo_plandecuenta
+=======
+//       listar_recibo_por_id_otras_cuentas_pagar ---> esos dos son de recibos listar_tipo_plandecuenta listadetalletransaccion
+>>>>>>> e0b6fd6032bac4ae403cc00cc530ae6040e4b1b1
 
 // reportedetallefpt reportecomprobantecontable     listadegestion   getgestion "archivo" => $qwe['archivo'],           listar_recibo_por_id_otras_cuentas_pagar ---> esos dos son de recibos rp_listar_plantilla_normal
 
