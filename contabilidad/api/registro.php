@@ -684,16 +684,16 @@ if($data['ver'] == "asignar_asiento_A_factura") {
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idplandecuenta'],$_POST['idplantilla_reporte'],$_POST['reporte'],$_POST['nombre_cuenta_superior'],$_POST['nivel_registrado'],$_POST['orden'],$_POST['grupo'],$_POST['es_calculable'],$_POST['es_activo_fijo'],$_POST['negrilla_cursiva'],$_POST['empresa']));
         }
     }elseif($ver=="registrar_agrupacion_rubro_plandecuenta"){
-        if(isset($_POST['idtipo_plandecuenta'],$_POST['numero'],$_POST['empresa'])){
+        if(isset($_POST['tipo_plandecuenta'],$_POST['numero'],$_POST['empresa'])){
             $cont=new Plandecuentas();
-            $cont->registrar_agrupacion_rubro_plandecuenta($_POST['idtipo_plandecuenta'],$_POST['numero'],$_POST['empresa']);
+            $cont->registrar_agrupacion_rubro_plandecuenta($_POST['tipo_plandecuenta'],$_POST['numero'],$_POST['empresa']);
         }
         else{
-            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idtipo_plandecuenta'],$_POST['numero'],$_POST['empresa']));
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['tipo_plandecuenta'],$_POST['numero'],$_POST['empresa']));
         }
     }elseif($ver=="editar_agrupacion_rubro_plandecuenta"){
     $cont=new Plandecuentas();
-    $cont->editar_agrupacion_rubro_plandecuenta($_POST['idagrupacion_rubro_plandecuenta'],$_POST['idtipo_plandecuenta'],$_POST['numero'],$_POST['empresa']);
+    $cont->editar_agrupacion_rubro_plandecuenta($_POST['idagrupacion_rubro_plandecuenta'],$_POST['tipo_plandecuenta'],$_POST['numero'],$_POST['empresa']);
     }
     elseif($ver=="registrar_balance_general_admin"){
         if(isset($_POST['idplantilla_reporte'],$_POST['idtn'],$_POST['empresa'])){
@@ -766,6 +766,6 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     }
 //editar_caja_bancos_facturas editar_caja_bancos_facturas_existentes   editar_recibo_caja_bancos   registrar_factura_recibo_pago_cajaBancos registrar_agrupacion_plantilla registrar_factura_recibo_cobro asignar asiento
 //  vincula  -- crearfacturasf5 registrar_factura_cobro registrar_factura_cobro_otras_cuentas --> aumentar usuario registrar_factura_cobros_tributario registrocobrarfactura registropagarfactura registrar_recibo
-//  registrotransaccion_por_asiento  registrar_recibo_cobro_cajaBancos_en_facturas registrar_recibo_cobro_cajaBancos_en_otras_cuentas  registrar_recibo_otras_cuentas 
-}//   gestion_tipo registrocobrarfacturaGrupal registrar_transaccion_recibo gestion registrar_recibo_otras_cuentas registrar_factura_otras_cuentas asignar_asiento_A_factura activar
+//   registrar_recibo_otras_cuentas 
+}// asignar_asiento_A_factura activar registroplanes
 ?> 
