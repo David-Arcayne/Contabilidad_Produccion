@@ -698,8 +698,8 @@ elseif($ver[0]=="listar_reportes_referencia"){
 //    listar_recibo_otras_cuentas  listar_recibo_otras_cuentas_pagar       listar_factura           listar_recibo_pago_por_id                                             listar_recibo_por_id   --> caja bancos 
 // listar_tipo_plandecuenta
 //       listar_recibo_por_id_otras_cuentas_pagar ---> esos dos son de recibos listar_tipo_plandecuenta listadetalletransaccion
-
-// reportedetallefpt reportecomprobantecontable     listadegestion   getgestion "archivo" => $qwe['archivo'],           listar_recibo_por_id_otras_cuentas_pagar ---> esos dos son de recibos rp_listar_plantilla_normal
+//
+// reportedetallefpt reportecomprobantecontable     listadegestion   getgestion "archivo" => $qwe['archivo'], listar_agrupacion        listar_recibo_por_id_otras_cuentas_pagar ---> esos dos son de recibos rp_listar_plantilla_normal
 
 
 ?>

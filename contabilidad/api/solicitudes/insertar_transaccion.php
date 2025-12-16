@@ -40,7 +40,8 @@ public function registrar_transaccionEn_espera($idtransaccion,$estado,$hora,$fec
                     $cod = $resultado['codigotransaccion'];
                     $idempresa = $resultado['idempresa'];
                     $transEditar=$this->dbc->query("SELECT * FROM transacciones 
-                    WHERE codigotransaccion >= '$cod' AND organizacion_idorganizacion = '$idempresa' AND idgestion = '$resultado[idgestion]'");
+                    WHERE codigotransaccion >= '$cod' AND organizacion_idorganizacion = '$idempresa' 
+                    AND idgestion = '$resultado[idgestion]' ORDER BY codigotransaccion ASC");
                     $cod =$cod+1;
                     while($qwe2=$this->dbc->fetch($transEditar)){
                         $descTRan=$this->dbc->query("UPDATE transacciones SET codigotransaccion = '$cod' 
@@ -118,7 +119,39 @@ public function registrar_transaccionEn_espera($idtransaccion,$estado,$hora,$fec
                         
                 // Retornar la lista en formato JSON
                 echo json_encode($lista);
-    }        
+    } 
+    
+    
+    public function modificacion_transacciones_desordenados($idtransaccion,$codigo_error,$codigo_correcto,$empresa,$gestion){
+        //actualizar esto:
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
+        $idempresa=$this->getidempresa($empresa);
+
+                    $transEditar=$this->dbc->query("SELECT * FROM transacciones 
+                    WHERE codigotransaccion >= '$codigo_correcto' AND codigotransaccion < '$codigo_error'
+                    AND organizacion_idorganizacion = '$idempresa' 
+                    AND idgestion = '$gestion' ORDER BY codigotransaccion ASC");
+
+                    // $cod =$cod+1;
+                    while($qwe2=$this->dbc->fetch($transEditar)){
+                        $codigo = $qwe2['codigotransaccion'] + 1;
+                        $descTRan=$this->dbc->query("UPDATE transacciones SET codigotransaccion = '$codigo' 
+                        WHERE idtransacciones = '$qwe2[idtransacciones]'");    
+                    }
+
+                if($descTRan===TRUE){
+                    $descTRan3=$this->dbc->query("UPDATE transacciones SET codigotransaccion = '$codigo_correcto' 
+                        WHERE idtransacciones = '$idtransaccion'");
+                    $res = array("success", "Se Registro Correctamente", "cambiarestadotransaccionEn_espera");
+                }else{
+                    $res = array("danger", "No se pudo registrar");
+                }   
+                echo json_encode($res);
+    }
+                
+
     public function getidempresa($md5)
     {
         $registro = $this->dbe->query("select * from organizacion where md5(idorganizacion)='$md5'");

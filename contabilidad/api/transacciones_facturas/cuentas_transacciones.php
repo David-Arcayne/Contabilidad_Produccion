@@ -68,15 +68,15 @@ class Cuentas_transacciones extends DB{
             //preguntar si factura es de pago y cobro
             if($factu['clasefactura'] == 2){
                 // es cobro
-                $factu_clase = $this->dbc->query("SELECT * FROM factura WHERE idorganizacion ='$idempresa' AND clasefactura='2'");
+                $factu_clase = $this->dbc->query("SELECT * FROM factura WHERE idorganizacion ='$idempresa' AND clasefactura='2' AND cuenta ='0'");
 
             }else{
                 // es pago
-                $factu_clase = $this->dbc->query("SELECT * FROM factura WHERE idorganizacion ='$idempresa' AND clasefactura='1'");
+                $factu_clase = $this->dbc->query("SELECT * FROM factura WHERE idorganizacion ='$idempresa' AND clasefactura='1' AND cuenta ='0'");
             }
         }else{
             //listara todas las facturas de cobro y pago porque no tiene ninguna factura todavia dentro
-            $factu_clase = $this->dbc->query("SELECT * FROM factura WHERE idorganizacion ='$idempresa'");
+            $factu_clase = $this->dbc->query("SELECT * FROM factura WHERE idorganizacion ='$idempresa' AND cuenta ='0'");
         }
         while ($qwe = $this->dbc->fetch($factu_clase)) {
                if ($qwe['clasefactura'] == 2) {

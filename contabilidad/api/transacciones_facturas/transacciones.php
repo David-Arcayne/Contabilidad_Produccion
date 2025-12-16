@@ -1410,7 +1410,7 @@ public function asignar_facturas_A_cuentas($data) {
             $idtipo_cambio = $this->dbc->insert_id;   
         
         $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
-        VALUE(NULL,'$nroTransaccion','$fecha','$tcu[idtipodecambio]','$ndocumento','-','1','1','$tt[idtipotransaccion]','$ide','$idsucursal','$idgestion')");
+        VALUE(NULL,'$nroTransaccion','$fecha','$tcu[idtipodecambio]','$ndocumento','$glosa','1','1','$tt[idtipotransaccion]','$ide','$idsucursal','$idgestion')");
 
         $idtransaccion = $this->dbc->insert_id;
         }
