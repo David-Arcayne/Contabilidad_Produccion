@@ -10,18 +10,19 @@ class Anulacion_transaccion extends DB{
         $gestion = $this->getgestionactualC($empresa);
         $idgestion = $gestion["id"];
         // Consulta SQL
-        if($todos == '0'){
+        if($todos == '0'){ // solo de la gestion activa
             $sql =$this->dbc->query("SELECT * FROM solicitud_anular_eliminar s
-            INNER JOIN transacciones t ON t.idtransacciones = s.transacciones_idtransacciones
-            WHERE s.idempresa = '$ide' AND t.idgestion = '$idgestion'
+            -- INNER JOIN transacciones t ON t.idtransacciones = s.transacciones_idtransacciones
+            WHERE s.idempresa = '$ide' 
+            AND s.idgestion = '$idgestion'
             ORDER BY 
                 (s.estado_solicitud = '1') DESC,
                 s.fecha DESC,
                 s.hora DESC;
             ");   
-        }else{
+        }else{ // de todos
             $sql =$this->dbc->query("SELECT * FROM solicitud_anular_eliminar s
-            INNER JOIN transacciones t ON t.idtransacciones = s.transacciones_idtransacciones
+            -- INNER JOIN transacciones t ON t.idtransacciones = s.transacciones_idtransacciones
             WHERE s.idempresa = '$ide'
             ORDER BY 
                 (s.estado_solicitud = '1') DESC,
@@ -70,8 +71,11 @@ public function registrar_anular_eliminar_activar_transaccion($idtransaccion,$mo
         //CASO I --> vacio SI,  consolidado NO 
         $idusuario=$this->getidusuario($usuario);
         $idempresa=$this->getidempresa($empresa);
+        $gestion = $this->getgestionactualC($empresa);
+        $idgestion = $gestion["id"];
         $res = "";
-        $registro=$this->dbc->query("INSERT INTO solicitud_anular_eliminar(transacciones_idtransacciones,motivo,estado_opcion,estado_solicitud,hora,fecha,idusuario,idempresa)VALUES('$idtransaccion','$motivo','$estado_opci','$estado_soli','$hora','$fecha','$idusuario','$idempresa')");
+        $registro=$this->dbc->query("INSERT INTO solicitud_anular_eliminar(transacciones_idtransacciones,motivo,estado_opcion,estado_solicitud,hora,fecha,idusuario,idempresa,idgestion)
+        VALUES('$idtransaccion','$motivo','$estado_opci','$estado_soli','$hora','$fecha','$idusuario','$idempresa','$idgestion')");
 
         // $detallet = $this->dbc->query("SELECT COUNT(*) AS total FROM factura WHERE cuenta='$dato'");
         // $resultado = $detallet->fetch_assoc();

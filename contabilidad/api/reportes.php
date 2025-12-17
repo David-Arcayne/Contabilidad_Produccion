@@ -1194,6 +1194,10 @@ $totalHaber = 0;
   public function reportecomprobantecontable($numeroIni,$numeroFin,$fechaIni,$fechaFin,$mes_año,$cadena_tipo,$empresa,$factura){
 //reporteactivodiaponible          La fecha, persona, ci, Nro comprobante y el monto
 // echo json_encode(array($fechaIni,$fechaFin,$numeroIni,$numeroFin,$empresa,$factura));
+    // ini_set('display_errors', 1);
+    //     ini_set('display_startup_errors', 1);
+    //     error_reporting(E_ALL);
+
     $lista=[];
     $ide=$this->getidempresa($empresa);
     $gestion=$this->getidgestion($empresa);
@@ -1311,7 +1315,7 @@ $totalHaber = 0;
                 t.estado,
                 t.consolidar,
                 t.idgestion,
-                t.tipodecambio
+                t.tipodecambio,
                 -- g.gestion AS gestion_anio,
               tt.nombre AS tipo_nombre
             FROM transacciones t
@@ -2438,7 +2442,7 @@ if ($pcuentas->num_rows > 0) {
 
         echo json_encode($lista); 
        }
-  //reportedetallefpt reporteactivodiaponibledos reportedetalletransaccion estado consolidar reporteactivoypasivo resultados reportecomprobantecontable                
+  //reportedetallefpt reporteactivodiaponibledos reportedetalletransaccion estado consolidar reporteactivoypasivo resultados reportecomprobantecontable                 
 //re   firmas  reportebalancegeneral mayor reportecomprobantecontable mayorcuentacontable  reporteactivoypasivo reportedetalle reportedetalletransaccion reportedetallefpt
 
 }

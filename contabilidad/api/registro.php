@@ -777,6 +777,9 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         }else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud"));
         }
+    }elseif($data['ver'] == "asignar_comprobantes_A_cuentas") {
+        $cont=new Transacciones();
+        $cont->asignar_comprobantes_A_cuentas($data);
     }
     
 //editar_caja_bancos_facturas editar_caja_bancos_facturas_existentes   editar_recibo_caja_bancos   registrar_factura_recibo_pago_cajaBancos registrar_agrupacion_plantilla registrar_factura_recibo_cobro asignar asiento
