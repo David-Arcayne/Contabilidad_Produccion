@@ -1455,15 +1455,17 @@ public function asignar_facturas_A_cuentas($data) {
         $idempresa = $this->getidempresa($data['idempresa']);
         // $idsucursal = $this->getidsucursal($data['idsucursal']); 
         $gestion = $this->getgestionactualid($idempresa);
-        $montoFacturas = 0;
+        $montoComprobantes = 0;
             foreach ($data['comprobantes'] as $comprobante) {
-                if($comprobante['tipo_comprobante'] == 'cobro'){
+                if($comprobante['tipo_comprobante'] == 'cobro'){  // COMPROBANTE COBROOO
 
-                }else{
+                    $montoComprobantes += $comprobante['monto'];
+                    $updatetranscodigo = $this->dbc->query("UPDATE cuentaspof SET cuenta = '$data[cuenta]' WHERE idcuentaspof = '{$comprobante['idcomprobante']}'");
+                }else{ // COMPROBANTE PAGOOOO
 
+                    $montoComprobantes += $comprobante['monto'];
+                    $updatetranscodigo = $this->dbc->query("UPDATE cuentaspor SET cuenta = '$data[cuenta]' WHERE idcuentaspor = '{$comprobante['idcomprobante']}'");
                 }
-                $montoFacturas += $comprobante['monto'];
-                $updatetranscodigo = $this->dbc->query("UPDATE cuentaspof SET cuenta = '$data[cuenta]' WHERE idcuentaspof = '{$comprobante['idcomprobante']}'");
 
             }
                         
@@ -1472,18 +1474,18 @@ public function asignar_facturas_A_cuentas($data) {
 
         if($data['sumar_reemplazar'] == 'suma'){ // SUMAR
             if($dt['debe'] > 0){
-                $nuevo_monto_dt = $dt['debe'] + $montoFacturas;
+                $nuevo_monto_dt = $dt['debe'] + $montoComprobantes;
                 $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
             }else{
-                $nuevo_monto_dt = $dt['haber'] + $montoFacturas;
+                $nuevo_monto_dt = $dt['haber'] + $montoComprobantes;
                 $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
             }
         }else{ // REEMPLAZAR
             if($dt['debe'] > 0){
-                $nuevo_monto_dt = $montoFacturas;
+                $nuevo_monto_dt = $montoComprobantes;
                 $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
             }else{
-                $nuevo_monto_dt = $montoFacturas;
+                $nuevo_monto_dt = $montoComprobantes;
                 $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
             }
         }
