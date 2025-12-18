@@ -1689,91 +1689,203 @@ $totalHaber = 0;
     }
 
     
-    public function mayorcuentacontable($fechai,$fechaf,$numero_ini,$numero_fin,$empresa){
-      ini_set('display_errors', 1);
-      ini_set('display_startup_errors', 1);
-      error_reporting(E_ALL);
+    // public function mayorcuentacontable($fechai,$fechaf,$numero_ini,$numero_fin,$empresa){
+    //   ini_set('display_errors', 1);
+    //   ini_set('display_startup_errors', 1);
+    //   error_reporting(E_ALL);
         
-        $lista_completa=[];
-        $ide=$this->getidempresa($empresa);
-        $gestion=$this->getidgestion($empresa);
+    //     $lista_completa=[];
+    //     $ide=$this->getidempresa($empresa);
+    //     $gestion=$this->getidgestion($empresa);
 
-    // $planCuenta=$this->dbc->query("SELECT saldonormal FROM plandecuenta WHERE idplandecuenta='$plan'"); //antes era dba
-    // $tipo_cuenta = $this->dbc->fetch($planCuenta);    
+    // // $planCuenta=$this->dbc->query("SELECT saldonormal FROM plandecuenta WHERE idplandecuenta='$plan'"); //antes era dba
+    // // $tipo_cuenta = $this->dbc->fetch($planCuenta);    
     
-    $planCuenta=$this->dbc->query("SELECT * FROM plandecuenta WHERE numero >= '$numero_ini' AND numero <= '$numero_fin' AND organizacion_idorganizacion ='$ide'"); //antes era dba
-    // $tipo_cuenta = $this->dbc->fetch($planCuenta);  
-    while($pl=$this->dbc->fetch($planCuenta)){
-      $lista=[];
+    // $planCuenta=$this->dbc->query("SELECT * FROM plandecuenta WHERE numero >= '$numero_ini' AND numero <= '$numero_fin' AND organizacion_idorganizacion ='$ide'"); //antes era dba
+    // // $tipo_cuenta = $this->dbc->fetch($planCuenta);  
+    // while($pl=$this->dbc->fetch($planCuenta)){
+    //   $lista=[];
 
-      $res_plan=array("nombre_plan"=>$pl['nombreplan'],
-                      "codigo_cuenta"=>$pl['numero'],
-                    "cuentas"=>[]);
+    //   $res_plan=array("nombre_plan"=>$pl['nombreplan'],
+    //                   "codigo_cuenta"=>$pl['numero'],
+    //                 "cuentas"=>[]);
 
                 
-    //reconfigurar consulta para que solo se muestre solo la gestion.
-        $registro=$this->dbc->query("SELECT
-        t.codigotransaccion,
-        t.fechatransaccion,
-        t.tipotransaccion_idtipotransaccion,
-        t.idtransacciones,
-        t.glosa
-      FROM
-        transacciones AS t
-      WHERE
-        t.organizacion_idorganizacion = '$ide'
-        AND t.fechatransaccion >= '$fechai'
-        AND t.fechatransaccion <= '$fechaf'
-        AND t.estado NOT IN (4, 5, 6)
-        AND t.idgestion = '$gestion'
-      ORDER BY
-        t.codigotransaccion ASC");
-        while($qwe=$this->dbc->fetch($registro)){
-            $tipotrans=$this->dbc->query("SELECT nombre FROM tipotransaccion WHERE idtipotransaccion='$qwe[2]'"); //antes era dba
-            $tipo=$this->dbc->fetch($tipotrans);
-            $detalle=[];
+    // //reconfigurar consulta para que solo se muestre solo la gestion.
+    //     $registro=$this->dbc->query("SELECT
+    //     t.codigotransaccion,
+    //     t.fechatransaccion,
+    //     t.tipotransaccion_idtipotransaccion,
+    //     t.idtransacciones,
+    //     t.glosa
+    //   FROM
+    //     transacciones AS t
+    //   WHERE
+    //     t.organizacion_idorganizacion = '$ide'
+    //     AND t.fechatransaccion >= '$fechai'
+    //     AND t.fechatransaccion <= '$fechaf'
+    //     AND t.estado NOT IN (4, 5, 6)
+    //     AND t.idgestion = '$gestion'
+    //   ORDER BY
+    //     t.codigotransaccion ASC");
+    //     while($qwe=$this->dbc->fetch($registro)){
+    //         $tipotrans=$this->dbc->query("SELECT nombre FROM tipotransaccion WHERE idtipotransaccion='$qwe[2]'"); //antes era dba
+    //         $tipo=$this->dbc->fetch($tipotrans);
+    //         $detalle=[];
 
-            $detallet=$this->dbc->query("SELECT
-            d.iddetalletransaccion,
+    //         $detallet=$this->dbc->query("SELECT
+    //         d.iddetalletransaccion,
+    //         d.debe,
+    //         d.haber,
+    //         d.transacciones_idtransacciones,
+    //         d.nota
+    //       FROM
+    //         detalletransaccion AS d
+    //       WHERE
+    //         d.idplandecuenta = '$pl[idplandecuenta]'
+    //         AND d.transacciones_idtransacciones='$qwe[3]'");
+    //         while($asd=$this->dbc->fetch($detallet)){
+    //             $res=array("debe"=>$asd[1],"haber"=>$asd[2],"nota"=>$asd[4]);
+    //             array_push($detalle,$res);
+    //         }
+
+    //         if($tipotrans->num_rows > 0 ){
+    //           $red=array("codigo"=>$qwe[0],
+    //         "fecha"=>$qwe[1],
+    //         "tipo"=>$tipo[0],
+    //         "tipo_cuenta"=>$pl['saldonormal'],
+    //         "glosa"=>$qwe['glosa'],
+    //         "detalle"=>$detalle);
+    //         array_push($lista,$red);
+    //         }else{
+    //           $red=array("codigo"=>$qwe[0],
+    //           "fecha"=>$qwe[1],
+    //           "tipo"=> 0,
+    //           "tipo_cuenta"=>$pl['saldonormal'],
+    //           "detalle"=>$detalle);
+    //           array_push($lista,$red);
+    //         }
+
+
+    //     }
+    //     $res_plan['cuentas'] = $lista;
+    //     array_push($lista_completa,$res_plan);
+    // }
+        
+    //     echo json_encode($lista_completa);   
+    // }
+    public function mayorcuentacontable($fechai, $fechaf, $numero_ini, $numero_fin, $empresa)
+{
+    ini_set('display_errors', 1);
+    error_reporting(E_ALL);
+
+    $ide = $this->getidempresa($empresa);
+    $gestion = $this->getidgestion($empresa);
+
+    $sql = "SELECT
+            pc.idplandecuenta,
+            pc.numero AS codigo_cuenta,
+            pc.nombreplan,
+            pc.saldonormal,
+
+            t.idtransacciones,
+            t.codigotransaccion,
+            t.fechatransaccion,
+            t.glosa,
+
+            tt.nombre AS tipo_transaccion,
+
             d.debe,
             d.haber,
-            d.transacciones_idtransacciones,
             d.nota
-          FROM
-            detalletransaccion AS d
-          WHERE
-            d.idplandecuenta = '$pl[idplandecuenta]'
-            AND d.transacciones_idtransacciones='$qwe[3]'");
-            while($asd=$this->dbc->fetch($detallet)){
-                $res=array("debe"=>$asd[1],"haber"=>$asd[2],"nota"=>$asd[4]);
-                array_push($detalle,$res);
-            }
 
-            if($tipotrans->num_rows > 0 ){
-              $red=array("codigo"=>$qwe[0],
-            "fecha"=>$qwe[1],
-            "tipo"=>$tipo[0],
-            "tipo_cuenta"=>$pl['saldonormal'],
-            "glosa"=>$qwe['glosa'],
-            "detalle"=>$detalle);
-            array_push($lista,$red);
-            }else{
-              $red=array("codigo"=>$qwe[0],
-              "fecha"=>$qwe[1],
-              "tipo"=> 0,
-              "tipo_cuenta"=>$pl['saldonormal'],
-              "detalle"=>$detalle);
-              array_push($lista,$red);
-            }
+        FROM plandecuenta pc
+        LEFT JOIN detalletransaccion d
+            ON d.idplandecuenta = pc.idplandecuenta
+        LEFT JOIN transacciones t
+            ON t.idtransacciones = d.transacciones_idtransacciones
+            AND t.fechatransaccion BETWEEN ? AND ?
+            AND t.estado NOT IN (4,5,6)
+            AND t.idgestion = ?
+        LEFT JOIN tipotransaccion tt
+            ON tt.idtipotransaccion = t.tipotransaccion_idtipotransaccion
 
+        WHERE
+            pc.numero BETWEEN ? AND ?
+            AND pc.organizacion_idorganizacion = ?
 
+        ORDER BY
+            pc.numero,
+            -- t.codigotransaccion
+            t.fechatransaccion
+    ";
+
+    $stmt = $this->dbc->prepare($sql);
+    $stmt->bind_param(
+        "ssisss",
+        $fechai,      // fecha inicio
+        $fechaf,      // fecha fin
+        $gestion,     // id gestion
+        $numero_ini,  // numero cuenta inicio
+        $numero_fin,  // numero cuenta fin
+        $ide          // organizacion
+    );
+
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $data = [];
+
+    while ($row = $result->fetch_assoc()) {
+
+        $cuentaKey = $row['codigo_cuenta'];
+
+        // ===== NIVEL CUENTA CONTABLE =====
+        if (!isset($data[$cuentaKey])) {
+            $data[$cuentaKey] = [
+                "nombre_plan" => $row['nombreplan'],
+                "codigo_cuenta" => $row['codigo_cuenta'],
+                "cuentas" => []
+            ];
         }
-        $res_plan['cuentas'] = $lista;
-        array_push($lista_completa,$res_plan);
+
+        // Si la cuenta no tiene transacciones
+        if (!$row['idtransacciones']) {
+            continue;
+        }
+
+        $trxKey = $row['idtransacciones'];
+
+        // ===== NIVEL TRANSACCIÓN =====
+        if (!isset($data[$cuentaKey]["cuentas"][$trxKey])) {
+            $data[$cuentaKey]["cuentas"][$trxKey] = [
+                "codigo" => $row['codigotransaccion'],
+                "fecha" => $row['fechatransaccion'],
+                "tipo" => $row['tipo_transaccion'],
+                "tipo_cuenta" => $row['saldonormal'],
+                "glosa" => $row['glosa'],
+                "detalle" => []
+            ];
+        }
+
+        // ===== NIVEL DETALLE =====
+        if ($row['debe'] !== null || $row['haber'] !== null) {
+            $data[$cuentaKey]["cuentas"][$trxKey]["detalle"][] = [
+                "debe" => $row['debe'],
+                "haber" => $row['haber'],
+                "nota" => $row['nota']
+            ];
+        }
     }
-        
-        echo json_encode($lista_completa);   
+
+    // Reindexar arrays para JSON limpio
+    foreach ($data as &$cuenta) {
+        $cuenta["cuentas"] = array_values($cuenta["cuentas"]);
     }
+
+    echo json_encode(array_values($data));
+}
+
 
     public function obtenereportefacturacobrar($ini,$fin,$sucursal){
 
