@@ -1500,49 +1500,83 @@ public function asignar_facturas_A_cuentas($data) {
     
         echo json_encode($res);
     }
-    // public function lista_padres_plandecuentas($idplandecuenta)
-    // {
-    //     // $ide = $this->getidempresa($empresa);
-    //     $lista = [];
-    //     $plancuenta = $this->dbc->query("SELECT * FROM plandecuenta WHERE idplandecuenta='$idplandecuenta'");
-    //     $pl_cuenta = $plancuenta->fetch_assoc();
+    public function desvincular_facturas_de_cuentas($data) {
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+    
+        $idempresa = $this->getidempresa($data['idempresa']);
+        // $idsucursal = $this->getidsucursal($data['idsucursal']); 
+        $gestion = $this->getgestionactualid($idempresa);
+        $montoFacturas = 0;
+            foreach ($data['facturas'] as $factura) {
 
-    //         $array_codigo = explode(".", $pl_cuenta['numero']); //[1.1.1.02.00] 
-    //         $cantidad = count($array_codigo);
-    //         $i = 0;
-    //         $aux_numero = "";
-    //         while($i < $cantidad){
-    //             $aux_numero = $array_codigo[$i];
+                $montoFacturas += $factura['monto'];
+                $updatetranscodigo = $this->dbc->query("UPDATE factura SET cuenta = '0' WHERE idfactura = '{$factura['idfactura']}'");
 
-    //             $aux_increment = $i;
-    //             $aux_array = $aux_numero;
-    //             while($aux_increment < $cantidad){
-    //                 if($aux_increment == '3'){
-    //                     $aux_array = $aux_array ."."."00";
+            }
+                        
+        $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$data[cuenta]'");
+        $dt = $detalle_trans->fetch_assoc();
 
-    //                 }elseif($aux_increment == '4'){
-    //                     $aux_array = $aux_array ."."."00";
+            if($dt['debe'] > 0){
+                $nuevo_monto_dt = $dt['debe'] - $montoFacturas;
+                $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
+            }else{
+                $nuevo_monto_dt = $dt['haber'] - $montoFacturas;
+                $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
+            }
+   
+        // Respuesta
+        if ($editar_dt === TRUE) {
+            $res = array("success", "Se Registro Correctamente", "cobrofacturasaasientomodelo");
+        } else {
+            $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde");
+        }
+    
+        echo json_encode($res);
+    }
+    public function desvincular_comprobantes_de_cuentas($data) {
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+    
+        $idempresa = $this->getidempresa($data['idempresa']);
+        // $idsucursal = $this->getidsucursal($data['idsucursal']); 
+        $gestion = $this->getgestionactualid($idempresa);
+        $montoComprobantes = 0;
+            foreach ($data['comprobantes'] as $comprobante) {
+                if($comprobante['tipo_comprobante'] == 'cobro'){  // COMPROBANTE COBROOO
 
-    //                 }else{
-    //                     $aux_array = $aux_array ."."."0";
+                    $montoComprobantes += $comprobante['monto'];
+                    $updatetranscodigo = $this->dbc->query("UPDATE cuentaspof SET cuenta = '0' WHERE idcuentaspof = '{$comprobante['idcomprobante']}'");
+                }else{ // COMPROBANTE PAGOOOO
 
-    //                 }
-    //                 $aux_increment++;
-    //             }
-    //             //1.0.0.00.00
-    //             // $aux_numero = $aux_numero .".".
-    //             $aux_numero = $aux_array;
+                    $montoComprobantes += $comprobante['monto'];
+                    $updatetranscodigo = $this->dbc->query("UPDATE cuentaspor SET cuenta = '0' WHERE idcuentaspor = '{$comprobante['idcomprobante']}'");
+                }
+            }
+                        
+        $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$data[cuenta]'");
+        $dt = $detalle_trans->fetch_assoc();
 
-    //             $i++;
-    //             $res = array(
-    //             "numero" => $aux_numero
-    //         );
-    //         array_push($lista, $res);
-    //         }
-            
-    //         // array_push($lista, $res);
+            if($dt['debe'] > 0){
+                $nuevo_monto_dt = $dt['debe'] - $montoComprobantes;
+                $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
+            }else{
+                $nuevo_monto_dt = $dt['haber'] - $montoComprobantes;
+                $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
+            }
         
-    //     echo json_encode($lista);
-    // }
-//array_push decode update
+   
+        
+        // Respuesta
+        if ($nuevo_monto_dt === TRUE) {
+            $res = array("success", "Se Registro Correctamente", "cobrofacturasaasientomodelo");
+        } else {
+            $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde");
+        }
+    
+        echo json_encode($res);
+    }
 }

@@ -22,6 +22,60 @@ public function registrar_transaccionEn_espera($idtransaccion,$estado,$hora,$fec
         echo json_encode($res);
 
     }
+    // public function cambiarestadotransaccionEn_espera($idtran_espera,$estado,$fecha,$hora,$idusuario_admin){
+    //     //actualizar esto:
+    //     ini_set('display_errors', 1);
+    //     ini_set('display_startup_errors', 1);
+    //     error_reporting(E_ALL);
+    //     // echo json_encode(array($idtran_espera,$estado,$fecha,$hora));
+    //     $usuario=$this->getidusuario($idusuario_admin);
+    //             $res="";
+    //             // $reg_trans=$this->dbc->query("SELECT * FROM transaccionEn_espera WHERE idtransaccionEn_espera='$idtran_espera'");
+
+    //     $registro=$this->dbc->query("UPDATE transaccionEn_espera SET estado='$estado',fecha_proceso='$fecha',hora_proceso='$hora',idusuario_admin = '$usuario' WHERE idtransaccionEn_espera='$idtran_espera'");
+    //     //consolidar es 2 y desconsolidar es 1
+    //     if($estado==1){//aceptado
+
+    //         $reg_trans=$this->dbc->query("SELECT * FROM transaccionEn_espera WHERE idtransaccionEn_espera='$idtran_espera'");
+    //         $resultado = $reg_trans->fetch_assoc();
+            
+    //         $trans=$this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones = $resultado[transacciones_idtransacciones]");
+    //         $trans_reg = $trans->fetch_assoc();
+    //         $cod = $trans_reg['codigotransaccion'];
+    //         $idempresa = $resultado['idempresa'];
+
+    //         $transEditar=$this->dbc->query("SELECT * FROM transacciones 
+    //         WHERE codigotransaccion >= '$cod' AND organizacion_idorganizacion = '$idempresa' 
+    //         AND idgestion = '$resultado[idgestion]' ORDER BY codigotransaccion ASC");
+    //         $cod =$cod+1;
+    //         while($qwe2=$this->dbc->fetch($transEditar)){
+    //             $descTRan=$this->dbc->query("UPDATE transacciones SET codigotransaccion = '$cod' 
+    //             WHERE idtransacciones = '$qwe2[idtransacciones]'");
+    //             $cod++;
+    //         }
+
+    //         $descTRan2=$this->dbc->query("INSERT INTO transacciones(codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
+    //         VALUES('$cod','$resultado[fecha_proceso]','$resultado[tipodecambio]','$resultado[ndocumento]','$resultado[glosa]','1','1','$resultado[tipotransaccion_idtipotransaccion]','$resultado[idempresa]','$resultado[sucursal]','$resultado[idgestion]')");
+          
+    //         if($descTRan2===TRUE){
+    //                 // $reg_trans=$this->dbc->query("SELECT * FROM transacciones WHERE codigotransaccion >= '$cod'");
+    //                 // $descTRan3=$this->dbc->query("UPDATE transaccionEn_espera SET estado = '$estado' 
+    //                 //     WHERE idtransaccionEn_espera = '$idtran_espera'");
+    //                 $res = array("success", "Se Registro Correctamente", "cambiarestadotransaccionEn_espera");
+    //             }else{
+    //                 $res = array("danger", "No se pudo registrar",$resultado['codigotransaccion'],$resultado['fecha_proceso'],$resultado['tipodecambio'],$resultado['ndocumento'],$resultado['glosa'],'1',$resultado['tipotransaccion_idtipotransaccion'],$resultado['idempresa'],$resultado['sucursal'],$resultado['idgestion']);
+    //             }   
+
+    //         }else{ //DENEGADOOO
+          
+    //             $res = array("success", "Se Denego el permiso para insertar", "cambiarestadotransaccionEn_espera");
+    //         }
+                
+        
+    //             echo json_encode($res);
+        
+    //         }
+
     public function cambiarestadotransaccionEn_espera($idtran_espera,$estado,$fecha,$hora,$idusuario_admin){
         //actualizar esto:
         ini_set('display_errors', 1);
@@ -32,56 +86,107 @@ public function registrar_transaccionEn_espera($idtransaccion,$estado,$hora,$fec
                 $res="";
                 // $reg_trans=$this->dbc->query("SELECT * FROM transaccionEn_espera WHERE idtransaccionEn_espera='$idtran_espera'");
 
-                $registro=$this->dbc->query("UPDATE transaccionEn_espera SET estado='$estado',fecha_proceso='$fecha',hora_proceso='$hora',idusuario_admin = '$usuario' WHERE idtransaccionEn_espera='$idtran_espera'");
-                //consolidar es 2 y desconsolidar es 1
-                if($estado==1){//aceptado
-                    $reg_trans=$this->dbc->query("SELECT * FROM transaccionEn_espera WHERE idtransaccionEn_espera='$idtran_espera'");
-                    $resultado = $reg_trans->fetch_assoc();
-                    $cod = $resultado['codigotransaccion'];
-                    $idempresa = $resultado['idempresa'];
-                    $transEditar=$this->dbc->query("SELECT * FROM transacciones 
-                    WHERE codigotransaccion >= '$cod' AND organizacion_idorganizacion = '$idempresa' 
-                    AND idgestion = '$resultado[idgestion]' ORDER BY codigotransaccion ASC");
-                    $cod =$cod+1;
-                    while($qwe2=$this->dbc->fetch($transEditar)){
-                        $descTRan=$this->dbc->query("UPDATE transacciones SET codigotransaccion = '$cod' 
-                        WHERE idtransacciones = '$qwe2[idtransacciones]'");
-                        $cod++;
+        $registro=$this->dbc->query("UPDATE transaccionEn_espera SET estado='$estado',fecha_proceso='$fecha',hora_proceso='$hora',idusuario_admin = '$usuario' WHERE idtransaccionEn_espera='$idtran_espera'");
+        //consolidar es 2 y desconsolidar es 1
+        if($estado==1){//aceptado
+            
+            $reg_trans=$this->dbc->query("SELECT * FROM transaccionEn_espera WHERE idtransaccionEn_espera='$idtran_espera'");
+            $resultado = $reg_trans->fetch_assoc();
+            
+            $trans=$this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones = $resultado[transacciones_idtransacciones]");
+            $trans_reg = $trans->fetch_assoc();
+            $cod = $trans_reg['codigotransaccion'];
+            $idempresa = $resultado['idempresa'];
+
+
+            // $transEditar=$this->dbc->query("SELECT * FROM transacciones 
+            // WHERE codigotransaccion >= '$cod' AND organizacion_idorganizacion = '$idempresa' 
+            // AND idgestion = '$resultado[idgestion]' ORDER BY codigotransaccion ASC");
+            // $cod =$cod+1;
+            // while($qwe2=$this->dbc->fetch($transEditar)){
+            //     $descTRan=$this->dbc->query("UPDATE transacciones SET codigotransaccion = '$cod' 
+            //     WHERE idtransacciones = '$qwe2[idtransacciones]'");
+            //     $cod++;
+            // }
+
+            // $descTRan2=$this->dbc->query("INSERT INTO transacciones(codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
+            // VALUES('$cod','$resultado[fecha_proceso]','$resultado[tipodecambio]','$resultado[ndocumento]','$resultado[glosa]','1','1','$resultado[tipotransaccion_idtipotransaccion]','$resultado[idempresa]','$resultado[sucursal]','$resultado[idgestion]')");
+            $gestion_sel = $this->dbc->query("SELECT * FROM gestion WHERE idgestion='$idgestion'");
+                $gc = $gestion_sel->fetch_assoc();
+
+                if($gc['formato_transaccion'] == 'por_tipo_mes'){
+
+                    // Construir rango dinámico (primer y último día del mes)
+                    $fecha_inicio = date("Y-m-01", strtotime($fecha_trans)); // "2025-03-01"
+                    $fecha_fin    = date("Y-m-t", strtotime($fecha_trans));  // "2025-03-31"
+
+                    $transs=$this->dbc->query(" SELECT * FROM transacciones 
+                    WHERE codigotransaccion > '$codig' AND organizacion_idorganizacion = '$idempresa' 
+                    AND idgestion = '$idgestion' AND tipotransaccion_idtipotransaccion ='$tipo_trans'
+                    AND fechatransaccion BETWEEN '$fecha_inicio' AND '$fecha_fin'");
+                    $aux=0;
+                    if ($transs->num_rows === 0){
+                        // $res = array("success", "Se Elimino correctamente");
+                    }else{
+                        while($qwe2=$this->dbc->fetch($transs)){
+                            $codigo =  $qwe2['codigotransaccion'];
+                            $codigo = $codigo - 1;
+                            
+                                $descTRan=$this->dbc->query("UPDATE transacciones SET codigotransaccion = '$codigo' 
+                                WHERE idtransacciones = '$qwe2[idtransacciones]'");
+                            $aux++;
+                            }  
                     }
-
-
-                        $descTRan2=$this->dbc->query("INSERT INTO transacciones(codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
-                        VALUES('$resultado[codigotransaccion]','$resultado[fecha_proceso]','$resultado[tipodecambio]','$resultado[ndocumento]','$resultado[glosa]','1','1','$resultado[tipotransaccion_idtipotransaccion]','$resultado[idempresa]','$resultado[sucursal]','$resultado[idgestion]')");
-         
-                
-                
-                if($descTRan2===TRUE){
-                    // $reg_trans=$this->dbc->query("SELECT * FROM transacciones WHERE codigotransaccion >= '$cod'");
-                    // $descTRan3=$this->dbc->query("UPDATE transaccionEn_espera SET estado = '$estado' 
-                    //     WHERE idtransaccionEn_espera = '$idtran_espera'");
+                }elseif($gc['formato_transaccion'] == 'por_tipo_gestion'){
+                    $transs=$this->dbc->query(" SELECT * FROM transacciones 
+                    WHERE codigotransaccion > '$codig' AND organizacion_idorganizacion = '$idempresa' 
+                    AND idgestion = '$idgestion' AND tipotransaccion_idtipotransaccion ='$tipo_trans'");
+                    $aux=0;
+                    if ($transs->num_rows === 0){
+                        // $res = array("success", "Se Elimino correctamente");
+                    }else{
+                        while($qwe2=$this->dbc->fetch($transs)){
+                            $codigo =  $qwe2['codigotransaccion'];
+                            $codigo = $codigo - 1;
+                            
+                                $descTRan=$this->dbc->query("UPDATE transacciones SET codigotransaccion = '$codigo' 
+                                WHERE idtransacciones = '$qwe2[idtransacciones]'");
+                            $aux++;
+                            }  
+                    }
+                }else{// POR GESTION
+                    $transs=$this->dbc->query("SELECT * FROM transacciones 
+                    WHERE codigotransaccion > '$codig' AND organizacion_idorganizacion = '$idempresa' AND idgestion = '$idgestion'");
+                    $aux=0;
+                    if ($transs->num_rows === 0){
+                        // $res = array("success", "Se Elimino correctamente");
+                    }else{
+                        while($qwe2=$this->dbc->fetch($transs)){
+                            $codigo =  $qwe2['codigotransaccion'];
+                            $codigo = $codigo - 1;
+                            
+                                $descTRan=$this->dbc->query("UPDATE transacciones SET codigotransaccion = '$codigo' 
+                                WHERE idtransacciones = '$qwe2[idtransacciones]'");
+                            $aux++;
+                            }  
+                    }
+                }
+            if($descTRan2===TRUE){
+                    
                     $res = array("success", "Se Registro Correctamente", "cambiarestadotransaccionEn_espera");
                 }else{
                     $res = array("danger", "No se pudo registrar",$resultado['codigotransaccion'],$resultado['fecha_proceso'],$resultado['tipodecambio'],$resultado['ndocumento'],$resultado['glosa'],'1',$resultado['tipotransaccion_idtipotransaccion'],$resultado['idempresa'],$resultado['sucursal'],$resultado['idgestion']);
                 }   
 
-            }else{
-                //DENEGADO
-            //     $descTRan3=$this->dbc->query("UPDATE transaccionEn_espera SET estado = '$estado' 
-            //             WHERE idtransaccionEn_espera = '$idtran_espera'");
-            // if($descTRan3===TRUE){
+            }else{ //DENEGADOOO
+          
                 $res = array("success", "Se Denego el permiso para insertar", "cambiarestadotransaccionEn_espera");
-
-            // }else{
-            //     $res = array("danger", "no se pudo registrar");
-
-            // }
             }
                 
         
                 echo json_encode($res);
         
             }
-
     public function lista_transaccionEn_espera($idempresa,$todos) {
             $lista = [];
             $gestion = $this->getgestionactualC($idempresa);

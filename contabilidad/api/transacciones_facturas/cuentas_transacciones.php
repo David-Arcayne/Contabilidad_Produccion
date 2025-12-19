@@ -190,4 +190,5 @@ class Cuentas_transacciones extends DB{
     
         echo json_encode($lista);
     }
+    
 }
