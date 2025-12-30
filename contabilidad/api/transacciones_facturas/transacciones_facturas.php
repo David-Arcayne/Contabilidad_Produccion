@@ -1,6 +1,6 @@
 <?php
 session_start();
-//require_once "db.php";
+//require_once "db.php"; editar
 require_once "../../db/db.php";
 class Transacciones_facturas extends DB{
     public function getidempresa($md5)

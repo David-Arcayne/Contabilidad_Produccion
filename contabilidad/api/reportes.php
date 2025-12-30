@@ -223,7 +223,7 @@ public function getidgestion($md5){
           AND t.estado NOT IN (4, 5, 6)
           AND t.idgestion='$gestion'
           $tipo_aux
-          ORDER BY t.codigotransaccion DESC");
+          ORDER BY t.codigotransaccion ASC");
         }
 
         while($qwe=$this->dbc->fetch($transacciones)){

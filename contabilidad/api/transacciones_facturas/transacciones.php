@@ -1571,7 +1571,7 @@ public function asignar_facturas_A_cuentas($data) {
    
         
         // Respuesta
-        if ($nuevo_monto_dt === TRUE) {
+        if ($editar_dt === TRUE) {
             $res = array("success", "Se Registro Correctamente", "cobrofacturasaasientomodelo");
         } else {
             $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde");

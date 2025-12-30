@@ -2546,20 +2546,69 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
         // array_push($lista, $res2);
         echo json_encode($lista, JSON_NUMERIC_CHECK);  
     }
+    // public function editar_configuracion_reporte($id,$idplandecuenta,$es_activo_fijo,$es_calculable,$orden,$negrilla_cursiva,$empresa) {
+    //     $idempresa = $this->getidempresa($empresa);
+        
+    //     $confi = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE idconfiguracion_reporte = '$id'");
+    //     $res_confi = $confi->fetch_assoc();
+    //     $existe_en_vinculacion = $this->dbc->query("SELECT *,
+    //                 CASE 
+    //                     WHEN idcuenta = '$res_confi[idplandecuenta]' THEN 'idcuenta'
+    //                     WHEN idcuenta_depreciacion = '$res_confi[idplandecuenta]' THEN 'idcuenta_depreciacion'
+    //                 END AS columna_encontrada
+    //             FROM vinculacion_cuenta_depreciacion
+    //             WHERE idcuenta = '$res_confi[idplandecuenta]' 
+    //             OR idcuenta_depreciacion = '$res_confi[idplandecuenta]'
+    //             ");
+
+    //     $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM configuracion_reporte 
+    //     WHERE idplandecuenta = '$idplandecuenta' AND idempresa = '$idempresa' AND idconfiguracion_reporte != '$id' AND idplantilla_reporte ='$res_confi[idplantilla_reporte]'");
+    //     $resultado = $consulta->fetch_assoc();
+    //     $totalRegistros = $resultado['total'];
+
+    //     if ($totalRegistros > 0) {
+    //         $res = array("danger", "El registro ya existe","editarCaracteristicassss");
+    //     }else {
+    //         if($existe_en_vinculacion->num_rows > 0){
+    //             $res_existe_vincu = $existe_en_vinculacion->fetch_assoc();
+    //             //EDITAR EN AMBAS TABLAS LA CUENTA 
+    //             $update_confi = $this->dbc->query("UPDATE configuracion_reporte
+    //                                 SET idplandecuenta = '$idplandecuenta'
+    //                                 WHERE idconfiguracion_reporte = '$id';");
+    //             if($res_existe_vincu['columna_encontrada'] == "idcuenta"){
+    //                 $update_vincu = $this->dbc->query("UPDATE vinculacion_cuenta_depreciacion
+    //                                 SET idcuenta = '$idplandecuenta'
+    //                                 WHERE idvinculacion_cuenta_depreciacion = '$res_existe_vincu[idvinculacion_cuenta_depreciacion]';");
+    //             }else{
+    //                 $update_vincu = $this->dbc->query("UPDATE vinculacion_cuenta_depreciacion
+    //                                 SET idcuenta_depreciacion = '$idplandecuenta'
+    //                                 WHERE idvinculacion_cuenta_depreciacion = '$res_existe_vincu[idvinculacion_cuenta_depreciacion]';");
+    //             }
+            
+    //         }else{
+    //             //EDITAR SOLO EN LA TABLA CONFI_REPORT
+    //             $update_confi = $this->dbc->query("UPDATE configuracion_reporte
+    //                                 SET idplandecuenta = '$idplandecuenta',
+    //                                 es_activo_fijo = '$es_activo_fijo',
+    //                                 es_calculable = '$es_calculable',
+    //                                 negrilla_cursiva = '$negrilla_cursiva'
+    //                                 WHERE idconfiguracion_reporte = '$id';");
+    //         }
+    //         // Insertar el nuevo registro
+            
+    //         if ($update_confi === TRUE) {                                                                                                                                                                
+    //             $res = array("success", "Edición exitosa","editarCaracteristicas");
+    //         } else {
+    //             $res = array("danger", "No se pudo editar");
+    //         }
+    //     }
+    //     echo json_encode($res);
+    // }
     public function editar_configuracion_reporte($id,$idplandecuenta,$es_activo_fijo,$es_calculable,$orden,$negrilla_cursiva,$empresa) {
         $idempresa = $this->getidempresa($empresa);
         
         $confi = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE idconfiguracion_reporte = '$id'");
         $res_confi = $confi->fetch_assoc();
-        $existe_en_vinculacion = $this->dbc->query("SELECT *,
-                    CASE 
-                        WHEN idcuenta = '$res_confi[idplandecuenta]' THEN 'idcuenta'
-                        WHEN idcuenta_depreciacion = '$res_confi[idplandecuenta]' THEN 'idcuenta_depreciacion'
-                    END AS columna_encontrada
-                FROM vinculacion_cuenta_depreciacion
-                WHERE idcuenta = '$res_confi[idplandecuenta]' 
-                OR idcuenta_depreciacion = '$res_confi[idplandecuenta]'
-                ");
 
         $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM configuracion_reporte 
         WHERE idplandecuenta = '$idplandecuenta' AND idempresa = '$idempresa' AND idconfiguracion_reporte != '$id' AND idplantilla_reporte ='$res_confi[idplantilla_reporte]'");
@@ -2569,31 +2618,32 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
         if ($totalRegistros > 0) {
             $res = array("danger", "El registro ya existe","editarCaracteristicassss");
         }else {
-            if($existe_en_vinculacion->num_rows > 0){
-                $res_existe_vincu = $existe_en_vinculacion->fetch_assoc();
-                //EDITAR EN AMBAS TABLAS LA CUENTA 
-                $update_confi = $this->dbc->query("UPDATE configuracion_reporte
-                                    SET idplandecuenta = '$idplandecuenta'
-                                    WHERE idconfiguracion_reporte = '$id';");
-                if($res_existe_vincu['columna_encontrada'] == "idcuenta"){
-                    $update_vincu = $this->dbc->query("UPDATE vinculacion_cuenta_depreciacion
-                                    SET idcuenta = '$idplandecuenta'
-                                    WHERE idvinculacion_cuenta_depreciacion = '$res_existe_vincu[idvinculacion_cuenta_depreciacion]';");
-                }else{
-                    $update_vincu = $this->dbc->query("UPDATE vinculacion_cuenta_depreciacion
-                                    SET idcuenta_depreciacion = '$idplandecuenta'
-                                    WHERE idvinculacion_cuenta_depreciacion = '$res_existe_vincu[idvinculacion_cuenta_depreciacion]';");
-                }
             
-            }else{
-                //EDITAR SOLO EN LA TABLA CONFI_REPORT
+            if($res_confi['orden'] == $orden){ //NO SE ESTA EDITANDO EL ORDEN EN ESTE REGISTRO
+
+            }else{ // SI SE EDITARA EL ORDEN EN ESTE REGISTRO
+                $recorrido_conf = $this->dbc->query("SELECT * FROM configuracion_reporte 
+                WHERE nombre_cuenta_superior ='$res_confi[nombre_cuenta_superior]' 
+                AND nivel_registrado = '$res_confi[nombre_cuenta_superior]' AND idempresa = '$idempresa'
+                AND orden >= '$orden' AND orden <= '$res_confi[orden]'
+                ORDER BY orden ASC
+                ");
+
+                while ($reco = $this->dbc->fetch($recorrido_conf)) {
+                    $orden_actualizado = $reco['orden'] + 1;
+                    $update_confi = $this->dbc->query("UPDATE configuracion_reporte
+                                    SET orden = '$orden_actualizado'
+                                    WHERE idconfiguracion_reporte = '$reco[idconfiguracion_reporte]';");
+                }
                 $update_confi = $this->dbc->query("UPDATE configuracion_reporte
                                     SET idplandecuenta = '$idplandecuenta',
                                     es_activo_fijo = '$es_activo_fijo',
                                     es_calculable = '$es_calculable',
-                                    negrilla_cursiva = '$negrilla_cursiva'
+                                    negrilla_cursiva = '$negrilla_cursiva',
+                                    orden = '$orden'
                                     WHERE idconfiguracion_reporte = '$id';");
             }
+            
             // Insertar el nuevo registro
             
             if ($update_confi === TRUE) {                                                                                                                                                                
@@ -3739,7 +3789,7 @@ public function select_plantilla_balance_general($idtipo_reporte,$empresa)
     //     $qwe = $this->dbc->fetch($registro);
     //     //$res=array("id"=>,"nombre"=>$qwe['nombre']); listapagarfactura
     //     return $qwe['idgestion'];
-    // }
+    // } editar_registros_padres_BG
 //activo--1    pasivo --2  patrimonio---3    ingresos---4   egresos_gastos --5  orden ---6  eliminar    editar
 }
 ?>

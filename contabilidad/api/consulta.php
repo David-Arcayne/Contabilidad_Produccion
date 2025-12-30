@@ -703,7 +703,7 @@ elseif($ver[0]=="listar_reportes_referencia"){
 // reportedetalle listar_recibo_por_id listar_recibo_por_id_otras_cuentas   eliminarcobrados lista_cobrar lista_plande listafactura listaproveedores getgestionactual -- listar_facturas   reportedetallefptclasefactura
 //    listar_recibo_otras_cuentas  listar_recibo_otras_cuentas_pagar       listar_factura           listar_recibo_pago_por_id                                             listar_recibo_por_id   --> caja bancos 
 // listar_tipo_plandecuenta listar_anular
-//       listar_recibo_por_id_otras_cuentas_pagar ---> esos dos son de recibos listar_tipo_plandecuenta listadetalletransaccion
+//       listar_recibo_por_id_otras_cuentas_pagar ---> esos dos son de recibos listar_tipo_plandecuenta listadetalletransaccion listatransacciones
 //
 // reportedetallefpt reportecomprobantecontable     listadegestion   getgestion "archivo" => $qwe['archivo'], listar_agrupacion        listar_recibo_por_id_otras_cuentas_pagar ---> esos dos son de recibos rp_listar_plantilla_normal
 

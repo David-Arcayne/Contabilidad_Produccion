@@ -742,19 +742,22 @@ WHERE md5(p.organizacion_idorganizacion)='$ide'");
         $res = "";
 
         $existe = $this->dbc->query("SELECT * FROM cuentaspof WHERE idfactura='$id'");
-        if($existe->num_rows > 0){
+        $existe_pagos = $this->dbc->query("SELECT * FROM cuentaspor WHERE idfactura='$id'");
+
+        if($existe->num_rows > 0 || $existe_pagos->num_rows > 0){
             //NO SE PODRA EDITAR EL MONTO PORQUE YA EXISTEN RECIBOS DENTRO
+            $registro = $this->dbc->query("UPDATE factura SET fecha='$fecha',nfactura='$nfactura', nautorizacion='$nautorizacion', codigocontrol='$codigocontrol', tasa0='$tasacero', export='$export', npoliza='$npoliza', iceiecdhotros='$ice', descuentobonificacion='$descuento',por_concepto_de='$concepto', proveedorcliente_idproveedorcliente='$cliente' WHERE idfactura='$id'");
 
         }else{
             //SI SE PODRA EDITAR TODO
             $registro = $this->dbc->query("UPDATE factura SET fecha='$fecha',nfactura='$nfactura', nautorizacion='$nautorizacion', codigocontrol='$codigocontrol',montofactura='$monto', tasa0='$tasacero', export='$export', npoliza='$npoliza', iceiecdhotros='$ice', descuentobonificacion='$descuento',por_concepto_de='$concepto', proveedorcliente_idproveedorcliente='$cliente' WHERE idfactura='$id'");
-            if ($registro === TRUE) {
+
+        }
+        if ($registro === TRUE) {
                 $res = array("success", "Registro Correcto", "crearfactura");
             } else {
                 $res = array("danger", "No se pudo realizar el registro ");
-            }
-        }
-        
+            }      
         echo json_encode($res);
         // echo json_encode(array($id, $fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento, $cliente,$concepto));
     }
@@ -2119,7 +2122,7 @@ WHERE
 }
 
     //listafactura listafactura_pagado registrocobrarfactura registrorelacionip lista_cobrar_cobrado_factura listaimpuestoentreplan getgestionactualid anular
-}//eliminarcobrados listapagos  listaimpuestoentreplan lista_plan_cuenta_no_vinculada lista_cobrar_cobrado_factura row cambiarestadoconsolidado crearfacturas
+}//eliminarcobrados listapagos  listaimpuestoentreplan lista_plan_cuenta_no_vinculada lista_cobrar_cobrado_factura row cambiarestadoconsolidado crearfacturas editar
 //registrardesconsolidar crearfactura   registropagarfactura listaclientes  listafacturaapi_cobrado listafacturaapi_pagado registrar_factura_cobros_tributario
 // $gestion = $this->getgestionactualid($ide); listapagos listaasientos cliente registrar_factura_cobros_tributario listafacturaapi_cobrado registrardesconsolidar  
 

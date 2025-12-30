@@ -70,27 +70,27 @@ class Cuentas_transacciones extends DB{
             //preguntar si factura es de pago y cobro
             if($factu['clasefactura'] == 2){
                 // es cobro
-                $factu_clase = $this->dbc->query("SELECT * FROM factura WHERE idorganizacion ='$idempresa' AND clasefactura='2' AND cuenta ='0' AND transacciones_idtransacciones IN(0,$dt[transacciones_idtransacciones])");
+                $factu_clase = $this->dbc->query("SELECT * FROM factura WHERE idorganizacion ='$idempresa' AND clasefactura='2' AND cuenta ='0' AND transacciones_idtransacciones IN(0,$dt[transacciones_idtransacciones]) ORDER BY fecha DESC");
 
             }else{
                 // es pago
-                $factu_clase = $this->dbc->query("SELECT * FROM factura WHERE idorganizacion ='$idempresa' AND clasefactura='1' AND cuenta ='0' AND transacciones_idtransacciones IN(0,$dt[transacciones_idtransacciones])");
+                $factu_clase = $this->dbc->query("SELECT * FROM factura WHERE idorganizacion ='$idempresa' AND clasefactura='1' AND cuenta ='0' AND transacciones_idtransacciones IN(0,$dt[transacciones_idtransacciones]) ORDER BY fecha DESC");
             }
         }else{
             //listara todas las facturas de cobro y pago porque no tiene ninguna factura todavia dentro
-            $factu_clase = $this->dbc->query("SELECT * FROM factura WHERE idorganizacion ='$idempresa' AND cuenta ='0' AND transacciones_idtransacciones IN(0,$dt[transacciones_idtransacciones])");
+            $factu_clase = $this->dbc->query("SELECT * FROM factura WHERE idorganizacion ='$idempresa' AND cuenta ='0' AND transacciones_idtransacciones IN(0,$dt[transacciones_idtransacciones]) ORDER BY fecha DESC");
         }
         while ($qwe = $this->dbc->fetch($factu_clase)) {
                if ($qwe['clasefactura'] == 2) {
                 $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $qwe['proveedorcliente_idproveedorcliente'] . "'");
                 $asd = $this->dbcm->fetch($cliente);
 
-                $res = array("id" => $qwe['idfactura'], "fecha" => $qwe['fecha'], "nfactura" => $qwe['nfactura'], "montofactura" => $qwe['montofactura'], "clasefactura" => $qwe['clasefactura'], "cobrado_pagado" => "cobro","por_concepto_de" => $qwe['por_concepto_de'],"cliente_proveedor" => $asd['nombre']);
+                $res = array("id" => $qwe['idfactura'], "fecha" => $qwe['fecha'], "nfactura" => $qwe['nfactura'], "montofactura" => $qwe['montofactura'], "clasefactura" => $qwe['clasefactura'], "tipo" => "venta","por_concepto_de" => $qwe['por_concepto_de'],"cliente_proveedor" => $asd['nombre']);
             } else {
                 $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='" . $qwe['proveedorcliente_idproveedorcliente'] . "'");
                 $asd = $this->dbcm->fetch($proveedor);
 
-                $res = array("id" => $qwe['idfactura'], "fecha" => $qwe['fecha'], "nfactura" => $qwe['nfactura'], "montofactura" => $qwe['montofactura'], "clasefactura" => $qwe['clasefactura'], "cobrado_pagado" => "pago","por_concepto_de" => $qwe['por_concepto_de'],"cliente_proveedor" => $asd['nombre']);
+                $res = array("id" => $qwe['idfactura'], "fecha" => $qwe['fecha'], "nfactura" => $qwe['nfactura'], "montofactura" => $qwe['montofactura'], "clasefactura" => $qwe['clasefactura'], "tipo" => "compra","por_concepto_de" => $qwe['por_concepto_de'],"cliente_proveedor" => $asd['nombre']);
             }
                     array_push($lista, $res);
         }
@@ -99,6 +99,9 @@ class Cuentas_transacciones extends DB{
 
     public function listar_comprobantes_cobro_pago($idcuenta,$empresa)
     {
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
         $idempresa = $this->getidempresa($empresa); 
         // $ide = $this->getidempresa($empresa);
         $lista = [];
@@ -106,16 +109,21 @@ class Cuentas_transacciones extends DB{
         $comprobante_pago = $this->dbc->query("SELECT * FROM cuentaspor WHERE cuenta = '$idcuenta'");
 
         $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion ='$idcuenta'");
-        $dt = $this->dbc->fetch($detalle_trans);
+        if($detalle_trans->num_rows > 0){
+            $dt = $this->dbc->fetch($detalle_trans); $array = [0, (int)$dt['transacciones_idtransacciones']]; 
+        } else { 
+            $array = [0]; 
+        } 
+        $array_buscar = implode(',', $array);
 
         if($comprobante_cobro->num_rows > 0){ // SOLO MOSTRAR COMPROBANTES DE COBRO
         
         //COBROS DE FACTURAS
         $cobros = $this->dbc->query("SELECT c.*,f.idorganizacion FROM cuentaspof c INNER JOIN factura f ON f.idfactura = c.idfactura
-        WHERE c.cuenta ='0' AND c.idfactura != '0' AND f.idorganizacion ='$idempresa' AND c.transaccion IN(0,$dt[transacciones_idtransacciones])");
+        WHERE c.cuenta ='0' AND c.idfactura != '0' AND f.idorganizacion ='$idempresa' AND c.transaccion IN($array_buscar) ORDER BY c.fecha DESC");
             while ($qwe = $this->dbc->fetch($cobros)) {
                
-                $res = array("idcomprobante" => $qwe['idcuentaspof'], "fecha" => $qwe['fecha'], "nrecibo" => $qwe['nrecibo'], "monto" => $qwe['monto'],"tipo" => "cobro");   
+                $res = array("idcomprobante" => $qwe['idcuentaspof'], "fecha" => $qwe['fecha'], "nrecibo" => $qwe['nrecibo'], "monto" => $qwe['monto'],"persona" => $qwe['persona'],"tipo" => "venta");   
 
                 array_push($lista, $res);
             }
@@ -125,32 +133,33 @@ class Cuentas_transacciones extends DB{
 
             //PAGOS DE FACTURAS
             $pagos = $this->dbc->query("SELECT c.*,f.idorganizacion FROM cuentaspor c INNER JOIN factura f ON f.idfactura = c.idfactura
-            WHERE c.cuenta ='0' AND c.idfactura != '0' AND f.idorganizacion ='$idempresa' AND c.transaccion IN(0,$dt[transacciones_idtransacciones])");
+            WHERE c.cuenta ='0' AND c.idfactura != '0' AND f.idorganizacion ='$idempresa' AND c.transaccion IN($array_buscar) ORDER BY c.fecha DESC");
             while ($qwe = $this->dbc->fetch($pagos)) {
                
-                $res = array("idcomprobante" => $qwe['idcuentaspor'], "fecha" => $qwe['fecha'], "nrecibo" => $qwe['nrecibo'], "monto" => $qwe['monto'],"tipo" => "pago");   
+                $res = array("idcomprobante" => $qwe['idcuentaspor'], "fecha" => $qwe['fecha'], "nrecibo" => $qwe['nrecibo'], "monto" => $qwe['monto'],"persona" => $qwe['persona'],"tipo" => "compra");   
 
                 array_push($lista, $res);
             }
 
         }else{ // NO TIENE NINGUN COBRO NI PAGO ESTA CUENTA, MOSTRAR TANTO COBROS Y PAGOS
 
-            $cobros_pagos = $this->dbc->query("SELECT c.idcuentaspof AS idcomprobante, c.fecha, c.nrecibo, c.monto, 'cobro' AS tipo
+            $cobros_pagos = $this->dbc->query("SELECT c.idcuentaspof AS idcomprobante, c.fecha, c.nrecibo, c.monto, c.persona, 'venta' AS tipo
             FROM cuentaspof c 
             INNER JOIN factura f ON f.idfactura = c.idfactura
-            WHERE c.cuenta ='0' AND c.idfactura != '0' AND f.idorganizacion ='$idempresa' AND c.transaccion IN(0,$dt[transacciones_idtransacciones])
-            
+            WHERE c.cuenta ='0' AND c.idfactura != '0' AND f.idorganizacion ='$idempresa' AND c.transaccion IN($array_buscar)
+
             UNION ALL
             
-            SELECT c.idcuentaspor AS idcomprobante, c.fecha, c.nrecibo, c.monto, 'pago' AS tipo
+            SELECT c.idcuentaspor AS idcomprobante, c.fecha, c.nrecibo, c.monto, c.persona, 'compra' AS tipo
             FROM cuentaspor c 
             INNER JOIN factura f ON f.idfactura = c.idfactura
-            WHERE c.cuenta ='0' AND c.idfactura != '0' AND f.idorganizacion ='$idempresa' AND c.transaccion IN(0,$dt[transacciones_idtransacciones])
+            WHERE c.cuenta ='0' AND c.idfactura != '0' AND f.idorganizacion ='$idempresa' AND c.transaccion IN($array_buscar)
+            ORDER BY fecha DESC
         ");
 
         while ($cp = $this->dbc->fetch($cobros_pagos)) { 
                
-                $res = array("idcomprobante" => $cp['idcomprobante'], "fecha" => $cp['fecha'], "nrecibo" => $cp['nrecibo'], "monto" => $cp['monto'],"tipo" => $cp[4]);   
+                $res = array("idcomprobante" => $cp['idcomprobante'], "fecha" => $cp['fecha'], "nrecibo" => $cp['nrecibo'], "monto" => $cp['monto'],"persona" => $cp['persona'],"tipo" => $cp[4]);   
                          
                 array_push($lista, $res);
             }

@@ -97,7 +97,7 @@ public function registrar_transaccionEn_espera($idtransaccion,$estado,$hora,$fec
             $trans_reg = $trans->fetch_assoc();
             $cod = $trans_reg['codigotransaccion'];
             $idempresa = $resultado['idempresa'];
-
+            $idgestion = $trans_reg['idgestion'];
 
             // $transEditar=$this->dbc->query("SELECT * FROM transacciones 
             // WHERE codigotransaccion >= '$cod' AND organizacion_idorganizacion = '$idempresa' 
@@ -117,59 +117,63 @@ public function registrar_transaccionEn_espera($idtransaccion,$estado,$hora,$fec
                 if($gc['formato_transaccion'] == 'por_tipo_mes'){
 
                     // Construir rango dinámico (primer y último día del mes)
-                    $fecha_inicio = date("Y-m-01", strtotime($fecha_trans)); // "2025-03-01"
-                    $fecha_fin    = date("Y-m-t", strtotime($fecha_trans));  // "2025-03-31"
+                    $fecha_inicio = date("Y-m-01", strtotime($trans_reg['fechatransaccion'])); // "2025-03-01"
+                    $fecha_fin    = date("Y-m-t", strtotime($trans_reg['fechatransaccion']));  // "2025-03-31"
 
-                    $transs=$this->dbc->query(" SELECT * FROM transacciones 
-                    WHERE codigotransaccion > '$codig' AND organizacion_idorganizacion = '$idempresa' 
-                    AND idgestion = '$idgestion' AND tipotransaccion_idtipotransaccion ='$tipo_trans'
-                    AND fechatransaccion BETWEEN '$fecha_inicio' AND '$fecha_fin'");
+                    $transs=$this->dbc->query("SELECT idtransacciones
+    FROM transacciones
+    WHERE codigotransaccion >= '$cod'
+    AND organizacion_idorganizacion = '$idempresa'
+    AND idgestion = '$idgestion'
+    AND tipotransaccion_idtipotransaccion = '{$resultado['tipotransaccion_idtipotransaccion']}'
+    AND fechatransaccion BETWEEN '$fecha_inicio' AND '$fecha_fin'
+    ORDER BY codigotransaccion DESC");
                     $aux=0;
-                    if ($transs->num_rows === 0){
-                        // $res = array("success", "Se Elimino correctamente");
-                    }else{
-                        while($qwe2=$this->dbc->fetch($transs)){
-                            $codigo =  $qwe2['codigotransaccion'];
-                            $codigo = $codigo - 1;
-                            
-                                $descTRan=$this->dbc->query("UPDATE transacciones SET codigotransaccion = '$codigo' 
-                                WHERE idtransacciones = '$qwe2[idtransacciones]'");
-                            $aux++;
-                            }  
-                    }
+                    // $codigo = $cod + 1;
+                        while($qwe2 = $transs->fetch_assoc()){
+    $this->dbc->query("
+        UPDATE transacciones
+        SET codigotransaccion = codigotransaccion + 1
+        WHERE idtransacciones = '{$qwe2['idtransacciones']}'
+    ");
+}
+                    
+                    $descTRan2=$this->dbc->query("INSERT INTO transacciones(codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
+                    VALUES('$cod','$trans_reg[fechatransaccion]','$resultado[tipodecambio]','$resultado[ndocumento]','$resultado[glosa]','1','1','$resultado[tipotransaccion_idtipotransaccion]','$resultado[idempresa]','$resultado[sucursal]','$resultado[idgestion]')");
+
                 }elseif($gc['formato_transaccion'] == 'por_tipo_gestion'){
-                    $transs=$this->dbc->query(" SELECT * FROM transacciones 
-                    WHERE codigotransaccion > '$codig' AND organizacion_idorganizacion = '$idempresa' 
-                    AND idgestion = '$idgestion' AND tipotransaccion_idtipotransaccion ='$tipo_trans'");
+                    $transs=$this->dbc->query("SELECT * FROM transacciones 
+                    WHERE codigotransaccion >= '$cod' AND organizacion_idorganizacion = '$idempresa' 
+                    AND idgestion = '$idgestion' AND tipotransaccion_idtipotransaccion ='$resultado[tipotransaccion_idtipotransaccion]'");
                     $aux=0;
-                    if ($transs->num_rows === 0){
-                        // $res = array("success", "Se Elimino correctamente");
-                    }else{
+                  
                         while($qwe2=$this->dbc->fetch($transs)){
-                            $codigo =  $qwe2['codigotransaccion'];
-                            $codigo = $codigo - 1;
+                            $codigo =  $qwe2['codigotransaccion'] + 1;
+                            // $codigo = $codigo - 1;
                             
                                 $descTRan=$this->dbc->query("UPDATE transacciones SET codigotransaccion = '$codigo' 
                                 WHERE idtransacciones = '$qwe2[idtransacciones]'");
                             $aux++;
                             }  
-                    }
+                    $descTRan2=$this->dbc->query("INSERT INTO transacciones(codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
+                    VALUES('$cod','$trans_reg[fechatransaccion]','$resultado[tipodecambio]','$resultado[ndocumento]','$resultado[glosa]','1','1','$resultado[tipotransaccion_idtipotransaccion]','$resultado[idempresa]','$resultado[sucursal]','$resultado[idgestion]')");
+
                 }else{// POR GESTION
                     $transs=$this->dbc->query("SELECT * FROM transacciones 
-                    WHERE codigotransaccion > '$codig' AND organizacion_idorganizacion = '$idempresa' AND idgestion = '$idgestion'");
+                    WHERE codigotransaccion >= '$cod' AND organizacion_idorganizacion = '$idempresa' AND idgestion = '$idgestion'");
                     $aux=0;
-                    if ($transs->num_rows === 0){
-                        // $res = array("success", "Se Elimino correctamente");
-                    }else{
+        
                         while($qwe2=$this->dbc->fetch($transs)){
-                            $codigo =  $qwe2['codigotransaccion'];
-                            $codigo = $codigo - 1;
+                            $codigo =  $qwe2['codigotransaccion'] + 1;
+                            // $codigo = $codigo + 1;
                             
                                 $descTRan=$this->dbc->query("UPDATE transacciones SET codigotransaccion = '$codigo' 
                                 WHERE idtransacciones = '$qwe2[idtransacciones]'");
                             $aux++;
                             }  
-                    }
+                    $descTRan2=$this->dbc->query("INSERT INTO transacciones(codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
+                    VALUES('$cod','$trans_reg[fechatransaccion]','$resultado[tipodecambio]','$resultado[ndocumento]','$resultado[glosa]','1','1','$resultado[tipotransaccion_idtipotransaccion]','$resultado[idempresa]','$resultado[sucursal]','$resultado[idgestion]')");
+
                 }
             if($descTRan2===TRUE){
                     

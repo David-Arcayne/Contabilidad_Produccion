@@ -750,18 +750,41 @@ while ($qwe = $this->dbc->fetch($registro)) {
     
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
-    public function editar_otras_cuentas($idotras_cuentas,$fecha,$lugar,$id_cliente_proveedor,$nro_tributario,$contacto,$nro_doc_identidad,$idtipo,$concepto,$condiciones,$observaciones,$precio,$forma_pago,$fecha_venci) {
+    public function editar_otras_cuentas($idotras_cuentas,$fecha,$lugar,$id_cliente_proveedor,$nro_tributario,$contacto,$nro_doc_identidad,$idtipo,$concepto,$condiciones,$observaciones,$precio,$forma_pago,$fecha_venci,$archivo) {
         // $idempresa = $this->getidempresa($empresa);
 
         // $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM caracteristicas WHERE caracteristica = '$nombre' AND empresa_idempresa = '$idempresa' AND idcaracteristicas != '$id'");
         // $resultado = $consulta->fetch_assoc();
         // $totalRegistros = $resultado['total'];
 
-        if (0 > 0) {
-            $res = array("Error", "El registro ya existe","editarCaracteristicas");
-        }else {
-            // Insertar el nuevo registro
-            $registroListaCompra = $this->dbc->query("UPDATE otras_cuentas
+        // if (0 > 0) {
+        //     $res = array("Error", "El registro ya existe","editarCaracteristicas");
+        // }else {
+        //     // Insertar el nuevo registro
+        //     $registroListaCompra = $this->dbc->query("UPDATE otras_cuentas
+        //                             SET fecha = '$fecha',
+        //                             lugar = '$lugar',
+        //                             id_cliente_proveedor = '$id_cliente_proveedor',
+        //                             nro_tributario = '$nro_tributario',
+        //                             contacto = '$contacto',
+        //                             nro_doc_identidad = '$nro_doc_identidad',
+        //                             idtipo = '$idtipo',
+        //                             concepto = '$concepto',
+        //                             condiciones = '$condiciones',
+        //                             observaciones = '$observaciones',
+        //                             precio = '$precio',
+        //                             forma_pago = '$forma_pago',
+        //                             fecha_venci = '$fecha_venci',
+        //                             archivo = '$archivo'
+        //                             WHERE idotras_cuentas = '$idotras_cuentas';");
+        //     if ($registroListaCompra === TRUE) {                                                                                                                                                                
+        //         $res = array("success", "Edición exitosa","editarCaracteristicas");
+        //     } else {
+        //         $res = array("danger", "No se pudo editar");
+        //     }
+        if(empty($archivo['name'])){
+
+                $editar_otras_cuentas = $this->dbc->query("UPDATE otras_cuentas
                                     SET fecha = '$fecha',
                                     lugar = '$lugar',
                                     id_cliente_proveedor = '$id_cliente_proveedor',
@@ -776,14 +799,58 @@ while ($qwe = $this->dbc->fetch($registro)) {
                                     forma_pago = '$forma_pago',
                                     fecha_venci = '$fecha_venci'
                                     WHERE idotras_cuentas = '$idotras_cuentas';");
-            if ($registroListaCompra === TRUE) {                                                                                                                                                                
-                $res = array("success", "Edición exitosa","editarCaracteristicas");
+            if ($editar_otras_cuentas === TRUE) {
+                $res = array("success", "Registro Realizado", "registrocobrarfactura",$archivo);
             } else {
-                $res = array("danger", "No se pudo editar");
+                $res = array("danger", "No se pudo realizar el registro");
+            }
+        }else{
+         // Manejar la carga del archivo
+            $archivo_nombre = "";
+            if ($archivo['error'] == UPLOAD_ERR_OK) {
+                $archivo_tmp = $archivo['tmp_name'];
+                $archivo_nombre = basename($archivo['name']);
+                // ----------------------------------
+                $unique_name = uniqid("img_", true) . '.' . $archivo_nombre;
+                // $target_file = $target_dir . $unique_name;
+
+                // $ruta_destino = __DIR__ . "/archivos/" . $archivo_nombre;
+                $ruta_destino = "../archivos/" . $unique_name;
+                // $ruta_destino = "../archivos/" . $archivo_nombre;
+                // move_uploaded_file($archivo_tmp, $ruta_destino);
+            }
+            if(move_uploaded_file($archivo_tmp, $ruta_destino)){
+                //registrar pago, preguntar guardar la anterior transaccion o la nueva
+                $editar_otras_cuentas = $this->dbc->query("UPDATE otras_cuentas
+                                    SET fecha = '$fecha',
+                                    lugar = '$lugar',
+                                    id_cliente_proveedor = '$id_cliente_proveedor',
+                                    nro_tributario = '$nro_tributario',
+                                    contacto = '$contacto',
+                                    nro_doc_identidad = '$nro_doc_identidad',
+                                    idtipo = '$idtipo',
+                                    concepto = '$concepto',
+                                    condiciones = '$condiciones',
+                                    observaciones = '$observaciones',
+                                    precio = '$precio',
+                                    forma_pago = '$forma_pago',
+                                    fecha_venci = '$fecha_venci',
+                                    archivo = '$unique_name'
+                                    WHERE idotras_cuentas = '$idotras_cuentas';");
+
+            if ($editar_otras_cuentas === TRUE) {
+                $res = array("success", "Edicion Realizada", "editar_otras_cuentas");
+            } else {
+                $res = array("danger", "No se pudo realizar el registro");
+            }
+            }else{
+                $res = array("danger", "No se movio el archivo a la carpeta");
             }
         }
-        echo json_encode($res);
-    }
+            echo json_encode($res);
+        }
+        
+    
 
 // ------------------------------------------------------------------------------------------------------
 
