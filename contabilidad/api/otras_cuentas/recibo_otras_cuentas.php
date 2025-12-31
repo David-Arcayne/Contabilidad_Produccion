@@ -284,7 +284,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
         // $idempresa = $this->getidempresa($empresa); 
     
         // Preparar la consulta
-      $listado = $this->dbc->query("SELECT c.idrecibo,c.nro_recibo,c.fecha,c.monto,c.persona,c.ci,c.transaccion,c.archivo,c.lugar FROM recibo as c WHERE c.idotras_cuentas='$idotras_cuentas'");
+      $listado = $this->dbc->query("SELECT c.idrecibo,c.nro_recibo,c.fecha,c.monto,c.persona,c.ci,c.transaccion,c.archivo,c.lugar,c.concepto FROM recibo as c WHERE c.idotras_cuentas='$idotras_cuentas'");
      while ($qwe = $this->dbc->fetch($listado)) {
         $comprobante = $this->dbc->query("SELECT * FROM cuentaspof WHERE idrecibo='$qwe[idrecibo]'");
         $compr = $comprobante->fetch_assoc();
@@ -296,7 +296,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
           "fecha" => $qwe[2], "monto" => $qwe[3], "persona" => $qwe[4],
            "ci" => $qwe[5],"transaccion" => $qwe[6],
             "codigotransaccion" => $idtr['codigotransaccion'],
-            "nombre_archivo" => $qwe[7],"lugar" => $qwe[8], "idcomprobante" => $compr['idcuentaspof']);
+            "nombre_archivo" => $qwe[7],"lugar" => $qwe[8], "idcomprobante" => $compr['idcuentaspof'],"concepto" => $qwe['concepto']);
          array_push($lista, $res);
      }
     
@@ -1057,7 +1057,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
         // $idempresa = $this->getidempresa($empresa); 
     
         // Preparar la consulta
-      $listado = $this->dbc->query("SELECT c.idrecibo,c.nro_recibo,c.fecha,c.monto,c.persona,c.ci,c.transaccion,c.archivo,c.lugar FROM recibo as c WHERE c.idotras_cuentas='$idotras_cuentas'");
+      $listado = $this->dbc->query("SELECT c.idrecibo,c.nro_recibo,c.fecha,c.monto,c.persona,c.ci,c.transaccion,c.archivo,c.lugar,c.concepto FROM recibo as c WHERE c.idotras_cuentas='$idotras_cuentas'");
      while ($qwe = $this->dbc->fetch($listado)) {
 
         $comprobante = $this->dbc->query("SELECT * FROM cuentaspor WHERE idrecibo='$qwe[idrecibo]'");
@@ -1070,7 +1070,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
           "fecha" => $qwe[2], "monto" => $qwe[3], "persona" => $qwe[4],
            "ci" => $qwe[5],"transaccion" => $qwe[6],
             "codigotransaccion" => $idtr['codigotransaccion'],
-            "nombre_archivo" => $qwe[7],"lugar" => $qwe[8],"idcomprobante" => $compr['idcuentaspor']);
+            "nombre_archivo" => $qwe[7],"lugar" => $qwe[8],"idcomprobante" => $compr['idcuentaspor'],"concepto" => $qwe['concepto']);
          array_push($lista, $res);
      }
     
