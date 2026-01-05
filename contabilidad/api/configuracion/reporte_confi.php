@@ -2619,7 +2619,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
             $res = array("danger", "El registro ya existe","editarCaracteristicassss");
         }else {
             
-            if($res_confi['orden'] == $orden){ //NO SE ESTA EDITANDO EL ORDEN EN ESTE REGISTRO
+            if($res_confi['orden'] === $orden){ //NO SE ESTA EDITANDO EL ORDEN EN ESTE REGISTRO
 
             }else{ // SI SE EDITARA EL ORDEN EN ESTE REGISTRO
                 $recorrido_conf = $this->dbc->query("SELECT * FROM configuracion_reporte 
