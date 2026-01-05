@@ -2621,20 +2621,39 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
             
             if($res_confi['orden'] === $orden){ //NO SE ESTA EDITANDO EL ORDEN EN ESTE REGISTRO
 
-            }else{ // SI SE EDITARA EL ORDEN EN ESTE REGISTRO
-                $recorrido_conf = $this->dbc->query("SELECT * FROM configuracion_reporte 
-                WHERE nombre_cuenta_superior ='$res_confi[nombre_cuenta_superior]' 
-                AND nivel_registrado = '$res_confi[nombre_cuenta_superior]' AND idempresa = '$idempresa'
-                AND orden >= '$orden' AND orden <= '$res_confi[orden]'
-                ORDER BY orden ASC
-                ");
+            }elseif($orden < $res_confi['orden']){ // SI QUIEREN CAMBIAR EL ORDEN
 
-                while ($reco = $this->dbc->fetch($recorrido_conf)) {
-                    $orden_actualizado = $reco['orden'] + 1;
-                    $update_confi = $this->dbc->query("UPDATE configuracion_reporte
-                                    SET orden = '$orden_actualizado'
-                                    WHERE idconfiguracion_reporte = '$reco[idconfiguracion_reporte]';");
+                    $recorrido_conf_menor = $this->dbc->query("SELECT * FROM configuracion_reporte 
+                    WHERE nombre_cuenta_superior ='$res_confi[nombre_cuenta_superior]' 
+                    AND nivel_registrado = '$res_confi[nivel_registrado]' AND idempresa = '$idempresa'
+                    AND orden >= '$orden' AND orden < '$res_confi[orden]'
+                    ORDER BY orden ASC
+                    ");
+                //EL NUEVO ORDEN ES MENOR QUE EL ORDEN Q YA ESTA REGISTRADO
+                    while ($reco = $this->dbc->fetch($recorrido_conf_menor)) {
+                        $orden_actualizado = $reco['orden'] + 1;
+
+                        $update_confi_reco = $this->dbc->query("UPDATE configuracion_reporte
+                                        SET orden = '$orden_actualizado'
+                                        WHERE idconfiguracion_reporte = '$reco[idconfiguracion_reporte]';");
+                    }
+            }elseif($orden > $res_confi['orden']){
+                    $recorrido_conf_mayor = $this->dbc->query("SELECT * FROM configuracion_reporte 
+                    WHERE nombre_cuenta_superior ='$res_confi[nombre_cuenta_superior]' 
+                    AND nivel_registrado = '$res_confi[nivel_registrado]' AND idempresa = '$idempresa'
+                    AND orden > '$res_confi[orden]' AND orden <= '$orden'
+                    ORDER BY orden ASC
+                    ");
+                //EL NUEVO ORDEN ES MAYOR QUE EL ORDEN Q YA ESTA REGISTRADO
+                    while ($reco = $this->dbc->fetch($recorrido_conf_mayor)) {
+                        $orden_actualizado = $reco['orden'] - 1;
+
+                        $update_confi_reco = $this->dbc->query("UPDATE configuracion_reporte
+                                        SET orden = '$orden_actualizado'
+                                        WHERE idconfiguracion_reporte = '$reco[idconfiguracion_reporte]';");
+                    }
                 }
+
                 $update_confi = $this->dbc->query("UPDATE configuracion_reporte
                                     SET idplandecuenta = '$idplandecuenta',
                                     es_activo_fijo = '$es_activo_fijo',
@@ -2651,9 +2670,10 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
             } else {
                 $res = array("danger", "No se pudo editar");
             }
-        }
+        
         echo json_encode($res);
-    }
+        }
+    
     // public function eliminar_configuracion_reporte($id){
         
     //         // $consulta3 = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE idconfiguracion_reporte = '$id'");
