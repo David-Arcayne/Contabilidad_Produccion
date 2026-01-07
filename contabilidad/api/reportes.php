@@ -91,7 +91,7 @@ public function getidgestion($md5){
         echo json_encode($lista);
     }
 
-    public function reportedetalletransaccion($fechai,$fechaf,$mes_año,$cadena_tipo,$empresa){
+    public function reportedetalletransaccion($fechai,$fechaf,$mes_año,$cadena_tipo,$empresa,$consolidados){
     //  echo json_encode(array($fechai,$fechaf,$mes_año,$cadena_tipo,$empresa));
       ini_set('display_errors', 1);
       ini_set('display_startup_errors', 1);
@@ -111,6 +111,11 @@ public function getidgestion($md5){
           $tipo_aux = "";
         }else{
           $tipo_aux = "AND t.tipotransaccion_idtipotransaccion IN ($tipos)";
+        }
+        if($consolidados == 'si'){
+          $consoli_aux = "AND t.consolidar = '2'";
+        }else{ // no
+          $consoli_aux = "";
         }
         if($gc['formato_transaccion'] == 'por_tipo_mes') {
           //
@@ -145,6 +150,7 @@ public function getidgestion($md5){
             AND t.fechatransaccion <= '$fin'
             AND t.estado NOT IN (4, 5, 6)
             $tipo_aux
+            $consoli_aux
             ORDER BY 
             YEAR(t.fechatransaccion) ASC,
             MONTH(t.fechatransaccion) ASC,
@@ -169,6 +175,7 @@ public function getidgestion($md5){
             AND t.fechatransaccion <= '$fechaf'
             AND t.estado NOT IN (4, 5, 6)
             $tipo_aux
+            $consoli_aux
             ORDER BY 
             YEAR(t.fechatransaccion) ASC,
             MONTH(t.fechatransaccion) ASC,
@@ -199,6 +206,7 @@ public function getidgestion($md5){
                 AND t.fechatransaccion <= '$fechaf'
                 AND t.estado NOT IN (4, 5, 6)
                 $tipo_aux
+                $consoli_aux
             ORDER BY 
                 t.idgestion ASC,           -- Agrupar por gestión
                 t.tipotransaccion_idtipotransaccion ASC,  -- Agrupar y ordenar por tipo
@@ -223,6 +231,7 @@ public function getidgestion($md5){
           AND t.estado NOT IN (4, 5, 6)
           AND t.idgestion='$gestion'
           $tipo_aux
+          $consoli_aux
           ORDER BY t.codigotransaccion ASC");
         }
 
@@ -253,7 +262,7 @@ public function getidgestion($md5){
         echo json_encode($total);
     }
 
-    public function reportedetallefpt($fechai,$fechaf,$mes_año,$cadena_tipo,$clase_factura,$empresa){
+    public function reportedetallefpt($fechai,$fechaf,$mes_año,$cadena_tipo,$clase_factura,$empresa,$consolidados){
       // ini_set('display_errors', 1);
       // ini_set('display_startup_errors', 1);
       // error_reporting(E_ALL);
@@ -272,6 +281,11 @@ public function getidgestion($md5){
           $tipo_aux = "";
         }else{
           $tipo_aux = "AND t.tipotransaccion_idtipotransaccion IN ($tipos)";
+        }
+        if($consolidados == 'si'){
+          $consoli_aux = "AND t.consolidar = '2'";
+        }else{ // no
+          $consoli_aux = "";
         }
         if($gc['formato_transaccion'] == 'por_tipo_mes') {
           //
@@ -306,6 +320,7 @@ public function getidgestion($md5){
             AND t.fechatransaccion <= '$fin'
             AND t.estado NOT IN (4, 5, 6)
             $tipo_aux
+            $consoli_aux
             ORDER BY 
             YEAR(t.fechatransaccion) ASC,
             MONTH(t.fechatransaccion) ASC,
@@ -330,6 +345,7 @@ public function getidgestion($md5){
             AND t.fechatransaccion <= '$fechaf'
             AND t.estado NOT IN (4, 5, 6)
             $tipo_aux
+            $consoli_aux
             ORDER BY 
             YEAR(t.fechatransaccion) ASC,
             MONTH(t.fechatransaccion) ASC,
@@ -360,6 +376,7 @@ public function getidgestion($md5){
                 AND t.fechatransaccion <= '$fechaf'
                 AND t.estado NOT IN (4, 5, 6)
                 $tipo_aux
+                $consoli_aux
             ORDER BY 
                 t.idgestion ASC,           -- Agrupar por gestión
                 t.tipotransaccion_idtipotransaccion ASC,  -- Agrupar y ordenar por tipo
@@ -384,6 +401,7 @@ public function getidgestion($md5){
           AND t.estado NOT IN (4, 5, 6)
           AND t.idgestion='$gestion'
           $tipo_aux
+          $consoli_aux
           ORDER BY t.codigotransaccion DESC");
         }
 
@@ -479,223 +497,6 @@ public function getidgestion($md5){
         
         echo json_encode($lista);
     }
-
-
-    public function reportedetallefptclasefactura($fechai, $fechaf, $empresa, $clasefactura) {
-      $lista = [];
-  
-      // Obtener datos iniciales
-      $ide = $this->getidempresa($empresa);
-      $gestion = $this->getidgestion($empresa);
-  
-       $gestion_sel = $this->dbc->query("SELECT * FROM gestion WHERE idgestion='$gestion'");
-        $gc = $gestion_sel->fetch_assoc();
-      
-        $array_tipos = array_map('intval', explode(",", $cadena_tipo));
-        $tipos = implode(",", $array_tipos);
-
-        if(empty($tipos) || $tipos == '0'){
-          $tipo_aux = "";
-        }else{
-          $tipo_aux = "AND t.tipotransaccion_idtipotransaccion IN ('$tipos')";
-        }
-        if($gc['formato_transaccion'] == 'por_tipo_mes') {
-          //
-          if($mes_año != "0"){ // EL FILTRO TENDRA MES_AÑO
-
-            // Crear objeto DateTime con el primer día del mes
-            $fechaInicio = DateTime::createFromFormat('Y-m', $mes_año);
-            $fechaInicio->modify('first day of this month');
-
-            // Clonar y calcular último día del mes
-            $fechaFin = clone $fechaInicio;
-            $fechaFin->modify('last day of this month');
-
-            // Formatear a YYYY-MM-DD
-            $inicio = $fechaInicio->format('Y-m-d');
-            $fin    = $fechaFin->format('Y-m-d');
-
-            $transacciones=$this->dbc->query("SELECT 
-                t.codigotransaccion,
-                t.fechatransaccion,
-                t.glosa,
-                t.idtransacciones,
-                t.estado,
-                t.consolidar,
-                t.tipotransaccion_idtipotransaccion,
-                t.idgestion,
-                t.tipodecambio
-            FROM transacciones t
-            WHERE t.idgestion = '$gestion'
-            AND t.organizacion_idorganizacion = '$ide'
-            AND t.fechatransaccion >= '$inicio'
-            AND t.fechatransaccion <= '$fin'
-            AND t.estado NOT IN (4, 5, 6)
-            $tipo_aux
-            ORDER BY 
-            YEAR(t.fechatransaccion) ASC,
-            MONTH(t.fechatransaccion) ASC,
-            t.tipotransaccion_idtipotransaccion ASC,
-            t.codigotransaccion ASC;");
-
-          }elseif($mes_año == "0"){// EL FILTRO NO TENDRA MES_AÑO
-              $transacciones=$this->dbc->query("SELECT 
-                t.codigotransaccion,
-                t.fechatransaccion,
-                t.glosa,
-                t.idtransacciones,
-                t.estado,
-                t.consolidar,
-                t.tipotransaccion_idtipotransaccion,
-                t.idgestion,
-                t.tipodecambio
-            FROM transacciones t
-            WHERE t.idgestion = '$gestion'
-            AND t.organizacion_idorganizacion = '$ide'
-            AND t.fechatransaccion >= '$fechai'
-            AND t.fechatransaccion <= '$fechaf'
-            AND t.estado NOT IN (4, 5, 6)
-            $tipo_aux
-            ORDER BY 
-            YEAR(t.fechatransaccion) ASC,
-            MONTH(t.fechatransaccion) ASC,
-            t.tipotransaccion_idtipotransaccion ASC,
-            t.codigotransaccion ASC;");
-          }
-
-        }elseif($gc['formato_transaccion'] == 'por_tipo_gestion'){
-
-          $transacciones = $this->dbc->query("SELECT 
-              t.codigotransaccion,
-              t.fechatransaccion,
-              t.glosa,
-              t.idtransacciones,
-              t.estado,
-              t.consolidar,
-              t.tipotransaccion_idtipotransaccion,
-              t.idgestion,
-              t.tipodecambio,
-                -- g.gestion AS gestion_anio,
-              tt.nombre AS tipo_nombre
-            FROM transacciones t
-            LEFT JOIN gestion g ON g.idgestion = t.idgestion
-            LEFT JOIN tipotransaccion tt ON tt.idtipotransaccion = t.tipotransaccion_idtipotransaccion
-            WHERE t.organizacion_idorganizacion = '$ide'
-                AND t.idgestion = '$gestion'
-                AND t.fechatransaccion >= '$fechai'
-                AND t.fechatransaccion <= '$fechaf'
-                AND t.estado NOT IN (4, 5, 6)
-                $tipo_aux
-            ORDER BY 
-                t.idgestion ASC,           -- Agrupar por gestión
-                t.tipotransaccion_idtipotransaccion ASC,  -- Agrupar y ordenar por tipo
-                t.fechatransaccion ASC,        -- Orden cronológico dentro del tipo
-                t.codigotransaccion ASC;       -- Correlativo correcto
-            ");
-
-        }else{ //POR GESTION
-          $transacciones=$this->dbc->query("SELECT
-          t.codigotransaccion,
-          t.fechatransaccion,
-          t.glosa,
-          t.idtransacciones,
-          t.estado,
-          t.organizacion_idorganizacion,
-          t.idgestion
-        FROM
-          transacciones AS t
-        WHERE t.organizacion_idorganizacion = '$ide'
-          AND t.fechatransaccion >= '$fechai'
-          AND t.fechatransaccion <= '$fechaf'
-          AND t.estado NOT IN (4, 5, 6)
-          AND t.idgestion='$gestion'
-          $tipo_aux
-          ORDER BY t.codigotransaccion DESC");
-        }
-     //***************************************************************************************** */
-      // Obtener todas las transacciones relevantes
-      $transacciones = $this->dbc->query("SELECT DISTINCT t.codigotransaccion, t.fechatransaccion, t.glosa, t.estado, t.idtransacciones
-          FROM transacciones AS t
-          LEFT JOIN factura AS f ON t.idtransacciones = f.transacciones_idtransacciones
-          WHERE t.organizacion_idorganizacion = '$ide'
-            AND t.fechatransaccion >= '$fechai'
-            AND t.fechatransaccion <= '$fechaf'
-            AND t.idgestion = '$gestion'
-            AND f.clasefactura = '$clasefactura'
-      ");
-  
-      // Obtener las facturas relacionadas (filtrando por clasefactura)
-      $facturasPorTransaccion = [];
-      $facturas = $this->dbc->query("SELECT 
-              f.transacciones_idtransacciones AS transaccion_id,
-              f.fecha,
-              f.nfactura,
-              f.montofactura,
-              f.clasefactura,
-              f.proveedorcliente_idproveedorcliente,
-              CASE 
-                  WHEN f.clasefactura = 1 THEN 'proveedor'
-                  WHEN f.clasefactura = 2 THEN 'cliente'
-              END AS tipo_relacion
-          FROM factura AS f
-          WHERE f.clasefactura = '$clasefactura'
-      ");
-  
-      // Organizar facturas por transacción
-      while ($factura = $this->dbc->fetch($facturas)) {
-          $facturasPorTransaccion[$factura['transaccion_id']][] = $factura;
-      }
-  
-      // Obtener todos los datos de proveedor o cliente en una sola consulta
-      $datosRelacionados = [];
-      if ($clasefactura == 1) {
-          $proveedores = $this->dbcm->query("SELECT id_proveedor AS id, nit, nombre FROM proveedor");
-          while ($prov = $this->dbcm->fetch($proveedores)) {
-              $datosRelacionados[$prov['id']] = ['nit' => $prov['nit'], 'nombre' => $prov['nombre']];
-          }
-      } elseif ($clasefactura == 2) {
-          $clientes = $this->dbcm->query("SELECT id_cliente AS id, nit, nombre FROM cliente");
-          while ($cli = $this->dbcm->fetch($clientes)) {
-              $datosRelacionados[$cli['id']] = ['nit' => $cli['nit'], 'nombre' => $cli['nombre']];
-          }
-      }
-  
-      // Procesar transacciones y asociar facturas
-      while ($transaccion = $this->dbc->fetch($transacciones)) {
-          $idTransaccion = $transaccion['idtransacciones'];
-          $facturas = $facturasPorTransaccion[$idTransaccion] ?? [];
-          $facturasProcesadas = [];
-  
-          foreach ($facturas as $factura) {
-              $idRelacion = $factura['proveedorcliente_idproveedorcliente'];
-              $relacion = $datosRelacionados[$idRelacion] ?? ['nit' => null, 'nombre' => null];
-  
-              $facturasProcesadas[] = [
-                  'fecha' => $factura['fecha'],
-                  'nfactura' => $factura['nfactura'],
-                  'monto' => $factura['montofactura'],
-                  'clasefactura' => $factura['clasefactura'],
-                  'nit' => $relacion['nit'],
-                  'proveedor' => $relacion['nombre'],
-              ];
-          }
-  
-          // Solo agregar la transacción si tiene facturas procesadas
-          if (!empty($facturasProcesadas)) {
-              $lista[] = [
-                  'transaccion' => $transaccion['codigotransaccion'],
-                  'fechat' => $transaccion['fechatransaccion'],
-                  'estado' => $transaccion['estado'],
-                  'facturas' => $facturasProcesadas,
-              ];
-          }
-      }
-  
-      // Devolver la lista como JSON
-      echo json_encode($lista);
-  }
-  
-  
 
     public function reportebalancedesumasysaldosB($fechai,$fechaf,$empresa){
         $lista=[];
@@ -982,216 +783,8 @@ $totalHaber = 0;
       }
           */
     }
-    public function reportebalancegeneral($fechai,$fechaf,$numeroa,$numerob,$empresa){
-        $lista=[];
-        $ide=$this->getidempresa($empresa);
-        $gestion=$this->getidgestion($empresa);
-        $registro=$this->dbc->query("SELECT
-        p.numero,
-        p.nombreplan,
-        p.idplandecuenta
-      from
-        plandecuenta as p
-      WHERE
-        p.numero >= '$numeroa'
-        and p.numero < '$numerob'
-        and p.organizacion_idorganizacion = '$ide'
-      order by
-        p.numero ASC;
-      ");
 
-
-        while($qwe=$this->dbc->fetch($registro)){
-            $detalle=$this->dbc->query("SELECT
-            SUM(d.debe) - SUM(d.haber) AS total,
-            d.idplandecuenta
-          FROM
-            detalletransaccion AS d,
-            transacciones AS t
-          WHERE
-            d.idplandecuenta = '$qwe[2]'
-            AND t.idgestion = '$gestion'
-            AND t.fechatransaccion>='$fechai'
-            AND t.fechatransaccion<='$fechaf'
-            AND t.consolidar = 2
-            AND t.idtransacciones = d.transacciones_idtransacciones");
-            $asd=$this->dbc->fetch($detalle);
-            if($qwe[2]==$asd[1]){
-            $res=array("numero"=>$qwe[0],"plan"=>$qwe[1],"total"=>$asd[0]);
-            array_push($lista,$res);
-            }
-            
-        }
-        echo json_encode($lista);
-    }
-
-    public function reportebalancegeneralpp($fechai,$fechaf,$numeroa,$numerob,$empresa){
-      $lista=[];
-      $ide=$this->getidempresa($empresa);
-      $gestion=$this->getidgestion($empresa);
-      $registro=$this->dbc->query("SELECT
-      p.numero,
-      p.nombreplan,
-      p.idplandecuenta,
-      p.saldonormal
-    from
-      plandecuenta as p
-    WHERE
-      p.numero >= '$numeroa'
-      and p.numero < '$numerob'
-      and p.organizacion_idorganizacion = '$ide'
-    order by
-      p.numero ASC;
-    ");
-      while($qwe=$this->dbc->fetch($registro)){
-        if($qwe[3]=="DEBE"){
-          $detalle=$this->dbc->query("SELECT
-          SUM(d.debe) - SUM(d.haber) AS total,
-          d.idplandecuenta
-        FROM
-          detalletransaccion AS d,
-          transacciones as t
-        WHERE
-          d.idplandecuenta = '$qwe[2]'
-          AND t.idgestion = '$gestion'
-          AND t.fechatransaccion>='$fechai'
-          AND t.fechatransaccion<='$fechaf'
-          AND t.consolidar = 2
-          AND t.idtransacciones = d.transacciones_idtransacciones");
-          $asd=$this->dbc->fetch($detalle);
-          if($qwe[2]==$asd[1]){
-          $res=array("numero"=>$qwe[0],"plan"=>$qwe[1],"total"=>$asd[0]);
-          array_push($lista,$res);
-          }
-        }else{
-          $detalle=$this->dbc->query("SELECT
-          SUM(d.haber) - SUM(d.debe) AS total,
-          d.idplandecuenta
-        FROM
-          detalletransaccion AS d,
-          transacciones AS t
-        WHERE
-          d.idplandecuenta = '$qwe[2]'
-          AND t.idgestion = '$gestion'
-          AND t.fechatransaccion>='$fechai'
-          AND t.fechatransaccion<='$fechaf'
-          AND t.consolidar = 2
-          AND t.idtransacciones = d.transacciones_idtransacciones");
-          $asd=$this->dbc->fetch($detalle);
-          if($qwe[2]==$asd[1]){
-          $res=array("numero"=>$qwe[0],"plan"=>$qwe[1],"total"=>$asd[0]);
-          array_push($lista,$res);
-          } 
-        }
-          
-      }
-      echo json_encode($lista);
-  }
-
-
-    public function reportebalancegeneralhasta($fechai,$fechaf,$numeroa,$numerob,$empresa){
-        $lista=[];
-        $ide=$this->getidempresa($empresa);
-        $gestion=$this->getidgestion($empresa);
-        
-        $registro=$this->dbc->query("SELECT
-        p.numero,
-        p.nombreplan,
-        p.idplandecuenta
-      from
-        plandecuenta as p
-      WHERE
-        p.numero >= '$numeroa'
-        and p.numero < '$numerob'
-        and p.organizacion_idorganizacion = '$ide'
-      order by
-        p.numero ASC;
-      ");
-        while($qwe=$this->dbc->fetch($registro)){
-            
-            $detalle=$this->dbc->query("select
-            SUM(d.debe) - SUM(d.haber) as total,
-            d.idplandecuenta
-          from
-            detalletransaccion as d,
-            transacciones as t
-          where
-            d.idplandecuenta = '$qwe[2]'
-            and t.idgestion = '$gestion'
-            and t.fechatransaccion<='$fechaf'
-            and t.idtransacciones = d.transacciones_idtransacciones");
-            $asd=$this->dbc->fetch($detalle);
-            if($qwe[2]==$asd[1]){
-            $res=array("numero"=>$qwe[0],"plan"=>$qwe[1],"total"=>$asd[0]);
-            array_push($lista,$res);
-            }
-            
-        }
-        echo json_encode($lista);
-    }
-
-    public function reportebalancegeneralhastapp($fechai,$fechaf,$numeroa,$numerob,$empresa){
-      $lista=[];
-      $ide=$this->getidempresa($empresa);
-      $gestion=$this->getidgestion($empresa);
-      $registro=$this->dbc->query("SELECT
-      p.numero,
-      p.nombreplan,
-      p.idplandecuenta,
-      p.saldonormal
-    from
-      plandecuenta as p
-    WHERE
-      p.numero >= '$numeroa'
-      and p.numero < '$numerob'
-      and p.organizacion_idorganizacion = '$ide'
-    order by
-      p.numero ASC;
-    ");
-      while($qwe=$this->dbc->fetch($registro)){
-          if($qwe[3]=="DEBE"){
-          $detalle=$this->dbc->query("select
-          SUM(d.debe) - SUM(d.haber) as total,
-          d.idplandecuenta
-        from
-          detalletransaccion as d,
-          transacciones as t
-        where
-          d.idplandecuenta = '$qwe[2]'
-          and t.idgestion = '$gestion'
-          and t.fechatransaccion<='$fechaf'
-          and t.idtransacciones = d.transacciones_idtransacciones");
-          $asd=$this->dbc->fetch($detalle);
-          if($qwe[2]==$asd[1]){
-          $res=array("numero"=>$qwe[0],"plan"=>$qwe[1],"total"=>$asd[0]);
-          array_push($lista,$res);
-          }
-          }else{
-          $detalle=$this->dbc->query("select
-          SUM(d.haber) - SUM(d.debe) as total,
-          d.idplandecuenta
-        from
-          detalletransaccion as d,
-          transacciones as t
-        where
-          d.idplandecuenta = '$qwe[2]'
-          and t.idgestion = '$gestion'
-          and t.fechatransaccion<='$fechaf'
-          and t.idtransacciones = d.transacciones_idtransacciones");
-          $asd=$this->dbc->fetch($detalle);
-          if($qwe[2]==$asd[1]){
-          $res=array("numero"=>$qwe[0],"plan"=>$qwe[1],"total"=>$asd[0]);
-          array_push($lista,$res);
-          }
-        }
-        
-          
-          
-      }
-      echo json_encode($lista);
-  }
-
-  public function reportecomprobantecontable($numeroIni,$numeroFin,$fechaIni,$fechaFin,$mes_año,$cadena_tipo,$empresa,$factura){
+  public function reportecomprobantecontable($numeroIni,$numeroFin,$fechaIni,$fechaFin,$mes_año,$cadena_tipo,$empresa,$factura,$consolidados){
 //reporteactivodiaponible          La fecha, persona, ci, Nro comprobante y el monto
 // echo json_encode(array($fechaIni,$fechaFin,$numeroIni,$numeroFin,$empresa,$factura));
     // ini_set('display_errors', 1);
@@ -1213,36 +806,14 @@ $totalHaber = 0;
         }else{
           $tipo_aux = "AND t.tipotransaccion_idtipotransaccion IN ($tipos)";
         }
+        if($consolidados == 'si'){
+          $consoli_aux = "AND t.consolidar = '2'";
+        }else{ // no
+          $consoli_aux = "";
+        }
         if($gc['formato_transaccion'] == 'por_tipo_mes') {
           if($fechaIni != "null" && $fechaIni != "null"){
-          //   $registro=$this->dbc->query("SELECT
-          //   t.codigotransaccion,
-          //   t.fechatransaccion,
-          //   t.ndocumento,
-          //   t.glosa,
-          //   t.tipotransaccion_idtipotransaccion,
-          //   t.idtransacciones,
-          //   t.estado
-          // FROM
-          //   transacciones AS t
-          // WHERE
-          //   t.fechatransaccion >= '$fechaIni'
-          //   AND t.fechatransaccion <= '$fechaFin'
-          //   AND t.organizacion_idorganizacion = '$ide'
-          //   AND t.estado NOT IN (4, 5, 6)
-          //   AND t.idgestion='$gestion'
-          // ORDER BY
-          //   t.codigotransaccion ASC;
-          // ");
 
-        //-----------------------------------------------------------------------
-      //   t.codigotransaccion,
-      // t.fechatransaccion,
-      // t.ndocumento,
-      // t.glosa,
-      // t.tipotransaccion_idtipotransaccion,
-      // t.idtransacciones,
-      // t.estado
           $registro=$this->dbc->query("SELECT 
                 t.codigotransaccion,
                 t.fechatransaccion,
@@ -1261,6 +832,7 @@ $totalHaber = 0;
             AND t.fechatransaccion <= '$fechaFin'
             AND t.estado NOT IN (4, 5, 6)
             $tipo_aux
+            $consoli_aux
             ORDER BY 
             YEAR(t.fechatransaccion) ASC,
             MONTH(t.fechatransaccion) ASC,
@@ -1297,6 +869,7 @@ $totalHaber = 0;
                   AND t.fechatransaccion <= '$fin'
                   AND t.estado NOT IN (4, 5, 6)
                   $tipo_aux
+                  $consoli_aux
                   ORDER BY 
                   YEAR(t.fechatransaccion) ASC,
                   MONTH(t.fechatransaccion) ASC,
@@ -1327,6 +900,7 @@ $totalHaber = 0;
                 AND t.fechatransaccion <= '$fechaFin'
                 AND t.estado NOT IN (4, 5, 6)
                 $tipo_aux
+                $consoli_aux
             ORDER BY 
                 t.idgestion ASC,           -- Agrupar por gestión
                 t.tipotransaccion_idtipotransaccion ASC,  -- Agrupar y ordenar por tipo
@@ -1355,6 +929,7 @@ $totalHaber = 0;
             AND t.estado NOT IN (4, 5, 6)
             AND t.idgestion='$gestion'
             $tipo_aux
+            $consoli_aux
           ORDER BY
             t.codigotransaccion ASC;
           ");
@@ -1376,8 +951,10 @@ $totalHaber = 0;
             t.codigotransaccion >= '$numeroIni'
             AND t.codigotransaccion <= '$numeroFin'
             AND t.organizacion_idorganizacion = '$ide'
+            AND t.estado NOT IN (4, 5, 6)
             AND t.idgestion='$gestion'
             $tipo_aux
+            $consoli_aux
           ORDER BY
             t.codigotransaccion ASC;
           ");
@@ -1815,9 +1392,10 @@ $totalHaber = 0;
             AND pc.organizacion_idorganizacion = ?
 
         ORDER BY
-            pc.numero,
-            -- t.codigotransaccion
-            t.fechatransaccion
+            -- pc.numero,
+            -- -- t.codigotransaccion
+            -- t.fechatransaccion
+            t.fechatransaccion ASC, t.codigotransaccion ASC, pc.numero ASC
     ";
 
     $stmt = $this->dbc->prepare($sql);
@@ -2556,7 +2134,6 @@ if ($pcuentas->num_rows > 0) {
        }
   //reportedetallefpt reporteactivodiaponibledos reportedetalletransaccion estado consolidar reporteactivoypasivo resultados reportecomprobantecontable                 
 //re   firmas  reportebalancegeneral mayor reportecomprobantecontable mayorcuentacontable  reporteactivoypasivo reportedetalle reportedetalletransaccion reportedetallefpt
-
 }
 
 

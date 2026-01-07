@@ -112,7 +112,7 @@ $nroTransaccion = $resultado122['siguiente'];
         $gestion_sel = $this->dbc->query("SELECT * FROM gestion WHERE idgestion='$gestion'");
         $gc = $gestion_sel->fetch_assoc();
 
-        if($gc['formato_transaccion'] == 'por_tipo_mes') {
+        if($gc['formato_transaccion'] == 'por_tipo_mes') { //FORMATO TIPO_MES
         $registro = $this->dbc->query("SELECT idtransacciones,
             codigotransaccion,
             fechatransaccion,
@@ -129,9 +129,9 @@ $nroTransaccion = $resultado122['siguiente'];
         YEAR(fechatransaccion) ASC,
         MONTH(fechatransaccion) ASC,
         tipotransaccion_idtipotransaccion ASC,
-        codigotransaccion ASC;");
+        codigotransaccion DESC;");
 
-        }elseif($gc['formato_transaccion'] == 'por_tipo_gestion'){
+        }elseif($gc['formato_transaccion'] == 'por_tipo_gestion'){ //FORMATO TIPO_GESTION
               $registro = $this->dbc->query("SELECT 
                 t.idtransacciones,
         t.codigotransaccion,
@@ -153,8 +153,9 @@ $nroTransaccion = $resultado122['siguiente'];
             ORDER BY 
                 t.idgestion ASC,           -- Agrupar por gestión
                 t.tipotransaccion_idtipotransaccion ASC,  -- Agrupar y ordenar por tipo
-                t.fechatransaccion ASC,        -- Orden cronológico dentro del tipo
-                t.codigotransaccion ASC;       -- Correlativo correcto
+                -- t.fechatransaccion ASC,       
+                 -- Orden cronológico dentro del tipo
+                t.codigotransaccion DESC;    -- Correlativo correcto
             ");
 
         }else{ //POR GESTION

@@ -296,7 +296,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
           "fecha" => $qwe[2], "monto" => $qwe[3], "persona" => $qwe[4],
            "ci" => $qwe[5],"transaccion" => $qwe[6],
             "codigotransaccion" => $idtr['codigotransaccion'],
-            "nombre_archivo" => $qwe[7],"lugar" => $qwe[8], "idcomprobante" => $compr['idcuentaspof'],"concepto" => $qwe['concepto']);
+            "nombre_archivo" => $qwe[7],"lugar" => $qwe[8], "idcomprobante" => $compr['idcuentaspof'],"concepto" => $qwe['concepto'],"cliente_proveedor" => $qwe['cliente_proveedor']);
          array_push($lista, $res);
      }
     
@@ -1070,7 +1070,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
           "fecha" => $qwe[2], "monto" => $qwe[3], "persona" => $qwe[4],
            "ci" => $qwe[5],"transaccion" => $qwe[6],
             "codigotransaccion" => $idtr['codigotransaccion'],
-            "nombre_archivo" => $qwe[7],"lugar" => $qwe[8],"idcomprobante" => $compr['idcuentaspor'],"concepto" => $qwe['concepto']);
+            "nombre_archivo" => $qwe[7],"lugar" => $qwe[8],"idcomprobante" => $compr['idcuentaspor'],"concepto" => $qwe['concepto'],"cliente_proveedor" => $qwe['cliente_proveedor']);
          array_push($lista, $res);
      }
     

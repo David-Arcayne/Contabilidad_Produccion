@@ -73,13 +73,10 @@ $cont=new Transacciones();
 $cont->eliminardetalle($ver[1]);
 }elseif($ver[0]=="reportedetallefpt"){
 $rep=new Reportes();
-$rep->reportedetallefpt($ver[1],$ver[2],$ver[3],$ver[4],$ver[5],$ver[6]);
-}elseif($ver[0]=="reportedetallefptclasefactura"){
-    $rep=new Reportes();
-    $rep->reportedetallefptclasefactura($ver[1],$ver[2],$ver[3],$ver[4]);
+$rep->reportedetallefpt($ver[1],$ver[2],$ver[3],$ver[4],$ver[5],$ver[6],$ver[7]);
 }elseif($ver[0]=="reportedetalletransaccion"){
 $rep=new Reportes();
-$rep->reportedetalletransaccion($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
+$rep->reportedetalletransaccion($ver[1],$ver[2],$ver[3],$ver[4],$ver[5],$ver[6]);
 }elseif($ver[0]=="reporteactivodisponible"){
 $rep=new Reportes();
 $rep->reporteactivodisponible($ver[1],$ver[2],$ver[3],$ver[4]);
@@ -104,21 +101,9 @@ $rep->reporteactivoypasivohasta($ver[1],$ver[2]);
 }elseif($ver[0]=="reportecuentasderesultado"){
 $rep=new Reportes();
 $rep->reportecuentasderesultado($ver[1],$ver[2],$ver[3]);
-}elseif($ver[0]=="reportebalancegeneral"){
-$rep=new Reportes();
-$rep->reportebalancegeneral($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
-}elseif($ver[0]=="reportebalancegeneralpp"){
-    $rep=new Reportes();
-    $rep->reportebalancegeneralpp($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
-    }elseif($ver[0]=="reportebalancegeneralhasta"){
-$rep=new Reportes();
-$rep->reportebalancegeneralhasta($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
-}elseif($ver[0]=="reportebalancegeneralhastapp"){
-    $rep=new Reportes();
-    $rep->reportebalancegeneralhastapp($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
 }elseif($ver[0]=="reportecomprobantecontable"){
 $rep=new Reportes();
-$rep->reportecomprobantecontable($ver[1],$ver[2],$ver[3],$ver[4],$ver[5],$ver[6],$ver[7],$ver[8]);
+$rep->reportecomprobantecontable($ver[1],$ver[2],$ver[3],$ver[4],$ver[5],$ver[6],$ver[7],$ver[8],$ver[9]);
 }elseif($ver[0]=="reporteactivodiaponibledos"){
 $rep=new Reportes();
 $rep->reporteactivodiaponibledos($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
@@ -701,9 +686,9 @@ elseif($ver[0]=="listar_reportes_referencia"){
 // reemplazar listar_plantilla     listadegestion   getgestion "archivo" => $qwe['archivo'],             listar_recibo_por_id_otras_cuentas      listar_recibo_por_id_otras_cuentas_pagar ---> esos dos son de recibos
 
 // reportedetalle listar_recibo_por_id listar_recibo_por_id_otras_cuentas   eliminarcobrados lista_cobrar lista_plande listafactura listaproveedores getgestionactual -- listar_facturas   reportedetallefptclasefactura
-//    listar_recibo_otras_cuentas  listar_recibo_otras_cuentas_pagar       listar_factura           listar_recibo_pago_por_id                                             listar_recibo_por_id   --> caja bancos 
-// listar_tipo_plandecuenta listar_anular listapagos listapagos_individuales listar_recibo_otras_cuentas
-//       listar_recibo_por_id_otras_cuentas_pagar ---> esos dos son de recibos listar_tipo_plandecuenta listadetalletransaccion listatransacciones
+//    listar_recibo_otras_cuentas  listar_recibo_otras_cuentas_pagar       listar_factura           listar_recibo_pago_por_id                                              listar_recibo_por_id   --> caja bancos 
+// listar_tipo_plandecuenta listar_anular listapagos listapagos_individuales listar_recibo_otras_cuentas reportedetalletransaccion reportedetallefpt
+//       listar_recibo_por_id_otras_cuentas_pagar ---> esos dos son de recibos listar_tipo_plandecuenta listadetalletransaccion listatransacciones reportecomprobantecontable
 //
 // reportedetallefpt reportecomprobantecontable     listadegestion   getgestion "archivo" => $qwe['archivo'], listar_agrupacion        listar_recibo_por_id_otras_cuentas_pagar ---> esos dos son de recibos rp_listar_plantilla_normal
 
