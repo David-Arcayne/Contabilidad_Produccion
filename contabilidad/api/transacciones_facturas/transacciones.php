@@ -22,9 +22,15 @@ class Transacciones extends DB{
         $gestion_sel = $this->dbc->query("SELECT * FROM gestion WHERE idgestion='$idgestion'");
         $gc = $gestion_sel->fetch_assoc();
 
+        $ultimo_trans = $this->dbc->query("SELECT * FROM transacciones 
+                WHERE organizacion_idorganizacion = '$ide'
+                AND idgestion = '$idgestion'
+                ORDER BY codigotransaccion DESC
+                LIMIT 1");
+        $ut = $ultimo_trans->fetch_assoc();
+
         if($gc['formato_transaccion'] == 'por_tipo_mes') {
-            $nroTransa = $this->dbc->query("
-                SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+            $nroTransa = $this->dbc->query("SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
             FROM transacciones
             WHERE tipotransaccion_idtipotransaccion = '$tipotransaccion'
             and fechatransaccion BETWEEN '$fecha_inicio' AND '$fecha_fin'
@@ -32,16 +38,14 @@ class Transacciones extends DB{
             AND organizacion_idorganizacion = '$ide'
             ");
         } elseif($gc['formato_transaccion'] == 'por_tipo_gestion') {
-            $nroTransa = $this->dbc->query("
-                SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+            $nroTransa = $this->dbc->query("SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
                 FROM transacciones 
                 WHERE tipotransaccion_idtipotransaccion = '$tipotransaccion'
                 AND idgestion = '$idgestion'
                 AND organizacion_idorganizacion = '$ide'
             ");
         } else { // POR_GESTION
-            $nroTransa = $this->dbc->query("
-                SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+            $nroTransa = $this->dbc->query("SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
                 FROM transacciones 
                 WHERE organizacion_idorganizacion = '$ide'
                 AND idgestion = '$idgestion'
@@ -53,7 +57,7 @@ $nroTransaccion = $resultado122['siguiente'];
 
 
         // echo json_encode(array($fecha, $tipocambio, $tipotransaccion, $glosa, $empresa,$ide, $sucursal,$ufv,$dolar,$idgestion,$nroTransaccion,$resultado122['codigotransaccion']));
-
+    if($fecha >= $ut['fechatransaccion']){    
         if($tipocambio != ""){
             // EXISTE TIPO DE CAMBIO PARA LA FECHA DE HOY O SE SELECCIONARA UNA Q YA EXISTE
             $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
@@ -73,7 +77,9 @@ $nroTransaccion = $resultado122['siguiente'];
 
         $idtransaccion = $this->dbc->insert_id;
         }
-       
+    }else{
+        $writetrans = FALSE;
+    }
         if ($writetrans === TRUE) {
             $tt = $this->dbc->query("SELECT * FROM tipotransaccion WHERE idtipotransaccion='" . $tipotransaccion . "'");
             $asd = $this->dbc->fetch($tt);

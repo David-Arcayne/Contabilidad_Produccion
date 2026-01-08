@@ -679,6 +679,9 @@ elseif($ver[0]=="listar_reportes_referencia"){
 }elseif($ver[0]=="listar_comprobantes_asignado_cuentas"){
     $cont=new Cuentas_transacciones();
     $cont->listar_comprobantes_asignado_cuentas($ver[1]);
+}elseif($ver[0]=="eliminar_otras_cuentas"){
+    $cont=new Documento_cobro();
+    $cont->eliminar_otras_cuentas($ver[1]);
 }
 
 // reportedetalle listar_recibo_por_id listar_recibo_por_id_otras_cuentas   eliminarcobrados lista_cobrar lista_plande listafactura listaproveedores getgestionactual -- listar_facturas
@@ -687,7 +690,7 @@ elseif($ver[0]=="listar_reportes_referencia"){
 
 // reportedetalle listar_recibo_por_id listar_recibo_por_id_otras_cuentas   eliminarcobrados lista_cobrar lista_plande listafactura listaproveedores getgestionactual -- listar_facturas   reportedetallefptclasefactura
 //    listar_recibo_otras_cuentas  listar_recibo_otras_cuentas_pagar       listar_factura           listar_recibo_pago_por_id                                              listar_recibo_por_id   --> caja bancos 
-// listar_tipo_plandecuenta listar_anular listapagos listapagos_individuales listar_recibo_otras_cuentas reportedetalletransaccion reportedetallefpt
+// listar_tipo_plandecuenta listar_anular listapagos listapagos_individuales listar_recibo_otras_cuentas reportedetalletransaccion reportedetallefpt listar_otras_cuentas_cobrar_vencidas 
 //       listar_recibo_por_id_otras_cuentas_pagar ---> esos dos son de recibos listar_tipo_plandecuenta listadetalletransaccion listatransacciones reportecomprobantecontable
 //
 // reportedetallefpt reportecomprobantecontable     listadegestion   getgestion "archivo" => $qwe['archivo'], listar_agrupacion        listar_recibo_por_id_otras_cuentas_pagar ---> esos dos son de recibos rp_listar_plantilla_normal
