@@ -1,6 +1,6 @@
 <?php
 require_once "../../db/db.php";
-// require_once "../configuracion/empresa.php";
+// require_once "../configuracion/empresa.php"; danger
 
 class Plantilla_admin extends DB{
     public function reporte_balance_general_admin($idtn,$empresa){
@@ -33,9 +33,9 @@ class Plantilla_admin extends DB{
     }
 
     public function registrar_balance_general_admin($idplantilla_reporte,$idtn,$empresa){
-         ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+        //  ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
         $idempresa = $this->getidempresa($empresa);
         $url = "http://mistersofts.com/administrador/api/getListaplantillareporterubro/".$idtn;
         $data = json_decode(file_get_contents($url), true);
@@ -55,7 +55,7 @@ class Plantilla_admin extends DB{
                     $listado_admin = $this->procesarListado($data[$cont]['config'],$idempresa, 1, $ordenPorNivelPadre,'',$idtipo_reporte);
                     $res = array("success", "Todos los elementos fueron registrados");
                 } else {
-                    $res = array("danger", "No se encontró el campo 'config' en la respuesta.",$data,$data[$cont]['config']);
+                    // $res = array("danger", "No se encontró el campo 'config' en la respuesta.",$data,$data[$cont]['config']);
                 }
             }else{
                 // NO ENTRO AL CONFIG DE BALANCE GENERAL Y SOLO ME SALTO
@@ -259,9 +259,9 @@ class Plantilla_admin extends DB{
     // }
 
     public function registrar_estado_resultados_admin($idplantilla_reporte,$idtn,$empresa){
-         ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+        //  ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
         $idempresa = $this->getidempresa($empresa);
         $url = "http://mistersofts.com/administrador/api/getListaplantillareporterubro/".$idtn;
         $data = json_decode(file_get_contents($url), true);
@@ -281,7 +281,7 @@ class Plantilla_admin extends DB{
                     $listado_admin = $this->procesarListado_Estado_resultados($data[$cont]['config'],$idempresa, 1, $ordenPorNivelPadre,$idtipo_reporte);
                     $res = array("success", "Todos los elementos fueron registrados");
                 } else {
-                    $res = array("danger", "No se encontró el campo 'config' en la respuesta.",$data,$data[$cont]['config']);
+                    // $res = array("danger", "No se encontró el campo 'config' en la respuesta.",$data,$data[$cont]['config']);
                 }
             }else{
                 // NO ENTRO AL CONFIG DE BALANCE GENERAL Y SOLO ME SALTO
@@ -399,21 +399,44 @@ class Plantilla_admin extends DB{
         // $idempresa = $this->getidempresa($empresa);
         $url = "http://mistersofts.com/administrador/api/getListaplantillareporterubro/".$idtn;
         $data = json_decode(file_get_contents($url), true);
-        
-        foreach($data as $plantilla){
-            if($plantilla['tiporeporte'] == 'estado_resultado'){
-                $listado_admin = $this->registrar_estado_resultados_admin($plantilla['idctplantilla'], $idtn,$empresa);
+        // $resultados = []; // aquí acumulamos
+        // foreach($data as $plantilla){
+        //     if($plantilla['tiporeporte'] == 'estado_resultado'){
+        //         $listado_admin = $this->registrar_estado_resultados_admin($plantilla['idctplantilla'], $idtn,$empresa);
                 
-            }elseif($plantilla['tiporeporte'] == 'balance_general'){
-                $listado_admin = $this->registrar_balance_general_admin($plantilla['idctplantilla'],$idtn, $empresa);
-            }
-        }
-        if($listado_admin === TRUE){
-            $res = array("success", "Todos los elementos fueron registrados");
-        }else{
-            $res = array("danger", "No se encontró el campo 'config' en la respuesta.");
-        }
-
+        //     }elseif($plantilla['tiporeporte'] == 'balance_general'){
+        //         $listado_admin = $this->registrar_balance_general_admin($plantilla['idctplantilla'],$idtn, $empresa);
+        //     }
+        //     // guardar cada resultado en el array 
+        //     $resultados[] = $listado_admin;
+        // }
+        // if($listado_admin === TRUE){
+        //     $res = array("success", "Todos los elementos fueron registrados");
+        // }else{
+        //     // $res = array("danger", "No se encontró el campo 'config' en la respuesta.");
+        // }
+foreach($data as $plantilla){ // Iniciar buffer para capturar el echo 
+    ob_start(); 
+    if($plantilla['tiporeporte'] == 'estado_resultado'){ 
+        $this->registrar_estado_resultados_admin($plantilla['idctplantilla'], $idtn,$empresa); 
+    }elseif($plantilla['tiporeporte'] == 'balance_general'){
+         $this->registrar_balance_general_admin($plantilla['idctplantilla'],$idtn, $empresa); 
+        } // Guardar lo que imprimió la función
+         $salida = ob_get_clean(); 
+         // Convertir la salida en array (si es JSON) 
+         $listado_admin = json_decode($salida, true); $resultados[] = $listado_admin; 
+        } // Ahora decides qué mostrar al final 
+        $todo_ok = true;
+         foreach($resultados as $r){
+             if(!is_array($r) || !in_array("success",$r)){
+                 $todo_ok = false; break; 
+                } 
+                }
+                 
+                 if($todo_ok){ 
+                    $res = ["success","Todos los elementos fueron registrados"]; 
+                }else{ $res = ["danger","Hubo un problema en el registro"]; 
+                }
         echo json_encode($res); 
         // echo json_encode(array($idplantilla_reporte,$idtn,$empresa)); 
     }
