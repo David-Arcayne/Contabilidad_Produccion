@@ -2439,7 +2439,7 @@ class PlantillaReporte extends DB{
         // ini_set('display_errors', 1); 
         // ini_set('display_startup_errors', 1);
         // error_reporting(E_ALL);
-
+                
         // $ide = $this->get_id_empresa($empresa);
         $lista = [];
         $plandecuenta = $this->dbc->query("SELECT idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,organizacion_idorganizacion,idp,idagrupacion_rubro_plandecuenta FROM plandecuenta WHERE idplandecuenta = '$idcuenta'");
@@ -2448,10 +2448,10 @@ class PlantillaReporte extends DB{
         $aux1 = $this->dbc->query("SELECT * FROM agrupacion_rubro_plandecuenta WHERE idagrupacion_rubro_plandecuenta='$aux_plan[idagrupacion_rubro_plandecuenta]'");
         $agru = $aux1->fetch_assoc();
 
-        $aux2 = $this->dbc->query("SELECT * FROM tipo_plandecuenta WHERE idtipo_plandecuenta='$agru[idtipo_plandecuenta]'");
-        $tipo_pl = $aux2->fetch_assoc();
+        // $aux2 = $this->dbc->query("SELECT * FROM tipo_plandecuenta WHERE idtipo_plandecuenta='$agru[idtipo_plandecuenta]'");
+        // $tipo_pl = $aux2->fetch_assoc();
         
-        $res = array("rubro" => $tipo_pl['nombre']);
+        $res = array("rubro" => $agru['tipo_plandecuenta']);
         
         array_push($lista, $res);
         

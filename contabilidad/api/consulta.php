@@ -79,7 +79,7 @@ $rep=new Reportes();
 $rep->reportedetalletransaccion($ver[1],$ver[2],$ver[3],$ver[4],$ver[5],$ver[6]);
 }elseif($ver[0]=="reporteactivodisponible"){
 $rep=new Reportes();
-$rep->reporteactivodisponible($ver[1],$ver[2],$ver[3],$ver[4]);
+$rep->reporteactivodisponible($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
 }elseif($ver[0]=="encabezado"){
 $rep=new Reportes();
 $rep->encabezado($ver[1]);
@@ -163,7 +163,7 @@ $cont=new Contabilidad();
 $cont->listapagoscobros($ver[1]);
 }elseif($ver[0]=="mayorcuentacontable"){
 $rep=new Reportes();
-$rep->mayorcuentacontable($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
+$rep->mayorcuentacontable($ver[1],$ver[2],$ver[3],$ver[4],$ver[5],$ver[6]);
 }elseif($ver[0]=="eliminarcliente"){
 $cont=new Contabilidad();
 $cont->eliminarcliente($ver[1]);
@@ -477,10 +477,12 @@ elseif($ver[0]=="listar_facturas_cobros_sin_transaccion"){
 }elseif($ver[0]=="listar_configuracion_reporte"){
     $cont=new Reporte_confi();
     $cont->listar_configuracion_reporte($ver[1],$ver[2]);
-}elseif($ver[0]=="reporte_balance_general"){
-    $cont=new Reporte_confi();
-    $cont->reporte_balance_general($ver[1],$ver[2],$ver[3],$ver[4]);
-}elseif($ver[0]=="eliminar_configuracion_reporte"){
+}
+// elseif($ver[0]=="reporte_balance_general"){
+//     $cont=new Reporte_confi();
+//     $cont->reporte_balance_general($ver[1],$ver[2],$ver[3],$ver[4]);
+// }
+elseif($ver[0]=="eliminar_configuracion_reporte"){
     $cont=new Reporte_confi();
     $cont->eliminar_configuracion_reporte($ver[1]);
 }elseif($ver[0]=="reporte_balance_general_hasta"){
@@ -682,16 +684,18 @@ elseif($ver[0]=="listar_reportes_referencia"){
 }elseif($ver[0]=="eliminar_otras_cuentas"){
     $cont=new Documento_cobro();
     $cont->eliminar_otras_cuentas($ver[1]);
+}elseif($ver[0]=="reporte_balance_general_por_niveles"){
+    $cont=new Reporte_confi();
+    $cont->reporte_balance_general_por_niveles($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
 }
-
 // reportedetalle listar_recibo_por_id listar_recibo_por_id_otras_cuentas   eliminarcobrados lista_cobrar lista_plande listafactura listaproveedores getgestionactual -- listar_facturas
-//    listadetalle  listar_recibo_otras_cuentas_pagar       listar_factura           listar_recibo_pago_por_id                                             listar_recibo_por_id   --> caja bancos 
+//    listadetalle  listar_recibo_otras_cuentas_pagar       listar_factura           listar_recibo_pago_por_id             listar_datos_contrataciones_cajas                                listar_recibo_por_id   --> caja bancos 
 // reemplazar listar_plantilla     listadegestion   getgestion "archivo" => $qwe['archivo'],             listar_recibo_por_id_otras_cuentas      listar_recibo_por_id_otras_cuentas_pagar ---> esos dos son de recibos
 
-// reportedetalle listar_recibo_por_id listar_recibo_por_id_otras_cuentas   eliminarcobrados lista_cobrar lista_plande listafactura listaproveedores getgestionactual -- listar_facturas   reportedetallefptclasefactura
+// mayorcuentacontable  reporteactivodisponible es_cuenta_de_orden listar_otras_cuentas_cobrar
 //    listar_recibo_otras_cuentas  listar_recibo_otras_cuentas_pagar       listar_factura           listar_recibo_pago_por_id                                              listar_recibo_por_id   --> caja bancos 
 // listar_tipo_plandecuenta listar_anular listapagos listapagos_individuales listar_recibo_otras_cuentas reportedetalletransaccion reportedetallefpt listar_otras_cuentas_cobrar_vencidas 
-//       listar_recibo_por_id_otras_cuentas_pagar ---> esos dos son de recibos listar_tipo_plandecuenta listadetalletransaccion listatransacciones reportecomprobantecontable
+// listadetalletransaccion listatransacciones reportecomprobantecontable listar_recibo_por_caja_bancos listar_agrupacion_rubro_plandecuenta
 //
 // reportedetallefpt reportecomprobantecontable     listadegestion   getgestion "archivo" => $qwe['archivo'], listar_agrupacion        listar_recibo_por_id_otras_cuentas_pagar ---> esos dos son de recibos rp_listar_plantilla_normal
 

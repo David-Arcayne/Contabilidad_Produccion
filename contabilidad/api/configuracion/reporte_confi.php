@@ -901,7 +901,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
 //         echo json_encode($lista, JSON_NUMERIC_CHECK);  
 //     }
 
- public function reporte_balance_general($idplantilla_reporte,$fecha_ini,$fecha_fin,$empresa) {
+ private function reporte_balance_general($idplantilla_reporte,$fecha_ini,$fecha_fin,$empresa) {
         ini_set('display_errors', 1); 
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
@@ -933,6 +933,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                     "codigo" => $nombre_cuenta['numero'],
                     "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
                     "suma_nivel_2" => 0,
+                    "profundidad" => '1',
                     "nivel_2" => [] //activo
                     );
                 $suma_nivel_2 = 0;
@@ -957,6 +958,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                     "codigo" => $nombre_cuenta2['numero'],
                     "nombre_nivel_2" => $nombre_cuenta2['nombreplan'],
                     "suma_nivel_3" => 0,
+                    "profundidad" => '2',
                     "nivel_3" => [] //activo
                     );
                     $suma_nivel_3 = 0;
@@ -1006,6 +1008,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                 "nombre_nivel_3" => $nombre_cuenta3['nombreplan'],
                                 "valor" => $valor_A['total'],
                                 "valor_restado" => $diferencia,
+                                "profundidad" => '3',
                                 "nivel_4" => [] //activo   
                                 );
 
@@ -1033,6 +1036,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                 "codigo" => $nombre_cuenta3['numero'],  
                                 "nombre_nivel_3" => $nombre_cuenta3['nombreplan'],
                                 "valor" => $valor_B['total'],
+                                "profundidad" => '3',
                                 // "valor_restado" => $diferencia,
                                 "nivel_4" => [] //activo   
                                 );
@@ -1062,6 +1066,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                     "codigo" => $nombre_cuenta3['numero'],   
                                     "nombre_nivel_3" => $nombre_cuenta3['nombreplan'],
                                     "valor" => $valor['total'],
+                                    "profundidad" => '3',
                                     "nivel_4" => [] //activo   
                                     );
                                     array_push($res3['nivel_3'], $res4); 
@@ -1080,12 +1085,13 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                         "codigo" => $nombre_cuenta3['numero'], 
                         "nombre_nivel_3" => $nombre_cuenta3['nombreplan'],
                         "suma_nivel_4" => 0,
+                        "profundidad" => '3',
                         "nivel_4" => [] //activo
                         );
                         $get_nivel_5 = $this->dbc->query("SELECT * from configuracion_reporte where grupo = '$qwe4[grupo]' AND nombre_cuenta_superior = '$nombre_cuenta3[nombreplan]' AND idempresa='$idempresa' 
                         AND idplantilla_reporte ='$idplantilla_reporte' ORDER BY orden ASC");// ACTIVO, PASIVO, PATRIMONIO
                         $suma_nivel_4 = 0;
-                        // $suma_nivel_5 = 0;
+                        // $suma_nivel_5 = 0; profundidad
                         $aux_sum_5 = 0;
                         while ($qwe5 = $this->dbc->fetch($get_nivel_5)) {
                             $cuenta4 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe5[idplandecuenta]'");// caja_general, banco
@@ -1133,6 +1139,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                     "nombre_nivel_4" => $nombre_cuenta4['nombreplan'],
                                     "valor" => $valor_A['total'],
                                     "valor_restado" => $diferencia,
+                                    "profundidad" => '4',
                                     "nivel_5" => [] //activo   
                                     );
                                 array_push($res4['nivel_4'], $res5);
@@ -1158,6 +1165,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                     "codigo" => $nombre_cuenta4['numero'],  
                                     "nombre_nivel_4" => $nombre_cuenta4['nombreplan'],
                                     "valor" => $valor_B['total'],
+                                    "profundidad" => '4',
                                     // "valor_restado" => $diferencia,
                                     "nivel_5" => [] //activo   
                                     );
@@ -1189,6 +1197,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                     "nombre_nivel_4" => $nombre_cuenta4['nombreplan'],
                                     "valor" => $valor['total'],
                                     "suma_nivel_5" => 0,
+                                    "profundidad" => '4',
                                     "nivel_5" => [] //activo   
                                     );
                                     array_push($res4['nivel_4'], $res5); 
@@ -1207,6 +1216,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                         "nombre_nivel_4" => $nombre_cuenta4['nombreplan'],
                         "valor" => 0,
                         "suma_nivel_5" => 0,
+                        "profundidad" => '4',
                         "nivel_5" => [] //activo
                         );
                         $get_nivel_6 = $this->dbc->query("SELECT * from configuracion_reporte where grupo = '$qwe5[grupo]' AND nombre_cuenta_superior = '$nombre_cuenta4[nombreplan]' AND idempresa='$idempresa' 
@@ -1237,6 +1247,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                 "codigo" => $nombre_cuenta5['numero'],   
                                 "nombre_nivel_5" => $nombre_cuenta5['nombreplan'],
                                 "valor" => $valor2['total'],
+                                "profundidad" => '5',
                                 "nivel_6" => [] //activo   
                                 );
                                 array_push($res5['nivel_5'], $res6); 
@@ -1291,6 +1302,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                     "codigo" => $nombre_cuenta['numero'],
                     "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
                     "suma_nivel_2" => 0,
+                    "profundidad" => '1',
                     "nivel_2" => [] //activo
                     );
                 $suma_nivel_2 = 0;
@@ -1315,6 +1327,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                     "codigo" => $nombre_cuenta2['numero'],
                     "nombre_nivel_2" => $nombre_cuenta2['nombreplan'],
                     "suma_nivel_3" => 0,
+                    "profundidad" => '2',
                     "nivel_3" => [] //activo
                     );
                     $suma_nivel_3 = 0;
@@ -1348,6 +1361,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                     "codigo" => $nombre_cuenta3['numero'],   
                                     "nombre_nivel_3" => $nombre_cuenta3['nombreplan'],
                                     "valor" => $valor['total'],
+                                    "profundidad" => '3',
                                     "nivel_4" => [] //activo   
                                     );
                                     array_push($res3['nivel_3'], $res4); 
@@ -1364,6 +1378,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                         "codigo" => $nombre_cuenta3['numero'], 
                         "nombre_nivel_3" => $nombre_cuenta3['nombreplan'],
                         "suma_nivel_4" => 0,
+                        "profundidad" => '3',
                         "nivel_4" => [] //activo
                         );
                         $get_nivel_5 = $this->dbc->query("SELECT * from configuracion_reporte where grupo = '$qwe4[grupo]' AND nombre_cuenta_superior = '$nombre_cuenta3[nombreplan]' AND idempresa='$idempresa' 
@@ -1402,6 +1417,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                     "nombre_nivel_4" => $nombre_cuenta4['nombreplan'],
                                     "valor" => $valor['total'],
                                     "suma_nivel_5" => 0,
+                                    "profundidad" => '4',
                                     "nivel_5" => [] //activo   
                                     );
                                     array_push($res4['nivel_4'], $res5); 
@@ -1418,6 +1434,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                         "nombre_nivel_4" => $nombre_cuenta4['nombreplan'],
                         "valor" => 0,
                         "suma_nivel_5" => 0,
+                        "profundidad" => '4',
                         "nivel_5" => [] //activo
                         );
                         $get_nivel_6 = $this->dbc->query("SELECT * from configuracion_reporte where grupo = '$qwe5[grupo]' AND nombre_cuenta_superior = '$nombre_cuenta4[nombreplan]' AND idempresa='$idempresa' 
@@ -1448,6 +1465,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                 "codigo" => $nombre_cuenta5['numero'],   
                                 "nombre_nivel_5" => $nombre_cuenta5['nombreplan'],
                                 "valor" => $valor2['total'],
+                                "profundidad" => '5',
                                 "nivel_6" => [] //activo   
                                 );
                                 array_push($res5['nivel_5'], $res6); 
@@ -1504,6 +1522,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                     "codigo" => $nombre_cuenta['numero'],
                     "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
                     "suma_nivel_2" => 0,
+                    "profundidad" => '1',
                     "nivel_2" => [] //activo
                     );
                 $suma_nivel_2 = 0;
@@ -1542,6 +1561,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                     "codigo" => $nombre_cuenta2['numero'],   
                                     "nombre_nivel_2" => $nombre_cuenta2['nombreplan'],
                                     "valor" => $valor0['total'],
+                                    "profundidad" => '2',
                                     "nivel_3" => [] //activo   
                                     );
                                     array_push($res2['nivel_2'], $res3); 
@@ -1557,6 +1577,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                     "codigo" => $nombre_cuenta2['numero'],
                     "nombre_nivel_2" => $nombre_cuenta2['nombreplan'],
                     "suma_nivel_3" => 0,
+                    "profundidad" => '2',
                     "nivel_3" => [] //activo
                     );
                     $suma_nivel_3 = 0;
@@ -1590,6 +1611,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                     "codigo" => $nombre_cuenta3['numero'],   
                                     "nombre_nivel_3" => $nombre_cuenta3['nombreplan'],
                                     "valor" => $valor['total'],
+                                    "profundidad" => '3',
                                     "nivel_4" => [] //activo   
                                     );
                                     array_push($res3['nivel_3'], $res4); 
@@ -1606,6 +1628,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                         "codigo" => $nombre_cuenta3['numero'], 
                         "nombre_nivel_3" => $nombre_cuenta3['nombreplan'],
                         "suma_nivel_4" => 0,
+                        "profundidad" => '3',
                         "nivel_4" => [] //activo
                         );
                         $get_nivel_5 = $this->dbc->query("SELECT * from configuracion_reporte where grupo = '$qwe4[grupo]' AND nombre_cuenta_superior = '$nombre_cuenta3[nombreplan]' AND idempresa='$idempresa' 
@@ -1644,6 +1667,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                     "nombre_nivel_4" => $nombre_cuenta4['nombreplan'],
                                     "valor" => $valor['total'],
                                     "suma_nivel_5" => 0,
+                                    "profundidad" => '4',
                                     "nivel_5" => [] //activo   
                                     );
                                     array_push($res4['nivel_4'], $res5); 
@@ -1660,6 +1684,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                         "nombre_nivel_4" => $nombre_cuenta4['nombreplan'],
                         "valor" => 0,
                         "suma_nivel_5" => 0,
+                        "profundidad" => '4',
                         "nivel_5" => [] //activo
                         );
                         $get_nivel_6 = $this->dbc->query("SELECT * from configuracion_reporte where grupo = '$qwe5[grupo]' AND nombre_cuenta_superior = '$nombre_cuenta4[nombreplan]' AND idempresa='$idempresa' 
@@ -1690,6 +1715,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                 "codigo" => $nombre_cuenta5['numero'],   
                                 "nombre_nivel_5" => $nombre_cuenta5['nombreplan'],
                                 "valor" => $valor2['total'],
+                                "profundidad" => '5',
                                 "nivel_6" => [] //activo   
                                 );
                                 array_push($res5['nivel_5'], $res6); 
@@ -1736,7 +1762,8 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
         }     
         
         // array_push($lista, $res2);
-        echo json_encode($lista, JSON_NUMERIC_CHECK);  
+        // echo json_encode($lista, JSON_NUMERIC_CHECK);  
+        return $lista;
     }
     public function reporte_balance_general_consolidado($idplantilla_reporte,$fecha_ini,$fecha_fin,$empresa) {
         ini_set('display_errors', 1); 
@@ -3788,6 +3815,63 @@ public function select_plantilla_balance_general($idtipo_reporte,$empresa)
         }
         echo json_encode($res);
     }
+
+    // public function reporte_configuracion_por_niveles($idplantilla_reporte,$fecha_ini,$fecha_fin,$empresa,$maxProfundidad)
+    // {
+    //     // $url = "http://mistersofts.com/administrador/api/getListaplantillareporterubro/".$idplantilla_reporte.",".$fecha_ini.",".$fecha_fin.",".$empresa;
+    //     // $data = json_decode(file_get_contents($url), true);
+
+    //     $array_reporte_confi =$this->reporte_balance_general($idplantilla_reporte,$fecha_ini,$fecha_fin,$empresa);
+    //     foreach ($array_reporte_confi as &$item) {
+
+    //     }
+
+    //     // return $data;
+    // }
+
+public function reporte_balance_general_por_niveles(
+    $idplantilla_reporte,
+    $fecha_ini,
+    $fecha_fin,
+    $empresa,
+    $maxProfundidad
+) {
+    $array = $this->reporte_balance_general(
+        $idplantilla_reporte,
+        $fecha_ini,
+        $fecha_fin,
+        $empresa
+    );
+
+    $limpiar = function (&$items) use (&$limpiar, $maxProfundidad) {
+
+        foreach ($items as &$item) {
+
+            // 1️⃣ BORRAR TODOS los niveles mayores al permitido
+            foreach ($item as $key => $value) {
+                if (preg_match('/^nivel_(\d+)$/', $key, $m)) {
+                    if ((int)$m[1] > $maxProfundidad) {
+                        unset($item[$key]);
+                    }
+                }
+            }
+
+            // 2️⃣ SOLO recorrer niveles permitidos
+            for ($i = 1; $i <= $maxProfundidad; $i++) {
+                $nivel = 'nivel_' . $i;
+                if (isset($item[$nivel]) && is_array($item[$nivel])) {
+                    $limpiar($item[$nivel]);
+                }
+            }
+        }
+    };
+
+    $limpiar($array);
+echo json_encode($array, JSON_NUMERIC_CHECK);
+    // return $array;
+}
+
+
 
     public function getidempresa($md5)
     {

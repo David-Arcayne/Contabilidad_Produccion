@@ -189,7 +189,7 @@ public function registrar_anular_eliminar_activar_transaccion($idtransaccion,$mo
                 $delete_trans_fact=$this->dbc->query("DELETE FROM transaccion_factura_comercial
                 WHERE idtransaccion = '$idtransaccion'");  
 
-                $eliminado=$this->dbc->query("SELECT codigotransaccion,organizacion_idorganizacion,idgestion FROM transacciones 
+                $eliminado=$this->dbc->query("SELECT codigotransaccion,fechatransaccion,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,idgestion FROM transacciones 
                 WHERE idtransacciones = '$idtransaccion'");
     
                  $resElimi = $eliminado->fetch_assoc();
@@ -211,7 +211,7 @@ public function registrar_anular_eliminar_activar_transaccion($idtransaccion,$mo
                     $fecha_inicio = date("Y-m-01", strtotime($fecha_trans)); // "2025-03-01"
                     $fecha_fin    = date("Y-m-t", strtotime($fecha_trans));  // "2025-03-31"
 
-                    $transs=$this->dbc->query(" SELECT * FROM transacciones 
+                    $transs=$this->dbc->query("SELECT * FROM transacciones 
                     WHERE codigotransaccion > '$codig' AND organizacion_idorganizacion = '$idempresa' 
                     AND idgestion = '$idgestion' AND tipotransaccion_idtipotransaccion ='$tipo_trans'
                     AND fechatransaccion BETWEEN '$fecha_inicio' AND '$fecha_fin'");
@@ -265,7 +265,7 @@ public function registrar_anular_eliminar_activar_transaccion($idtransaccion,$mo
 
                 // -------------------------------------------------------------------------------------
 
-                $res = array("success", "Se Acepto la eliminacion de transaccion", "cambiarEstado_anular_eliminar_transaccion");
+                $res = array("success", "Se Acepto la eliminacion de transaccion", "cambiarEstado_anular_eliminar_transaccion", $idgestion, $codig, $tipo_trans, $fecha_inicio, $fecha_fin,$fecha_trans);
 
                 }else{
                       //NO SE ANULARA NI CAMBIARA ESTADO DE TRANSACCION NI DETALLE TRANSACCION  

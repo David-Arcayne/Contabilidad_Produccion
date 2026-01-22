@@ -194,7 +194,7 @@ $cont->cambiarestadoconsolidado($_POST['grupo'],$_POST['estado'],$_POST['fecha']
 }elseif($ver=="registrar_transaccionEn_espera"){
     $cont=new Insertar_transaccion();
     //$idtransaccion,$estado,$hora,$fecha,$idusuario,$codigo,$tipocambio, $tipotransaccion, $glosa,$idempresa,$sucursal
-    $cont->registrar_transaccionEn_espera($_POST['transacciones_idtransacciones'],$_POST['estado'],$_POST['hora'],$_POST['fecha'],$_POST['idusuario'],$_POST['codigotransaccion'],$_POST['tipocambio'],$_POST['tipotransaccion'],$_POST['glosa'],$_POST['idempresa'],$_POST['sucursal']);
+    $cont->registrar_transaccionEn_espera($_POST['transacciones_idtransacciones'],$_POST['estado'],$_POST['hora'],$_POST['fecha'],$_POST['fecha_del_usuario'],$_POST['fecha_siguiente'],$_POST['idusuario'],$_POST['codigotransaccion'],$_POST['tipocambio'],$_POST['tipotransaccion'],$_POST['glosa'],$_POST['idempresa'],$_POST['sucursal']);
 }elseif($ver=="cambiarestadotransaccionEn_espera"){
     if (isset($_POST['idtransaccionEn_espera'],$_POST['estado'],$_POST['fecha'],$_POST['hora'],$_POST['idusuario'])) {
         $cont=new Insertar_transaccion();
@@ -791,7 +791,7 @@ if($data['ver'] == "asignar_asiento_A_factura") {
 //editar_caja_bancos_facturas editar_caja_bancos_facturas_existentes   editar_recibo_caja_bancos   registrar_factura_recibo_pago_cajaBancos registrar_agrupacion_plantilla registrar_factura_recibo_cobro asignar asiento
 //  vincula  -- crearfacturasf5 registrar_factura_cobro registrar_factura_cobro_otras_cuentas --> aumentar usuario registrar_factura_cobros_tributario registrocobrarfactura registropagarfactura registrar_recibo
 
-//   registrar_recibo_otras_cuentas editar factura editar_configuracion_reporte
+//   asignar_asiento_A_factura asignar_asiento_A_otras_cuentas asignar_asiento_A_recibos 
 }
 // asignar_asiento_A_factura activar registroplanes registrotransaccion_por_asiento registrar_factura registrar_asignacion_asiento_operacion
 //  registrotransaccion_por_asiento  registrar_recibo_cobro_cajaBancos_en_facturas registrar_recibo_cobro_cajaBancos_en_otras_cuentas  registrar_recibo_otras_cuentas  registrar_estado_resultados_admin

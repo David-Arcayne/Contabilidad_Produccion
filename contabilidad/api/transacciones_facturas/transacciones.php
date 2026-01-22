@@ -94,7 +94,7 @@ $nroTransaccion = $resultado122['codigotransaccion'] + 1;
 
             $res = array("success", "Se Registro Correctamente", "registrotransaccion",$idtransaccion,$nroTransaccion,$fecha,$glosa,'1',$asd['nombre'],$tipotransaccion,$fecha_inicio,$fecha_fin);
         } else {
-            $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
+            $res = array("danger", "La fecha debe ser posterior al último registro realizado: ".$resultado122['fechatransaccion']);
         }
         echo json_encode($res);
     }
@@ -127,37 +127,59 @@ $nroTransaccion = $resultado122['codigotransaccion'] + 1;
         $gc = $gestion_sel->fetch_assoc();
 
         if($gc['formato_transaccion'] == 'por_tipo_mes') { //FORMATO TIPO_MES
-        $registro = $this->dbc->query("SELECT idtransacciones,
-            codigotransaccion,
-            fechatransaccion,
-            glosa,
-            consolidar,
-            tipotransaccion_idtipotransaccion,
-            idgestion,
-            estado,
-            tipodecambio
-        FROM transacciones
-        WHERE idgestion = '$gestion'
-        AND organizacion_idorganizacion = '$ide'
+        $registro = $this->dbc->query("SELECT 
+    t.idtransacciones,
+    t.codigotransaccion,
+    t.fechatransaccion,
+    t.glosa,
+    t.consolidar,
+    t.tipotransaccion_idtipotransaccion,
+    t.idgestion,
+    t.estado,
+    t.tipodecambio,
+    LAG(t.fechatransaccion) OVER (
         ORDER BY 
-        YEAR(fechatransaccion) ASC,
-        MONTH(fechatransaccion) ASC,
-        tipotransaccion_idtipotransaccion ASC,
-        codigotransaccion DESC;");
+            YEAR(t.fechatransaccion) ASC,
+            MONTH(t.fechatransaccion) ASC,
+            t.tipotransaccion_idtipotransaccion ASC,
+            t.codigotransaccion DESC
+    ) AS fecha_anterior,
+    LEAD(t.fechatransaccion) OVER (
+        ORDER BY 
+            YEAR(t.fechatransaccion) ASC,
+            MONTH(t.fechatransaccion) ASC,
+            t.tipotransaccion_idtipotransaccion ASC,
+            t.codigotransaccion DESC
+    ) AS fecha_siguiente
+FROM transacciones AS t
+WHERE t.idgestion = '$gestion'
+  AND t.organizacion_idorganizacion = '$ide'
+ORDER BY 
+    YEAR(t.fechatransaccion) ASC,
+    MONTH(t.fechatransaccion) ASC,
+    t.tipotransaccion_idtipotransaccion ASC,
+    t.codigotransaccion DESC;");
 
         }elseif($gc['formato_transaccion'] == 'por_tipo_gestion'){ //FORMATO TIPO_GESTION
               $registro = $this->dbc->query("SELECT 
                 t.idtransacciones,
-        t.codigotransaccion,
-        t.fechatransaccion,
-        t.glosa,
-        t.consolidar,
-        t.tipotransaccion_idtipotransaccion,
-        t.idgestion,
-        t.estado,
-        t.tipodecambio,
-                -- g.gestion AS gestion_anio,
-                tt.nombre AS tipo_nombre
+                t.codigotransaccion,
+                t.fechatransaccion,
+                t.glosa,
+                t.consolidar,
+                t.tipotransaccion_idtipotransaccion,
+                t.idgestion,
+                t.estado,
+                t.tipodecambio,
+                        -- g.gestion AS gestion_anio,
+                tt.nombre AS tipo_nombre,
+                LAG(t.fechatransaccion) OVER 
+                (ORDER BY t.idgestion ASC,t.tipotransaccion_idtipotransaccion ASC, 
+                t.codigotransaccion DESC) AS fecha_anterior,
+                LEAD(t.fechatransaccion) OVER 
+                (ORDER BY t.idgestion ASC,t.tipotransaccion_idtipotransaccion ASC, 
+                t.codigotransaccion DESC) AS fecha_siguiente
+
             FROM transacciones t
             LEFT JOIN gestion g ON g.idgestion = t.idgestion
             LEFT JOIN tipotransaccion tt ON tt.idtipotransaccion = t.tipotransaccion_idtipotransaccion
@@ -182,7 +204,9 @@ $nroTransaccion = $resultado122['codigotransaccion'] + 1;
         t.tipotransaccion_idtipotransaccion,
         t.idgestion,
         t.estado,
-        t.tipodecambio
+        t.tipodecambio,
+        LAG(t.fechatransaccion) OVER (ORDER BY t.codigotransaccion DESC) AS fecha_anterior,
+        LEAD(t.fechatransaccion) OVER (ORDER BY t.codigotransaccion DESC) AS fecha_siguiente
       FROM
         transacciones AS t
       WHERE
@@ -207,7 +231,7 @@ $nroTransaccion = $resultado122['codigotransaccion'] + 1;
                 array_push($detalle, $ress);
             }
 
-            $res = array("id" => $qwe[0], "ntransaccion" => $qwe[1], "fecha" => $qwe[2], "glosa" => $qwe[3], "consolidar" => $qwe[4], "ttransaccion" => $asd['nombre'],"idtipotransaccion"=>$qwe[5], "gestion" => $qwe[6],"estado" => $qwe[7], "detalle" => $detalle, "tipocambio" => $qwe[8],"existe" => 1,"formato_transaccion" => $gc['formato_transaccion']);
+            $res = array("id" => $qwe[0], "ntransaccion" => $qwe[1], "fecha" => $qwe[2],"fecha_anterior" => $qwe['fecha_anterior'],"fecha_siguiente" => $qwe['fecha_siguiente'], "glosa" => $qwe[3], "consolidar" => $qwe[4], "ttransaccion" => $asd['nombre'],"idtipotransaccion"=>$qwe[5], "gestion" => $qwe[6],"estado" => $qwe[7], "detalle" => $detalle, "tipocambio" => $qwe[8],"existe" => 1,"formato_transaccion" => $gc['formato_transaccion']);
             array_push($lista, $res);
         }
         }else{
@@ -222,7 +246,7 @@ $nroTransaccion = $resultado122['codigotransaccion'] + 1;
                 array_push($detalle, $ress);
             }
 
-            $res = array("id" => $qwe[0], "ntransaccion" => $qwe[1], "fecha" => $qwe[2], "glosa" => $qwe[3], "consolidar" => $qwe[4], "ttransaccion" => $asd['nombre'],"idtipotransaccion"=>$qwe[5], "gestion" => $qwe[6],"estado" => $qwe[7], "detalle" => $detalle, "tipocambio" => $qwe[8],"existe" => 0,"formato_transaccion" => $gc['formato_transaccion']);
+            $res = array("id" => $qwe[0], "ntransaccion" => $qwe[1], "fecha" => $qwe[2],"fecha_anterior" => $qwe['fecha_anterior'],"fecha_siguiente" => $qwe['fecha_siguiente'], "glosa" => $qwe[3], "consolidar" => $qwe[4], "ttransaccion" => $asd['nombre'],"idtipotransaccion"=>$qwe[5], "gestion" => $qwe[6],"estado" => $qwe[7], "detalle" => $detalle, "tipocambio" => $qwe[8],"existe" => 0,"formato_transaccion" => $gc['formato_transaccion']);
             array_push($lista, $res);
         }
         }
@@ -646,7 +670,7 @@ if($filtrado->num_rows > 0){
                     $debe = 0;
                     $haber = $monto * ($qwe['porciento'] / 100);
                 }
-                //$pcuenta=$_POST['plandecuenta'];
+                //$pcuenta=$_POST['plandecuenta']; 
                 $ppresupuestario = 0; //$_POST['planpresupuestario'];
                 $nota = "-";
                 $estado = 1; //$_POST['estado'];
@@ -1344,15 +1368,19 @@ public function asignar_facturas_A_cuentas($data) {
         // $idsucursal = $this->getidsucursal($data['idsucursal']); 
         $gestion = $this->getgestionactualid($idempresa);
         $montoFacturas = 0;
+
+        $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$data[cuenta]'");
+        $dt = $detalle_trans->fetch_assoc();
+
             foreach ($data['facturas'] as $factura) {
 
                 $montoFacturas += $factura['monto'];
-                $updatetranscodigo = $this->dbc->query("UPDATE factura SET cuenta = '$data[cuenta]' WHERE idfactura = '{$factura['idfactura']}'");
-
+                $updatetranscodigo = $this->dbc->query("UPDATE factura SET cuenta = '$data[cuenta]',transacciones_idtransacciones = '$dt[transacciones_idtransacciones]'  
+                WHERE idfactura = '{$factura['idfactura']}'");
             }
                         
-        $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$data[cuenta]'");
-        $dt = $detalle_trans->fetch_assoc();
+        // $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$data[cuenta]'");
+        // $dt = $detalle_trans->fetch_assoc(); cobrofacturasaasientomodelo
 
         if($data['sumar_reemplazar'] == 'suma'){ // SUMAR
             if($dt['debe'] > 0){
@@ -1375,7 +1403,7 @@ public function asignar_facturas_A_cuentas($data) {
         
         // Respuesta
         if ($updatetranscodigo === TRUE) {
-            $res = array("success", "Se Registro Correctamente", "cobrofacturasaasientomodelo");
+            $res = array("success", "Se Registro Correctamente", "asignar_facturas_A_cuentas",$data['cuenta'],$dt['transacciones_idtransacciones'],$nuevo_monto_dt,$dt['debe'],$dt['haber']);
         } else {
             $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde");
         }
@@ -1508,7 +1536,7 @@ public function asignar_facturas_A_cuentas($data) {
         
         // Respuesta
         if ($updatetranscodigo === TRUE) {
-            $res = array("success", "Se Registro Correctamente", "cobrofacturasaasientomodelo");
+            $res = array("success", "Se Registro Correctamente", "cobrofacturasaasientomodelo","hola");
         } else {
             $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde");
         }
@@ -1587,7 +1615,7 @@ public function asignar_facturas_A_cuentas($data) {
         
         // Respuesta
         if ($editar_dt === TRUE) {
-            $res = array("success", "Se Registro Correctamente", "cobrofacturasaasientomodelo");
+            $res = array("success", "Se Registro Correctamente", "cobrofacturasaasientomodelo","desvinculacion");
         } else {
             $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde");
         }

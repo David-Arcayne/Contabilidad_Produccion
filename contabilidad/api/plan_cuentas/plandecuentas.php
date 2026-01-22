@@ -355,12 +355,19 @@ class Plandecuentas extends DB{
         $get = $this->dbc->query("SELECT * FROM agrupacion_rubro_plandecuenta WHERE idempresa = '$idempresa'");
     
         while ($qwe = $this->dbc->fetch($get)) {
-            // $get_nombre = $this->dbc->query("SELECT * FROM tipo_plandecuenta WHERE idtipo_plandecuenta = '$qwe[idtipo_plandecuenta]'");
-            // $nombre = $get_nombre->fetch_assoc();
+
+            $existe_vinculacion = $this->dbc->query("SELECT * FROM plandecuenta WHERE idagrupacion_rubro_plandecuenta = '$qwe[idagrupacion_rubro_plandecuenta]'");
+
+            if($existe_vinculacion->num_rows > 0){
+            $vinculado = 'si';
+            }else{
+            $vinculado = 'no';
+            }
             $res = array(
                 "idagrupacion_rubro_plandecuenta" => $qwe['idagrupacion_rubro_plandecuenta'],
                 "tipo_plandecuenta" => $qwe['tipo_plandecuenta'],
                 "numero" => $qwe['numero'],
+                "vinculado" => $vinculado
             );
             array_push($lista, $res);
         }
@@ -457,7 +464,7 @@ class Plandecuentas extends DB{
             $res = array("danger", "Ya existen registros en esta empresa");
         }else{
             foreach ($data as $item) {
-                $registro=$this->dbc->query("INSERT INTO agrupacion_rubro_plandecuenta(tipo_plandecuenta,numero,idempresa)VALUES('$item[tipo_plandecuenta]','$item[numero]','$idempresa')");
+                $registro=$this->dbc->query("INSERT INTO agrupacion_rubro_plandecuenta(tipo_plandecuenta,numero,idempresa)VALUES('$item[nombre]','$item[codigo]','$idempresa')");
             }
             $res = array("success", "Todos los elementos fueron registrados");
         }

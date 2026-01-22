@@ -505,6 +505,8 @@ while ($qwe = $this->dbc->fetch($registro)) {
             $forma_pago = $this->dbc->query("SELECT nombre FROM forma_pago WHERE idforma_pago = '$qwe[forma_pago]'");
             $fp = $forma_pago->fetch_assoc();
 
+            $aux_concepto = "s/g Contrato: ". $qwe['concepto'].", N° ".$qwe['nro_otras_cuentas'].", ".$qwe['fecha'];
+
             $res = array(
                 "idotras_cuentas" => $qwe['idotras_cuentas'],
                 "fecha" => $qwe['fecha'],
@@ -518,6 +520,7 @@ while ($qwe = $this->dbc->fetch($registro)) {
                 "nro_doc_identidad" => $qwe['nro_doc_identidad'],
                 "idtipo" => $qwe['idtipo'],
                 "concepto" => $qwe['concepto'],
+                "concepto_con_formato" => "(".$aux_concepto.")",
                 "nombre_tipo" => $resultado2['nombre'],
                 "condiciones" => $qwe['condiciones'],
                 "observaciones" => $qwe['observaciones'],
@@ -954,6 +957,8 @@ while ($qwe = $this->dbc->fetch($registro)) {
             $forma_pago = $this->dbc->query("SELECT nombre FROM forma_pago WHERE idforma_pago = '$qwe[forma_pago]'");
             $fp = $forma_pago->fetch_assoc();
 
+            $aux_concepto = "s/g Contrato: ". $qwe['concepto'].", N° ".$qwe['nro_otras_cuentas'].", ".$qwe['fecha'];
+
             $res = array(
                 "idotras_cuentas" => $qwe['idotras_cuentas'],
                 "fecha" => $qwe['fecha'],
@@ -966,6 +971,7 @@ while ($qwe = $this->dbc->fetch($registro)) {
                 "contacto" => $qwe['contacto'],
                 "nro_doc_identidad" => $qwe['nro_doc_identidad'],
                 "idtipo" => $qwe['idtipo'],
+                "concepto_con_formato" => "(".$aux_concepto.")",
                 "concepto" => $qwe['concepto'],
                 "nombre_tipo" => $resultado2['nombre'],
                 "condiciones" => $qwe['condiciones'],
@@ -1125,33 +1131,54 @@ while ($qwe = $this->dbc->fetch($registro)) {
 
             if($gc['formato_transaccion'] == 'por_tipo_mes') {
                 $nroTransa = $this->dbc->query("
-                    SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
-                FROM transacciones
-                WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]'
-                and fechatransaccion BETWEEN '$fecha_inicio' AND '$fecha_fin'
-                AND idgestion = '$gestion'
-                AND organizacion_idorganizacion = '$idempresa'
+                    SELECT 
+                        COALESCE(t.codigotransaccion, 0) + 1 AS siguiente,
+                        t.*
+                    FROM transacciones t
+                    WHERE t.codigotransaccion = (
+                        SELECT MAX(codigotransaccion)
+                        FROM transacciones
+                        WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]'
+                        AND fechatransaccion BETWEEN '$fecha_inicio' AND '$fecha_fin'
+                        AND idgestion = '$gestion'
+                        AND organizacion_idorganizacion = '$idempresa'
+                    )
+                    AND t.tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]'
+                    AND t.fechatransaccion BETWEEN '$fecha_inicio' AND '$fecha_fin'
+                    AND t.idgestion = '$gestion'
+                    AND t.organizacion_idorganizacion = '$idempresa';
                 ");
             } elseif($gc['formato_transaccion'] == 'por_tipo_gestion') {
                 $nroTransa = $this->dbc->query("
-                    SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                    SELECT COALESCE(t.codigotransaccion, 0) + 1 AS siguiente, t.* 
+                    FROM transacciones t 
+                    WHERE t.codigotransaccion = ( 
+                    SELECT MAX(codigotransaccion) 
                     FROM transacciones 
-                    WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]'
-                    AND idgestion = '$gestion'
-                    AND organizacion_idorganizacion = '$idempresa'
+                    WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]' AND idgestion = '$gestion' AND organizacion_idorganizacion = '$idempresa') 
+                    AND t.tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]' AND t.idgestion = '$gestion' AND t.organizacion_idorganizacion = '$idempresa';
                 ");
             } else { // POR_GESTION
                 $nroTransa = $this->dbc->query("
-                    SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
-                    FROM transacciones 
-                    WHERE organizacion_idorganizacion = '$idempresa'
-                    AND idgestion = '$gestion'
+                      SELECT 
+                        COALESCE(t.codigotransaccion, 0) + 1 AS siguiente,
+                        t.*
+                    FROM transacciones t
+                    WHERE t.codigotransaccion = (
+                        SELECT MAX(codigotransaccion)
+                        FROM transacciones
+                        WHERE organizacion_idorganizacion = '$idempresa'
+                        AND idgestion = '$gestion'
+                    )
+                    AND t.organizacion_idorganizacion = '$idempresa'
+                    AND t.idgestion = '$gestion';
                 ");
             }
 
         $resultado122 = $nroTransa->fetch_assoc();
         $nroTransaccion = $resultado122['siguiente'];
-    
+
+        if($data['fecha'] >= $resultado122['fechatransaccion']){
         // Insertar en transacciones
         $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion, fechatransaccion, tipodecambio, ndocumento, glosa, consolidar,estado, tipotransaccion_idtipotransaccion, organizacion_idorganizacion, sucursal, idgestion) 
         VALUES ('$nroTransaccion', '{$data['fecha']}', '1', '0', '{$data['glosa']}', '1','1', '$tt[idtipotransaccion]', '$idempresa', '$idsucursal', '$gestion')");
@@ -1193,23 +1220,32 @@ while ($qwe = $this->dbc->fetch($registro)) {
             
             $orden = $orden + 1;
         }
-        
-    }else{
+    }else{// LA FECHA NO ESTA DENTRO DEL RANGO PERMITIDO
+        $writetrans = FALSE;
+    }
+
+    // Respuesta 
+        if ($writetrans === TRUE) {
+            $res = array("success", "Se Registro Correctamente", "cobrofacturasaasientomodelo");
+        } else {
+            $res = array("danger", "La fecha debe ser posterior al último registro realizado: ".$resultado122['fechatransaccion']);
+        }
+
+    }else{ // NO SE CREA UN NUEVO ASIENTO MODELO...
 
             foreach ($data['recibos'] as $recibo) {
 
                 $updatetranscodigo = $this->dbc->query("UPDATE recibo SET transaccion = '$data[idtrans]' WHERE idrecibo = '{$recibo['idrecibo']}'");
 
             }
-        }
 
-    
-        // Respuesta
+        // Respuesta 
         if ($updatetranscodigo === TRUE) {
-            $res = array("success", "Se Registro Correctamente", "cobrofacturasaasientomodelo");
+            $res = array("success", "Se Registro Correctamente", "cobrofacturasaasientomodelo",$data['idtrans'],$data['cuenta'],$data['idasientotipo']);
         } else {
             $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde");
         }
+    }
     
         echo json_encode($res);
     }
