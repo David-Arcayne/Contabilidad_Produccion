@@ -165,12 +165,12 @@ class Transacciones_facturas extends DB{
         }
     }else{ // NO SE CREA UN NUEVO ASIENTO MODELO...
 
-        if($data['cuenta'] == ""){
+        if($data['cuenta'] == ""){ // SOLO SE ASIGNARA TRANSACCION Y NO LA CUENTA
             foreach ($data['facturas'] as $factura) {
                 $updatetranscodigo = $this->dbc->query("UPDATE factura SET transacciones_idtransacciones = '$data[idtrans]'
                 WHERE idfactura = '{$factura['idfactura']}'");
             }
-        }else{
+        }else{// SE ASIGNARA CUENTA MAS 
             $montoFacturas = 0;
             $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$data[cuenta]'");
             $dt = $detalle_trans->fetch_assoc();
@@ -193,7 +193,7 @@ class Transacciones_facturas extends DB{
                     $nuevo_monto_dt = $dt['haber'] + $montoFacturas;
                     $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
                 }
-            }else{ // REEMPLAZAR
+            }elseif($data['tipo'] == 'reemplazo'){ // REEMPLAZAR
                 if($dt['debe'] > 0){
                     $nuevo_monto_dt = $montoFacturas;
                     $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
@@ -201,6 +201,8 @@ class Transacciones_facturas extends DB{
                     $nuevo_monto_dt = $montoFacturas;
                     $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
                 }
+            }else{ // SOLO VINCULA NO PASA NADA
+
             }
         }
         

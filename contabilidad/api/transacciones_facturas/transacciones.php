@@ -1390,7 +1390,7 @@ public function asignar_facturas_A_cuentas($data) {
                 $nuevo_monto_dt = $dt['haber'] + $montoFacturas;
                 $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
             }
-        }else{ // REEMPLAZAR
+        }elseif($data['sumar_reemplazar'] == 'reemplazar'){ // REEMPLAZAR
             if($dt['debe'] > 0){
                 $nuevo_monto_dt = $montoFacturas;
                 $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
@@ -1398,6 +1398,8 @@ public function asignar_facturas_A_cuentas($data) {
                 $nuevo_monto_dt = $montoFacturas;
                 $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
             }
+        }else{ // SOLO VINCULARA NADA MAS
+
         }
    
         

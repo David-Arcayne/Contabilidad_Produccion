@@ -2,7 +2,7 @@
 require_once "../../db/db.php";
 class Cuentaspor extends DB{
 
-    public function registropagarfactura($idfactura,$lugar, $idtransaccion,$idcaja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$concepto,$archivo,$zn)
+    public function registropagarfactura($idfactura,$lugar, $idtransaccion,$idcaja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$concepto,$archivo,$zn,$fecha_transaccion,$cuenta,$tipo_cuenta)
     {
         // ini_set('display_errors', 1);
         // ini_set('display_startup_errors', 1);
@@ -44,8 +44,8 @@ class Cuentaspor extends DB{
 
         
                 // Construir rango dinámico (primer y último día del mes)
-        $fecha_inicio = date("Y-m-01", strtotime($fecha)); // "2025-03-01"
-        $fecha_fin    = date("Y-m-t", strtotime($fecha));  // "2025-03-31"
+        $fecha_inicio = date("Y-m-01", strtotime($fecha_transaccion)); // "2025-03-01"
+        $fecha_fin    = date("Y-m-t", strtotime($fecha_transaccion));  // "2025-03-31"
 
         $asiento_tipo = $this->dbc->query("SELECT * FROM asientotipo WHERE idasientotipo='$asiento'");
         $at = $asiento_tipo->fetch_assoc();
@@ -57,44 +57,54 @@ class Cuentaspor extends DB{
         $gc = $gestion_sel->fetch_assoc();
 
         if($gc['formato_transaccion'] == 'por_tipo_mes') {
-            $nroTransa = $this->dbc->query("
-                SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+            $nroTransa = $this->dbc->query("SELECT *
+            -- COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
             FROM transacciones
             WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]'
             and fechatransaccion BETWEEN '$fecha_inicio' AND '$fecha_fin'
             AND idgestion = '$idgestion'
             AND organizacion_idorganizacion = '$ide'
+            ORDER BY codigotransaccion DESC
+            LIMIT 1
             ");
         } elseif($gc['formato_transaccion'] == 'por_tipo_gestion') {
-            $nroTransa = $this->dbc->query("
-                SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+            $nroTransa = $this->dbc->query("SELECT *
+            -- COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
                 FROM transacciones 
                 WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]'
                 AND idgestion = '$idgestion'
                 AND organizacion_idorganizacion = '$ide'
+                ORDER BY codigotransaccion DESC
+                LIMIT 1
             ");
         } else { // POR_GESTION
-            $nroTransa = $this->dbc->query("
-                SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+            $nroTransa = $this->dbc->query("SELECT *
+            -- COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
                 FROM transacciones 
                 WHERE organizacion_idorganizacion = '$ide'
                 AND idgestion = '$idgestion'
+                ORDER BY codigotransaccion DESC
+                LIMIT 1
             ");
         }
 
     $resultado122 = $nroTransa->fetch_assoc();
-    $nroTransaccion = $resultado122['siguiente'];
+    // $nroTransaccion = $resultado122['siguiente'];
+    $nroTransaccion = $resultado122['codigotransaccion'] + 1;
 
         // $empresa = $this->emp; registropagarfactura nrecibo
         // $transi = $this->dbc->query("SELECT * FROM transacciones WHERE organizacion_idorganizacion='$ide' AND idgestion='$idgestion' order by codigotransaccion desc Limit 1");
         // $qq = $this->dbc->fetch($transi);
         // $codigo = $qq['codigotransaccion'] + 1;
         $glosa = "Registro cobro $nrecibo";
-
+        
+        $bandera = TRUE;
 
         if ($asiento != "" && $idtransaccion == "") {
+
+        if($fecha_transaccion >= $resultado122['fechatransaccion']){  
         $insertrans = $this->dbc->query("INSERT INTO `transacciones` (`idtransacciones`, `codigotransaccion`, `fechatransaccion`, `tipodecambio`, `ndocumento`, `glosa`, `consolidar`,`estado`, `tipotransaccion_idtipotransaccion`, `organizacion_idorganizacion`, `sucursal`, `idgestion`) 
-        VALUES (NULL, '$nroTransaccion', '$fecha', '1', '0', '$glosa', '1','1', '$tt[idtipotransaccion]', '$ide', '$sucursal', '$idgestion');");
+        VALUES (NULL, '$nroTransaccion', '$fecha_transaccion', '1', '0', '$glosa', '1','1', '$tt[idtipotransaccion]', '$ide', '$sucursal', '$idgestion');");
         //nuevat transaccion
         $transis = $this->dbc->query("select * from transacciones where codigotransaccion='$nroTransaccion' and  organizacion_idorganizacion='$ide' order by idtransacciones desc Limit 1");
         $ww = $this->dbc->fetch($transis);
@@ -123,13 +133,47 @@ class Cuentaspor extends DB{
 
             $orden = $orden + 1;
         }
+        }else{
+            $bandera = FALSE;
+        }
     }elseif($idtransaccion == "" && $asiento == "") {
             $trans = 0;
     }else{
         $trans = $idtransaccion;
+        if($cuenta == ""){ // SOLO SE ASIGNARA TRANSACCION Y NO LA CUENTA
+            // no ocurrira nada
+            }else{// SE ASIGNARA CUENTA MAS 
+                // $montoFacturas = 0;
+                $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$cuenta'");
+                $dt = $detalle_trans->fetch_assoc();
+
+                // $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$data[cuenta]'");
+                // $dt = $detalle_trans->fetch_assoc();
+
+                if($tipo_cuenta == 'suma'){ // SUMAR
+                    
+                    if($dt['debe'] > 0){
+                        $nuevo_monto_dt = $dt['debe'] + $monto;
+                        $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
+                    }else{
+                        $nuevo_monto_dt = $dt['haber'] + $monto;
+                        $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
+                    }
+                }elseif($tipo_cuenta == 'reemplazo'){ // REEMPLAZAR
+                    if($dt['debe'] > 0){
+                        $nuevo_monto_dt = $monto;
+                        $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
+                    }else{
+                        $nuevo_monto_dt = $monto;
+                        $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
+                    }
+                }else{ // SOLO VINCULA NO PASA NADA
+
+                }
+            }
     }
 // -------------------------------------------------------------------------------------------
-
+    if($bandera === TRUE){
     if(empty($archivo['name'])){
         $registropago = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,concepto,archivo,registro_desde)
         VALUES(NULL,'$nrecibo','$fecha_completa','$lugar','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$idcuenta','$concepto',NULL,'facturas_x_pagar')");
@@ -199,6 +243,10 @@ class Cuentaspor extends DB{
         $editar_factura = $this->dbc->query("UPDATE factura SET pagado = '2' WHERE idfactura = '$idfactura'");
     }else{
         //TODAVIA NO SE PAGO EL TOTAL DEL SALDO
+    }
+    }else{
+        $res = array("danger", "La fecha de registro es menor al ultimo registro de la transaccion que existe: ".$resultado122['fechatransaccion']);
+       
     }
         echo json_encode($res);
         // echo json_encode($$idfactura,$lugar, $idtransaccion,$idcaja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$archivo,$zn);

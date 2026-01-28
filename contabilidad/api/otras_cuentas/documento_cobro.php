@@ -1231,7 +1231,7 @@ while ($qwe = $this->dbc->fetch($registro)) {
             $res = array("danger", "La fecha debe ser posterior al último registro realizado: ".$resultado122['fechatransaccion']);
         }
 
-    }else{ // NO SE CREA UN NUEVO ASIENTO MODELO...
+    }else{ // NO SE CREA UN NUEVO ASIENTO MODELO...  AQUI FALTA IMPLEMENTAR VINCULAR CUENTA CON RECIBO Y CON COBRS O PAGOS
 
             foreach ($data['recibos'] as $recibo) {
 

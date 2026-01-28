@@ -692,7 +692,7 @@ elseif($ver[0]=="listar_reportes_referencia"){
 //    listadetalle  listar_recibo_otras_cuentas_pagar       listar_factura           listar_recibo_pago_por_id             listar_datos_contrataciones_cajas                                listar_recibo_por_id   --> caja bancos 
 // reemplazar listar_plantilla     listadegestion   getgestion "archivo" => $qwe['archivo'],             listar_recibo_por_id_otras_cuentas      listar_recibo_por_id_otras_cuentas_pagar ---> esos dos son de recibos
 
-// mayorcuentacontable  reporteactivodisponible es_cuenta_de_orden listar_otras_cuentas_cobrar
+// mayorcuentacontable  reporteactivodisponible es_cuenta_de_orden listar_otras_cuentas_cobrar lista_cobrar_cobrado_factura
 //    listar_recibo_otras_cuentas  listar_recibo_otras_cuentas_pagar       listar_factura           listar_recibo_pago_por_id                                              listar_recibo_por_id   --> caja bancos 
 // listar_tipo_plandecuenta listar_anular listapagos listapagos_individuales listar_recibo_otras_cuentas reportedetalletransaccion reportedetallefpt listar_otras_cuentas_cobrar_vencidas 
 // listadetalletransaccion listatransacciones reportecomprobantecontable listar_recibo_por_caja_bancos listar_agrupacion_rubro_plandecuenta

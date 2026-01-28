@@ -2,7 +2,7 @@
 require_once "../../db/db.php";
 class Cuentaspof extends DB{
 
-    public function registrocobrarfactura($idfactura,$lugar, $idtransaccion,$idcaja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$concepto,$archivo,$zn)
+    public function registrocobrarfactura($idfactura,$lugar, $idtransaccion,$idcaja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$concepto,$archivo,$zn,$fecha_transaccion,$cuenta,$tipo_cuenta)
     {
         // echo json_encode(array($idfactura,$lugar, $idtransaccion,$idcaja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$concepto,$archivo,$zn));
 
@@ -46,8 +46,8 @@ class Cuentaspof extends DB{
 //----------------------------------------------------------------------------------------------------------------
 
         // Construir rango dinámico (primer y último día del mes)
-        $fecha_inicio = date("Y-m-01", strtotime($fecha)); // "2025-03-01"
-        $fecha_fin    = date("Y-m-t", strtotime($fecha));  // "2025-03-31"
+        $fecha_inicio = date("Y-m-01", strtotime($fecha_transaccion)); // "2025-03-01"
+        $fecha_fin    = date("Y-m-t", strtotime($fecha_transaccion));  // "2025-03-31"
 
         $asiento_tipo = $this->dbc->query("SELECT * FROM asientotipo WHERE idasientotipo='$asiento'");
         $at = $asiento_tipo->fetch_assoc();
@@ -99,9 +99,10 @@ class Cuentaspof extends DB{
         $trans = "";
         $bandera = TRUE;
         if ($asiento != "" && $idtransaccion == "") {
-            if($fecha >= $resultado122['fechatransaccion']){  
+
+            if($fecha_transaccion >= $resultado122['fechatransaccion']){  
                 $insertrans = $this->dbc->query("INSERT INTO `transacciones` (`idtransacciones`, `codigotransaccion`, `fechatransaccion`, `tipodecambio`, `ndocumento`, `glosa`, `consolidar`, `estado`, `tipotransaccion_idtipotransaccion`, `organizacion_idorganizacion`, `sucursal`, `idgestion`) 
-                VALUES (NULL, '$nroTransaccion', '$fecha', '1', '0', '$glosa', '1', '1', '$tt[idtipotransaccion]', '$ide', '$sucursal', '$idgestion');");
+                VALUES (NULL, '$nroTransaccion', '$fecha_transaccion', '1', '0', '$glosa', '1', '1', '$tt[idtipotransaccion]', '$ide', '$sucursal', '$idgestion');");
                 //nuevat transaccion
                 $transis = $this->dbc->query("SELECT * FROM transacciones WHERE codigotransaccion='$nroTransaccion' AND  organizacion_idorganizacion='$ide' ORDER BY idtransacciones DESC LIMIT 1");
                 $ww = $this->dbc->fetch($transis);
@@ -134,17 +135,49 @@ class Cuentaspof extends DB{
                 $bandera = FALSE;
             }
             
-        } elseif($idtransaccion == "" && $asiento == "") {
+        } elseif($idtransaccion == "" && $asiento == "") { // NO SE VINCULA A NINGUNA TRANSACCION NI SE CREA NUEVA 
             $trans = 0;
-        }else{
-            $trans = $idtransaccion;
+            
+        }else{ // ESTO OCURRE EN ESTE ELSE --> $idtransaccion > 0 && $asiento == ""
+             $trans = $idtransaccion;
+            if($cuenta == ""){ // SOLO SE ASIGNARA TRANSACCION Y NO LA CUENTA
+            // no ocurrira nada
+            }else{// SE ASIGNARA CUENTA MAS 
+                // $montoFacturas = 0;
+                $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$cuenta'");
+                $dt = $detalle_trans->fetch_assoc();
+
+                // $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$data[cuenta]'");
+                // $dt = $detalle_trans->fetch_assoc();
+
+                if($tipo_cuenta == 'suma'){ // SUMAR
+                    
+                    if($dt['debe'] > 0){
+                        $nuevo_monto_dt = $dt['debe'] + $monto;
+                        $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
+                    }else{
+                        $nuevo_monto_dt = $dt['haber'] + $monto;
+                        $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
+                    }
+                }elseif($tipo_cuenta == 'reemplazo'){ // REEMPLAZAR
+                    if($dt['debe'] > 0){
+                        $nuevo_monto_dt = $monto;
+                        $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
+                    }else{
+                        $nuevo_monto_dt = $monto;
+                        $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
+                    }
+                }else{ // SOLO VINCULA NO PASA NADA
+
+                }
+            }
         }
         
         //------------------------------------------------------------------------------------
         if($bandera === TRUE){
             if(empty($archivo['name'])){
                 $registropago = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,concepto,archivo,registro_desde)
-                VALUES(NULL,'$nrecibo','$fecha_completa','$lugar','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$idcuenta','$concepto',NULL,'facturas_x_cobrar')");
+                VALUES(NULL,'$nrecibo','$fecha_completa','$lugar','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$cuenta','$concepto',NULL,'facturas_x_cobrar')");
 
                 if ($registropago === TRUE) {
 
@@ -180,7 +213,7 @@ class Cuentaspof extends DB{
                 if(move_uploaded_file($archivo_tmp, $ruta_destino)){
                     //registrar pago, preguntar guardar la anterior transaccion o la nueva
                 $registropago2 = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,concepto,archivo,registro_desde)
-                VALUES(NULL,'$nrecibo','$fecha_completa','$lugar','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$idcuenta','$concepto','$unique_name','facturas_x_cobrar')");
+                VALUES(NULL,'$nrecibo','$fecha_completa','$lugar','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$cuenta','$concepto','$unique_name','facturas_x_cobrar')");
 
                 
                 if ($registropago2 === TRUE) {
