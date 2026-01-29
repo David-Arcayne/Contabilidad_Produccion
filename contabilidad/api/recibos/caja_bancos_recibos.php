@@ -25,12 +25,12 @@ class Caja_bancos_recibos extends DB{
         //$res=array("id"=>,"nombre"=>$qwe['nombre']); registrar_factura_recibo_pago_cajaBancos
         return $qwe['idgestion'];
     }
-    public function registrar_factura_recibo_cobro_cajaBancos($idotras_cuentas,$por_concepto_de,$fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento,$clasefactura,$cobro, $pagar, $espesificacion,$trans, $cliente, $empresa, $cuenta,  $sucursal,$asiento,$idcaja_bancos,$archivo,$registro_desde,$zn)
+    public function registrar_factura_recibo_cobro_cajaBancos($idotras_cuentas,$por_concepto_de,$fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento,$clasefactura,$cobro, $pagar, $espesificacion,$trans, $cliente, $empresa, $sucursal,$asiento,$idcaja_bancos,$archivo,$registro_desde,$zn,$fecha_transaccion,$cuenta,$tipo_cuenta)
     {
 
-         ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+        //  ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
 
         // Establecer la zona horaria recibida
         date_default_timezone_set($zn);
@@ -54,6 +54,8 @@ class Caja_bancos_recibos extends DB{
         }
         $res = ""; //array($fecha,$nfactura,$nautorizacion,$codigocontrol,$monto,$tasacero,$export,$npoliza,$ice,$descuento,$espesificacion,$cliente,$co,$pa,$trans,$clasefactura,$cuenta,$idempresa,$idsucursal);
         
+        $bandera = TRUE;
+
         //--------------------------------------------------------------------
         $recibo_trans = $this->dbc->query("SELECT count(*) AS cant1 FROM cuentaspof cp 
         INNER JOIN transacciones t ON t.idtransacciones=cp.transaccion 
@@ -103,28 +105,75 @@ class Caja_bancos_recibos extends DB{
         if($trans == "" && $asiento == ""){
             // se crea factura sin transaccion asignada
             //$trans = 0
-            $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`,`tipo_factura`, `clasefactura`, `cobrado`, `pagado`,`idotras_cuentas`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento','contado', '$clasefactura', '$co', '$pa','$id_otras_cuentas_aux', '$espesificacion', '1', '1', '0', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de','$registro_desde');");
+            $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`,`tipo_factura`, `clasefactura`, `cobrado`, `pagado`,`idotras_cuentas`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) 
+            VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento','contado', '$clasefactura', '$co', '$pa','$id_otras_cuentas_aux', '$espesificacion', '1', '1', '0', '$cliente', '$idempresa', '0', '$idsucursal','$por_concepto_de','$registro_desde');");
         
             $idfact = $this->dbc->insert_id;
 
             $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','0','$trans','0',NULL,'$registro_desde')");
+            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','0','0','0',NULL,'$registro_desde')");
 
             $idrecibo = $this->dbc->insert_id;
         }elseif($trans != "" && $asiento == ""){
             //SE CREA LA FACTURA CON LA TRANSACCION EXISTENTE QUE YA TE PASARON
-            $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`,`tipo_factura`, `clasefactura`, `cobrado`, `pagado`,`idotras_cuentas`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento','contado', '$clasefactura', '$co', '$pa','$id_otras_cuentas_aux', '$espesificacion', '1', '1', '$trans', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de','$registro_desde');");
+            
+            if($cuenta == ""){ // SOLO SE ASIGNARA TRANSACCION Y NO LA CUENTA
+
+            //SE CREA LA FACTURA CON LA TRANSACCION EXISTENTE QUE YA TE PASARON
+            $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`,`tipo_factura`, `clasefactura`, `cobrado`, `pagado`,`idotras_cuentas`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) 
+            VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento','contado', '$clasefactura', '$co', '$pa','0', '$espesificacion', '1', '1', '$trans', '$cliente', '$idempresa', '0', '$idsucursal','$por_concepto_de','$registro_desde');");
         
             $idfact = $this->dbc->insert_id;
 
-            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','0','$trans','0',NULL,'$registro_desde')");
+            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
+            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$trans','0',NULL,'$registro_desde')");
 
             $idrecibo = $this->dbc->insert_id;
-        }else{
+        
+        }else{// SE ASIGNARA CUENTA MAS 
+            $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`,`tipo_factura`, `clasefactura`, `cobrado`, `pagado`,`idotras_cuentas`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) 
+            VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento','contado', '$clasefactura', '$co', '$pa','0', '$espesificacion', '1', '1', '$trans', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de','$registro_desde');");
+        
+            $idfact = $this->dbc->insert_id;
+
+            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
+            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$trans','$cuenta',NULL,'$registro_desde')");
+
+            $idrecibo = $this->dbc->insert_id;
+
+            $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$cuenta'");
+                $dt = $detalle_trans->fetch_assoc();
+
+                // $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$data[cuenta]'");
+                // $dt = $detalle_trans->fetch_assoc();
+
+                if($tipo_cuenta == 'suma'){ // SUMAR
+                    
+                    if($dt['debe'] > 0){
+                        $nuevo_monto_dt = $dt['debe'] + $monto;
+                        $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
+                    }else{
+                        $nuevo_monto_dt = $dt['haber'] + $monto;
+                        $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
+                    }
+                }elseif($tipo_cuenta == 'reemplazo'){ // REEMPLAZAR
+                    if($dt['debe'] > 0){
+                        $nuevo_monto_dt = $monto;
+                        $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
+                    }else{
+                        $nuevo_monto_dt = $monto;
+                        $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
+                    }
+                }else{ // SOLO VINCULA NO PASA NADA
+
+                }
+
+        }
+        }else{ //SE CREARA UN NUEVO ASIENTO MODELO
+
             // Construir rango dinámico (primer y último día del mes)
-            $fecha_inicio = date("Y-m-01", strtotime($fecha)); // "2025-03-01"
-            $fecha_fin    = date("Y-m-t", strtotime($fecha));  // "2025-03-31"
+            $fecha_inicio = date("Y-m-01", strtotime($fecha_transaccion)); // "2025-03-01"
+            $fecha_fin    = date("Y-m-t", strtotime($fecha_transaccion));  // "2025-03-31"
 
             $asiento_tipo = $this->dbc->query("SELECT * FROM asientotipo WHERE idasientotipo='$asiento'");
             $at = $asiento_tipo->fetch_assoc();
@@ -136,37 +185,44 @@ class Caja_bancos_recibos extends DB{
             $gc = $gestion_sel->fetch_assoc();
 
             if($gc['formato_transaccion'] == 'por_tipo_mes') {
-                $nroTransa = $this->dbc->query("
-                    SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                $nroTransa = $this->dbc->query("SELECT *
+                -- COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
                 FROM transacciones
                 WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]'
                 and fechatransaccion BETWEEN '$fecha_inicio' AND '$fecha_fin'
                 AND idgestion = '$gestion'
                 AND organizacion_idorganizacion = '$idempresa'
+                ORDER BY codigotransaccion DESC
+                LIMIT 1
                 ");
             } elseif($gc['formato_transaccion'] == 'por_tipo_gestion') {
-                $nroTransa = $this->dbc->query("
-                    SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                $nroTransa = $this->dbc->query("SELECT *
+                -- COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
                     FROM transacciones 
                     WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]'
                     AND idgestion = '$gestion'
                     AND organizacion_idorganizacion = '$idempresa'
+                    ORDER BY codigotransaccion DESC
+                    LIMIT 1
                 ");
             } else { // POR_GESTION
-                $nroTransa = $this->dbc->query("
-                    SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                $nroTransa = $this->dbc->query("SELECT *
+                -- COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
                     FROM transacciones 
                     WHERE organizacion_idorganizacion = '$idempresa'
                     AND idgestion = '$gestion'
+                    ORDER BY codigotransaccion DESC
+                    LIMIT 1
                 ");
             }
-
         $resultado122 = $nroTransa->fetch_assoc();
-        $nroTransaccion = $resultado122['siguiente'];
+        $nroTransaccion = $resultado122['codigotransaccion'] + 1;
+
+        if($fecha_transaccion >= $resultado122['fechatransaccion']){// REGISTRO CON UN NUEVO ASIENTO (TRANSACCION) {{{{{{{{{{{{{{{{{{{{{{{{{{}}}}}}}}}}}}}}}}}}}}}}}}}}
 
         // Insertar en transacciones
         $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion, fechatransaccion, tipodecambio, ndocumento, glosa, consolidar,estado, tipotransaccion_idtipotransaccion, organizacion_idorganizacion, sucursal, idgestion) 
-        VALUES ('$nroTransaccion', '$fecha', '1', '0', 'Registro Cobro Caja Bancos', '1','1', '$tt[idtipotransaccion]', '$idempresa', '$idsucursal', '$gestion')");
+        VALUES ('$nroTransaccion', '$fecha_transaccion', '1', '0', 'Registro Cobro Caja Bancos', '1','1', '$tt[idtipotransaccion]', '$idempresa', '$idsucursal', '$gestion')");
         $idtrans = $this->dbc->insert_id;
 // -----------------------------------------------------------------------------------------------------------------
              // Obtener los asientos relacionados y calcular debe y haber
@@ -200,6 +256,16 @@ class Caja_bancos_recibos extends DB{
             VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','0','$idtrans','0',NULL,'$registro_desde')");
 
         $idrecibo = $this->dbc->insert_id;
+
+            if ($registro === TRUE) {
+                $res = array("success", "Registro Correcto", "crearfactura", $trans, $clasefactura, $cuenta);
+            } else {
+                $res = array("danger", "No se pudo realizar el registro ");
+            }
+
+            }else{  // FINALIZA CON UN NUEVO ASIENTO (TRANSACCION) {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+            $bandera = FALSE;
+            }
         }
       
         //----------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -236,21 +302,24 @@ class Caja_bancos_recibos extends DB{
         $crear_detalle_cajaBancos = $this->dbc->query("INSERT INTO detalle_caja_bancos_cobrar(idcaja_bancos,monto,idcuentaspof,idfactura,idotras_cuentas)
         VALUES('$idcaja_bancos','$monto','$idrecibo','$idfact','0')");
 
-        if ($crearRecibo === TRUE) {
-            $res = array("success", "Registro Correcto", "crearfactura", $trans, $clasefactura, $cuenta);
-        } else {
-            $res = array("danger", "No se pudo realizar el registro ");
+        if($bandera === TRUE){
+            $res = array("success", "Registro Correcto", "crearfactura");
+
+        }else{
+            
+            $res = array("danger", "La fecha de registro es menor al ultimo registro de la transaccion que existe: ".$resultado122['fechatransaccion']);
+
         }
         echo json_encode($res);
 
     }
 
-    public function registrar_factura_recibo_pago_cajaBancos($idotras_cuentas,$por_concepto_de,$fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento,$clasefactura,$cobro, $pagar, $espesificacion,$trans, $cliente, $empresa, $cuenta,  $sucursal,$asiento,$idcaja_bancos,$archivo,$registro_desde,$zn)
+    public function registrar_factura_recibo_pago_cajaBancos($idotras_cuentas,$por_concepto_de,$fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento,$clasefactura,$cobro, $pagar, $espesificacion,$trans, $cliente, $empresa, $sucursal,$asiento,$idcaja_bancos,$archivo,$registro_desde,$zn,$fecha_transaccion,$cuenta,$tipo_cuenta)
     {
 
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
 
         // Establecer la zona horaria recibida
         date_default_timezone_set($zn);
@@ -274,6 +343,7 @@ class Caja_bancos_recibos extends DB{
         }
         $res = ""; //array($fecha,$nfactura,$nautorizacion,$codigocontrol,$monto,$tasacero,$export,$npoliza,$ice,$descuento,$espesificacion,$cliente,$co,$pa,$trans,$clasefactura,$cuenta,$idempresa,$idsucursal);
         
+        $bandera = TRUE;
         //--------------------------------------------------------------------
         $recibo_trans = $this->dbc->query("SELECT count(*) AS cant1 FROM cuentaspor cp 
         INNER JOIN transacciones t ON t.idtransacciones=cp.transaccion 
@@ -323,29 +393,82 @@ class Caja_bancos_recibos extends DB{
             // se crea factura sin transaccion asignada
             //$trans = 0
             $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`,`tipo_factura`, `clasefactura`, `cobrado`, `pagado`,`idotras_cuentas`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) 
-            VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento','contado', '$clasefactura', '$co', '$pa','$id_otras_cuentas_aux', '$espesificacion', '1', '1', '0', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de','$registro_desde');");
+            VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento','contado', '$clasefactura', '$co', '$pa','$id_otras_cuentas_aux', '$espesificacion', '1', '1', '0', '$cliente', '$idempresa', '0', '$idsucursal','$por_concepto_de','$registro_desde');");
         
             $idfact = $this->dbc->insert_id;
 
             $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$proveedor_select[nombre]','$proveedor_select[nit]','$monto','$idfact','0','0','$trans','0',NULL,'$registro_desde')");
+            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$proveedor_select[nombre]','$proveedor_select[nit]','$monto','$idfact','0','0','0','0',NULL,'$registro_desde')");
 
             $idrecibo = $this->dbc->insert_id;
         }elseif($trans > 0 && $asiento == ""){
             //SE CREA LA FACTURA CON LA TRANSACCION EXISTENTE QUE YA TE PASARON
-            $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`,`tipo_factura`, `clasefactura`, `cobrado`, `pagado`, `idotras_cuentas`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) 
-            VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento','contado', '$clasefactura', '$co', '$pa','$id_otras_cuentas_aux', '$espesificacion', '1', '1', '$trans', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de','$registro_desde');");
+            // $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`,`tipo_factura`, `clasefactura`, `cobrado`, `pagado`, `idotras_cuentas`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) 
+            // VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento','contado', '$clasefactura', '$co', '$pa','$id_otras_cuentas_aux', '$espesificacion', '1', '1', '$trans', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de','$registro_desde');");
+        
+            // $idfact = $this->dbc->insert_id;
+
+            // $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
+            // VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$proveedor_select[nombre]','$proveedor_select[nit]','$monto','$idfact','0','0','$trans','0',NULL,'$registro_desde')");
+
+            // $idrecibo = $this->dbc->insert_id;
+            if($cuenta == ""){ // SOLO SE ASIGNARA TRANSACCION Y NO LA CUENTA
+
+            //SE CREA LA FACTURA CON LA TRANSACCION EXISTENTE QUE YA TE PASARON
+            $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`,`tipo_factura`, `clasefactura`, `cobrado`, `pagado`,`idotras_cuentas`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) 
+            VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento','contado', '$clasefactura', '$co', '$pa','0', '$espesificacion', '1', '1', '$trans', '$cliente', '$idempresa', '0', '$idsucursal','$por_concepto_de','$registro_desde');");
         
             $idfact = $this->dbc->insert_id;
 
-            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$proveedor_select[nombre]','$proveedor_select[nit]','$monto','$idfact','0','0','$trans','0',NULL,'$registro_desde')");
+            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
+            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$proveedor_select[nombre]','$proveedor_select[nit]','$monto','$idfact','0','$trans','0',NULL,'$registro_desde')");
 
             $idrecibo = $this->dbc->insert_id;
-        }else{
+        
+        }else{// SE ASIGNARA CUENTA MAS 
+            $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`,`tipo_factura`, `clasefactura`, `cobrado`, `pagado`,`idotras_cuentas`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) 
+            VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento','contado', '$clasefactura', '$co', '$pa','0', '$espesificacion', '1', '1', '$trans', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de','$registro_desde');");
+        
+            $idfact = $this->dbc->insert_id;
+
+            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
+            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$proveedor_select[nombre]','$proveedor_select[nit]','$monto','$idfact','0','$trans','$cuenta',NULL,'$registro_desde')");
+
+            $idrecibo = $this->dbc->insert_id;
+
+            $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$cuenta'");
+                $dt = $detalle_trans->fetch_assoc();
+
+                // $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$data[cuenta]'");
+                // $dt = $detalle_trans->fetch_assoc();
+
+                if($tipo_cuenta == 'suma'){ // SUMAR
+                    
+                    if($dt['debe'] > 0){
+                        $nuevo_monto_dt = $dt['debe'] + $monto;
+                        $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
+                    }else{
+                        $nuevo_monto_dt = $dt['haber'] + $monto;
+                        $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
+                    }
+                }elseif($tipo_cuenta == 'reemplazo'){ // REEMPLAZAR
+                    if($dt['debe'] > 0){
+                        $nuevo_monto_dt = $monto;
+                        $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
+                    }else{
+                        $nuevo_monto_dt = $monto;
+                        $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
+                    }
+                }else{ // SOLO VINCULA NO PASA NADA
+
+                }
+
+        }
+        }else{ //SE CREARA UN NUEVO ASIENTO MODELO
+
             // Construir rango dinámico (primer y último día del mes)
-            $fecha_inicio = date("Y-m-01", strtotime($fecha)); // "2025-03-01"
-            $fecha_fin    = date("Y-m-t", strtotime($fecha));  // "2025-03-31"
+            $fecha_inicio = date("Y-m-01", strtotime($fecha_transaccion)); // "2025-03-01"
+            $fecha_fin    = date("Y-m-t", strtotime($fecha_transaccion));  // "2025-03-31"
 
             $asiento_tipo = $this->dbc->query("SELECT * FROM asientotipo WHERE idasientotipo='$asiento'");
             $at = $asiento_tipo->fetch_assoc();
@@ -357,37 +480,44 @@ class Caja_bancos_recibos extends DB{
             $gc = $gestion_sel->fetch_assoc();
 
             if($gc['formato_transaccion'] == 'por_tipo_mes') {
-                $nroTransa = $this->dbc->query("
-                    SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                $nroTransa = $this->dbc->query("SELECT *
+                -- COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
                 FROM transacciones
                 WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]'
                 and fechatransaccion BETWEEN '$fecha_inicio' AND '$fecha_fin'
                 AND idgestion = '$gestion'
                 AND organizacion_idorganizacion = '$idempresa'
+                ORDER BY codigotransaccion DESC
+                LIMIT 1
                 ");
             } elseif($gc['formato_transaccion'] == 'por_tipo_gestion') {
-                $nroTransa = $this->dbc->query("
-                    SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                $nroTransa = $this->dbc->query("SELECT *
+                -- COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
                     FROM transacciones 
                     WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]'
                     AND idgestion = '$gestion'
                     AND organizacion_idorganizacion = '$idempresa'
+                    ORDER BY codigotransaccion DESC
+                    LIMIT 1
                 ");
             } else { // POR_GESTION
-                $nroTransa = $this->dbc->query("
-                    SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                $nroTransa = $this->dbc->query("SELECT *
+                -- COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
                     FROM transacciones 
                     WHERE organizacion_idorganizacion = '$idempresa'
                     AND idgestion = '$gestion'
+                    ORDER BY codigotransaccion DESC
+                    LIMIT 1
                 ");
             }
-
         $resultado122 = $nroTransa->fetch_assoc();
-        $nroTransaccion = $resultado122['siguiente'];
+        $nroTransaccion = $resultado122['codigotransaccion'] + 1;
+
+        if($fecha_transaccion >= $resultado122['fechatransaccion']){// REGISTRO CON UN NUEVO ASIENTO (TRANSACCION) {{{{{{{{{{{{{{{{{{{{{{{{{{}}}}}}}}}}}}}}}}}}}}}}}}}}
 
         // Insertar en transacciones
         $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion, fechatransaccion, tipodecambio, ndocumento, glosa, consolidar,estado, tipotransaccion_idtipotransaccion, organizacion_idorganizacion, sucursal, idgestion) 
-        VALUES ('$nroTransaccion', '$fecha', '1', '0', 'Registro Pago Caja Bancos', '1','1', '$tt[idtipotransaccion]', '$idempresa', '$idsucursal', '$gestion')");
+        VALUES ('$nroTransaccion', '$fecha_transaccion', '1', '0', 'Registro Pago Caja Bancos', '1','1', '$tt[idtipotransaccion]', '$idempresa', '$idsucursal', '$gestion')");
         $idtrans = $this->dbc->insert_id;
 // -----------------------------------------------------------------------------------------------------------------
              // Obtener los asientos relacionados y calcular debe y haber
@@ -421,6 +551,16 @@ class Caja_bancos_recibos extends DB{
             VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$proveedor_select[nombre]','$proveedor_select[nit]','$monto','$idfact','0','0','$idtrans','0',NULL,'$registro_desde')");
 
         $idrecibo = $this->dbc->insert_id;
+
+         if ($registro === TRUE) {
+                $res = array("success", "Registro Correcto", "crearfactura", $trans, $clasefactura, $cuenta);
+            } else {
+                $res = array("danger", "No se pudo realizar el registro ");
+            }
+
+            }else{  // FINALIZA CON UN NUEVO ASIENTO (TRANSACCION) {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+            $bandera = FALSE;
+            }
         }
       
          //----------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -457,10 +597,13 @@ class Caja_bancos_recibos extends DB{
         $crear_detalle_cajaBancos = $this->dbc->query("INSERT INTO detalle_caja_bancos_pagar(idcaja_bancos,monto,idcuentaspor,idfactura,idotras_cuentas)
         VALUES('$idcaja_bancos','$monto','$idrecibo','$idfact','0')");
 
-        if ($crearRecibo === TRUE) {
-            $res = array("success", "Registro Correcto", "crearfactura", $trans, $clasefactura, $cuenta);
-        } else {
-            $res = array("danger", "No se pudo realizar el registro ");
+        if($bandera === TRUE){
+            $res = array("success", "Registro Correcto", "crearfactura");
+
+        }else{
+            
+            $res = array("danger", "La fecha de registro es menor al ultimo registro de la transaccion que existe: ".$resultado122['fechatransaccion']);
+
         }
         echo json_encode($res);
 
@@ -2728,12 +2871,12 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         // echo json_encode(array);
     }  
 
-    public function registrar_recibo_cobro_cajaBancos_en_facturas($idfact,$fecha,$lugar,$persona, $ci,$monto, $asiento,$trans,$idcaja_bancos,$concepto,$archivo,$registro_desde,$sucursal,$empresa,$zn)
+    public function registrar_recibo_cobro_cajaBancos_en_facturas($idfact,$fecha,$lugar,$persona, $ci,$monto, $asiento,$trans,$idcaja_bancos,$concepto,$archivo,$registro_desde,$sucursal,$empresa,$zn,$fecha_transaccion,$cuenta,$tipo_cuenta)
     { // nueva apiiiiiiiiiii
 
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
 
         // Establecer la zona horaria recibida
         date_default_timezone_set($zn);
@@ -2749,7 +2892,8 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         $gestion = $this->getgestionactualid($idempresa);
     
         $res = ""; 
-        
+
+        $bandera = TRUE;
         //--------------------------------------------------------------------
         $recibo_trans = $this->dbc->query("SELECT count(*) AS cant1 FROM cuentaspof cp 
         INNER JOIN transacciones t ON t.idtransacciones=cp.transaccion 
@@ -2780,20 +2924,62 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             //$trans = 0
 
             $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,concepto,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha_completa','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','0','$trans','0','$concepto',NULL,'$registro_desde')");
+            VALUES('$nroRecibo','$fecha_completa','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','0','0','0','$concepto',NULL,'$registro_desde')");
 
             $idrecibo = $this->dbc->insert_id;
         }elseif($trans > 0 && $asiento == ""){
             //SE CREA LA FACTURA CON LA TRANSACCION EXISTENTE QUE YA TE PASARON
 
-            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,concepto,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha_completa','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','0','$trans','0','$concepto',NULL,'$registro_desde')");
+            // $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,concepto,archivo,registro_desde)
+            // VALUES('$nroRecibo','$fecha_completa','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','0','$trans','0','$concepto',NULL,'$registro_desde')");
 
-            $idrecibo = $this->dbc->insert_id;
-        }else{
+            // $idrecibo = $this->dbc->insert_id;
+
+            if($cuenta == ""){ // SOLO SE ASIGNARA TRANSACCION Y NO LA CUENTA
+                //
+                $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,concepto,archivo,registro_desde)
+                VALUES('$nroRecibo','$fecha_completa','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','0','$trans','0','$concepto',NULL,'$registro_desde')");
+
+                $idrecibo = $this->dbc->insert_id;
+            }else{// SE ASIGNARA CUENTA MAS 
+                
+                $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,concepto,archivo,registro_desde)
+                VALUES('$nroRecibo','$fecha_completa','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','0','$trans','$cuenta','$concepto',NULL,'$registro_desde')");
+
+                $idrecibo = $this->dbc->insert_id;
+
+                $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$cuenta'");
+                $dt = $detalle_trans->fetch_assoc();
+
+                // $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$data[cuenta]'");
+                // $dt = $detalle_trans->fetch_assoc();
+
+                if($tipo_cuenta == 'suma'){ // SUMAR
+                    
+                    if($dt['debe'] > 0){
+                        $nuevo_monto_dt = $dt['debe'] + $monto;
+                        $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
+                    }else{
+                        $nuevo_monto_dt = $dt['haber'] + $monto;
+                        $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
+                    }
+                }elseif($tipo_cuenta == 'reemplazo'){ // REEMPLAZAR
+                    if($dt['debe'] > 0){
+                        $nuevo_monto_dt = $monto;
+                        $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
+                    }else{
+                        $nuevo_monto_dt = $monto;
+                        $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
+                    }
+                }else{ // SOLO VINCULA NO PASA NADA
+
+                }
+            }
+        }else{ //SE CREARA UN NUEVO ASIENTO MODELO
+
             // Construir rango dinámico (primer y último día del mes)
-            $fecha_inicio = date("Y-m-01", strtotime($fecha)); // "2025-03-01"
-            $fecha_fin    = date("Y-m-t", strtotime($fecha));  // "2025-03-31"
+            $fecha_inicio = date("Y-m-01", strtotime($fecha_transaccion)); // "2025-03-01"
+            $fecha_fin    = date("Y-m-t", strtotime($fecha_transaccion));  // "2025-03-31"
 
             $asiento_tipo = $this->dbc->query("SELECT * FROM asientotipo WHERE idasientotipo='$asiento'");
             $at = $asiento_tipo->fetch_assoc();
@@ -2804,38 +2990,47 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             $gestion_sel = $this->dbc->query("SELECT * FROM gestion WHERE idgestion='$gestion'");
             $gc = $gestion_sel->fetch_assoc();
 
-            if($gc['formato_transaccion'] == 'por_tipo_mes') {
-                $nroTransa = $this->dbc->query("
-                    SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+             if($gc['formato_transaccion'] == 'por_tipo_mes') {
+                $nroTransa = $this->dbc->query("SELECT *
+                -- COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
                 FROM transacciones
                 WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]'
                 and fechatransaccion BETWEEN '$fecha_inicio' AND '$fecha_fin'
                 AND idgestion = '$gestion'
                 AND organizacion_idorganizacion = '$idempresa'
+                ORDER BY codigotransaccion DESC
+                LIMIT 1
                 ");
             } elseif($gc['formato_transaccion'] == 'por_tipo_gestion') {
-                $nroTransa = $this->dbc->query("
-                    SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                $nroTransa = $this->dbc->query("SELECT *
+                -- COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
                     FROM transacciones 
                     WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]'
                     AND idgestion = '$gestion'
                     AND organizacion_idorganizacion = '$idempresa'
+                    ORDER BY codigotransaccion DESC
+                    LIMIT 1
                 ");
             } else { // POR_GESTION
-                $nroTransa = $this->dbc->query("
-                    SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                $nroTransa = $this->dbc->query("SELECT *
+                -- COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
                     FROM transacciones 
                     WHERE organizacion_idorganizacion = '$idempresa'
                     AND idgestion = '$gestion'
+                    ORDER BY codigotransaccion DESC
+                    LIMIT 1
                 ");
             }
 
         $resultado122 = $nroTransa->fetch_assoc();
-        $nroTransaccion = $resultado122['siguiente'];
+        $nroTransaccion = $resultado122['codigotransaccion'] + 1;
+
+         if($fecha_transaccion >= $resultado122['fechatransaccion']){// REGISTRO CON UN NUEVO ASIENTO (TRANSACCION) {{{{{{{{{{{{{{{{{{{{{{{{{{}}}}}}}}}}}}}}}}}}}}}}}}}}
+
 
         // Insertar en transacciones
         $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion, fechatransaccion, tipodecambio, ndocumento, glosa, consolidar,estado, tipotransaccion_idtipotransaccion, organizacion_idorganizacion, sucursal, idgestion) 
-        VALUES ('$nroTransaccion', '$fecha', '1', '0', 'Registro Cobro Caja Bancos', '1','1', '$tt[idtipotransaccion]', '$idempresa', '$idsucursal', '$gestion')");
+        VALUES ('$nroTransaccion', '$fecha_transaccion', '1', '0', 'Registro Cobro Caja Bancos', '1','1', '$tt[idtipotransaccion]', '$idempresa', '$idsucursal', '$gestion')");
         $idtrans = $this->dbc->insert_id;
 // -----------------------------------------------------------------------------------------------------------------
              // Obtener los asientos relacionados y calcular debe y haber
@@ -2868,6 +3063,18 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             VALUES('$nroRecibo','$fecha_completa','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','0','$idtrans','0','$concepto',NULL,'$registro_desde')");
 
         $idrecibo = $this->dbc->insert_id;
+
+        // if ($crearRecibo === TRUE) {
+        //     $update_fact = $this->dbc->query("UPDATE factura SET cobrado = '2' WHERE idfactura = '$idfact'");
+
+        //     $res = array("success", "Registro Correcto", "crearfactura");
+        // } else {
+        //     $res = array("danger", "No se pudo realizar el registro ");
+        // }
+
+        }else{  // FINALIZA CON UN NUEVO ASIENTO (TRANSACCION) {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+            $bandera = FALSE;
+        }
         }
       
         //----------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -2904,25 +3111,29 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         $crear_detalle_cajaBancos = $this->dbc->query("INSERT INTO detalle_caja_bancos_cobrar(idcaja_bancos,monto,idcuentaspof,idfactura,idotras_cuentas)
         VALUES('$idcaja_bancos','$monto','$idrecibo','$idfact','0')");
 
-        if ($crearRecibo === TRUE) {
+        if($bandera === TRUE){
+            
             $update_fact = $this->dbc->query("UPDATE factura SET cobrado = '2' WHERE idfactura = '$idfact'");
 
             $res = array("success", "Registro Correcto", "crearfactura");
-        } else {
-            $res = array("danger", "No se pudo realizar el registro ");
-        }
-        echo json_encode($res);
 
+        }else{
+            
+            $res = array("danger", "La fecha de registro es menor al ultimo registro de la transaccion que existe: ".$resultado122['fechatransaccion']);
+
+        }
+
+        echo json_encode($res);
     }
 
     //esta api esta en la opcion caja_bancos donde podemos crear recibos asignando directamente a una factura existente
 
-    public function registrar_recibo_pago_cajaBancos_en_facturas($idfact,$fecha,$lugar,$persona, $ci,$monto, $asiento,$trans,$idcaja_bancos,$concepto,$archivo,$registro_desde,$sucursal,$empresa,$zn)
+    public function registrar_recibo_pago_cajaBancos_en_facturas($idfact,$fecha,$lugar,$persona, $ci,$monto, $asiento,$trans,$idcaja_bancos,$concepto,$archivo,$registro_desde,$sucursal,$empresa,$zn,$fecha_transaccion,$cuenta,$tipo_cuenta)
     { // nueva apiiiiiiiiiii
 
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
 
         // Establecer la zona horaria recibida
         date_default_timezone_set($zn);
@@ -2939,6 +3150,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
     
         $res = ""; //array($fecha,$nfactura,$nautorizacion,$codigocontrol,$monto,$tasacero,$export,$npoliza,$ice,$descuento,$espesificacion,$cliente,$co,$pa,$trans,$clasefactura,$cuenta,$idempresa,$idsucursal);
         
+        $bandera = TRUE;
         //--------------------------------------------------------------------
         $recibo_trans = $this->dbc->query("SELECT count(*) AS cant1 FROM cuentaspor cp 
         INNER JOIN transacciones t ON t.idtransacciones=cp.transaccion 
@@ -2970,22 +3182,62 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             //$trans = 0
 
             $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,concepto,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha_completa','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','0','$trans','0','$concepto',NULL,'$registro_desde')");
+            VALUES('$nroRecibo','$fecha_completa','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','0','0','0','$concepto',NULL,'$registro_desde')");
 
             $idrecibo = $this->dbc->insert_id;
-        }elseif($trans > 0 && $asiento == 0){
+        }elseif($trans > 0 && $asiento == ""){
             //SE CREA LA FACTURA CON LA TRANSACCION EXISTENTE QUE YA TE PASARON
         
-            $idfact = $this->dbc->insert_id;
 
-            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,concepto,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha_completa','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','0','$trans','0','$concepto',NULL,'$registro_desde')");
+            // $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,concepto,archivo,registro_desde)
+            // VALUES('$nroRecibo','$fecha_completa','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','0','$trans','0','$concepto',NULL,'$registro_desde')");
 
-            $idrecibo = $this->dbc->insert_id;
-        }else{
+            // $idrecibo = $this->dbc->insert_id;
+            if($cuenta == ""){ // SOLO SE ASIGNARA TRANSACCION Y NO LA CUENTA
+                //
+                $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,concepto,archivo,registro_desde)
+                VALUES('$nroRecibo','$fecha_completa','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','0','$trans','0','$concepto',NULL,'$registro_desde')");
+
+                $idrecibo = $this->dbc->insert_id;
+            }else{// SE ASIGNARA CUENTA MAS 
+                
+                $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,concepto,archivo,registro_desde)
+                VALUES('$nroRecibo','$fecha_completa','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','0','$trans','$cuenta','$concepto',NULL,'$registro_desde')");
+
+                $idrecibo = $this->dbc->insert_id;
+
+                $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$cuenta'");
+                $dt = $detalle_trans->fetch_assoc();
+
+                // $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$data[cuenta]'");
+                // $dt = $detalle_trans->fetch_assoc();
+
+                if($tipo_cuenta == 'suma'){ // SUMAR
+                    
+                    if($dt['debe'] > 0){
+                        $nuevo_monto_dt = $dt['debe'] + $monto;
+                        $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
+                    }else{
+                        $nuevo_monto_dt = $dt['haber'] + $monto;
+                        $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
+                    }
+                }elseif($tipo_cuenta == 'reemplazo'){ // REEMPLAZAR
+                    if($dt['debe'] > 0){
+                        $nuevo_monto_dt = $monto;
+                        $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
+                    }else{
+                        $nuevo_monto_dt = $monto;
+                        $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
+                    }
+                }else{ // SOLO VINCULA NO PASA NADA
+
+                }
+            }
+        }else{ //SE CREARA UN NUEVO ASIENTO MODELO
+
             // Construir rango dinámico (primer y último día del mes)
-            $fecha_inicio = date("Y-m-01", strtotime($fecha)); // "2025-03-01"
-            $fecha_fin    = date("Y-m-t", strtotime($fecha));  // "2025-03-31"
+            $fecha_inicio = date("Y-m-01", strtotime($fecha_transaccion)); // "2025-03-01"
+            $fecha_fin    = date("Y-m-t", strtotime($fecha_transaccion));  // "2025-03-31"
 
             $asiento_tipo = $this->dbc->query("SELECT * FROM asientotipo WHERE idasientotipo='$asiento'");
             $at = $asiento_tipo->fetch_assoc();
@@ -2997,33 +3249,41 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             $gc = $gestion_sel->fetch_assoc();
 
             if($gc['formato_transaccion'] == 'por_tipo_mes') {
-                $nroTransa = $this->dbc->query("
-                    SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                $nroTransa = $this->dbc->query("SELECT *
+                -- COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
                 FROM transacciones
                 WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]'
                 and fechatransaccion BETWEEN '$fecha_inicio' AND '$fecha_fin'
                 AND idgestion = '$gestion'
                 AND organizacion_idorganizacion = '$idempresa'
+                ORDER BY codigotransaccion DESC
+                LIMIT 1
                 ");
             } elseif($gc['formato_transaccion'] == 'por_tipo_gestion') {
-                $nroTransa = $this->dbc->query("
-                    SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                $nroTransa = $this->dbc->query("SELECT *
+                -- COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
                     FROM transacciones 
                     WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]'
                     AND idgestion = '$gestion'
                     AND organizacion_idorganizacion = '$idempresa'
+                    ORDER BY codigotransaccion DESC
+                    LIMIT 1
                 ");
             } else { // POR_GESTION
-                $nroTransa = $this->dbc->query("
-                    SELECT COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                $nroTransa = $this->dbc->query("SELECT *
+                -- COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
                     FROM transacciones 
                     WHERE organizacion_idorganizacion = '$idempresa'
                     AND idgestion = '$gestion'
+                    ORDER BY codigotransaccion DESC
+                    LIMIT 1
                 ");
             }
 
         $resultado122 = $nroTransa->fetch_assoc();
-        $nroTransaccion = $resultado122['siguiente'];
+        $nroTransaccion = $resultado122['codigotransaccion'] + 1;
+
+        if($fecha_transaccion >= $resultado122['fechatransaccion']){// REGISTRO CON UN NUEVO ASIENTO (TRANSACCION) {{{{{{{{{{{{{{{{{{{{{{{{{{}}}}}}}}}}}}}}}}}}}}}}}}}}
 
         // Insertar en transacciones
         $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion, fechatransaccion, tipodecambio, ndocumento, glosa, consolidar,estado, tipotransaccion_idtipotransaccion, organizacion_idorganizacion, sucursal, idgestion) 
@@ -3060,6 +3320,19 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             VALUES('$nroRecibo','$fecha_completa','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','0','$idtrans','0','$concepto',NULL,'$registro_desde')");
 
         $idrecibo = $this->dbc->insert_id;
+
+        // if ($crearRecibo === TRUE) {
+        //     $update_fact = $this->dbc->query("UPDATE factura SET pagado = '2' WHERE idfactura = '$idfact'");
+
+        //     $res = array("success", "Registro Correcto", "crearfactura");
+        // } else {
+        //     $res = array("danger", "No se pudo realizar el registro ");
+        // }
+
+        }else{  // FINALIZA CON UN NUEVO ASIENTO (TRANSACCION) {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+            $bandera = FALSE;
+        }
+
         }
       
         //----------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -3096,12 +3369,16 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         $crear_detalle_cajaBancos = $this->dbc->query("INSERT INTO detalle_caja_bancos_pagar(idcaja_bancos,monto,idcuentaspor,idfactura,idotras_cuentas)
         VALUES('$idcaja_bancos','$monto','$idrecibo','$idfact','0')");
 
-        if ($crearRecibo === TRUE) {
+        if($bandera === TRUE){
+            
             $update_fact = $this->dbc->query("UPDATE factura SET pagado = '2' WHERE idfactura = '$idfact'");
 
             $res = array("success", "Registro Correcto", "crearfactura");
-        } else {
-            $res = array("danger", "No se pudo realizar el registro ");
+
+        }else{
+            
+            $res = array("danger", "La fecha de registro es menor al ultimo registro de la transaccion que existe: ".$resultado122['fechatransaccion']);
+
         }
         echo json_encode($res);
 

@@ -266,7 +266,7 @@ class Transacciones_facturas extends DB{
         // $gestion = $this->getgestionactualid($ide);
         $trans = "";
         
-        if ($idasientotipo != "") {
+        if ($idasientotipo != "") { // SE CREARA UNA NUEVA TRANSACCION 
             $glosa2 = $this->dbc->real_escape_string($glosa);
             $fecha2 = $this->dbc->real_escape_string($fecha);
 
@@ -344,7 +344,8 @@ class Transacciones_facturas extends DB{
                 
                 $orden = $orden + 1;
             }
-        } else {
+        } else { // SE VINCULARA A UNA TRANSACCION EXISTENTE
+        
             $idtrans = $idtransaccion;
         }
 
