@@ -794,6 +794,6 @@ if($data['ver'] == "asignar_asiento_A_factura") {
 //   registrocobrarfacturaGrupal registropagarfacturaGrupal asignar_asiento_A_otras_cuentas asignar_asiento_A_recibos asignar_facturas_A_cuentas 
 }
 // registrocobrarfactura activar registroplanes registrotransaccion_por_asiento registrar_factura registrar_asignacion_asiento_operacion
-//  registrar_factura_cobros_tributario  registrar_recibo_cobro_cajaBancos_en_facturas registrar_recibo_cobro_cajaBancos_en_otras_cuentas  registrar_recibo_otras_cuentas  registrar_estado_resultados_admin
-// registrar_factura_recibo_cobro_cajaBancos egistrar_recibo_cobro_cajaBancos_en_facturas
+//  registrar_recibo_otras_cuentas  registrar_estado_resultados_admin registrar_factura_cobro_otras_cuentas
+// registrar_recibo_cobro_cajaBancos_en_facturas registrar_recibo_otras_cuentas
 ?> 
