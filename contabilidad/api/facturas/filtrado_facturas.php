@@ -1030,6 +1030,25 @@ class Filtrado_facturas extends DB{
         //   }
           echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
+    public function facturas_perteneciente_a_cuenta($idcuenta){
+        $lista = [];
+        // $idempresa = $this->getidempresa($empresa);
+    
+        // Preparar la consulta
+        $getPedido = $this->dbc->query("SELECT * FROM factura WHERE cuenta = '$idcuenta'");
+    
+        while ($qwe = $this->dbc->fetch($getPedido)) {
+            $res = array(
+                "idfactura" => $qwe['idfactura'],
+                "fecha" => $qwe['fecha'],
+                "nfactura" => $qwe['simbolo'],
+                "montofactura" => $qwe['montofactura']
+            );
+            array_push($lista, $res);
+        }
+    
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
     public function getidempresa($md5){
         $registro=$this->dbe->query("select * from organizacion where md5(idorganizacion)='$md5'");
         $qwe=$this->dbe->fetch($registro);
