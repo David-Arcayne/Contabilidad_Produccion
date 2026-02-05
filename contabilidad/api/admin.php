@@ -180,29 +180,105 @@ class Admin extends DB
         return $qwe['idorganizacion'];
     }
 
+    // public function milistaplanes($empresa)
+    // {
+    //     $ide = $this->getidempresa($empresa);
+    //     $lista = [];
+    //     $registro = $this->dbc->query("SELECT idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,organizacion_idorganizacion,idp,idagrupacion_rubro_plandecuenta FROM plandecuenta WHERE organizacion_idorganizacion='$ide' ORDER BY numero ASC");
+    //     while ($qwe = $this->dbc->fetch($registro)) {
+    //         $numero_descompuesto = explode(".", $qwe[1]); 
+    //         $aux = $this->dbc->query("SELECT nombreplan FROM plandecuenta WHERE numero >= $numero_descompuesto[0] LIMIT 1");
+    //         $name_plan = $aux->fetch_assoc();
+
+    //         if($qwe['idp'] != 0 || $qwe['idp'] != null){ // tiene padre
+    //             $padre_list = $this->dbc->query("SELECT nombreplan FROM plandecuenta WHERE idp = '$qwe[idp]'");
+    //             $nombre_padre_aux = $padre_list->fetch_assoc();
+    //             $nombre_padre = $nombre_padre_aux['nombreplan'];
+    //         }else{
+    //             $nombre_padre = "";
+    //         }
+            
+    //         // --> select * from plandecuenta where numero >= 1 limit 1
+    //         // if($codigo_padre[0] == 1){ }
+    //     $agru = $this->dbc->query("SELECT * FROM agrupacion_rubro_plandecuenta WHERE idagrupacion_rubro_plandecuenta='$qwe[idagrupacion_rubro_plandecuenta]'");
+    //     $agru_aux = $agru->fetch_assoc();
+
+    //     // $tipo_pl = $this->dbc->query("SELECT * from tipo_plandecuenta where idtipo_plandecuenta = '$agru_aux[idtipo_plandecuenta]'");// HIJOS DE LAS PLANTILLAS AGRUPADORAS
+    //     // $pl_aux = $tipo_pl->fetch_assoc();
+
+    //         $res = array("id" => $qwe[0], "numero" => $qwe[1], "plan" => $qwe[2], "descripcion" => $qwe[3], "rubro" => $name_plan['nombreplan'], "tipo" => $qwe[4], "consolidar" => $qwe[5], "empresa" => $qwe[6], "idp" => $qwe[7],"idagrupacion_rubro_plandecuenta" => $qwe[8],"nombre_rubro" => $agru_aux['tipo_plandecuenta'],"nombre_padre" => $nombre_padre);
+
+    //         array_push($lista, $res);
+    //     }
+    //     echo json_encode($lista);
+    // }
     public function milistaplanes($empresa)
-    {
-        $ide = $this->getidempresa($empresa);
-        $lista = [];
-        $registro = $this->dbc->query("SELECT idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,organizacion_idorganizacion,idp,idagrupacion_rubro_plandecuenta FROM plandecuenta WHERE organizacion_idorganizacion='$ide' ORDER BY numero ASC");
-        while ($qwe = $this->dbc->fetch($registro)) {
-            $numero_descompuesto = explode(".", $qwe[1]); 
-            $aux = $this->dbc->query("SELECT nombreplan FROM plandecuenta WHERE numero >= $numero_descompuesto[0] LIMIT 1");
-            $name_plan = $aux->fetch_assoc();
-            // --> select * from plandecuenta where numero >= 1 limit 1
-            // if($codigo_padre[0] == 1){ }
-        $agru = $this->dbc->query("SELECT * FROM agrupacion_rubro_plandecuenta WHERE idagrupacion_rubro_plandecuenta='$qwe[idagrupacion_rubro_plandecuenta]'");
+{
+    $ide = $this->getidempresa($empresa);
+    $lista = [];
+
+    // Usamos fetch_assoc para trabajar siempre con nombres de columnas
+    $registro = $this->dbc->query("
+        SELECT idplandecuenta, numero, nombreplan, descripcion, saldonormal, consolidar, organizacion_idorganizacion, idp, idagrupacion_rubro_plandecuenta 
+        FROM plandecuenta 
+        WHERE organizacion_idorganizacion = '$ide' 
+        ORDER BY numero ASC
+    ");
+
+    while ($qwe = $registro->fetch_assoc()) {
+        // Obtener rubro
+        $numero_descompuesto = explode(".", $qwe['numero']); 
+        $aux = $this->dbc->query("
+            SELECT nombreplan 
+            FROM plandecuenta 
+            WHERE numero >= {$numero_descompuesto[0]} 
+            LIMIT 1
+        ");
+        $name_plan = $aux->fetch_assoc();
+
+        // Obtener nombre del padre correctamente
+        if ($qwe['idp'] != 0 && $qwe['idp'] != null) { 
+            $padre_list = $this->dbc->query("
+                SELECT nombreplan 
+                FROM plandecuenta 
+                WHERE idplandecuenta = '{$qwe['idp']}'
+            ");
+            $nombre_padre_aux = $padre_list->fetch_assoc();
+            $nombre_padre = $nombre_padre_aux ? $nombre_padre_aux['nombreplan'] : "";
+        } else {
+            $nombre_padre = "-";
+        }
+
+        // Obtener agrupación
+        $agru = $this->dbc->query("
+            SELECT * 
+            FROM agrupacion_rubro_plandecuenta 
+            WHERE idagrupacion_rubro_plandecuenta = '{$qwe['idagrupacion_rubro_plandecuenta']}'
+        ");
         $agru_aux = $agru->fetch_assoc();
 
-        // $tipo_pl = $this->dbc->query("SELECT * from tipo_plandecuenta where idtipo_plandecuenta = '$agru_aux[idtipo_plandecuenta]'");// HIJOS DE LAS PLANTILLAS AGRUPADORAS
-        // $pl_aux = $tipo_pl->fetch_assoc();
+        // Construir resultado
+        $res = array(
+            "id" => $qwe['idplandecuenta'],
+            "numero" => $qwe['numero'],
+            "plan" => $qwe['nombreplan'],
+            "descripcion" => $qwe['descripcion'],
+            "rubro" => $name_plan['nombreplan'],
+            "tipo" => $qwe['saldonormal'],
+            "consolidar" => $qwe['consolidar'],
+            "empresa" => $qwe['organizacion_idorganizacion'],
+            "idp" => $qwe['idp'],
+            "idagrupacion_rubro_plandecuenta" => $qwe['idagrupacion_rubro_plandecuenta'],
+            "nombre_rubro" => $agru_aux['tipo_plandecuenta'],
+            "nombre_padre" => $nombre_padre
+        );
 
-            $res = array("id" => $qwe[0], "numero" => $qwe[1], "plan" => $qwe[2], "descripcion" => $qwe[3], "rubro" => $name_plan['nombreplan'], "tipo" => $qwe[4], "consolidar" => $qwe[5], "empresa" => $qwe[6], "idp" => $qwe[7],"idagrupacion_rubro_plandecuenta" => $qwe[8],"nombre_rubro" => $agru_aux['tipo_plandecuenta']);
-
-            array_push($lista, $res);
-        }
-        echo json_encode($lista);
+        $lista[] = $res;
     }
+
+    echo json_encode($lista);
+}
+
 
     public function registroplanes($numero, $plan, $descripcion, $tipo, $idp,$rubro, $empresa)
     {
