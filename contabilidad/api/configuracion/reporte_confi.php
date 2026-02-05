@@ -4,38 +4,45 @@ require_once "../../db/db.php";
 
 class Reporte_confi extends DB{
 
-    public function activar_desactivar_tipo_reportes($idtipo_reportes, $tipo_reporte, $empresa){
+    public function activar_desactivar_tipo_reportes($idtipo_reportes, $estado){
          ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
-        $idempresa = $this->getidempresa($empresa);
+        // $idempresa = $this->getidempresa($empresa);
 
-            $tipo_reporte_lista = $this->dbc->query("SELECT * FROM tipo_reportes WHERE idtipo_reportes = '$idtipo_reportes'");
-            $esta_activo = $tipo_reporte_lista->fetch_assoc();
+            $cambiar_estado = $this->dbc->query("UPDATE tipo_reportes SET estado = '$estado' WHERE idtipo_reportes = '$idtipo_reportes'");
+            // $tipo_reporte_lista = $this->dbc->query("SELECT * FROM tipo_reportes WHERE idtipo_reportes = '$idtipo_reportes'");
+            // $esta_activo = $tipo_reporte_lista->fetch_assoc();
 
-            if($esta_activo['estado'] == '1'){ // ESTA ACTIVO
-                // DEBO DESACTIVARLO Y NO ACTIVAR NINGUNO 
-                $desactivar = $this->dbc->query("UPDATE tipo_reportes SET estado = '0' WHERE idtipo_reportes = '$idtipo_reportes'");
+            // if($esta_activo['estado'] == '1'){ // ESTA ACTIVO
+            //     // DEBO DESACTIVARLO Y NO ACTIVAR NINGUNO 
+            //     $desactivar = $this->dbc->query("UPDATE tipo_reportes SET estado = '0' WHERE idtipo_reportes = '$idtipo_reportes'");
 
-                if ($desactivar === TRUE){   
+            //     if ($desactivar === TRUE){   
                                                                                                                                                                     
-                    $res = array("success", "Registro exitoso","rp_registrar_reporte");
-                }else {
-                    $res = array("danger", "No se pudo registrar");
-                }
-            }else{ // NO ESTA ACTIVO
-                //ACTIVAR DE FORMA NORMAL Y DESACTIVAR LOS DEMAS
-                $activar = $this->dbc->query("UPDATE tipo_reportes SET estado = '1' WHERE idtipo_reportes = '$idtipo_reportes'");
+            //         $res = array("success", "Registro exitoso","rp_registrar_reporte");
+            //     }else {
+            //         $res = array("danger", "No se pudo registrar");
+            //     }
+            // }else{ // NO ESTA ACTIVO
+            //     //ACTIVAR DE FORMA NORMAL 
+            //     $activar = $this->dbc->query("UPDATE tipo_reportes SET estado = '1' WHERE idtipo_reportes = '$idtipo_reportes'");
 
-                if ($activar === TRUE){   
+            //     if ($activar === TRUE){   
+            //         // $desactivado = $this->dbc->query("UPDATE tipo_reportes SET estado = '0' WHERE tipo_reporte = '$tipo_reporte' AND idtipo_reportes != '$idtipo_reportes' AND idempresa = '$idempresa'");
+                                                                                                                                                                    
+            //         $res = array("success", "Registro exitoso","rp_registrar_reporte");
+            //     }else {
+            //         $res = array("danger", "No se pudo registrar");
+            //     }
+            // }
+                if ($cambiar_estado === TRUE){   
                     // $desactivado = $this->dbc->query("UPDATE tipo_reportes SET estado = '0' WHERE tipo_reporte = '$tipo_reporte' AND idtipo_reportes != '$idtipo_reportes' AND idempresa = '$idempresa'");
                                                                                                                                                                     
-                    $res = array("success", "Registro exitoso","rp_registrar_reporte");
+                    $res = array("success", "Se cambio de estado correctamente","rp_registrar_reporte");
                 }else {
                     $res = array("danger", "No se pudo registrar");
                 }
-            }
-    
         echo json_encode($res);
     }
 
@@ -89,7 +96,7 @@ class Reporte_confi extends DB{
                 }
     
             }
-        }else{
+        }elseif($es_activo == '2'){
             while ($row = $this->dbc->fetch($tipo_reportes)) {
                 if($row['estado'] == '0'){ // DEDO ABAJO, MOSTRAR
                     $lista[] = [
@@ -104,6 +111,8 @@ class Reporte_confi extends DB{
                 }
     
             }
+        }else{
+            // NO MOSTRARA NADA PORQUE SU ESTADO ES CERO 
         }
     
         echo json_encode($lista, JSON_PRETTY_PRINT);

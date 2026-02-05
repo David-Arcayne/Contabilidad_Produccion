@@ -245,7 +245,7 @@ class Cuentaspor extends DB{
         //TODAVIA NO SE PAGO EL TOTAL DEL SALDO
     }
     }else{
-        $res = array("danger", "La fecha de registro es menor al ultimo registro de la transaccion que existe: ".$resultado122['fechatransaccion']);
+        $res = array("danger", "La fecha de registro es menor al ultimo registro de la transaccion que existe: ".date("d/m/Y", strtotime($resultado122['fechatransaccion'])));
        
     }
         echo json_encode($res);

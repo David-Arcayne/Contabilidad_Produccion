@@ -57,6 +57,27 @@ class Cuentas_transacciones extends DB{
         }
         echo json_encode($lista);
     }
+    public function listar_recibos_asignado_cuentas($idcuenta)
+    {
+        // $ide = $this->getidempresa($empresa);
+        $lista = [];
+        $registro = $this->dbc->query("SELECT * FROM recibo WHERE cuenta = '$idcuenta'");
+        while ($qwe = $this->dbc->fetch($registro)) {
+               if ($qwe['cobrado'] != 0) {
+                $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $qwe['proveedorcliente_idproveedorcliente'] . "'");
+                $asd = $this->dbcm->fetch($cliente);
+
+                $res = array("id" => $qwe['idrecibo'], "fecha" => $qwe['fecha'], "nro_recibo" => $qwe['nro_recibo'], "monto" => $qwe['monto'], "cobrado" => $qwe['cobrado'], "pagado" => $qwe['pagado'],"concepto" => $qwe['concepto'],"cliente_proveedor" => $asd['nombre']);
+            } else {
+                $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='" . $qwe['proveedorcliente_idproveedorcliente'] . "'");
+                $asd = $this->dbcm->fetch($proveedor);
+
+                $res = array("id" => $qwe['idrecibo'], "fecha" => $qwe['fecha'], "nro_recibo" => $qwe['nro_recibo'], "monto" => $qwe['monto'], "cobrado" => $qwe['cobrado'], "pagado" => $qwe['pagado'],"concepto" => $qwe['concepto'],"cliente_proveedor" => $asd['nombre']);
+            }
+                    array_push($lista, $res);
+        }
+        echo json_encode($lista);
+    }
     public function listar_facturas_cobro_pago($idcuenta,$empresa)
     {
         $idempresa = $this->getidempresa($empresa); 
@@ -91,6 +112,45 @@ class Cuentas_transacciones extends DB{
                 $asd = $this->dbcm->fetch($proveedor);
 
                 $res = array("id" => $qwe['idfactura'], "fecha" => $qwe['fecha'], "nfactura" => $qwe['nfactura'], "montofactura" => $qwe['montofactura'], "clasefactura" => $qwe['clasefactura'], "tipo" => "compra","por_concepto_de" => $qwe['por_concepto_de'],"cliente_proveedor" => $asd['nombre']);
+            }
+                    array_push($lista, $res);
+        }
+        echo json_encode($lista);
+    }
+    public function listar_recibos_cobro_pago($idcuenta,$empresa)
+    {
+        $idempresa = $this->getidempresa($empresa); 
+        // $ide = $this->getidempresa($empresa);
+        $lista = [];
+        $registro = $this->dbc->query("SELECT * FROM recibo WHERE cuenta = '$idcuenta' LIMIT 1");
+        $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion ='$idcuenta'");
+        $dt = $this->dbc->fetch($detalle_trans);
+        if($registro->num_rows > 0){
+            $reci = $this->dbc->fetch($registro);
+            //preguntar si recibo es de pago y cobro
+            if($reci['cobrado'] != 0){
+                // es cobro
+                $recibo_clase = $this->dbc->query("SELECT * FROM recibo WHERE idempresa ='$idempresa' AND cobrado != '0' AND cuenta ='0' AND transaccion IN(0,$dt[transacciones_idtransacciones]) ORDER BY fecha DESC");
+
+            }else{
+                // es pago
+                $recibo_clase = $this->dbc->query("SELECT * FROM recibo WHERE idempresa ='$idempresa' AND pagado != '1' AND cuenta ='0' AND transaccion IN(0,$dt[transacciones_idtransacciones]) ORDER BY fecha DESC");
+            }
+        }else{
+            //listara todas las facturas de cobro y pago porque no tiene ninguna factura todavia dentro
+            $recibo_clase = $this->dbc->query("SELECT * FROM recibo WHERE idempresa ='$idempresa' AND cuenta ='0' AND transaccion IN(0,$dt[transacciones_idtransacciones]) ORDER BY fecha DESC");
+        }
+        while ($qwe = $this->dbc->fetch($recibo_clase)) {
+               if ($qwe['clasefactura'] == 2) {
+                $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $qwe['proveedorcliente_idproveedorcliente'] . "'");
+                $asd = $this->dbcm->fetch($cliente);
+
+                $res = array("id" => $qwe['idrecibo'], "fecha" => $qwe['fecha'], "nro_recibo" => $qwe['nro_recibo'], "monto" => $qwe['monto'], "tipo" => "venta","concepto" => $qwe['concepto'],"cliente_proveedor" => $asd['nombre']);
+            } else {
+                $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='" . $qwe['proveedorcliente_idproveedorcliente'] . "'");
+                $asd = $this->dbcm->fetch($proveedor);
+
+                $res = array("id" => $qwe['idrecibo'], "fecha" => $qwe['fecha'], "nro_recibo" => $qwe['nro_recibo'], "monto" => $qwe['monto'], "tipo" => "compra","concepto" => $qwe['concepto'],"cliente_proveedor" => $asd['nombre']);
             }
                     array_push($lista, $res);
         }

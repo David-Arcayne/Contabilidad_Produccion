@@ -686,6 +686,7 @@ class Filtrado_facturas extends DB{
                 "montofactura" => $qwe['montofactura'],
                 "estado" => $qwe['estado'],
                 "razon_social" => $prov_client_2['nombre'],
+                "nit" => $prov_client_2['nit'],
                 "nro_transaccion" => $transaccion['codigotransaccion']
             );
             array_push($lista, $res);
@@ -711,6 +712,7 @@ class Filtrado_facturas extends DB{
                 "montofactura" => $qwe['montofactura'],
                 "estado" => $qwe['estado'],
                 "razon_social" => $prov_client_2['nombre'],
+                "nit" => $prov_client_2['nit'],
                 "nro_transaccion" => $transaccion['codigotransaccion']
             );
   
