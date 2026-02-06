@@ -43,7 +43,7 @@ class Factura_comercial extends DB{
 
         $facturas = implode(", ", $listaFactura);
 
-        if (!empty($facturas)) {
+        if (!empty($facturas)) { //SI HAY FACTURAS VINCULADAS A TRANSACCION
             // $condicion_facturas = "AND v.id_venta NOT IN ($facturas)";
     $clien = $this->dbcm->query("SELECT v.id_venta, a.nombre, v.fecha_venta, c.nombre , c.nombrecomercial, c.ciudad, v.tipo_venta, v.tipo_pago, v.monto_total, v.nfactura, v.descuento, pa.almacen_id_almacen, v.cliente_id_cliente1, s.nombre, v.estado, ca.canal, vf.cuf, vf.fechaEmission, vf.shortLink, vf.urlSin,ec.estado as estado_cobro,ec.saldo FROM venta v 
         LEFT JOIN cliente c ON v.cliente_id_cliente1=c.id_cliente

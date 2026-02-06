@@ -50,7 +50,7 @@ class Reporte_confi extends DB{
         $idempresa = $this->getidempresa($empresa);
 
         // Insertar el nuevo registro
-        $registro = $this->dbc->query("INSERT INTO tipo_reportes(nombre, descripcion, tipo_reporte, idempresa) VALUES ('$nombre', '$descripcion', '$tipo_reporte', '$idempresa')");
+        $registro = $this->dbc->query("INSERT INTO tipo_reportes(nombre, descripcion, tipo_reporte,estado, idempresa) VALUES ('$nombre', '$descripcion', '$tipo_reporte','0', '$idempresa')");
         if ($registro === TRUE) {                                                                                                                                                                
             $res = array("success", "Registro exitoso","rp_registrar_reporte");
         } else {
@@ -98,7 +98,7 @@ class Reporte_confi extends DB{
             }
         }elseif($es_activo == '2'){
             while ($row = $this->dbc->fetch($tipo_reportes)) {
-                if($row['estado'] == '0'){ // DEDO ABAJO, MOSTRAR
+                if($row['estado'] == '2'){ // DEDO ABAJO, MOSTRAR
                     $lista[] = [
                     "idtipo_reportes" => $row['idtipo_reportes'],
                     "nombre"=>$row['nombre'],
@@ -2032,7 +2032,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                     "codigo" => $nombre_cuenta4['numero'],  
                                     "nombre_nivel_4" => $nombre_cuenta4['nombreplan'],
                                     "valor" => $valor_B['total'],
-                                    // "valor_restado" => $diferencia,
+                                    // "valor_restado" => $diferencia, 
                                     "nivel_5" => [] //activo   
                                     );
                                     array_push($res4['nivel_4'], $res5);
@@ -2104,9 +2104,9 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                 }else{
                                     $res6 = array(
                                 "idconfiguracion_reporte" => $qwe6['idconfiguracion_reporte'],
-                                "grupo" => $qwe5['grupo'],
-                                "negrilla_cursiva" => $qwe5['negrilla_cursiva'],
-                                "es_calculable" => $qwe5['es_calculable'],
+                                "grupo" => $qwe6['grupo'],
+                                "negrilla_cursiva" => $qwe6['negrilla_cursiva'],
+                                "es_calculable" => $qwe6['es_calculable'],
                                 "idplandecuenta" => $nombre_cuenta5['idplandecuenta'], 
                                 "codigo" => $nombre_cuenta5['numero'],   
                                 "nombre_nivel_5" => $nombre_cuenta5['nombreplan'],
@@ -2394,7 +2394,37 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                     
                     $cuenta2 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe3[idplandecuenta]'");// ACTIVO_CIRCULANTE, ACTIVO_FIJO, OTROS ACTIVOS
                     $nombre_cuenta2 = $cuenta2->fetch_assoc();
-                    $res3 = array(
+
+                    if($qwe3['es_calculable'] == 'si'){ // ES CALCULABLE
+                        //ESTO ES NIVEL 2
+                        $suma_cuentas0 = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(haber) - SUM(debe) AS total FROM transacciones t
+                                INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
+                                INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
+                                where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$nombre_cuenta2[idplandecuenta]'
+                                AND t.estado NOT IN (4, 5, 6) AND t.consolidar = '2' AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
+
+                                $valor0 = $suma_cuentas0->fetch_assoc();
+                                $suma_nivel_2 = $suma_nivel_2 + $valor0['total'];
+                                if($valor0['total'] == null || $valor0['total'] == '0'){
+                                    //NO MOSTRARIA NADA PORQ EL VALOR ES CERO
+                                }else{
+                                    $res3 = array(
+                                    "idconfiguracion_reporte" => $qwe3['idconfiguracion_reporte'],
+                                    "grupo" => $qwe3['grupo'],
+                                    "negrilla_cursiva" => $qwe3['negrilla_cursiva'],
+                                    "es_calculable" => $qwe3['es_calculable'],
+                                    "idplandecuenta" => $nombre_cuenta2['idplandecuenta'], 
+                                    "codigo" => $nombre_cuenta2['numero'],   
+                                    "nombre_nivel_2" => $nombre_cuenta2['nombreplan'],
+                                    "valor" => $valor0['total'],
+                                    "profundidad" => '2',
+                                    "nivel_3" => [] //activo   
+                                    );
+                                    array_push($res2['nivel_2'], $res3); 
+                                }
+                    }else{
+                        //NO ES CALCULABLE
+                        $res3 = array(
                     "idconfiguracion_reporte" => $qwe3['idconfiguracion_reporte'],
                     "grupo" => $qwe3['grupo'],
                     "negrilla_cursiva" => $qwe3['negrilla_cursiva'],
@@ -2403,6 +2433,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                     "codigo" => $nombre_cuenta2['numero'],
                     "nombre_nivel_2" => $nombre_cuenta2['nombreplan'],
                     "suma_nivel_3" => 0,
+                    "profundidad" => '2',
                     "nivel_3" => [] //activo
                     );
                     $suma_nivel_3 = 0;
@@ -2420,7 +2451,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                 INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
                                 INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
                                 where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$nombre_cuenta3[idplandecuenta]'
-                                AND t.estado NOT IN (4, 5, 6) AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
+                                AND t.estado NOT IN (4, 5, 6) AND t.consolidar = '2' AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
 
                                 $valor = $suma_cuentas->fetch_assoc();
                                 $suma_nivel_3 = $suma_nivel_3 + $valor['total'];
@@ -2436,6 +2467,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                     "codigo" => $nombre_cuenta3['numero'],   
                                     "nombre_nivel_3" => $nombre_cuenta3['nombreplan'],
                                     "valor" => $valor['total'],
+                                    "profundidad" => '3',
                                     "nivel_4" => [] //activo   
                                     );
                                     array_push($res3['nivel_3'], $res4); 
@@ -2452,6 +2484,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                         "codigo" => $nombre_cuenta3['numero'], 
                         "nombre_nivel_3" => $nombre_cuenta3['nombreplan'],
                         "suma_nivel_4" => 0,
+                        "profundidad" => '3',
                         "nivel_4" => [] //activo
                         );
                         $get_nivel_5 = $this->dbc->query("SELECT * from configuracion_reporte where grupo = '$qwe4[grupo]' AND nombre_cuenta_superior = '$nombre_cuenta3[nombreplan]' AND idempresa='$idempresa' 
@@ -2472,7 +2505,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                 INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
                                 INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
                                 where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$nombre_cuenta4[idplandecuenta]'
-                                AND t.estado NOT IN (4, 5, 6) AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
+                                AND t.estado NOT IN (4, 5, 6) AND t.consolidar = '2' AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
 
                                 $valor = $suma_cuentas->fetch_assoc();
                                 $suma_nivel_4 = $suma_nivel_4 + $valor['total'];
@@ -2490,6 +2523,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                     "nombre_nivel_4" => $nombre_cuenta4['nombreplan'],
                                     "valor" => $valor['total'],
                                     "suma_nivel_5" => 0,
+                                    "profundidad" => '4',
                                     "nivel_5" => [] //activo   
                                     );
                                     array_push($res4['nivel_4'], $res5); 
@@ -2506,6 +2540,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                         "nombre_nivel_4" => $nombre_cuenta4['nombreplan'],
                         "valor" => 0,
                         "suma_nivel_5" => 0,
+                        "profundidad" => '4',
                         "nivel_5" => [] //activo
                         );
                         $get_nivel_6 = $this->dbc->query("SELECT * from configuracion_reporte where grupo = '$qwe5[grupo]' AND nombre_cuenta_superior = '$nombre_cuenta4[nombreplan]' AND idempresa='$idempresa' 
@@ -2518,7 +2553,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                 INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
                                 INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
                                 where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$nombre_cuenta5[idplandecuenta]'
-                                AND t.estado NOT IN (4, 5, 6) AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
+                                AND t.estado NOT IN (4, 5, 6) AND t.consolidar = '2' AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
 
                                 $valor2 = $suma_cuentas2->fetch_assoc();
                                 $suma_nivel_5 = $suma_nivel_5 + $valor2['total'];
@@ -2536,6 +2571,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                 "codigo" => $nombre_cuenta5['numero'],   
                                 "nombre_nivel_5" => $nombre_cuenta5['nombreplan'],
                                 "valor" => $valor2['total'],
+                                "profundidad" => '5',
                                 "nivel_6" => [] //activo   
                                 );
                                 array_push($res5['nivel_5'], $res6); 
@@ -2569,6 +2605,8 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                      $res3['suma_nivel_3'] = $suma_nivel_3;
                         $suma_nivel_2 = $suma_nivel_2 + $res3['suma_nivel_3'];
                     array_push($res2['nivel_2'], $res3); 
+                    }
+    
                                 // $res2['suma_nivel_2'] = $suma_nivel_2;
                             }
                 $res2['suma_nivel_2'] = $suma_nivel_2; 

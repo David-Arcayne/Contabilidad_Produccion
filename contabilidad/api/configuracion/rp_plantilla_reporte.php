@@ -2806,7 +2806,7 @@ class PlantillaReporte extends DB{
         $agru = $this->dbc->query("SELECT * from agrupacion_rubro_plandecuenta where idagrupacion_rubro_plandecuenta = '$id_agru_rubro'");// HIJOS DE LAS PLANTILLAS AGRUPADORAS
         $agru_aux = $agru->fetch_assoc();
 
-        $tipo_pl = $this->dbc->query("SELECT * from tipo_plandecuenta where idtipo_plandecuenta = '$agru_aux[idtipo_plandecuenta]'");// HIJOS DE LAS PLANTILLAS AGRUPADORAS
+        $tipo_pl = $this->dbc->query("SELECT * from tipo_plandecuenta where nombre = '$agru_aux[tipo_plandecuenta]'");// HIJOS DE LAS PLANTILLAS AGRUPADORAS
         $pl_aux = $tipo_pl->fetch_assoc();
 
         if($pl_aux['nombre'] == 'Ingreso' || $pl_aux['nombre'] == 'Pasivo' || $pl_aux['nombre'] == 'Patrimonio'){ // INGRESOS 4.0.0.00.00 - pasivo, patrimonio
@@ -2814,7 +2814,7 @@ class PlantillaReporte extends DB{
                 INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
                 INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
                 where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$idplandecuenta'
-                AND t.estado NOT IN (4, 5, 6) AND t.consolidar = 2 AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
+                AND t.estado NOT IN (4, 5, 6) AND t.consolidar = '2' AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
 
             $valor_auxi = $calcu->fetch_assoc();
             $valor_total = $valor_auxi['total'];
@@ -2824,7 +2824,7 @@ class PlantillaReporte extends DB{
                 INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
                 INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
                 where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$idplandecuenta'
-                AND t.estado NOT IN (4, 5, 6) AND t.consolidar = 2 AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
+                AND t.estado NOT IN (4, 5, 6) AND t.consolidar = '2' AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
 
             $valor_auxi = $calcu->fetch_assoc();
             $valor_total = $valor_auxi['total'];
@@ -2947,5 +2947,6 @@ class PlantillaReporte extends DB{
             
             echo json_encode($res);
     }
+    //reporte_estado_resultados_actualizado_consolidado
 }
 ?>
