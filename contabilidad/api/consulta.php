@@ -699,6 +699,12 @@ elseif($ver[0]=="listar_reportes_referencia"){
 }elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
     $cont=new Filtrado_facturas();
     $cont->facturas_perteneciente_a_cuenta($ver[1]);
+}elseif($ver[0]=="listar_facturas_comercial_cobro"){
+    $cont=new Cuentas_transacciones();
+    $cont->listar_facturas_comercial_cobro($ver[1],$ver[2]);
+}elseif($ver[0]=="listar_facturas_comercial_asignado_cuentas"){
+    $cont=new Cuentas_transacciones();
+    $cont->listar_facturas_comercial_asignado_cuentas($ver[1]);
 }
 
 // reportedetalle listar_recibo_por_id listar_recibo_por_id_otras_cuentas   eliminarcobrados lista_cobrar lista_plande listafactura listaproveedores getgestionactual -- listar_facturas
@@ -707,11 +713,11 @@ elseif($ver[0]=="listar_reportes_referencia"){
 
 // mayorcuentacontable  reporteactivodisponible es_cuenta_de_orden busqueda_facturas_contabilidad
 //    listar_recibo_otras_cuentas  listar_recibo_otras_cuentas_pagar       listar_factura           listar_recibo_pago_por_id   listafactura_pago_trans                                           listar_recibo_por_id   --> caja bancos 
-// milista  reporteactivodisponible es_cuenta_de_orden listar_otras_cuentas_cobrar lista_cobrar_cobrado_factura
+// milista  reporteactivodisponible es_cuenta_de_orden listar_otras_cuentas_cobrar lista_cobrar_cobrado_factura listar_facturas_cobro_pago
 //    listar_recibo_otras_cuentas  listar_recibo_otras_cuentas_pagar       listar_factura           listar_recibo_pago_por_id                                              listar_recibo_por_id   --> caja bancos 
 // listar_tipo_plandecuenta listar_anular listapagos listapagos_individuales listar_recibo_otras_cuentas reportedetalletransaccion reportedetallefpt listar_otras_cuentas_cobrar_vencidas 
 // l listar_recibo_por_caja_bancos listar_agrupacion_rubro_plandecuenta listar_tipo_reportes_activos 
-//reporte_balance_general_por_niveles
+//reporte_balance_general_por_niveles mayorcuentacontable listar_facturas_cobro_pago
 //      listadegestion  
 
 

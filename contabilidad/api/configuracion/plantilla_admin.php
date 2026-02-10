@@ -329,13 +329,33 @@ class Plantilla_admin extends DB{
 
                 $ph_aux = $plantilla_hijo->fetch_assoc();
 
+                // if ($ph_aux) {
+                //     $idplantilla_hijo = $ph_aux['idplantilla'];
+
+                //     // Registrar en agrupacion_plantilla
+                //     $this->dbc->query("INSERT INTO agrupacion_plantilla(idplantilla_padre, idplantilla_hijo, tipo_operacion, monto, idtipo_reportes, idempresa)
+                //         VALUES ('$idplantilla_actual', '$idplantilla_hijo', '$tipo_op', '$monto_op', '$idtipo_reporte', '$idempresa')");
+                // }
                 if ($ph_aux) {
                     $idplantilla_hijo = $ph_aux['idplantilla'];
 
-                    // Registrar en agrupacion_plantilla
-                    $this->dbc->query("INSERT INTO agrupacion_plantilla(idplantilla_padre, idplantilla_hijo, tipo_operacion, monto, idtipo_reportes, idempresa)
-                        VALUES ('$idplantilla_actual', '$idplantilla_hijo', '$tipo_op', '$monto_op', '$idtipo_reporte', '$idempresa')");
+                    if ($tipo_op === 'porcentaje') {
+                        // 👉 Invertir la relación: el relacionado es el padre
+                        $this->dbc->query("INSERT INTO agrupacion_plantilla(
+                            idplantilla_padre, idplantilla_hijo, tipo_operacion, monto, idtipo_reportes, idempresa
+                        ) VALUES (
+                            '$idplantilla_hijo', '$idplantilla_actual', '$tipo_op', '$monto_op', '$idtipo_reporte', '$idempresa'
+                        )");
+                    } else {
+                        // 👉 Mantener la lógica original
+                        $this->dbc->query("INSERT INTO agrupacion_plantilla(
+                            idplantilla_padre, idplantilla_hijo, tipo_operacion, monto, idtipo_reportes, idempresa
+                        ) VALUES (
+                            '$idplantilla_actual', '$idplantilla_hijo', '$tipo_op', '$monto_op', '$idtipo_reporte', '$idempresa'
+                        )");
+                    }
                 }
+
             }
         }
           

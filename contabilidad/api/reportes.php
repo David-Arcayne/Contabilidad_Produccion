@@ -1322,7 +1322,7 @@ AND t.idgestion = '$gestion'
 AND p.numero BETWEEN '$numero_ini' AND '$numero_fin'
 AND t.fechatransaccion < '$fechai'
 AND t.estado NOT IN (4,5,6)
-ORDER BY t.fechatransaccion asc
+ORDER BY p.numero ASC, t.fechatransaccion ASC
     ");
 
     while ($row = $this->dbc->fetch($sqlSaldo)) {
@@ -1442,6 +1442,8 @@ ORDER BY t.fechatransaccion asc
     /* =====================================================
        3️⃣ LIMPIAR ÍNDICES PARA JSON
     ===================================================== */
+
+    ksort($data); // Ordena por número de cuenta
     foreach ($data as &$cuenta) {
         $cuenta["cuentas"] = array_values($cuenta["cuentas"]);
     }
