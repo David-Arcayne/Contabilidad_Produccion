@@ -1677,4 +1677,47 @@ public function asignar_facturas_A_cuentas($data) {
     
         echo json_encode($res);
     }
+    public function desvincular_facturas_comercial_de_transaccion($data) {
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+    
+            foreach ($data['facturas_comercial'] as $factura) {
+
+                // $montoFacturas += $factura['monto'];
+                $updatetranscodigo = $this->dbc->query("DELETE FROM transaccion_factura_comercial WHERE idfactura_comercial = '{$factura['idfactura_comercial']}'");
+
+            }
+   
+        // Respuesta
+        if ($updatetranscodigo === TRUE) {
+            $res = array("success", "Desvinculacion exitosa", "cobrofacturasaasientomodelo");
+        } else {
+            $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde",$factura['idfactura_comercial']);
+        }
+    
+        echo json_encode($res);
+    }
+    public function desvincular_facturas_contabilidad_de_transaccion($data) {
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+
+            foreach ($data['facturas_contabilidad'] as $factura) {
+
+                // $montoFacturas += $factura['monto'];
+                $updatetranscodigo = $this->dbc->query("UPDATE factura SET transacciones_idtransacciones = '0' WHERE idfactura = '{$factura['idfactura']}'");
+
+            }
+   
+        // Respuesta
+        if ($updatetranscodigo === TRUE) {
+            $res = array("success", "Desvinculacion exitosa", "cobrofacturasaasientomodelo");
+        } else {
+            $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde");
+        }
+    
+        echo json_encode($res);
+    }
+    
 }
