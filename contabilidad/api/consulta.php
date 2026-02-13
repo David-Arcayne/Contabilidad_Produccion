@@ -716,7 +716,7 @@ elseif($ver[0]=="listar_reportes_referencia"){
 // milista  reporteactivodisponible es_cuenta_de_orden listar_otras_cuentas_cobrar lista_cobrar_cobrado_factura listar_facturas_cobro_pago
 //    listar_recibo_otras_cuentas  listar_recibo_otras_cuentas_pagar       listar_factura           listar_recibo_pago_por_id                                              listar_recibo_por_id   --> caja bancos 
 // listar_tipo_plandecuenta listar_anular listapagos listapagos_individuales listar_recibo_otras_cuentas reportedetalletransaccion reportedetallefpt listar_otras_cuentas_cobrar_vencidas 
-// l listar_recibo_por_caja_bancos listar_agrupacion_rubro_plandecuenta listar_tipo_reportes_activos 
+// l listar_factura_comercial
 //reporte_balance_general_por_niveles mayorcuentacontable listar_facturas_cobro_pago
 //      listadegestion  
 

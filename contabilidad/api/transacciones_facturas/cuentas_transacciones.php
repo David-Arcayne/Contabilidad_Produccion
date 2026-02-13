@@ -281,7 +281,26 @@ class Cuentas_transacciones extends DB{
      
                 array_push($lista, $res);
         }
-        echo json_encode($lista);
+//´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´
+        $url = "https://mistersofts.com/app/cmv1/api/listaVentas/".$empresa;
+        $data = json_decode(file_get_contents($url), true);
+        $lista_factura_venta = [];
+
+        foreach($data as $plantilla){
+            $trans_fact = $this->dbc->query("SELECT idfactura_comercial 
+                                            FROM transaccion_factura_comercial 
+                                            WHERE idfactura_comercial = '{$plantilla['id']}'");
+            if($trans_fact->num_rows > 0){
+                // Ya existe, no lo agregamos
+            } else {
+                // Guardamos todo el registro, no solo el id
+                $lista_factura_venta[] = $plantilla;
+            }
+        }
+
+        $lista_final = array_merge($lista, $lista_factura_venta);
+        
+        echo json_encode($lista_final);
     }
     public function listar_facturas_comercial_asignado_cuentas($idcuenta)
     {
