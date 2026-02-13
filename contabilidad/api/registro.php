@@ -795,7 +795,19 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     }elseif($data['ver'] == "desvincular_facturas_contabilidad_de_transaccion") {
         $cont=new Transacciones();
         $cont->desvincular_facturas_contabilidad_de_transaccion($data);
-    }
+    }elseif($data['ver'] == "asignar_facturas_comercial_A_cuentas") {
+        $cont=new Factura_comercial();
+        $cont->asignar_facturas_comercial_A_cuentas($data);
+    }elseif($ver == "registrar_anular_eliminar_activar_factura_caja_bancos"){
+        if(isset($_POST['id_documento'],$_POST['tipo_documento'],$_POST['registro_desde'],$_POST['motivo'],$_POST['estado_opcion'],$_POST['estado_solicitud'],$_POST['hora'],$_POST['fecha'],$_POST['idusuario'],$_POST['idempresa'])){
+            // decode echo json_encode(array("danger", "Faltan parámetros en la solicitud", $_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$facturas));
+            $cont=new Factura_cobros();
+            $cont->registrar_anular_eliminar_activar_factura_caja_bancos($_POST['id_documento'],$_POST['tipo_documento'],$_POST['registro_desde'],$_POST['motivo'],$_POST['estado_opcion'],$_POST['estado_solicitud'],$_POST['hora'],$_POST['fecha'],$_POST['idusuario'],$_POST['idempresa']);
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['id_documento'],$_POST['tipo_documento'],$_POST['registro_desde'],$_POST['motivo'],$_POST['estado_opcion'],$_POST['estado_solicitud'],$_POST['hora'],$_POST['fecha'],$_POST['idusuario'],$_POST['idempresa']));
+        }
+}
 
     
 //editar_caja_bancos_facturas editar_caja_bancos_facturas_existentes   editar_recibo_caja_bancos   registrar_factura_recibo_pago_cajaBancos registrar_agrupacion_plantilla registrar_factura_recibo_cobro asignar asiento
@@ -804,6 +816,6 @@ if($data['ver'] == "asignar_asiento_A_factura") {
 //   registrocobrarfacturaGrupal registropagarfacturaGrupal asignar_asiento_A_otras_cuentas asignar_asiento_A_recibos asignar_facturas_A_cuentas  registrar_recibo_otras_cuentas_pagar
 }
 // registrocobrarfactura activar registroplanes registrotransaccion_por_asiento registrar_factura registrar_asignacion_asiento_operacion
-//  registrar_recibo_otras_cuentas  registrar_estado_resultados_admin registrar_factura_cobro_otras_cuentas 
+//  registrar_recibo_otras_cuentas  registrar_estado_resultados_admin registrar_factura_cobro_otras_cuentas  registrar_anular_eliminar_activar_factura_caja_bancos
 // registrar_recibo_cobro_cajaBancos_en_facturas registrar_recibo_otras_cuentas asignar_facturas_A_cuentas activar_desactivar_tipo_reportes 
 ?> 

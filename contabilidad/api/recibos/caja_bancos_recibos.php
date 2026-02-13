@@ -1730,29 +1730,6 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             }
 
             }else{
-                // if($fact['idotras_cuentas'] == '0' || $fact['idotras_cuentas'] == null){ //ESTA FACTURA NO PERTENECE A CONTRATO, NO TENDRA "s/g Contrato"
-                  
-                //     $aux_descripcion = $fact['por_concepto_de'];
-                //     $pertenece_contrato = "no";
-                // }else{
-                //     //ESTA FACTURA SII PERTENECE A CONTRATO
-                   
-                //     $otras_cuentas = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idotras_cuentas = '$fact[idotras_cuentas]'");
-                //     $oc = $otras_cuentas->fetch_assoc();
-                //     // if($oc['cobrado'] == '-1' && $oc['pagado'] == '-1'){ //CONTRATO GENERAL
-                //     //     $aux_descripcion = $fact['por_concepto_de'];
-                //     // }else{
-                //     //     $aux_descripcion = $fact['por_concepto_de']."("."s/g Contrato: ". $oc['concepto'].", N° ".$oc['nro_otras_cuentas'].", ".$oc['fecha'].")"; // NO ES CONTRATO GENERAL
-                //     // }
-
-                //     if($fact['tipo_factura'] == 'contado'){ //factura al contado
-                //         $aux_descripcion = $fact['por_concepto_de'];
-                //     }else{ // factura a credito
-                //         $aux_descripcion = $qwe['concepto'];
-                //     }
-
-                //     $pertenece_contrato = "si";
-                // }
 
                 if($fact['tipo_factura'] == 'contado'){ //factura al contado
                     $aux_descripcion = $fact['por_concepto_de'];
@@ -1792,6 +1769,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         "persona" => $qwe['persona'],
                         "ci" => $qwe['ci'],
                         "factura_recibo" => "factura",
+                        "idfactura" => $fact['idfactura'],
                         "nro_documento" => "$nro_documento",
                         "por_concepto_de" => "$fact[por_concepto_de]",
                         "codigotransaccion" => $tr['codigotransaccion'],
@@ -1824,6 +1802,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                     "persona" => $qwe['persona'],
                     "ci" => $qwe['ci'],
                     "factura_recibo" => "factura",
+                    "idfactura" => $fact['idfactura'],
                     "nro_documento" => "$nro_documento",
                     "por_concepto_de" => "$fact[por_concepto_de]",
                     "codigotransaccion" => $tr['codigotransaccion'],
@@ -2012,26 +1991,6 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                 }
     
                 }else{
-                    // $fecha_nueva = date("d/m/Y", strtotime($fact['fecha']));
-                    // $aux_descripcion = "s/g doc N° $fact[nfactura] de: $fecha_nueva";
-                    
-                    // if($fact['idotras_cuentas'] == '0' || $fact['idotras_cuentas'] == null){ // ESTA FACTURA NO PERTENECE A CONTRATO, NO TENDRA "s/g Contrato"
-                    //     $aux_descripcion = $fact['por_concepto_de'];
-                    //     $pertenece_contrato = "no";
-                    // }else{
-                    //     //ESTA FACTURA SII PERTENECE A CONTRATO
-                   
-                    //     $otras_cuentas = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idotras_cuentas = '$fact[idotras_cuentas]'");
-                    //     $oc = $otras_cuentas->fetch_assoc();
-
-                    //     if($oc['cobrado'] == '-1' && $oc['pagado'] == '-1'){ //CONTRATO GENERAL
-                    //         $aux_descripcion = $fact['por_concepto_de'];
-                    //     }else{
-                    //         $aux_descripcion = $fact['por_concepto_de']."("."s/g Contrato: ". $oc['concepto'].", N° ".$oc['nro_otras_cuentas'].", ".$oc['fecha'].")"; // NO ES CONTRATO GENERAL
-                    //     }
-
-                    //     $pertenece_contrato = "si";
-                    // }
 
                     if($fact['tipo_factura'] == 'contado'){ //factura al contado
                         $aux_descripcion = $fact['por_concepto_de'];
@@ -2067,6 +2026,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "persona" => $qwe['persona'],
                             "ci" => $qwe['ci'],
                             "factura_recibo" => "factura",
+                            "idfactura" => $fact['idfactura'],
                             "nro_documento" => "$nro_documento",
                             "por_concepto_de" => $fact['por_concepto_de'],
                             "codigotransaccion" => $tr['codigotransaccion'],
@@ -2098,6 +2058,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         "persona" => $qwe['persona'],
                         "ci" => $qwe['ci'],
                         "factura_recibo" => "factura",
+                        "idfactura" => $fact['idfactura'],
                         "nro_documento" => "$nro_documento",
                         "por_concepto_de" => "$fact[por_concepto_de]",
                         "codigotransaccion" => $tr['codigotransaccion'],
@@ -2429,6 +2390,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "persona" => $qwe['persona'],
                             "ci" => $qwe['ci'],
                             "factura_recibo" => "factura",
+                            "idfactura" => $fact['idfactura'],
                             "nro_documento" => $nro_documento,
                             "por_concepto_de" => $fact['por_concepto_de'],
                             "codigotransaccion" => $tr['codigotransaccion'],
@@ -2530,6 +2492,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "persona" => $qwe['persona'],
                             "ci" => $qwe['ci'],
                             "factura_recibo" => "factura",
+                            "idfactura" => $fact['idfactura'],
                             "nro_documento" => $nro_documento,
                             "por_concepto_de" => $fact['por_concepto_de'],
                             "codigotransaccion" => $tr['codigotransaccion'],

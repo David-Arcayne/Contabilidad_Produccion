@@ -719,4 +719,57 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
 
         echo json_encode($lista);
     }
+    public function asignar_facturas_comercial_A_cuentas($data) {
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+    
+        $idempresa = $this->getidempresa($data['idempresa']);
+        // $idsucursal = $this->getidsucursal($data['idsucursal']); 
+        $gestion = $this->getgestionactualid($idempresa);
+        $montoFacturas = 0;
+
+        $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$data[cuenta]'");
+        $dt = $detalle_trans->fetch_assoc();
+
+            foreach ($data['facturas'] as $factura) {
+
+                $montoFacturas += $factura['monto'];
+                $updatetranscodigo = $this->dbc->query("UPDATE factura SET cuenta = '$data[cuenta]',transacciones_idtransacciones = '$dt[transacciones_idtransacciones]'  
+                WHERE idfactura = '{$factura['idfactura']}'");
+            }
+                        
+        // $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$data[cuenta]'");
+        // $dt = $detalle_trans->fetch_assoc(); cobrofacturasaasientomodelo
+
+        if($data['sumar_reemplazar'] == 'suma'){ // SUMAR
+            if($dt['debe'] > 0){
+                $nuevo_monto_dt = $dt['debe'] + $montoFacturas;
+                $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
+            }else{
+                $nuevo_monto_dt = $dt['haber'] + $montoFacturas;
+                $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
+            }
+        }elseif($data['sumar_reemplazar'] == 'reemplazar'){ // REEMPLAZAR
+            if($dt['debe'] > 0){
+                $nuevo_monto_dt = $montoFacturas;
+                $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
+            }else{
+                $nuevo_monto_dt = $montoFacturas;
+                $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
+            }
+        }else{ // SOLO VINCULARA NADA MAS
+
+        }
+   
+        
+        // Respuesta
+        if ($updatetranscodigo === TRUE) {
+            $res = array("success", "Se Registro Correctamente", "asignar_facturas_A_cuentas",$data['cuenta'],$dt['transacciones_idtransacciones'],$nuevo_monto_dt,$dt['debe'],$dt['haber']);
+        } else {
+            $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde");
+        }
+    
+        echo json_encode($res);
+    }
 }
