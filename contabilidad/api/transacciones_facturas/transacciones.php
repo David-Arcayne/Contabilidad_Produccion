@@ -1390,7 +1390,19 @@ public function asignar_facturas_A_cuentas($data) {
                 $nuevo_monto_dt = $dt['haber'] + $montoFacturas;
                 $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
             }
-        }elseif($data['sumar_reemplazar'] == 'reemplazar'){ // REEMPLAZAR
+        }elseif($data['sumar_reemplazar'] == 'reemplazo'){ // REEMPLAZAR
+
+        // DESVINCULAR LAS FACTURAS VINCULADAS
+            // Desvincular todas las facturas viejas excepto las nuevas
+            $idsNuevos = array_column($data['facturas'], 'idfactura');
+            $idsNuevosStr = implode(",", $idsNuevos);
+
+            $desvincular = $this->dbc->query("UPDATE factura 
+                SET cuenta = '0' 
+                WHERE cuenta = '$data[cuenta]' 
+                AND idfactura NOT IN ($idsNuevosStr)
+            ");
+
             if($dt['debe'] > 0){
                 $nuevo_monto_dt = $montoFacturas;
                 $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
@@ -1405,12 +1417,14 @@ public function asignar_facturas_A_cuentas($data) {
         
         // Respuesta
         if ($updatetranscodigo === TRUE) {
-            $res = array("success", "Se Registro Correctamente", "asignar_facturas_A_cuentas",$data['cuenta'],$dt['transacciones_idtransacciones'],$nuevo_monto_dt,$dt['debe'],$dt['haber']);
+            $res = array("success", "Se Registro Correctamente", "asignar_facturas_A_cuentas",$data['sumar_reemplazar'],$data['cuenta'],$dt['transacciones_idtransacciones'],$nuevo_monto_dt,$dt['debe'],$dt['haber']);
         } else {
             $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde");
         }
     
         echo json_encode($res);
+        
+        // echo json_encode(array($data['sumar_reemplazar'],$data['cuenta'],$montoFacturas));
     }
 
     public function asignar_recibos_A_cuentas($data) {

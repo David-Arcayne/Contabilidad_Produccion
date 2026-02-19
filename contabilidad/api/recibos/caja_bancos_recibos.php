@@ -157,6 +157,20 @@ class Caja_bancos_recibos extends DB{
                         $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
                     }
                 }elseif($tipo_cuenta == 'reemplazo'){ // REEMPLAZAR
+
+                    // Desvincular todas las facturas viejas excepto las nuevas
+
+                    $desvincular_fact = $this->dbc->query("UPDATE factura 
+                        SET cuenta = '0' 
+                        WHERE cuenta = '$cuenta' 
+                        AND idfactura NOT IN ($idfact)
+                    ");
+                    $desvincular_comprobante = $this->dbc->query("UPDATE cuentaspof 
+                        SET cuenta = '0' 
+                        WHERE cuenta = '$cuenta' 
+                        AND idcuentaspof NOT IN ($idrecibo)
+                    ");
+
                     if($dt['debe'] > 0){
                         $nuevo_monto_dt = $monto;
                         $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
@@ -452,6 +466,20 @@ class Caja_bancos_recibos extends DB{
                         $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
                     }
                 }elseif($tipo_cuenta == 'reemplazo'){ // REEMPLAZAR
+
+                // Desvincular todas las facturas viejas excepto las nuevas
+
+                    $desvincular_fact = $this->dbc->query("UPDATE factura 
+                        SET cuenta = '0' 
+                        WHERE cuenta = '$cuenta' 
+                        AND idfactura NOT IN ($idfact)
+                    ");
+                    $desvincular_comprobante = $this->dbc->query("UPDATE cuentaspor 
+                        SET cuenta = '0' 
+                        WHERE cuenta = '$cuenta' 
+                        AND idcuentaspor NOT IN ($idrecibo)
+                    ");
+
                     if($dt['debe'] > 0){
                         $nuevo_monto_dt = $monto;
                         $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
@@ -2927,6 +2955,13 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
                     }
                 }elseif($tipo_cuenta == 'reemplazo'){ // REEMPLAZAR
+
+                $desvincular = $this->dbc->query("UPDATE cuentaspof 
+                        SET cuenta = '0' 
+                        WHERE cuenta = '$cuenta'
+                        AND idcuentaspof NOT IN ($idrecibo)
+                    ");
+
                     if($dt['debe'] > 0){
                         $nuevo_monto_dt = $monto;
                         $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
@@ -3185,6 +3220,13 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
                     }
                 }elseif($tipo_cuenta == 'reemplazo'){ // REEMPLAZAR
+
+                $desvincular = $this->dbc->query("UPDATE cuentaspor 
+                        SET cuenta = '0' 
+                        WHERE cuenta = '$cuenta'
+                        AND idcuentaspor NOT IN ($idrecibo)
+                    ");
+
                     if($dt['debe'] > 0){
                         $nuevo_monto_dt = $monto;
                         $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");

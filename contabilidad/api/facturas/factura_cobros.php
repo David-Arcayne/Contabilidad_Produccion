@@ -99,6 +99,7 @@ class Factura_cobros extends DB{
                 $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`,`tipo_factura`, `clasefactura`, `cobrado`, `pagado`,`idotras_cuentas`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) 
                 VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento','$tipo_factura', '$clasefactura', '$co', '$pa','0', '$espesificacion', '1', '1', '$trans', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de','tributario_x_cobrar');");
             
+                $idfactu = $this->dbc->insert_id;
 
                 $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$cuenta'");
                 $dt = $detalle_trans->fetch_assoc();
@@ -116,6 +117,16 @@ class Factura_cobros extends DB{
                         $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
                     }
                 }elseif($tipo_cuenta == 'reemplazo'){ // REEMPLAZAR
+
+                
+                // Desvincular todas las facturas viejas excepto las nuevas
+
+                    $desvincular_fact = $this->dbc->query("UPDATE factura 
+                        SET cuenta = '0' 
+                        WHERE cuenta = '$cuenta' 
+                        AND idfactura NOT IN ($idfactu)
+                    ");
+
                     if($dt['debe'] > 0){
                         $nuevo_monto_dt = $monto;
                         $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
@@ -281,6 +292,20 @@ class Factura_cobros extends DB{
                         $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
                     }
                 }elseif($tipo_cuenta == 'reemplazo'){ // REEMPLAZAR
+
+                    // Desvincular todas las facturas viejas excepto las nuevas
+
+                    $desvincular_fact = $this->dbc->query("UPDATE factura 
+                        SET cuenta = '0' 
+                        WHERE cuenta = '$cuenta' 
+                        AND idfactura NOT IN ($idfact)
+                    ");
+                    $desvincular_comprobante = $this->dbc->query("UPDATE cuentaspof 
+                        SET cuenta = '0' 
+                        WHERE cuenta = '$cuenta' 
+                        AND idcuentaspof NOT IN ($idrecibo)
+                    ");
+
                     if($dt['debe'] > 0){
                         $nuevo_monto_dt = $monto;
                         $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");

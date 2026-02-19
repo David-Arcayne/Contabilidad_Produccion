@@ -1032,19 +1032,44 @@ class Filtrado_facturas extends DB{
         //   }
           echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
-    public function facturas_perteneciente_a_cuenta($idcuenta){
+    public function facturas_perteneciente_a_cuenta($idcuenta,$fecha_ini,$fecha_fin){
         $lista = [];
         // $idempresa = $this->getidempresa($empresa);
     
-        // Preparar la consulta
-        $getPedido = $this->dbc->query("SELECT * FROM factura WHERE cuenta = '$idcuenta'");
+        if($fecha_ini == ""){
+            $getPedido = $this->dbc->query("SELECT * FROM factura WHERE cuenta = '$idcuenta'");
+        }else{
+            $getPedido = $this->dbc->query("SELECT * FROM factura WHERE cuenta = '$idcuenta' AND fecha BETWEEN '$fecha_ini' AND '$fecha_fin'");
+        }
     
         while ($qwe = $this->dbc->fetch($getPedido)) {
             $res = array(
                 "idfactura" => $qwe['idfactura'],
                 "fecha" => $qwe['fecha'],
-                "nfactura" => $qwe['simbolo'],
+                "nfactura" => $qwe['nfactura'],
                 "montofactura" => $qwe['montofactura']
+            );
+            array_push($lista, $res);
+        }
+    
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
+    public function recibos_perteneciente_a_cuenta($idcuenta,$fecha_ini,$fecha_fin){
+        $lista = [];
+        // $idempresa = $this->getidempresa($empresa);
+    
+        if($fecha_ini == ""){
+            $getPedido = $this->dbc->query("SELECT * FROM recibo WHERE cuenta = '$idcuenta'");
+        }else{
+            $getPedido = $this->dbc->query("SELECT * FROM recibo WHERE cuenta = '$idcuenta' AND fecha BETWEEN '$fecha_ini' AND '$fecha_fin'");
+        }
+    
+        while ($qwe = $this->dbc->fetch($getPedido)) {
+            $res = array(
+                "idrecibo" => $qwe['idrecibo'],
+                "fecha" => $qwe['fecha'],
+                "nro_recibo" => $qwe['nro_recibo'],
+                "monto" => $qwe['monto']
             );
             array_push($lista, $res);
         }

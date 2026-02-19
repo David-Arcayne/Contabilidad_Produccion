@@ -677,11 +677,11 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
         $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$data[cuenta]'");
         $dt = $detalle_trans->fetch_assoc();
 
-            foreach ($data['facturas'] as $factura) {
+            foreach ($data['facturas_comercial'] as $factura) {
 
                 $montoFacturas += $factura['monto'];
-                $updatetranscodigo = $this->dbc->query("UPDATE factura SET cuenta = '$data[cuenta]',transacciones_idtransacciones = '$dt[transacciones_idtransacciones]'  
-                WHERE idfactura = '{$factura['idfactura']}'");
+                $updatetranscodigo = $this->dbc->query("UPDATE transaccion_factura_comercial SET cuenta = '$data[cuenta]',idtransaccion = '$dt[transacciones_idtransacciones]'  
+                WHERE idfactura_comercial = '{$factura['idfactura_comercial']}'");
             }
                         
         // $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$data[cuenta]'");
@@ -695,7 +695,11 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
                 $nuevo_monto_dt = $dt['haber'] + $montoFacturas;
                 $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
             }
-        }elseif($data['sumar_reemplazar'] == 'reemplazar'){ // REEMPLAZAR
+        }elseif($data['sumar_reemplazar'] == 'reemplazo'){ // REEMPLAZAR
+
+            // DESVINCULAR LAS FACTURAS VINCULADAS
+            $desvincular_facturas = $this->dbc->query("UPDATE transaccion_factura_comercial SET cuenta = '0' WHERE cuenta = '$data[cuenta]'");
+
             if($dt['debe'] > 0){
                 $nuevo_monto_dt = $montoFacturas;
                 $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");

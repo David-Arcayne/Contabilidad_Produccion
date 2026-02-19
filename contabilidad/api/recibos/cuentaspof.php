@@ -160,6 +160,15 @@ class Cuentaspof extends DB{
                         $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
                     }
                 }elseif($tipo_cuenta == 'reemplazo'){ // REEMPLAZAR
+
+                    // Desvincular todas las facturas viejas excepto las nuevas
+                    // $idsNuevos = array_column($data['facturas'], 'idfactura');
+                    // $idsNuevosStr = implode(",", $idsNuevos);
+
+                    $desvincular = $this->dbc->query("UPDATE cuentaspof 
+                        SET cuenta = '0' 
+                        WHERE cuenta = '$cuenta'
+                    ");
                     if($dt['debe'] > 0){
                         $nuevo_monto_dt = $monto;
                         $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");

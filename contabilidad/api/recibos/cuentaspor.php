@@ -160,6 +160,12 @@ class Cuentaspor extends DB{
                         $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
                     }
                 }elseif($tipo_cuenta == 'reemplazo'){ // REEMPLAZAR
+
+                    $desvincular = $this->dbc->query("UPDATE cuentaspor 
+                        SET cuenta = '0' 
+                        WHERE cuenta = '$cuenta'
+                    ");
+
                     if($dt['debe'] > 0){
                         $nuevo_monto_dt = $monto;
                         $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");

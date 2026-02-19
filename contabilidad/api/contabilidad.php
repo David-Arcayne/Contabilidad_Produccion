@@ -851,46 +851,46 @@ WHERE md5(p.organizacion_idorganizacion)='$ide'");
     
 //----------------------------------------------------------------------------------------------------------------------------------------
         //SELECCIONAMOS LAS FACTURAS DE COMERCIAL QUE ESTAN RELACIONADAS EN CONTABILIDAD POR MEDIO DE LA TRANSACCION
-        $factura_conta_comer = $this->dbc->query("SELECT * FROM transaccion_factura_comercial WHERE idtransaccion = '$idtransaccion'");
-        if($factura_conta_comer->num_rows > 0){
-             $lista_fact_comer = [];
+        // $factura_conta_comer = $this->dbc->query("SELECT * FROM transaccion_factura_comercial WHERE idtransaccion = '$idtransaccion'");
+        // if($factura_conta_comer->num_rows > 0){
+        //      $lista_fact_comer = [];
 
-            while ($www = $this->dbc->fetch($factura_conta_comer)) {
+        //     while ($www = $this->dbc->fetch($factura_conta_comer)) {
                 
-                array_push($lista_fact_comer, $www['idfactura_comercial']);
-            }
-            $array_facturas_comercial = implode(", ", $lista_fact_comer);
+        //         array_push($lista_fact_comer, $www['idfactura_comercial']);
+        //     }
+        //     $array_facturas_comercial = implode(", ", $lista_fact_comer);
             
-            //SELECCIONAMOS LAS FACTURAS DE COMERCIAL QUE PERTENECEN A UNA TRANSACCION DE CONTABILIDAD
-            $factura_comercial = $this->dbcm->query("SELECT id_venta,fecha_venta,nfactura,cliente_id_cliente1,monto_total, estado,tipo_pago 
-            FROM venta WHERE id_venta IN ($array_facturas_comercial)");
+        //     //SELECCIONAMOS LAS FACTURAS DE COMERCIAL QUE PERTENECEN A UNA TRANSACCION DE CONTABILIDAD
+        //     $factura_comercial = $this->dbcm->query("SELECT id_venta,fecha_venta,nfactura,cliente_id_cliente1,monto_total, estado,tipo_pago 
+        //     FROM venta WHERE id_venta IN ($array_facturas_comercial)");
 
-            while ($fc = $this->dbcm->fetch($factura_comercial)) {
+        //     while ($fc = $this->dbcm->fetch($factura_comercial)) {
 
-                if($fc['tipo_pago'] == 'contado'){
-                    $estado_factura = 'cobrado';
-                }else{
-                    $estado_cobro = $this->dbcm->query("SELECT *
-                    FROM estado_cobro WHERE venta_id_venta = '$fc[id_venta]'");
-                    $resu_cobro = $estado_cobro->fetch_assoc();
-                        if($resu_cobro['saldo'] == 0){
-                            $estado_factura = 'cobrado';
-                        }else{
-                            $estado_factura = 'por cobrar';
-                        }
-                }
-                    $trans_f = $this->dbc->query("SELECT * FROM transaccion_factura_comercial WHERE idfactura_comercial='" . $fc['id_venta'] . "'");
-                    $tf = $this->dbc->fetch($trans_f);
+        //         if($fc['tipo_pago'] == 'contado'){
+        //             $estado_factura = 'cobrado';
+        //         }else{
+        //             $estado_cobro = $this->dbcm->query("SELECT *
+        //             FROM estado_cobro WHERE venta_id_venta = '$fc[id_venta]'");
+        //             $resu_cobro = $estado_cobro->fetch_assoc();
+        //                 if($resu_cobro['saldo'] == 0){
+        //                     $estado_factura = 'cobrado';
+        //                 }else{
+        //                     $estado_factura = 'por cobrar';
+        //                 }
+        //         }
+        //             $trans_f = $this->dbc->query("SELECT * FROM transaccion_factura_comercial WHERE idfactura_comercial='" . $fc['id_venta'] . "'");
+        //             $tf = $this->dbc->fetch($trans_f);
 
-                    $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $fc['cliente_id_cliente1'] . "'");
-                    $asd = $this->dbcm->fetch($cliente);
-                    $res = array("id" => $fc['id_venta'], "fecha" => $fc['fecha_venta'], "nfactura" => $fc['nfactura'], "montofactura" => $fc['monto_total'], "clasefactura" => 1, "cobrado" => 0, "pagado" => 0,"estado" => $estado_factura, "idtransaccion" => $tf['idtransaccion'], "idcliente_proveedor" => $asd['id_cliente'], "procli" => $asd['nombre'], "nit" => $asd['nit'],"desde" => 'comercial',"por_concepto_de" => NULL,"registro_desde" => NULL);
+        //             $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $fc['cliente_id_cliente1'] . "'");
+        //             $asd = $this->dbcm->fetch($cliente);
+        //             $res = array("id" => $fc['id_venta'], "fecha" => $fc['fecha_venta'], "nfactura" => $fc['nfactura'], "montofactura" => $fc['monto_total'], "clasefactura" => 1, "cobrado" => 0, "pagado" => 0,"estado" => $estado_factura, "idtransaccion" => $tf['idtransaccion'], "idcliente_proveedor" => $asd['id_cliente'], "procli" => $asd['nombre'], "nit" => $asd['nit'],"desde" => 'comercial',"por_concepto_de" => NULL,"registro_desde" => NULL);
             
-                array_push($lista, $res);
-            }
-        }else{
+        //         array_push($lista, $res);
+        //     }
+        // }else{
 
-        }
+        // }
 
         echo json_encode($lista);
     }
