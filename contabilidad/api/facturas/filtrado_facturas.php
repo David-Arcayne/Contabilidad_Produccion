@@ -1032,44 +1032,190 @@ class Filtrado_facturas extends DB{
         //   }
           echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
-    public function facturas_perteneciente_a_cuenta($idcuenta,$fecha_ini,$fecha_fin){
+    public function facturas_perteneciente_a_cuenta($idtransaccion,$idcuenta,$fecha_ini,$fecha_fin){
         $lista = [];
-        // $idempresa = $this->getidempresa($empresa);
     
-        if($fecha_ini == ""){
-            $getPedido = $this->dbc->query("SELECT * FROM factura WHERE cuenta = '$idcuenta'");
+        if($fecha_ini == 0){ // tambien la fecha_fin debe ser cero
+            $fecha_rango = "";
         }else{
-            $getPedido = $this->dbc->query("SELECT * FROM factura WHERE cuenta = '$idcuenta' AND fecha BETWEEN '$fecha_ini' AND '$fecha_fin'");
+            $fecha_rango = "AND fecha BETWEEN '$fecha_ini' AND '$fecha_fin'";
+        }
+
+        if($idtransaccion != 0 && $idcuenta == 0){ // LISTARA FACTURAS DE UNA TRANSACCION Y NO POR CUENTA
+            
+            $factura_trans = $this->dbc->query("SELECT * FROM factura WHERE transacciones_idtransacciones = '$idtransaccion' $fecha_rango");
+
+        }elseif($idtransaccion != 0 && $idcuenta != 0){ // LISTARA FACTURAS DE UNA CUENTA PERTENECIENTE A UNA TRANSACCION
+            
+            $factura_trans = $this->dbc->query("SELECT * FROM factura WHERE cuenta = '$idcuenta' $fecha_rango");
+
+        }else{ // LA TRANSACCION SERA CERO Y SE LISTARA TODAS LAS FACTURAS PERTENECIENTES A TODAS LAS CUENTAS 
+            $det_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE idplandecuenta = '$idcuenta'");
+
+            // Creamos un array para guardar los IDs
+            $array_ids = []; 
+            while ($row = $det_trans->fetch_assoc()) { 
+            // Suponiendo que la columna que quieres capturar se llama 'id' 
+            $array_ids[] = $row['iddetalletransaccion']; 
+            } 
+            // Convertimos el array en una lista separada por comas 
+            $ids_string = implode(",", $array_ids);
+
+            $factura_trans = $this->dbc->query("SELECT * FROM factura WHERE cuenta IN($ids_string) $fecha_rango");
         }
     
-        while ($qwe = $this->dbc->fetch($getPedido)) {
+        while ($qwe = $this->dbc->fetch($factura_trans)) {
+
+            $trans = $this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones = '$qwe[transacciones_idtransacciones]'");
+            $nro_trans = $this->dbc->fetch($trans);
+
+            $dt_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$qwe[cuenta]'");
+            $dt_aux = $this->dbc->fetch($dt_trans);
+
+            $plandecuenta = $this->dbc->query("SELECT * FROM plandecuenta WHERE idplandecuenta = '$dt_aux[idplandecuenta]'");
+            $pl_cuenta = $this->dbc->fetch($plandecuenta);
+
             $res = array(
                 "idfactura" => $qwe['idfactura'],
                 "fecha" => $qwe['fecha'],
                 "nfactura" => $qwe['nfactura'],
-                "montofactura" => $qwe['montofactura']
+                "montofactura" => $qwe['montofactura'],
+                "nro_transaccion" => $nro_trans['codigotransaccion'],
+                "nombre_cuenta" => $pl_cuenta['nombreplan']
             );
             array_push($lista, $res);
         }
     
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
-    public function recibos_perteneciente_a_cuenta($idcuenta,$fecha_ini,$fecha_fin){
+
+    public function recibos_perteneciente_a_cuenta($idtransaccion,$idcuenta,$fecha_ini,$fecha_fin){
         $lista = [];
-        // $idempresa = $this->getidempresa($empresa);
     
-        if($fecha_ini == ""){
-            $getPedido = $this->dbc->query("SELECT * FROM recibo WHERE cuenta = '$idcuenta'");
+        if($fecha_ini == 0){ // tambien la fecha_fin debe ser cero
+            $fecha_rango = "";
         }else{
-            $getPedido = $this->dbc->query("SELECT * FROM recibo WHERE cuenta = '$idcuenta' AND fecha BETWEEN '$fecha_ini' AND '$fecha_fin'");
+            $fecha_rango = "AND fecha BETWEEN '$fecha_ini' AND '$fecha_fin'";
+        }
+
+        if($idtransaccion != 0 && $idcuenta == 0){ // LISTARA RECIBOS DE UNA TRANSACCION Y NO POR CUENTA
+            
+            $recibo_trans = $this->dbc->query("SELECT * FROM recibo WHERE transaccion = '$idtransaccion' $fecha_rango");
+
+        }elseif($idtransaccion != 0 && $idcuenta != 0){ // LISTARA RECIBOS DE UNA CUENTA PERTENECIENTE A UNA TRANSACCION
+            
+            $recibo_trans = $this->dbc->query("SELECT * FROM recibo WHERE cuenta = '$idcuenta' $fecha_rango");
+
+        }else{ // LA TRANSACCION SERA CERO Y SE LISTARA TODAS LAS RECIBOS PERTENECIENTES A TODAS LAS CUENTAS 
+            $det_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE idplandecuenta = '$idcuenta'");
+
+            // Creamos un array para guardar los IDs
+            $array_ids = []; 
+            while ($row = $det_trans->fetch_assoc()) { 
+            // Suponiendo que la columna que quieres capturar se llama 'id' 
+            $array_ids[] = $row['iddetalletransaccion']; 
+            } 
+            // Convertimos el array en una lista separada por comas 
+            $ids_string = implode(",", $array_ids);
+
+            $recibo_trans = $this->dbc->query("SELECT * FROM recibo WHERE cuenta IN($ids_string) $fecha_rango");
         }
     
-        while ($qwe = $this->dbc->fetch($getPedido)) {
+        while ($qwe = $this->dbc->fetch($recibo_trans)) {
+
+            $trans = $this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones = '$qwe[transaccion]'");
+            $nro_trans = $this->dbc->fetch($trans);
+
+            $dt_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$qwe[cuenta]'");
+            $dt_aux = $this->dbc->fetch($dt_trans);
+
+            $plandecuenta = $this->dbc->query("SELECT * FROM plandecuenta WHERE idplandecuenta = '$dt_aux[idplandecuenta]'");
+            $pl_cuenta = $this->dbc->fetch($plandecuenta);
+
             $res = array(
                 "idrecibo" => $qwe['idrecibo'],
                 "fecha" => $qwe['fecha'],
                 "nro_recibo" => $qwe['nro_recibo'],
-                "monto" => $qwe['monto']
+                "monto" => $qwe['monto'],
+                "nro_transaccion" => $nro_trans['codigotransaccion'],
+                "nombre_cuenta" => $pl_cuenta['nombreplan']
+            );
+            array_push($lista, $res);
+        }
+    
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
+    public function comprobantes_perteneciente_a_cuenta($idtransaccion,$idcuenta,$fecha_ini,$fecha_fin){
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
+        $lista = [];
+ 
+        if($fecha_ini == 0){ // tambien la fecha_fin debe ser cero
+            $fecha_rango = "";
+        }else{
+            $fecha_rango = "AND fecha BETWEEN CONCAT('$fecha_ini', ' 00:00:00') AND CONCAT('$fecha_fin', ' 23:59:59')";
+        }
+
+        if($idtransaccion != 0 && $idcuenta == 0){ // LISTARA RECIBOS DE UNA TRANSACCION Y NO POR CUENTA
+            
+            $comprobante_trans = $this->dbc->query("SELECT idcuentaspof AS idcomprobante, nrecibo, transaccion, fecha, monto, cuenta
+            FROM cuentaspof 
+            WHERE transaccion = '$idtransaccion' $fecha_rango
+            UNION ALL
+            SELECT idcuentaspor AS idcomprobante, transaccion, fecha, monto, cuenta
+            FROM cuentaspor 
+            WHERE transaccion = '$idtransaccion' $fecha_rango");
+
+        }elseif($idtransaccion != 0 && $idcuenta != 0){ // LISTARA RECIBOS DE UNA CUENTA PERTENECIENTE A UNA TRANSACCION
+            
+            $comprobante_trans = $this->dbc->query("SELECT idcuentaspof AS idcomprobante, nrecibo, transaccion, fecha, monto, cuenta
+            FROM cuentaspof 
+            WHERE cuenta = '$idcuenta' $fecha_rango
+            UNION ALL
+            SELECT idcuentaspor AS idcomprobante, nrecibo, transaccion, fecha, monto, cuenta
+            FROM cuentaspor 
+            WHERE cuenta = '$idcuenta' $fecha_rango");
+
+        }else{ // LA TRANSACCION SERA CERO Y SE LISTARA TODAS LAS RECIBOS PERTENECIENTES A TODAS LAS CUENTAS 
+            $det_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE idplandecuenta = '$idcuenta'");
+
+            // Creamos un array para guardar los IDs
+            $array_ids = []; 
+            while ($row = $det_trans->fetch_assoc()) { 
+            // Suponiendo que la columna que quieres capturar se llama 'id' 
+            $array_ids[] = $row['iddetalletransaccion']; 
+            } 
+            // Convertimos el array en una lista separada por comas 
+            $ids_string = implode(",", $array_ids);
+
+            $comprobante_trans = $this->dbc->query("SELECT idcuentaspof AS idcomprobante, nrecibo, transaccion, fecha, monto, cuenta
+            FROM cuentaspof 
+            WHERE cuenta IN($ids_string) $fecha_rango
+            UNION ALL
+            SELECT idcuentaspor AS idcomprobante, transaccion, fecha, monto, cuenta
+            FROM cuentaspor 
+            WHERE cuenta IN($ids_string) $fecha_rango");
+        }
+    
+        while ($qwe = $this->dbc->fetch($comprobante_trans)) {
+
+            $trans = $this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones = '$qwe[transaccion]'");
+            $nro_trans = $this->dbc->fetch($trans);
+
+            $dt_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$qwe[cuenta]'");
+            $dt_aux = $this->dbc->fetch($dt_trans);
+
+            $plandecuenta = $this->dbc->query("SELECT * FROM plandecuenta WHERE idplandecuenta = '$dt_aux[idplandecuenta]'");
+            $pl_cuenta = $this->dbc->fetch($plandecuenta);
+
+            $res = array(
+                "idcomprobante" => $qwe['idcomprobante'],
+                "fecha" => $qwe['fecha'],
+                "nro_comprobante" => $qwe['nrecibo'],
+                "monto" => $qwe['monto'],
+                "nro_transaccion" => $nro_trans['codigotransaccion'],
+                "nombre_cuenta" => $pl_cuenta['nombreplan']
             );
             array_push($lista, $res);
         }

@@ -1627,6 +1627,18 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
                 $fact = $factura->fetch_assoc();
 
+                if($fact['estado'] == '1'){ //ACTIVO
+                    $estado_documento = "activo";
+                }elseif($fact['estado'] == '2'){ // PENDIENTE DE ANULACION
+                    $estado_documento = "pendiente anulacion";
+                }elseif($fact['estado'] == '3'){ // PENDIENTE DE ELIMINACION
+                    $estado_documento = "pendiente eliminacion";
+                }elseif($fact['estado'] == '4'){// ANULADO
+                    $estado_documento = "anulado";
+                }elseif($fact['estado'] == '5'){// PENDIENTE DE ACTIVACION
+                    $estado_documento = "pendiente activacion";
+                }
+
                 $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente= '$fact[proveedorcliente_idproveedorcliente]'");
                 $cl = $cliente->fetch_assoc();
 
@@ -1656,6 +1668,17 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
                 $reci = $recibo->fetch_assoc();
 
+                if($reci['estado'] == '1'){ //ACTIVO
+                    $estado_documento = "activo";
+                }elseif($reci['estado'] == '2'){ // PENDIENTE DE ANULACION
+                    $estado_documento = "pendiente anulacion";
+                }elseif($reci['estado'] == '3'){ // PENDIENTE DE ELIMINACION
+                    $estado_documento = "pendiente eliminacion";
+                }elseif($reci['estado'] == '4'){// ANULADO
+                    $estado_documento = "anulado";
+                }elseif($reci['estado'] == '5'){// PENDIENTE DE ACTIVACION
+                    $estado_documento = "pendiente activacion";
+                }
                 $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente= '$reci[cliente_proveedor]'");
                 $cl = $cliente->fetch_assoc();
             }
@@ -1703,6 +1726,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         "idrecibo" => "$reci[idrecibo]",
                         "nro_documento" => "$reci[nro_recibo]",
                         "por_concepto_de" => "$reci[concepto]",
+                        "estado_documento" => $estado_documento,
                         // "idtipo" => "$reci[idtipo]",
                         "codigotransaccion" => $tr['codigotransaccion'],
                         "id_cliente" => $cl['id_cliente'],
@@ -1739,6 +1763,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                     "idrecibo" => "$reci[idrecibo]",
                     "nro_documento" => "$reci[nro_recibo]",
                     "por_concepto_de" => "$reci[concepto]",
+                    "estado_documento" => $estado_documento,
                     // "idtipo" => "$oc[idtipo]",
                     "codigotransaccion" => $tr['codigotransaccion'],
                     "id_cliente" => $cl['id_cliente'],
@@ -1800,6 +1825,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         "idfactura" => $fact['idfactura'],
                         "nro_documento" => "$nro_documento",
                         "por_concepto_de" => "$fact[por_concepto_de]",
+                        "estado_documento" => $estado_documento,
                         "codigotransaccion" => $tr['codigotransaccion'],
                         "id_cliente" => $cl['id_cliente'],
                         "nombre_cliente" => $cl['nombre'],
@@ -1833,6 +1859,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                     "idfactura" => $fact['idfactura'],
                     "nro_documento" => "$nro_documento",
                     "por_concepto_de" => "$fact[por_concepto_de]",
+                    "estado_documento" => $estado_documento,
                     "codigotransaccion" => $tr['codigotransaccion'],
                     "id_cliente" => $cl['id_cliente'],
                     "nombre_cliente" => $cl['nombre'],
@@ -1885,6 +1912,18 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
     
                     $fact = $factura->fetch_assoc();
     
+                    if($fact['estado'] == '1'){ //ACTIVO
+                            $estado_documento = "activo";
+                        }elseif($fact['estado'] == '2'){ // PENDIENTE DE ANULACION
+                            $estado_documento = "pendiente anulacion";
+                        }elseif($fact['estado'] == '3'){ // PENDIENTE DE ELIMINACION
+                            $estado_documento = "pendiente eliminacion";
+                        }elseif($fact['estado'] == '4'){ // ANULADO
+                            $estado_documento = "anulado";
+                        }elseif($fact['estado'] == '5'){// PENDIENTE DE ACTIVACION
+                            $estado_documento = "pendiente activacion";
+                        }
+
                     $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor= '$fact[proveedorcliente_idproveedorcliente]'");
                     $prov = $proveedor->fetch_assoc();
     
@@ -1916,6 +1955,17 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
     
                     $reci = $recibo->fetch_assoc();
     
+                    if($reci['estado'] == '1'){ //ACTIVO
+                            $estado_documento = "activo";
+                        }elseif($reci['estado'] == '2'){ // PENDIENTE DE ANULACION
+                            $estado_documento = "pendiente anulacion";
+                        }elseif($reci['estado'] == '3'){ // PENDIENTE DE ELIMINACION
+                            $estado_documento = "pendiente eliminacion";
+                        }elseif($reci['estado'] == '4'){ // ANULADO
+                            $estado_documento = "anulado";
+                        }elseif($reci['estado'] == '5'){// PENDIENTE DE ACTIVACION
+                            $estado_documento = "pendiente activacion";
+                        }
                     $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor= '$reci[cliente_proveedor]'");
                     $prov = $proveedor->fetch_assoc();
                 }
@@ -1965,6 +2015,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "idrecibo" => "$reci[idrecibo]",
                             "nro_documento" => "$reci[nro_recibo]",
                             "por_concepto_de" => "$reci[concepto]",
+                            "estado_documento" => $estado_documento,
                             // "idtipo" => "$oc[idtipo]",
                             "codigotransaccion" => $tr['codigotransaccion'],
                             "id_cliente" => $prov['id_proveedor'],
@@ -2000,6 +2051,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         "idrecibo" => "$reci[idrecibo]",
                         "nro_documento" => "$reci[nro_recibo]",
                         "por_concepto_de" => "$reci[concepto]",
+                        "estado_documento" => $estado_documento,
                         // "idtipo" => "$oc[idtipo]",
                         "codigotransaccion" => $tr['codigotransaccion'],
                         "id_cliente" => $prov['id_proveedor'],
@@ -2057,6 +2109,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "idfactura" => $fact['idfactura'],
                             "nro_documento" => "$nro_documento",
                             "por_concepto_de" => $fact['por_concepto_de'],
+                            "estado_documento" => $estado_documento,
                             "codigotransaccion" => $tr['codigotransaccion'],
                             "id_cliente" => $prov['id_proveedor'],
                             "nombre_cliente" => $prov['nombre'],
@@ -2089,6 +2142,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         "idfactura" => $fact['idfactura'],
                         "nro_documento" => "$nro_documento",
                         "por_concepto_de" => "$fact[por_concepto_de]",
+                        "estado_documento" => $estado_documento,
                         "codigotransaccion" => $tr['codigotransaccion'],
                         "id_cliente" => $prov['id_proveedor'],
                         "nombre_cliente" => $prov['nombre'],
@@ -2187,6 +2241,18 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         
                         $fact = $factura->fetch_assoc();
         
+                        if($fact['estado'] == '1'){ //ACTIVO
+                            $estado_documento = "activo";
+                        }elseif($fact['estado'] == '2'){ // PENDIENTE DE ANULACION
+                            $estado_documento = "pendiente anulacion";
+                        }elseif($fact['estado'] == '3'){ // PENDIENTE DE ELIMINACION
+                            $estado_documento = "pendiente eliminacion";
+                        }elseif($fact['estado'] == '4'){ // ANULADO
+                            $estado_documento = "anulado";
+                        }elseif($fact['estado'] == '5'){// PENDIENTE DE ACTIVACION
+                            $estado_documento = "pendiente activacion";
+                        }
+
                         $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente= '$fact[proveedorcliente_idproveedorcliente]'");
                         $cl = $cliente->fetch_assoc();
         
@@ -2202,11 +2268,18 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         WHERE idfactura = '$cuentas_cobro_grupal[idfactura]'");
         // }
                         // $cuentas_cobro_grupal = $getTabla->fetch_assoc();
-        
-                        
-        
                         $fact = $factura->fetch_assoc();
                         
+                        // if($fact['estado'] == '1'){ //ACTIVO
+                        //     $estado_documento = "activo";
+                        // }elseif($fact['estado'] == '2'){ // PENDIENTE DE ANULACION
+                        //     $estado_documento = "pendiente anulacion";
+                        // }elseif($fact['estado'] == '3'){ // PENDIENTE DE ELIMINACION
+                        //     $estado_documento = "pendiente eliminacion";
+                        // }elseif($fact['estado'] == '5'){// PENDIENTE DE ACTIVACION
+                        //     $estado_documento = "pendiente activacion";
+                        // }
+
                         $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente= '$fact[proveedorcliente_idproveedorcliente]'");
                         $cl = $cliente->fetch_assoc();
                     }else{
@@ -2218,6 +2291,18 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         
                         $reci = $recibo->fetch_assoc();
         
+                        if($reci['estado'] == '1'){ //ACTIVO
+                            $estado_documento = "activo";
+                        }elseif($reci['estado'] == '2'){ // PENDIENTE DE ANULACION
+                            $estado_documento = "pendiente anulacion";
+                        }elseif($reci['estado'] == '3'){ // PENDIENTE DE ELIMINACION
+                            $estado_documento = "pendiente eliminacion";
+                        }elseif($reci['estado'] == '4'){ // ANULADO
+                            $estado_documento = "anulado";
+                        }elseif($reci['estado'] == '5'){// PENDIENTE DE ACTIVACION
+                            $estado_documento = "pendiente activacion";
+                        }
+
                         $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente= '$reci[cliente_proveedor]'");
                         $cl = $cliente->fetch_assoc();
                     }
@@ -2233,6 +2318,18 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         
                         $fact = $factura->fetch_assoc();
         
+                        if($fact['estado'] == '1'){ //ACTIVO
+                            $estado_documento = "activo";
+                        }elseif($fact['estado'] == '2'){ // PENDIENTE DE ANULACION
+                            $estado_documento = "pendiente anulacion";
+                        }elseif($fact['estado'] == '3'){ // PENDIENTE DE ELIMINACION
+                            $estado_documento = "pendiente eliminacion";
+                        }elseif($fact['estado'] == '4'){ // ANULADO
+                            $estado_documento = "anulado";
+                        }elseif($fact['estado'] == '5'){// PENDIENTE DE ACTIVACION
+                            $estado_documento = "pendiente activacion";
+                        }
+
                         $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor= '$fact[proveedorcliente_idproveedorcliente]'");
                         $cl = $proveedor->fetch_assoc();
         
@@ -2241,18 +2338,27 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         $getTabla = $this->dbc->query("SELECT * 
                         FROM cuentaspagar_grupal 
                         WHERE idfactura = '$qwe[idfactura]'");
-        $cuentas_pago_grupal = $getTabla->fetch_assoc();
-        // while ($ccg = $this->dbc->fetch($getTabla)) {
-            $factura = $this->dbc->query("SELECT * 
-                        FROM factura 
-                        WHERE idfactura = '$cuentas_pago_grupal[idfactura]'");
-        // }
-                        // $cuentas_cobro_grupal = $getTabla->fetch_assoc();
-        
+
+                        $cuentas_pago_grupal = $getTabla->fetch_assoc();
+                        // while ($ccg = $this->dbc->fetch($getTabla)) {
+                            $factura = $this->dbc->query("SELECT * 
+                                        FROM factura 
+                                        WHERE idfactura = '$cuentas_pago_grupal[idfactura]'");
+                        // }
+                                        // $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         
-        
                         $fact = $factura->fetch_assoc();
                         
+                        // if($fact['estado'] == '1'){ //ACTIVO
+                        //     $estado_documento = "activo";
+                        // }elseif($fact['estado'] == '2'){ // PENDIENTE DE ANULACION
+                        //     $estado_documento = "pendiente anulacion";
+                        // }elseif($fact['estado'] == '3'){ // PENDIENTE DE ELIMINACION
+                        //     $estado_documento = "pendiente eliminacion";
+                        // }elseif($fact['estado'] == '5'){// PENDIENTE DE ACTIVACION
+                        //     $estado_documento = "pendiente activacion";
+                        // }
+
                         $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor= '$fact[proveedorcliente_idproveedorcliente]'");
                         $cl = $proveedor->fetch_assoc();
                     }else{
@@ -2263,7 +2369,19 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         WHERE idrecibo = '$qwe[idrecibo]'");
         
                         $reci = $recibo->fetch_assoc();
-        
+
+                        if($reci['estado'] == '1'){ //ACTIVO
+                            $estado_documento = "activo";
+                        }elseif($reci['estado'] == '2'){ // PENDIENTE DE ANULACION
+                            $estado_documento = "pendiente anulacion";
+                        }elseif($reci['estado'] == '3'){ // PENDIENTE DE ELIMINACION
+                            $estado_documento = "pendiente eliminacion";
+                        }elseif($reci['estado'] == '4'){ // ANULADO
+                            $estado_documento = "anulado";
+                        }elseif($reci['estado'] == '5'){// PENDIENTE DE ACTIVACION
+                            $estado_documento = "pendiente activacion";
+                        }
+
                         $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor= '$reci[cliente_proveedor]'");
                         $cl = $proveedor->fetch_assoc();
                     }
@@ -2364,6 +2482,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "idrecibo" => "$reci[idrecibo]",
                             "nro_documento" => "$reci[nro_recibo]",
                             "por_concepto_de" => "$reci[concepto]",
+                            "estado_documento" => $estado_documento,
                             // "idtipo" => "$oc[idtipo]",
                             "codigotransaccion" => $tr['codigotransaccion'],
                             "id_cliente" => $cl['id_cliente'],
@@ -2421,6 +2540,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "idfactura" => $fact['idfactura'],
                             "nro_documento" => $nro_documento,
                             "por_concepto_de" => $fact['por_concepto_de'],
+                            "estado_documento" => $estado_documento,
                             "codigotransaccion" => $tr['codigotransaccion'],
                             "id_cliente" => $cl['id_cliente'],
                             "nombre_cliente" => $cl['nombre'],
@@ -2466,6 +2586,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "idrecibo" => "$reci[idrecibo]",
                             "nro_documento" => "$reci[nro_recibo]",
                             "por_concepto_de" => "$reci[concepto]",
+                            "estado_documento" => $estado_documento,
                             // "idtipo" => "$oc[idtipo]",
                             "codigotransaccion" => $tr['codigotransaccion'],
                             "id_cliente" => $cl['id_proveedor'],
@@ -2523,6 +2644,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "idfactura" => $fact['idfactura'],
                             "nro_documento" => $nro_documento,
                             "por_concepto_de" => $fact['por_concepto_de'],
+                            "estado_documento" => $estado_documento,
                             "codigotransaccion" => $tr['codigotransaccion'],
                             "id_cliente" => $cl['id_proveedor'],
                             "nombre_cliente" => $cl['nombre'],

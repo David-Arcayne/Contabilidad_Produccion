@@ -1566,23 +1566,23 @@ public function asignar_facturas_A_cuentas($data) {
     
         $idempresa = $this->getidempresa($data['idempresa']);
         // $idsucursal = $this->getidsucursal($data['idsucursal']); 
+        $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$data[cuenta]'");
+        $dt = $detalle_trans->fetch_assoc();
+
         $gestion = $this->getgestionactualid($idempresa);
         $montoComprobantes = 0;
             foreach ($data['comprobantes'] as $comprobante) {
                 if($comprobante['tipo_comprobante'] == 'cobro'){  // COMPROBANTE COBROOO
 
                     $montoComprobantes += $comprobante['monto'];
-                    $updatetranscodigo = $this->dbc->query("UPDATE cuentaspof SET cuenta = '$data[cuenta]' WHERE idcuentaspof = '{$comprobante['idcomprobante']}'");
+                    $updatetranscodigo = $this->dbc->query("UPDATE cuentaspof SET cuenta = '$data[cuenta]', transaccion = '$dt[transacciones_idtransacciones]' WHERE idcuentaspof = '{$comprobante['idcomprobante']}'");
                 }else{ // COMPROBANTE PAGOOOO
 
                     $montoComprobantes += $comprobante['monto'];
-                    $updatetranscodigo = $this->dbc->query("UPDATE cuentaspor SET cuenta = '$data[cuenta]' WHERE idcuentaspor = '{$comprobante['idcomprobante']}'");
+                    $updatetranscodigo = $this->dbc->query("UPDATE cuentaspor SET cuenta = '$data[cuenta]', transaccion = '$dt[transacciones_idtransacciones]' WHERE idcuentaspor = '{$comprobante['idcomprobante']}'");
                 }
 
             }
-                        
-        $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$data[cuenta]'");
-        $dt = $detalle_trans->fetch_assoc();
 
         if($data['sumar_reemplazar'] == 'suma'){ // SUMAR
             if($dt['debe'] > 0){
@@ -1592,7 +1592,17 @@ public function asignar_facturas_A_cuentas($data) {
                 $nuevo_monto_dt = $dt['haber'] + $montoComprobantes;
                 $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
             }
-        }else{ // REEMPLAZAR
+        }elseif($data['sumar_reemplazar'] == 'reemplazo'){ // REEMPLAZAR
+
+            $desvincular = $this->dbc->query("UPDATE cuentaspof 
+                        SET cuenta = '0' 
+                        WHERE cuenta = '$data[cuenta]'
+                    ");
+            $desvincular2 = $this->dbc->query("UPDATE cuentaspor 
+                        SET cuenta = '0' 
+                        WHERE cuenta = '$data[cuenta]'
+                    ");
+
             if($dt['debe'] > 0){
                 $nuevo_monto_dt = $montoComprobantes;
                 $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
@@ -1600,6 +1610,8 @@ public function asignar_facturas_A_cuentas($data) {
                 $nuevo_monto_dt = $montoComprobantes;
                 $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
             }
+        }else{
+            // SOLO VINCULARA
         }
    
         

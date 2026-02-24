@@ -698,17 +698,26 @@ elseif($ver[0]=="listar_reportes_referencia"){
     $cont->listafactura_cobro_trans_comercial($ver[1]);
 }elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
     $cont=new Filtrado_facturas();
-    $cont->facturas_perteneciente_a_cuenta($ver[1]);
+    $cont->facturas_perteneciente_a_cuenta($ver[1],$ver[2],$ver[3],$ver[4]);
 }elseif($ver[0]=="listar_facturas_comercial_cobro"){
     $cont=new Cuentas_transacciones();
     $cont->listar_facturas_comercial_cobro($ver[1],$ver[2]);
 }elseif($ver[0]=="listar_facturas_comercial_asignado_cuentas"){
     $cont=new Cuentas_transacciones();
     $cont->listar_facturas_comercial_asignado_cuentas($ver[1]);
+}elseif($ver[0]=="recibos_perteneciente_a_cuenta"){
+    $cont=new Filtrado_facturas();
+    $cont->recibos_perteneciente_a_cuenta($ver[1],$ver[2],$ver[3],$ver[4]);
+}elseif($ver[0]=="comprobantes_perteneciente_a_cuenta"){
+    $cont=new Filtrado_facturas();
+    $cont->comprobantes_perteneciente_a_cuenta($ver[1],$ver[2],$ver[3],$ver[4]);
+}elseif($ver[0]=="listar_anular_eliminar_factura"){
+    $cont=new Factura_cobros();
+    $cont->listar_anular_eliminar_factura($ver[1],$ver[2]);
 }
 
 // reportedetalle listar_recibo_por_id listar_recibo_por_id_otras_cuentas   eliminarcobrados lista_cobrar lista_plande listafactura listaproveedores getgestionactual -- listar_facturas
-// listar_factura           listar_facturas_cobro_pago             listar_datos_contrataciones_cajas                                listar_recibo_por_id   --> caja bancos 
+// listar_factura           listar_facturas_cobro_pago             listar_datos_contrataciones_cajas    listar_recibo_por_caja_bancos                             listar_recibo_por_id   --> caja bancos  lista_plande_subcuentas
 // reemplazar listar_plantilla     listadegestion   getgestion "archivo" => $qwe['archivo'],  listar_recibo_por_id_otras_cuentas      listar_recibo_por_id_otras_cuentas_pagar ---> esos dos son de recibos
 
 // mayorcuentacontable  reporteactivodisponible es_cuenta_de_orden busqueda_facturas_contabilidad

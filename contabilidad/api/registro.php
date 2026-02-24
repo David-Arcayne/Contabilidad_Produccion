@@ -807,8 +807,17 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['id_documento'],$_POST['tipo_documento'],$_POST['registro_desde'],$_POST['motivo'],$_POST['estado_opcion'],$_POST['estado_solicitud'],$_POST['hora'],$_POST['fecha'],$_POST['idusuario'],$_POST['idempresa']));
         }
-}
+    }elseif($ver == "cambiarEstado_anular_eliminar_activar_factura_caja_bancos"){
 
+        if(isset($_POST['idsolicitud_anular_eliminar'],$_POST['estado_opcion'],$_POST['estado_solicitud'],$_POST['fecha_proceso'],$_POST['hora_proceso'],$_POST['idusuario_admin'])){
+            // decode echo json_encode(array("danger", "Faltan parámetros en la solicitud", $_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$facturas));
+            $cont=new Factura_cobros();
+            $cont->cambiarEstado_anular_eliminar_activar_factura_caja_bancos($_POST['idsolicitud_anular_eliminar'],$_POST['estado_opcion'],$_POST['estado_solicitud'],$_POST['fecha_proceso'],$_POST['hora_proceso'],$_POST['idusuario_admin']);
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idsolicitud_anular_eliminar'],$_POST['estado_opcion'],$_POST['estado_solicitud'],$_POST['fecha_proceso'],$_POST['hora_proceso'],$_POST['idusuario_admin']));
+        }
+    }
     
 //editar_caja_bancos_facturas editar_caja_bancos_facturas_existentes   editar_recibo_caja_bancos   registrar_factura_recibo_pago_cajaBancos registrar_agrupacion_plantilla registrar_factura_recibo_cobro asignar asiento
 //  vincula  -- crearfacturasf5 registrar_factura_cobro registrar_factura_cobro_otras_cuentas --> aumentar usuario registrar_factura_cobros_tributario registrocobrarfactura registropagarfactura registrar_recibo

@@ -28,7 +28,7 @@ class Anulacion_transaccion extends DB{
                 (s.estado_solicitud = '1') DESC,
                 s.fecha DESC,
                 s.hora DESC;
-");
+        ");
         }
     
             // Procesar los resultados
