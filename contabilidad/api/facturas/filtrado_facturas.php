@@ -1032,7 +1032,10 @@ class Filtrado_facturas extends DB{
         //   }
           echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
-    public function facturas_perteneciente_a_cuenta($idtransaccion,$idcuenta,$fecha_ini,$fecha_fin){
+    public function facturas_perteneciente_a_cuenta($idtransaccion,$idcuenta,$fecha_ini,$fecha_fin,$empresa){
+        
+        $idempresa = $this->getidempresa($empresa); 
+
         $lista = [];
     
         if($fecha_ini == 0){ // tambien la fecha_fin debe ser cero
@@ -1049,7 +1052,7 @@ class Filtrado_facturas extends DB{
             
             $factura_trans = $this->dbc->query("SELECT * FROM factura WHERE cuenta = '$idcuenta' $fecha_rango");
 
-        }else{ // LA TRANSACCION SERA CERO Y SE LISTARA TODAS LAS FACTURAS PERTENECIENTES A TODAS LAS CUENTAS 
+        }elseif($idtransaccion == 0 && $idcuenta != 0){ // LA TRANSACCION SERA CERO Y SE LISTARA TODAS LAS FACTURAS PERTENECIENTES A TODAS LAS CUENTAS 
             $det_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE idplandecuenta = '$idcuenta'");
 
             // Creamos un array para guardar los IDs
@@ -1062,6 +1065,10 @@ class Filtrado_facturas extends DB{
             $ids_string = implode(",", $array_ids);
 
             $factura_trans = $this->dbc->query("SELECT * FROM factura WHERE cuenta IN($ids_string) $fecha_rango");
+        }else{ // SOLO HABRA FECHA INI Y FINAL 
+            
+            $factura_trans = $this->dbc->query("SELECT * FROM factura WHERE idorganizacion = '$idempresa' $fecha_rango");
+
         }
     
         while ($qwe = $this->dbc->fetch($factura_trans)) {
@@ -1089,8 +1096,12 @@ class Filtrado_facturas extends DB{
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
 
-    public function recibos_perteneciente_a_cuenta($idtransaccion,$idcuenta,$fecha_ini,$fecha_fin){
-        $lista = [];
+    public function recibos_perteneciente_a_cuenta($idtransaccion,$idcuenta,$fecha_ini,$fecha_fin,$empresa){
+    //  ini_set('display_errors', 1);
+    //     ini_set('display_startup_errors', 1);
+    //     error_reporting(E_ALL);
+    $idempresa = $this->getidempresa($empresa);    
+    $lista = [];
     
         if($fecha_ini == 0){ // tambien la fecha_fin debe ser cero
             $fecha_rango = "";
@@ -1106,7 +1117,7 @@ class Filtrado_facturas extends DB{
             
             $recibo_trans = $this->dbc->query("SELECT * FROM recibo WHERE cuenta = '$idcuenta' $fecha_rango");
 
-        }else{ // LA TRANSACCION SERA CERO Y SE LISTARA TODAS LAS RECIBOS PERTENECIENTES A TODAS LAS CUENTAS 
+        }elseif($idtransaccion == 0 && $idcuenta != 0){ // LA TRANSACCION SERA CERO Y SE LISTARA TODAS LAS RECIBOS PERTENECIENTES A TODAS LAS CUENTAS 
             $det_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE idplandecuenta = '$idcuenta'");
 
             // Creamos un array para guardar los IDs
@@ -1119,6 +1130,10 @@ class Filtrado_facturas extends DB{
             $ids_string = implode(",", $array_ids);
 
             $recibo_trans = $this->dbc->query("SELECT * FROM recibo WHERE cuenta IN($ids_string) $fecha_rango");
+        }else{ // SOLO HABRA FECHA INI Y FINAL 
+            
+            $recibo_trans = $this->dbc->query("SELECT * FROM recibo WHERE idempresa = '$idempresa' $fecha_rango");
+
         }
     
         while ($qwe = $this->dbc->fetch($recibo_trans)) {
@@ -1145,57 +1160,90 @@ class Filtrado_facturas extends DB{
     
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
-    public function comprobantes_perteneciente_a_cuenta($idtransaccion,$idcuenta,$fecha_ini,$fecha_fin){
+    public function comprobantes_perteneciente_a_cuenta($idtransaccion,$idcuenta,$fecha_ini,$fecha_fin,$empresa){
         // ini_set('display_errors', 1);
         // ini_set('display_startup_errors', 1);
         // error_reporting(E_ALL);
+        $idempresa = $this->getidempresa($empresa);
         $lista = [];
  
         if($fecha_ini == 0){ // tambien la fecha_fin debe ser cero
             $fecha_rango = "";
         }else{
-            $fecha_rango = "AND fecha BETWEEN CONCAT('$fecha_ini', ' 00:00:00') AND CONCAT('$fecha_fin', ' 23:59:59')";
+            $fecha_rango = "AND cp.fecha BETWEEN CONCAT('$fecha_ini', ' 00:00:00') AND CONCAT('$fecha_fin', ' 23:59:59')";
         }
 
         if($idtransaccion != 0 && $idcuenta == 0){ // LISTARA RECIBOS DE UNA TRANSACCION Y NO POR CUENTA
             
-            $comprobante_trans = $this->dbc->query("SELECT idcuentaspof AS idcomprobante, nrecibo, transaccion, fecha, monto, cuenta
-            FROM cuentaspof 
-            WHERE transaccion = '$idtransaccion' $fecha_rango
-            UNION ALL
-            SELECT idcuentaspor AS idcomprobante, transaccion, fecha, monto, cuenta
-            FROM cuentaspor 
-            WHERE transaccion = '$idtransaccion' $fecha_rango");
+    $comprobante_trans = $this->dbc->query("SELECT cp.idcuentaspof AS idcomprobante, cp.nrecibo, cp.transaccion, cp.fecha, cp.monto, cp.cuenta
+    FROM cuentaspof cp
+    WHERE cp.transaccion = '$idtransaccion' $fecha_rango
+    UNION ALL
+    SELECT cp.idcuentaspor AS idcomprobante, cp.nrecibo, cp.transaccion, cp.fecha, cp.monto, cp.cuenta
+    FROM cuentaspor cp
+    WHERE cp.transaccion = '$idtransaccion' $fecha_rango");
 
-        }elseif($idtransaccion != 0 && $idcuenta != 0){ // LISTARA RECIBOS DE UNA CUENTA PERTENECIENTE A UNA TRANSACCION
+}elseif($idtransaccion != 0 && $idcuenta != 0){ // LISTARA RECIBOS DE UNA CUENTA PERTENECIENTE A UNA TRANSACCION
             
-            $comprobante_trans = $this->dbc->query("SELECT idcuentaspof AS idcomprobante, nrecibo, transaccion, fecha, monto, cuenta
-            FROM cuentaspof 
-            WHERE cuenta = '$idcuenta' $fecha_rango
+    $comprobante_trans = $this->dbc->query("SELECT cp.idcuentaspof AS idcomprobante, cp.nrecibo, cp.transaccion, cp.fecha, cp.monto, cp.cuenta
+    FROM cuentaspof cp
+    WHERE cp.cuenta = '$idcuenta' $fecha_rango
+    UNION ALL
+    SELECT cp.idcuentaspor AS idcomprobante, cp.nrecibo, cp.transaccion, cp.fecha, cp.monto, cp.cuenta
+    FROM cuentaspor cp
+    WHERE cp.cuenta = '$idcuenta' $fecha_rango");
+
+}elseif($idtransaccion == 0 && $idcuenta != 0){ // LA TRANSACCION SERA CERO Y SE LISTARA TODAS LAS RECIBOS PERTENECIENTES A TODAS LAS CUENTAS 
+    $det_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE idplandecuenta = '$idcuenta'");
+
+    // Creamos un array para guardar los IDs
+    $array_ids = []; 
+    while ($row = $det_trans->fetch_assoc()) { 
+        $array_ids[] = $row['iddetalletransaccion']; 
+    } 
+    // Convertimos el array en una lista separada por comas 
+    $ids_string = implode(",", $array_ids);
+
+    $comprobante_trans = $this->dbc->query("SELECT cp.idcuentaspof AS idcomprobante, cp.nrecibo, cp.transaccion, cp.fecha, cp.monto, cp.cuenta
+    FROM cuentaspof cp
+    WHERE cp.cuenta IN($ids_string) $fecha_rango
+    UNION ALL
+    SELECT cp.idcuentaspor AS idcomprobante, cp.nrecibo, cp.transaccion, cp.fecha, cp.monto, cp.cuenta
+    FROM cuentaspor cp
+    WHERE cp.cuenta IN($ids_string) $fecha_rango");
+}
+else{ // SOLO HABRA FECHA INI Y FINAL 
+            
+            $comprobante_trans = $this->dbc->query("SELECT cp.idcuentaspof AS idcomprobante, cp.nrecibo, cp.transaccion, cp.fecha, cp.monto, cp.cuenta
+            FROM cuentaspof cp
+            INNER JOIN otras_cuentas oc ON oc.idotras_cuentas=cp.idotras_cuentas
+            WHERE oc.idempresa='$idempresa' $fecha_rango
             UNION ALL
-            SELECT idcuentaspor AS idcomprobante, nrecibo, transaccion, fecha, monto, cuenta
-            FROM cuentaspor 
-            WHERE cuenta = '$idcuenta' $fecha_rango");
-
-        }else{ // LA TRANSACCION SERA CERO Y SE LISTARA TODAS LAS RECIBOS PERTENECIENTES A TODAS LAS CUENTAS 
-            $det_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE idplandecuenta = '$idcuenta'");
-
-            // Creamos un array para guardar los IDs
-            $array_ids = []; 
-            while ($row = $det_trans->fetch_assoc()) { 
-            // Suponiendo que la columna que quieres capturar se llama 'id' 
-            $array_ids[] = $row['iddetalletransaccion']; 
-            } 
-            // Convertimos el array en una lista separada por comas 
-            $ids_string = implode(",", $array_ids);
-
-            $comprobante_trans = $this->dbc->query("SELECT idcuentaspof AS idcomprobante, nrecibo, transaccion, fecha, monto, cuenta
-            FROM cuentaspof 
-            WHERE cuenta IN($ids_string) $fecha_rango
+            SELECT cp.idcuentaspof AS idcomprobante, cp.nrecibo, cp.transaccion, cp.fecha, cp.monto, cp.cuenta
+            FROM cuentaspof cp
+            INNER JOIN factura f ON f.idfactura=cp.idfactura
+            WHERE f.idorganizacion='$idempresa' $fecha_rango
             UNION ALL
-            SELECT idcuentaspor AS idcomprobante, transaccion, fecha, monto, cuenta
-            FROM cuentaspor 
-            WHERE cuenta IN($ids_string) $fecha_rango");
+            SELECT cp.idcuentaspor AS idcomprobante, cp.nrecibo, cp.transaccion, cp.fecha, cp.monto, cp.cuenta
+            FROM cuentaspor cp
+            INNER JOIN otras_cuentas oc ON oc.idotras_cuentas=cp.idotras_cuentas
+            WHERE oc.idempresa='$idempresa' $fecha_rango
+            UNION ALL
+            SELECT cp.idcuentaspor AS idcomprobante, cp.nrecibo, cp.transaccion, cp.fecha, cp.monto, cp.cuenta
+            FROM cuentaspor cp
+            INNER JOIN factura f ON f.idfactura=cp.idfactura
+            WHERE f.idorganizacion='$idempresa' $fecha_rango");
+
+        //     $recibo_fact = $this->dbc->query("SELECT count(*) AS cant2 FROM cuentaspof cp
+        //     INNER JOIN factura f ON f.idfactura=cp.idfactura
+        //     WHERE f.idorganizacion='$ide' AND cp.transaccion = '0'");
+        // $res2 = $recibo_fact->fetch_assoc();
+
+        // $recibo_oc = $this->dbc->query("SELECT count(*) AS cant3 FROM cuentaspof cp
+        // INNER JOIN otras_cuentas oc ON oc.idotras_cuentas=cp.idotras_cuentas
+        // WHERE oc.idempresa='$ide'");
+        // $res3 = $recibo_oc->fetch_assoc();
+
         }
     
         while ($qwe = $this->dbc->fetch($comprobante_trans)) {
