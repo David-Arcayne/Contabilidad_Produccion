@@ -665,28 +665,33 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
         echo json_encode($lista);
     }
     public function asignar_facturas_comercial_A_cuentas($data) {
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
     
         $idempresa = $this->getidempresa($data['idempresa']);
-        // $idsucursal = $this->getidsucursal($data['idsucursal']); 
+        // Decodificar el JSON a array asociativo 
+        $facturas = json_decode($data['facturas_comercial'], true);
         $gestion = $this->getgestionactualid($idempresa);
         $montoFacturas = 0;
 
         $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$data[cuenta]'");
         $dt = $detalle_trans->fetch_assoc();
-
-            foreach ($data['facturas_comercial'] as $factura) {
+            $monto_aux = 0;
+            foreach ($facturas as $factura) {
 
                 $montoFacturas += $factura['monto'];
-                $updatetranscodigo = $this->dbc->query("UPDATE transaccion_factura_comercial SET cuenta = '$data[cuenta]',idtransaccion = '$dt[transacciones_idtransacciones]'  
-                WHERE idfactura_comercial = '{$factura['idfactura_comercial']}'");
-            }
-                        
-        // $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$data[cuenta]'");
-        // $dt = $detalle_trans->fetch_assoc(); cobrofacturasaasientomodelo
+                $existe_fact_comercial = $this->dbc->query("SELECT * FROM transaccion_factura_comercial WHERE idfactura_comercial = '$factura[idfactura_comercial]'");
+                if($existe_fact_comercial->num_rows > 0){
+                    $updatetranscodigo = $this->dbc->query("UPDATE transaccion_factura_comercial SET cuenta = '$data[cuenta]',idtransaccion = '$dt[transacciones_idtransacciones]'  
+                    WHERE idfactura_comercial = '{$factura['idfactura_comercial']}'");
 
+                     $monto_aux = 111;
+                }else{ // NO EXISTE EN LA TABLA ESA FACTURA
+                    $registrar_fact_trans = $this->dbc->query("INSERT INTO transaccion_factura_comercial(idfactura_comercial,idtransaccion,cuenta,idempresa)
+                    VALUES('$factura[idfactura_comercial]','$dt[transacciones_idtransacciones]','$data[cuenta]','$idempresa')");
+                    $monto_aux = 100;
+                }   
+                
+            }
+                    
         if($data['sumar_reemplazar'] == 'suma'){ // SUMAR
             if($dt['debe'] > 0){
                 $nuevo_monto_dt = $dt['debe'] + $montoFacturas;
@@ -713,10 +718,10 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
    
         
         // Respuesta
-        if ($updatetranscodigo === TRUE) {
-            $res = array("success", "Se Registro Correctamente", "asignar_facturas_A_cuentas",$data['cuenta'],$dt['transacciones_idtransacciones'],$nuevo_monto_dt,$dt['debe'],$dt['haber']);
+        if ($editar_dt === TRUE) {
+            $res = array("success", "Se Registro Correctamente", "asignar_facturas_A_cuentas",$data['cuenta'],$dt['transacciones_idtransacciones'],$nuevo_monto_dt,$monto_aux,$montoFacturas,$idempresa,$data['idempresa'],gethostname());
         } else {
-            $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde");
+            $res = array("danger", "Lo sient00o hubo un problema, por favor vuelva a intentar más tarde",$data['facturas_comercial'],$data['cuenta'],$nuevo_monto_dt);
         }
     
         echo json_encode($res);

@@ -817,6 +817,9 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idsolicitud_anular_eliminar'],$_POST['estado_opcion'],$_POST['estado_solicitud'],$_POST['fecha_proceso'],$_POST['hora_proceso'],$_POST['idusuario_admin']));
         }
+    }elseif($data['ver'] == "desvincular_recibos_de_cuentas") {
+        $cont=new Transacciones();
+        $cont->desvincular_recibos_de_cuentas($data);
     }
     
 //editar_caja_bancos_facturas editar_caja_bancos_facturas_existentes   editar_recibo_caja_bancos   registrar_factura_recibo_pago_cajaBancos registrar_agrupacion_plantilla registrar_factura_recibo_cobro asignar asiento
@@ -825,6 +828,6 @@ if($data['ver'] == "asignar_asiento_A_factura") {
 //   registrocobrarfacturaGrupal registropagarfacturaGrupal asignar_asiento_A_otras_cuentas asignar_asiento_A_recibos asignar_facturas_A_cuentas  registrar_recibo_otras_cuentas_pagar
 }
 // registrocobrarfactura activar registroplanes registrotransaccion_por_asiento registrar_factura registrar_asignacion_asiento_operacion registrar_factura_recibo_cobro_cajaBancos
-//  registrar_recibo_otras_cuentas  registrar_estado_resultados_admin registrar_factura_pago_otras_cuentas  registrar_anular_eliminar_activar_factura_caja_bancos
-//  registrar_factura_pagos_tributario registrar_recibo_cobro_cajaBancos_en_facturas registrar_recibo_otras_cuentas cierre
+//  registrar_recibo_otras_cuentas  registrar_estado_resultados_admin registrar_factura_pago_otras_cuentas  registrar_anular_eliminar_activar_factura_caja_bancos cobro_asignacion_factura_comercial
+//  registrar_factura_pagos_tributario registrar_recibo_cobro_cajaBancos_en_facturas registrar_recibo_otras_cuentas cierre registrar_factura_recibo_cobro_cajaBancos
 ?> 

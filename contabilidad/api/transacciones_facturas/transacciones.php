@@ -1428,9 +1428,9 @@ public function asignar_facturas_A_cuentas($data) {
     }
 
     public function asignar_recibos_A_cuentas($data) {
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
     
         $idempresa = $this->getidempresa($data['idempresa']);
         // $idsucursal = $this->getidsucursal($data['idsucursal']); 
@@ -1440,35 +1440,63 @@ public function asignar_facturas_A_cuentas($data) {
         $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$data[cuenta]'");
         $dt = $detalle_trans->fetch_assoc();
 
-            foreach ($data['recibos'] as $recibo) {
+        $ids_vinculados = [];
 
-                $montoRecibos += $recibo['monto'];
-                $updatetranscodigo = $this->dbc->query("UPDATE recibo SET cuenta = '$data[cuenta]',transaccion = '$dt[transacciones_idtransacciones]'  
-                WHERE idrecibo = '{$recibo['idrecibo']}'");
-            }
-                        
-        // $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$data[cuenta]'");
-        // $dt = $detalle_trans->fetch_assoc(); cobrofacturasaasientomodelo
-
-        if($data['sumar_reemplazar'] == 'suma'){ // SUMAR
-            if($dt['debe'] > 0){
-                $nuevo_monto_dt = $dt['debe'] + $montoRecibos;
-                $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
-            }else{
-                $nuevo_monto_dt = $dt['haber'] + $montoRecibos;
-                $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
-            }
-        }elseif($data['sumar_reemplazar'] == 'reemplazar'){ // REEMPLAZAR
-            if($dt['debe'] > 0){
-                $nuevo_monto_dt = $montoRecibos;
-                $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
-            }else{
-                $nuevo_monto_dt = $montoRecibos;
-                $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
-            }
-        }else{ // SOLO VINCULARA NADA MAS
-
+        foreach ($data['recibos'] as $recibo) {
+            $montoRecibos += $recibo['monto'];
+            $updatetranscodigo = $this->dbc->query("
+                UPDATE recibo 
+                SET cuenta = '$data[cuenta]', transaccion = '$dt[transacciones_idtransacciones]'  
+                WHERE idrecibo = '{$recibo['idrecibo']}'
+            ");
+            $ids_vinculados[] = $recibo['idrecibo'];
         }
+
+        if ($data['sumar_reemplazar'] == 'suma') {
+            if ($dt['debe'] > 0) {
+                $nuevo_monto_dt = $dt['debe'] + $montoRecibos;
+                $editar_dt = $this->dbc->query("
+                    UPDATE detalletransaccion 
+                    SET debe = '$nuevo_monto_dt' 
+                    WHERE iddetalletransaccion = '$data[cuenta]'
+                ");
+            } else {
+                $nuevo_monto_dt = $dt['haber'] + $montoRecibos;
+                $editar_dt = $this->dbc->query("
+                    UPDATE detalletransaccion 
+                    SET haber = '$nuevo_monto_dt' 
+                    WHERE iddetalletransaccion = '$data[cuenta]'
+                ");
+            }
+        } elseif ($data['sumar_reemplazar'] == 'reemplazo') {
+            if ($dt['debe'] > 0) {
+                $nuevo_monto_dt = $montoRecibos;
+                $editar_dt = $this->dbc->query("
+                    UPDATE detalletransaccion 
+                    SET debe = '$nuevo_monto_dt' 
+                    WHERE iddetalletransaccion = '$data[cuenta]'
+                ");
+            } else {
+                $nuevo_monto_dt = $montoRecibos;
+                $editar_dt = $this->dbc->query("
+                    UPDATE detalletransaccion 
+                    SET haber = '$nuevo_monto_dt' 
+                    WHERE iddetalletransaccion = '$data[cuenta]'
+                ");
+            }
+
+            // Desvincular recibos anteriores EXCLUYENDO los recién vinculados
+            if (!empty($ids_vinculados)) {
+                $ids_str = implode(',', $ids_vinculados);
+                $desvincular = $this->dbc->query("
+                    UPDATE recibo 
+                    SET cuenta = '0' 
+                    WHERE cuenta = '$data[cuenta]'
+                    AND idrecibo NOT IN ($ids_str)
+                ");
+            }
+        }
+
    
         
         // Respuesta
@@ -1571,16 +1599,22 @@ public function asignar_facturas_A_cuentas($data) {
 
         $gestion = $this->getgestionactualid($idempresa);
         $montoComprobantes = 0;
+        $ids_vinculados = [];
+        
             foreach ($data['comprobantes'] as $comprobante) {
                 if($comprobante['tipo_comprobante'] == 'cobro'){  // COMPROBANTE COBROOO
 
                     $montoComprobantes += $comprobante['monto'];
                     $updatetranscodigo = $this->dbc->query("UPDATE cuentaspof SET cuenta = '$data[cuenta]', transaccion = '$dt[transacciones_idtransacciones]' WHERE idcuentaspof = '{$comprobante['idcomprobante']}'");
+                
+                    $ids_vinculados[] = $comprobante['idcomprobante'];
                 }else{ // COMPROBANTE PAGOOOO
 
                     $montoComprobantes += $comprobante['monto'];
                     $updatetranscodigo = $this->dbc->query("UPDATE cuentaspor SET cuenta = '$data[cuenta]', transaccion = '$dt[transacciones_idtransacciones]' WHERE idcuentaspor = '{$comprobante['idcomprobante']}'");
-                }
+                
+                    $ids_vinculados[] = $comprobante['idcomprobante'];                
+                    }
 
             }
 
@@ -1594,14 +1628,24 @@ public function asignar_facturas_A_cuentas($data) {
             }
         }elseif($data['sumar_reemplazar'] == 'reemplazo'){ // REEMPLAZAR
 
+            // Convertir array a lista separada por comas
+            $ids_str = implode(',', $ids_vinculados);
+
             $desvincular = $this->dbc->query("UPDATE cuentaspof 
                         SET cuenta = '0' 
                         WHERE cuenta = '$data[cuenta]'
+                        AND idcuentaspof NOT IN ($ids_str)
                     ");
             $desvincular2 = $this->dbc->query("UPDATE cuentaspor 
                         SET cuenta = '0' 
                         WHERE cuenta = '$data[cuenta]'
+                        AND idcuentaspor NOT IN ($ids_str)
                     ");
+            
+            // UPDATE cuentaspof 
+        //                 SET cuenta = '0' 
+        //                 WHERE cuenta = '$cuenta' 
+        //                  AND idcuentaspof NOT IN ($idrecibo
 
             if($dt['debe'] > 0){
                 $nuevo_monto_dt = $montoComprobantes;
@@ -1625,9 +1669,9 @@ public function asignar_facturas_A_cuentas($data) {
         echo json_encode($res);
     }
     public function desvincular_facturas_de_cuentas($data) {
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
     
         $idempresa = $this->getidempresa($data['idempresa']);
         // $idsucursal = $this->getidsucursal($data['idsucursal']); 
@@ -1660,10 +1704,46 @@ public function asignar_facturas_A_cuentas($data) {
     
         echo json_encode($res);
     }
+    public function desvincular_recibos_de_cuentas($data) {
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
+    
+        $idempresa = $this->getidempresa($data['idempresa']);
+        // $idsucursal = $this->getidsucursal($data['idsucursal']); 
+        $gestion = $this->getgestionactualid($idempresa);
+        $montoRecibos = 0;
+            foreach ($data['recibos'] as $recibo) {
+
+                $montoFacturas += $recibo['monto'];
+                $updatetranscodigo = $this->dbc->query("UPDATE recibo SET cuenta = '0' WHERE idrecibo = '{$recibo['idrecibo']}'");
+
+            }
+                        
+        $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$data[cuenta]'");
+        $dt = $detalle_trans->fetch_assoc();
+
+            if($dt['debe'] > 0){
+                $nuevo_monto_dt = $dt['debe'] - $montoRecibos;
+                $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
+            }else{
+                $nuevo_monto_dt = $dt['haber'] - $montoRecibos;
+                $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
+            }
+   
+        // Respuesta
+        if ($editar_dt === TRUE) {
+            $res = array("success", "Se Registro Correctamente", "cobrofacturasaasientomodelo");
+        } else {
+            $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde");
+        }
+    
+        echo json_encode($res);
+    }
     public function desvincular_comprobantes_de_cuentas($data) {
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
     
         $idempresa = $this->getidempresa($data['idempresa']);
         // $idsucursal = $this->getidsucursal($data['idsucursal']); 
@@ -1725,9 +1805,9 @@ public function asignar_facturas_A_cuentas($data) {
         echo json_encode($res);
     }
     public function desvincular_facturas_contabilidad_de_transaccion($data) {
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
 
             foreach ($data['facturas_contabilidad'] as $factura) {
 

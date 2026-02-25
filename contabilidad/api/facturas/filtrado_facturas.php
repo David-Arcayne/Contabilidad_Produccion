@@ -1073,6 +1073,20 @@ class Filtrado_facturas extends DB{
     
         while ($qwe = $this->dbc->fetch($factura_trans)) {
 
+            if($qwe['cobrado'] == 1){
+                $tipo_factura = "venta";
+                $estado_de_cobro_pago = "por cobrar";
+            }elseif($qwe['cobrado'] == 2){
+                $tipo_factura = "venta";
+                $estado_de_cobro_pago = "cobrado";
+            }elseif($qwe['pagado'] == 1){
+                $tipo_factura = "compra";
+                $estado_de_cobro_pago = "por pagar";
+            }elseif($qwe['pagado'] == 2){
+                $tipo_factura = "compra";
+                $estado_de_cobro_pago = "pagado";
+            }
+
             $trans = $this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones = '$qwe[transacciones_idtransacciones]'");
             $nro_trans = $this->dbc->fetch($trans);
 
@@ -1087,6 +1101,10 @@ class Filtrado_facturas extends DB{
                 "fecha" => $qwe['fecha'],
                 "nfactura" => $qwe['nfactura'],
                 "montofactura" => $qwe['montofactura'],
+                "factura_de" => "contabilidad",
+                "estado_factura" => $qwe['tipo_factura'],
+                "tipo_factura" => $tipo_factura,
+                "estado_saldo" => $estado_de_cobro_pago,
                 "nro_transaccion" => $nro_trans['codigotransaccion'],
                 "nombre_cuenta" => $pl_cuenta['nombreplan']
             );
@@ -1138,6 +1156,20 @@ class Filtrado_facturas extends DB{
     
         while ($qwe = $this->dbc->fetch($recibo_trans)) {
 
+            if($qwe['cobrado'] == 1){
+                $tipo_recibo = "venta";
+                $estado_de_cobro_pago = "cobrado";
+            }elseif($qwe['cobrado'] == 2){
+                $tipo_recibo = "venta";
+                $estado_de_cobro_pago = "cobrado";
+            }elseif($qwe['pagado'] == 1){
+                $tipo_recibo = "compra";
+                $estado_de_cobro_pago = "pagado";
+            }elseif($qwe['pagado'] == 2){
+                $tipo_recibo = "compra";
+                $estado_de_cobro_pago = "pagado";
+            }
+
             $trans = $this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones = '$qwe[transaccion]'");
             $nro_trans = $this->dbc->fetch($trans);
 
@@ -1153,6 +1185,9 @@ class Filtrado_facturas extends DB{
                 "nro_recibo" => $qwe['nro_recibo'],
                 "monto" => $qwe['monto'],
                 "nro_transaccion" => $nro_trans['codigotransaccion'],
+                "estado_recibo" => "contado",
+                "tipo_recibo" => $tipo_recibo,
+                "estado_saldo" => $estado_de_cobro_pago,
                 "nombre_cuenta" => $pl_cuenta['nombreplan']
             );
             array_push($lista, $res);
@@ -1269,6 +1304,76 @@ else{ // SOLO HABRA FECHA INI Y FINAL
         }
     
         echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
+    public function listar_comprobantes_de_factura($idfactura)
+    {
+        $lista = [];
+
+        $comprobante= $this->dbc->query("SELECT idcuentaspof AS idcomprobante, monto,nrecibo, fecha,transaccion,cuenta FROM cuentaspof WHERE idfactura = '$idfactura'
+        UNION ALL
+        SELECT idcuentaspor AS idcomprobante, monto,nrecibo, fecha,transaccion,cuenta FROM cuentaspor WHERE idfactura = '$idfactura'");
+       
+        // $recibo= $this->dbc->query("SELECT * FROM recibo WHERE idrecibo = '$idrecibo'");
+        while ($qwe = $this->dbc->fetch($comprobante)) {
+
+            $transaccion= $this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones = '$qwe[transaccion]'");
+            $trans = $this->dbc->fetch($transaccion);
+
+            $dt_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$qwe[cuenta]'");
+            $dt_aux = $this->dbc->fetch($dt_trans);
+
+            $plandecuenta = $this->dbc->query("SELECT * FROM plandecuenta WHERE idplandecuenta = '$dt_aux[idplandecuenta]'");
+            $pl_cuenta = $this->dbc->fetch($plandecuenta);
+
+            $res = array(
+                "idcomprobante" => $qwe['idcomprobante'],
+                "fecha_transaccion" => $trans['fechatransaccion'],
+                "codigotransaccion" => $trans['codigotransaccion'],
+                "nro_comprobante" => $qwe['nrecibo'],
+                "monto" => $qwe['monto'],
+                "nombre_cuenta" => $pl_cuenta['nombreplan']
+            );
+            array_push($lista, $res);
+
+        }
+         
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+
+    }
+
+    public function listar_comprobantes_de_recibo($idrecibo)
+    {
+        $lista = [];
+
+        $comprobante= $this->dbc->query("SELECT idcuentaspof AS idcomprobante, monto,nrecibo, fecha,transaccion,cuenta FROM cuentaspof WHERE idrecibo = '$idrecibo'
+        UNION ALL
+        SELECT idcuentaspor AS idcomprobante, monto,nrecibo, fecha,transaccion,cuenta FROM cuentaspor WHERE idrecibo = '$idrecibo'");
+
+        while ($qwe = $this->dbc->fetch($comprobante)) {
+
+            $transaccion= $this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones = '$qwe[transaccion]'");
+            $trans = $this->dbc->fetch($transaccion);
+
+            $dt_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$qwe[cuenta]'");
+            $dt_aux = $this->dbc->fetch($dt_trans);
+
+            $plandecuenta = $this->dbc->query("SELECT * FROM plandecuenta WHERE idplandecuenta = '$dt_aux[idplandecuenta]'");
+            $pl_cuenta = $this->dbc->fetch($plandecuenta);
+
+            $res = array(
+                "idcomprobante" => $qwe['idcomprobante'],
+                "fecha_transaccion" => $trans['fechatransaccion'],
+                "codigotransaccion" => $trans['codigotransaccion'],
+                "nro_comprobante" => $qwe['nrecibo'],
+                "monto" => $qwe['monto'],
+                "nombre_cuenta" => $pl_cuenta['nombreplan']
+            );
+            array_push($lista, $res);
+
+        }
+         
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+
     }
     public function getidempresa($md5){
         $registro=$this->dbe->query("select * from organizacion where md5(idorganizacion)='$md5'");

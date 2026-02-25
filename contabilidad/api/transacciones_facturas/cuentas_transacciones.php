@@ -277,12 +277,12 @@ class Cuentas_transacciones extends DB{
     
                 $venta = $this->dbcm->query("SELECT * FROM venta WHERE id_venta='" . $qwe['idfactura_comercial'] . "'");
                 $asd = $this->dbcm->fetch($venta);
-                $res = array("id" => $asd['id_venta'], "fecha" => $asd['fecha_venta'], "nfactura" => $asd['nfactura'], "montofactura" => $asd['monto_total']);
+                $res = array("id_venta" => $asd['id_venta'], "fecha" => $asd['fecha_venta'], "nfactura" => $asd['nfactura'], "montofactura" => $asd['monto_total']);
      
                 array_push($lista, $res);
         }
 //´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´
-        $url = "https://mistersofts.com/app/cmv1/api/listaVentas/".$empresa;
+        $url = "https://vivasoft.link.link/app/cmv1/api/listaVentas/".$empresa;
         $data = json_decode(file_get_contents($url), true);
         $lista_factura_venta = [];
 
@@ -320,7 +320,7 @@ class Cuentas_transacciones extends DB{
 
             //     $res = array("id" => $qwe['idfactura'], "fecha" => $qwe['fecha'], "nfactura" => $qwe['nfactura'], "montofactura" => $qwe['montofactura'], "clasefactura" => $qwe['clasefactura'], "cobrado" => $qwe['cobrado'], "pagado" => $qwe['pagado'],"por_concepto_de" => $qwe['por_concepto_de'],"cliente_proveedor" => $asd['nombre']);
             // }
-                $venta = $this->dbcm->query("SELECT * FROM venta WHERE id_venta='" . $qwe['idfactura_comercial'] . "'");
+                $venta = $this->dbcm->query("SELECT * FROM venta WHERE id_venta= '$qwe[idfactura_comercial]'");
                 $asd = $this->dbcm->fetch($venta);
                 $res = array("id" => $asd['id_venta'], "fecha" => $asd['fecha_venta'], "nfactura" => $asd['nfactura'], "montofactura" => $asd['monto_total']);
            
