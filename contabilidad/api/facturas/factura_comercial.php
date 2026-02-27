@@ -674,8 +674,9 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
 
         $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$data[cuenta]'");
         $dt = $detalle_trans->fetch_assoc();
-            $monto_aux = 0;
-            foreach ($facturas as $factura) {
+        $array_ids = [];
+        
+        foreach ($facturas as $factura) {
 
                 $montoFacturas += $factura['monto'];
                 $existe_fact_comercial = $this->dbc->query("SELECT * FROM transaccion_factura_comercial WHERE idfactura_comercial = '$factura[idfactura_comercial]'");
@@ -683,12 +684,13 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
                     $updatetranscodigo = $this->dbc->query("UPDATE transaccion_factura_comercial SET cuenta = '$data[cuenta]',idtransaccion = '$dt[transacciones_idtransacciones]'  
                     WHERE idfactura_comercial = '{$factura['idfactura_comercial']}'");
 
-                     $monto_aux = 111;
                 }else{ // NO EXISTE EN LA TABLA ESA FACTURA
                     $registrar_fact_trans = $this->dbc->query("INSERT INTO transaccion_factura_comercial(idfactura_comercial,idtransaccion,cuenta,idempresa)
                     VALUES('$factura[idfactura_comercial]','$dt[transacciones_idtransacciones]','$data[cuenta]','$idempresa')");
-                    $monto_aux = 100;
+
                 }   
+                // Guardamos el idfactura_comercial en el array 
+                $array_ids[] = $factura['idfactura_comercial'];
                 
             }
                     
@@ -702,8 +704,11 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
             }
         }elseif($data['sumar_reemplazar'] == 'reemplazo'){ // REEMPLAZAR
 
+        // Convertimos el array en una lista separada por comas 
+        $ids_vinculados = implode(",", $array_ids);
             // DESVINCULAR LAS FACTURAS VINCULADAS
-            $desvincular_facturas = $this->dbc->query("UPDATE transaccion_factura_comercial SET cuenta = '0' WHERE cuenta = '$data[cuenta]'");
+            $desvincular_facturas = $this->dbc->query("UPDATE transaccion_factura_comercial 
+            SET cuenta = '0' WHERE cuenta = '$data[cuenta]' AND idfactura_comercial NOT IN ($ids_vinculados)");
 
             if($dt['debe'] > 0){
                 $nuevo_monto_dt = $montoFacturas;
@@ -713,7 +718,7 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
                 $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
             }
         }else{ // SOLO VINCULARA NADA MAS
-
+            $editar_dt = TRUE;
         }
    
         

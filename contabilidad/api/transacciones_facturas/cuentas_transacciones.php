@@ -282,7 +282,7 @@ class Cuentas_transacciones extends DB{
                 array_push($lista, $res);
         }
 //´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´
-        $url = "https://vivasoft.link.link/app/cmv1/api/listaVentas/".$empresa;
+        $url = "https://vivasoft.link/app/cmv1/api/listaVentas/".$empresa;
         $data = json_decode(file_get_contents($url), true);
         $lista_factura_venta = [];
 
@@ -309,20 +309,13 @@ class Cuentas_transacciones extends DB{
         $registro = $this->dbc->query("SELECT * FROM transaccion_factura_comercial WHERE cuenta = '$idcuenta'");
         while ($qwe = $this->dbc->fetch($registro)) {
 
-            //    if ($qwe['clasefactura'] == 2) {
-            //     $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $qwe['proveedorcliente_idproveedorcliente'] . "'");
-            //     $asd = $this->dbcm->fetch($cliente);
-
-            //     $res = array("id" => $qwe['idfactura'], "fecha" => $qwe['fecha'], "nfactura" => $qwe['nfactura'], "montofactura" => $qwe['montofactura'], "clasefactura" => $qwe['clasefactura'], "cobrado" => $qwe['cobrado'], "pagado" => $qwe['pagado'],"por_concepto_de" => $qwe['por_concepto_de'],"cliente_proveedor" => $asd['nombre']);
-            // } else {
-            //     $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='" . $qwe['proveedorcliente_idproveedorcliente'] . "'");
-            //     $asd = $this->dbcm->fetch($proveedor);
-
-            //     $res = array("id" => $qwe['idfactura'], "fecha" => $qwe['fecha'], "nfactura" => $qwe['nfactura'], "montofactura" => $qwe['montofactura'], "clasefactura" => $qwe['clasefactura'], "cobrado" => $qwe['cobrado'], "pagado" => $qwe['pagado'],"por_concepto_de" => $qwe['por_concepto_de'],"cliente_proveedor" => $asd['nombre']);
-            // }
                 $venta = $this->dbcm->query("SELECT * FROM venta WHERE id_venta= '$qwe[idfactura_comercial]'");
                 $asd = $this->dbcm->fetch($venta);
-                $res = array("id" => $asd['id_venta'], "fecha" => $asd['fecha_venta'], "nfactura" => $asd['nfactura'], "montofactura" => $asd['monto_total']);
+
+                $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente= '$asd[cliente_id_cliente1]'");
+                $cl = $this->dbcm->fetch($cliente);
+
+                $res = array("id" => $asd['id_venta'], "fecha" => $asd['fecha_venta'], "nfactura" => $asd['nfactura'], "montofactura" => $asd['monto_total'],"cliente" =>$cl['nombre']);
            
                     array_push($lista, $res);
         }
