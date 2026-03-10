@@ -409,7 +409,7 @@ $caja_bancos = json_decode($cajasBancos, true);
     }
     // listar_recibo_pago_por_id
 
-    public function listar_recibo_por_id($idrecibo)
+    public function listar_comprobantes_de_factura_cobro($idrecibo)
     {
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
@@ -428,7 +428,7 @@ $caja_bancos = json_decode($cajasBancos, true);
         );
 
         $registro = $this->dbc->query("SELECT * FROM cuentaspof WHERE idcuentaspof = '$idrecibo'");
-        $recib = $registro->fetch_assoc();
+        $comprob = $registro->fetch_assoc();
 
         $factura_lista = $this->dbc->query("SELECT DISTINCT idfactura 
         FROM detalle_caja_bancos_cobrar 
@@ -439,11 +439,11 @@ $caja_bancos = json_decode($cajasBancos, true);
                 $factura= $this->dbc->query("SELECT * FROM factura WHERE idfactura = '$factu[idfactura]'");
                 $ft = $factura->fetch_assoc();
     
-                if($recib['concepto'] == null){
+                if($comprob['concepto'] == null){
 
                     $concepto_comprobante = "Factura N°: ".$ft['nfactura']. " Fecha: ". $ft['fecha'].", ".$ft['por_concepto_de'];
                 }else{
-                    $concepto_comprobante = $recib['concepto'];
+                    $concepto_comprobante = $comprob['concepto'];
                 }
 
                 if($ft['cobrado'] != 0){
@@ -454,16 +454,29 @@ $caja_bancos = json_decode($cajasBancos, true);
                     $cl = $proveedor->fetch_assoc();
                 }
     
+                if($comprob['estado'] == '1'){ //ACTIVO
+                    $estado_documento = "activo";
+                }elseif($comprob['estado'] == '2'){ // PENDIENTE DE ANULACION
+                    $estado_documento = "pendiente anulacion";
+                }elseif($comprob['estado'] == '3'){ // PENDIENTE DE ELIMINACION
+                    $estado_documento = "pendiente eliminacion";
+                }elseif($comprob['estado'] == '4'){ // ANULADO
+                    $estado_documento = "anulado";
+                }elseif($comprob['estado'] == '5'){// PENDIENTE DE ACTIVACION
+                    $estado_documento = "pendiente activacion";
+                }
+
                 $detalle_facturas = array(
     
                     //lugar,    nombre_cliente_proveedor, nit, direccion row
-                    "nrecibo" => $recib['nrecibo'],
-                    "lugar" => $recib['lugar'],
-                    "fecha" => $recib['fecha'],
-                    "persona" => $recib['persona'],
+                    "nrecibo" => $comprob['nrecibo'],
+                    "lugar" => $comprob['lugar'],
+                    "fecha" => $comprob['fecha'],
+                    "persona" => $comprob['persona'],
                     "idfactura" => $ft['idfactura'],
                     "fecha_factura" => $ft['fecha'],
                     "nro_factura" => $ft['nfactura'],
+                    "estado_documento" => $estado_documento,
                     "nombre" => $cl['nombre'],
                     "direccion" => $cl['direccion'],
                     "nit" => $cl['nit'],
@@ -512,13 +525,13 @@ $caja_bancos = json_decode($cajasBancos, true);
                 array_push($res['caja_bancos'], $detalle_caja_bancos);
             }
         }else{
-            $factura= $this->dbc->query("SELECT * FROM factura WHERE idfactura = '$recib[idfactura]'");
+            $factura= $this->dbc->query("SELECT * FROM factura WHERE idfactura = '$comprob[idfactura]'");
             $ft = $factura->fetch_assoc();
 
-            if($recib['concepto'] == null){
+            if($comprob['concepto'] == null){
                 $concepto_comprobante = "Factura N°: ".$ft['nfactura']. " ". $ft['fecha'];
             }else{
-                $concepto_comprobante = $recib['concepto'];
+                $concepto_comprobante = $comprob['concepto'];
             }
 
             if($ft['cobrado'] != 0){
@@ -529,16 +542,29 @@ $caja_bancos = json_decode($cajasBancos, true);
                 $cl = $proveedor->fetch_assoc();
             }
 
+            if($comprob['estado'] == '1'){ //ACTIVO
+                    $estado_documento = "activo";
+                }elseif($comprob['estado'] == '2'){ // PENDIENTE DE ANULACION
+                    $estado_documento = "pendiente anulacion";
+                }elseif($comprob['estado'] == '3'){ // PENDIENTE DE ELIMINACION
+                    $estado_documento = "pendiente eliminacion";
+                }elseif($comprob['estado'] == '4'){ // ANULADO
+                    $estado_documento = "anulado";
+                }elseif($comprob['estado'] == '5'){// PENDIENTE DE ACTIVACION
+                    $estado_documento = "pendiente activacion";
+                }
+
             $detalle_facturas = array(
     
                 //lugar,    nombre_cliente_proveedor, nit, direccion row
-                "nrecibo" => $recib['nrecibo'],
-                "lugar" => $recib['lugar'],
-                "fecha" => $recib['fecha'],
-                "persona" => $recib['persona'],
+                "nrecibo" => $comprob['nrecibo'],
+                "lugar" => $comprob['lugar'],
+                "fecha" => $comprob['fecha'],
+                "persona" => $comprob['persona'],
                 "idfactura" => $ft['idfactura'],
                 "fecha_factura" => $ft['fecha'],
                 "nro_factura" => $ft['nfactura'],
+                "estado_documento" => $estado_documento,
                 "nombre" => $cl['nombre'],
                 "direccion" => $cl['direccion'],
                 "nit" => $cl['nit'],

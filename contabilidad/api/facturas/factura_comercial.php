@@ -724,7 +724,7 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
         
         // Respuesta
         if ($editar_dt === TRUE) {
-            $res = array("success", "Se Registro Correctamente", "asignar_facturas_A_cuentas",$data['cuenta'],$dt['transacciones_idtransacciones'],$nuevo_monto_dt,$monto_aux,$montoFacturas,$idempresa,$data['idempresa'],gethostname());
+            $res = array("success", "Se Registro Correctamente", "asignar_facturas_A_cuentas",$data['cuenta'],$dt['transacciones_idtransacciones'],$nuevo_monto_dt,$montoFacturas,$idempresa,$data['idempresa'],gethostname());
         } else {
             $res = array("danger", "Lo sient00o hubo un problema, por favor vuelva a intentar más tarde",$data['facturas_comercial'],$data['cuenta'],$nuevo_monto_dt);
         }

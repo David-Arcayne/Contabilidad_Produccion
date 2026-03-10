@@ -321,4 +321,94 @@ class Cuentas_transacciones extends DB{
         }
         echo json_encode($lista);
     }
+    public function listar_todos_documentos_asignado_cuenta($idcuenta)
+{
+    $lista = [];
+
+    // FACTURAS COMERCIALES
+    $registro = $this->dbc->query("SELECT * FROM transaccion_factura_comercial WHERE cuenta = '$idcuenta'");
+    while ($qwe = $this->dbc->fetch($registro)) {
+        $venta = $this->dbcm->query("SELECT * FROM venta WHERE id_venta= '$qwe[idfactura_comercial]'");
+        $asd = $this->dbcm->fetch($venta);
+
+        $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente= '$asd[cliente_id_cliente1]'");
+        $cl = $this->dbcm->fetch($cliente);
+
+        $res = array(
+            "tipo" => "factura_comercial",
+            "id" => $asd['id_venta'],
+            "fecha" => $asd['fecha_venta'],
+            "nro_documento" => $asd['nfactura'],
+            "monto" => $asd['monto_total'],
+            "cobrado" => "cobro",
+            "pagado" => "",
+            "concepto" => "",
+            "cliente_proveedor" => $cl['nombre']
+        );
+        $lista[] = $res;
+    }
+
+    // FACTURAS
+    $registro = $this->dbc->query("SELECT * FROM factura WHERE cuenta = '$idcuenta'");
+    while ($qwe = $this->dbc->fetch($registro)) {
+        if ($qwe['clasefactura'] == 2) {
+            $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $qwe['proveedorcliente_idproveedorcliente'] . "'");
+            $asd = $this->dbcm->fetch($cliente);
+            $nombre = $asd['nombre'];
+        } else {
+            $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='" . $qwe['proveedorcliente_idproveedorcliente'] . "'");
+            $asd = $this->dbcm->fetch($proveedor);
+            $nombre = $asd['nombre'];
+        }
+
+        $res = array(
+            "tipo" => "factura_contabilidad",
+            "id" => $qwe['idfactura'],
+            "fecha" => $qwe['fecha'],
+            "nro_documento" => $qwe['nfactura'],
+            "monto" => $qwe['montofactura'],
+            "clasefactura" => $qwe['clasefactura'],
+            "cobrado" => $qwe['cobrado'],
+            "pagado" => $qwe['pagado'],
+            "concepto" => $qwe['por_concepto_de'],
+            "cliente_proveedor" => $nombre
+        );
+        $lista[] = $res;
+    }
+
+    // RECIBOS
+    $registro = $this->dbc->query("SELECT * FROM recibo WHERE cuenta = '$idcuenta'");
+    while ($qwe = $this->dbc->fetch($registro)) {
+        if ($qwe['cobrado'] != 0) {
+            $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $qwe['proveedorcliente_idproveedorcliente'] . "'");
+            $asd = $this->dbcm->fetch($cliente);
+            $nombre = $asd['nombre'];
+        } else {
+            $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='" . $qwe['proveedorcliente_idproveedorcliente'] . "'");
+            $asd = $this->dbcm->fetch($proveedor);
+            $nombre = $asd['nombre'];
+        }
+
+        $res = array(
+            "tipo" => "recibo",
+            "id" => $qwe['idrecibo'],
+            "fecha" => $qwe['fecha'],
+            "nro_documento" => $qwe['nro_recibo'],
+            "monto" => $qwe['monto'],
+            "cobrado" => $qwe['cobrado'],
+            "pagado" => $qwe['pagado'],
+            "concepto" => $qwe['concepto'],
+            "cliente_proveedor" => $nombre
+        );
+        $lista[] = $res;
+    }
+
+    // ORDENAR POR FECHA
+    usort($lista, function($a, $b) {
+        return strtotime($a['fecha']) - strtotime($b['fecha']);
+    });
+
+    echo json_encode($lista);
+}
+
 }

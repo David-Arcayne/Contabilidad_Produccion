@@ -3,9 +3,9 @@ require_once "../../db/db.php";
 class Documento_cobro extends DB{ //          idtransaccion, asiento,fecha, id_cliente_proveedor, concepto, precio, idtipo
     public function registrar_otras_cuentas($fecha,$lugar,$id_cliente_proveedor,$coc,$pagado,$cobrado,$nro_tributario,$contacto,$nro_doc_identidad,$idtipo,$concepto,$condiciones,$observaciones,$precio,$forma_pago,$fecha_venci,$empresa,$sucursal,$archivo){
            
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
         // echo json_encode(array($fecha,$lugar,$cliente,$nro_tributario,$contacto,$nro_doc_identidad,$idtipo,$condiciones,$observaciones,$precio,$forma_pago,$empresa));
         $idsucursal = $this->getidsucursal($sucursal);
         $idempresa = $this->getidempresa($empresa);
@@ -334,7 +334,7 @@ while ($qwe = $this->dbc->fetch($registro)) {
         echo json_encode($lista);
     }
 
-    public function listar_recibo_por_id_otras_cuentas($idrecibo)
+    public function listar_comprobantes_de_recibo_cobro($idrecibo)
     {
         // ini_set('display_errors', 1);
         // ini_set('display_startup_errors', 1);
@@ -353,7 +353,7 @@ while ($qwe = $this->dbc->fetch($registro)) {
         );
 
         $registro = $this->dbc->query("SELECT * FROM cuentaspof WHERE idcuentaspof = '$idrecibo'");
-        $recib = $registro->fetch_assoc();
+        $comprob = $registro->fetch_assoc();
 
         $factura_lista = $this->dbc->query("SELECT DISTINCT idotras_cuentas 
         FROM detalle_caja_bancos_cobrar 
@@ -363,32 +363,40 @@ while ($qwe = $this->dbc->fetch($registro)) {
             // $factura= $this->dbc->query("SELECT * FROM otras_cuentas WHERE idotras_cuentas = '$factu[idotras_cuentas]'");
             // $ft = $factura->fetch_assoc();
 
-        $recibo= $this->dbc->query("SELECT * FROM recibo WHERE idrecibo = '$recib[idrecibo]'");
+        $recibo= $this->dbc->query("SELECT * FROM recibo WHERE idrecibo = '$comprob[idrecibo]'");
         $rec = $recibo->fetch_assoc();
 
-        if($recib['concepto'] == null){
+        if($comprob['concepto'] == null){
             $concepto_comprobante = "Recibo N°: ".$rec['nro_recibo']. " Fecha: ". $rec['fecha'].", ".$rec['concepto'];
         }else{
-            $concepto_comprobante = $recib['concepto'];
+            $concepto_comprobante = $comprob['concepto'];
         }
 
-            // if($ft['cobrado'] != 0){
                 $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $rec['cliente_proveedor'] . "'");
                 $cl = $cliente->fetch_assoc();
-            // }else{
-            //     $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='" . $ft['proveedorcliente_idproveedorcliente'] . "'");
-            //     $cl = $proveedor->fetch_assoc();
-            // }
+
+            if($comprob['estado'] == '1'){ //ACTIVO
+                $estado_documento = "activo";
+            }elseif($comprob['estado'] == '2'){ // PENDIENTE DE ANULACION
+                $estado_documento = "pendiente anulacion";
+            }elseif($comprob['estado'] == '3'){ // PENDIENTE DE ELIMINACION
+                $estado_documento = "pendiente eliminacion";
+            }elseif($comprob['estado'] == '4'){ // ANULADO
+                $estado_documento = "anulado";
+            }elseif($comprob['estado'] == '5'){// PENDIENTE DE ACTIVACION
+                $estado_documento = "pendiente activacion";
+            }
 
             $detalle_facturas = array(
 
-                "nrecibo" => $recib['nrecibo'],
-                "lugar" => $recib['lugar'],
-                "fecha" => $recib['fecha'],
-                "persona" => $recib['persona'],
+                "nrecibo" => $comprob['nrecibo'],
+                "lugar" => $comprob['lugar'],
+                "fecha" => $comprob['fecha'],
+                "persona" => $comprob['persona'],
                 "idotras_cuentas" => $rec['idotras_cuentas'],
                 "fecha_oc" => $rec['fecha'], // recibo
                 "nro_recibo" => $rec['nro_recibo'], // nro recibo
+                "estado_documento" => $estado_documento,
                 "nombre" => $cl['nombre'], // rec
                 "direccion" => $cl['direccion'], // rec
                 "nit" => $cl['nit'], // rec
@@ -440,28 +448,41 @@ while ($qwe = $this->dbc->fetch($registro)) {
         //   $factura= $this->dbc->query("SELECT * FROM otras_cuentas WHERE idotras_cuentas = '$recib[idotras_cuentas]'");
         // $ft = $factura->fetch_assoc();
 
-        $recibo_n= $this->dbc->query("SELECT * FROM recibo WHERE idrecibo = '$recib[idrecibo]'");
+        $recibo_n= $this->dbc->query("SELECT * FROM recibo WHERE idrecibo = '$comprob[idrecibo]'");
         $rec = $recibo_n->fetch_assoc();
 
-        if($recib['concepto'] == null){
+        if($comprob['concepto'] == null){
             $concepto_comprobante = "Recibo N°: ".$rec['nro_recibo']. " ". $rec['fecha'];
         }else{
-            $concepto_comprobante = $recib['concepto'];
+            $concepto_comprobante = $comprob['concepto'];
         }
 
         $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $rec['id_cliente_proveedor'] . "'");
         $cl = $cliente->fetch_assoc();
         
+            if($comprob['estado'] == '1'){ //ACTIVO
+                $estado_documento = "activo";
+            }elseif($comprob['estado'] == '2'){ // PENDIENTE DE ANULACION
+                $estado_documento = "pendiente anulacion";
+            }elseif($comprob['estado'] == '3'){ // PENDIENTE DE ELIMINACION
+                $estado_documento = "pendiente eliminacion";
+            }elseif($comprob['estado'] == '4'){ // ANULADO
+                $estado_documento = "anulado";
+            }elseif($comprob['estado'] == '5'){// PENDIENTE DE ACTIVACION
+                $estado_documento = "pendiente activacion";
+            }
+
         $detalle_facturas = array(
 
             //lugar,    nombre_cliente_proveedor, nit, direccion row
-            "nrecibo" => $recib['nrecibo'],
-            "lugar" => $recib['lugar'],
-            "fecha" => $recib['fecha'],
-            "persona" => $recib['persona'],
+            "nrecibo" => $comprob['nrecibo'],
+            "lugar" => $comprob['lugar'],
+            "fecha" => $comprob['fecha'],
+            "persona" => $comprob['persona'],
             "idfactura" => $rec['idrecibo'],
             "fecha_factura" => $rec['fecha'],
             "nro_factura" => $rec['nro_recibo'],
+            "estado_documento" => $estado_documento,
             "nombre" => $cl['nombre'],
             "direccion" => $cl['direccion'],
             "nit" => $cl['nit'],
@@ -474,12 +495,12 @@ while ($qwe = $this->dbc->fetch($registro)) {
         // ------------------------------------------------------------------------------------------------------------------------
       
         // }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
-    echo json_encode($res);
+        echo json_encode($res);
     }
     public function listar_otras_cuentas_cobrar($empresa) {
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
         $lista = [];
         $idempresa = $this->getidempresa($empresa);
     
@@ -495,9 +516,27 @@ while ($qwe = $this->dbc->fetch($registro)) {
             $proveedor = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $qwe['id_cliente_proveedor'] . "'");
             $pro = $this->dbcm->fetch($proveedor);
 
-            $cobras = $this->dbc->query("SELECT SUM(monto) FROM cuentaspof WHERE idotras_cuentas='$qwe[0]'"); //173
-                    $asd = $this->dbc->fetch($cobras);
-                    $saldo = $qwe['precio'] - $asd[0];
+            //{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+
+            $listado_union_aux = $this->dbc->query("SELECT monto AS monto
+                FROM recibo
+                WHERE idotras_cuentas = '$qwe[0]'
+                UNION ALL
+                SELECT montofactura AS monto
+                FROM factura
+                WHERE idotras_cuentas = '$qwe[0]'
+            ");
+
+
+            $monto_cobrado = 0;
+            // if($listado_recibo_aux->num_rows > 0){ //RECIBOS
+                while ($zxc = $this->dbc->fetch($listado_union_aux)) {
+
+                    $monto_cobrado = $monto_cobrado + $zxc['monto'];
+                    
+                }
+             
+            //{}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
 
             $getTipo = $this->dbc->query("SELECT nombre FROM tipo WHERE idtipo = '$qwe[idtipo]'");
             $resultado2 = $getTipo->fetch_assoc();
@@ -525,8 +564,8 @@ while ($qwe = $this->dbc->fetch($registro)) {
                 "condiciones" => $qwe['condiciones'],
                 "observaciones" => $qwe['observaciones'],
                 "precio" => $qwe['precio'],
-                "pagado" => $asd[0],
-                "saldo" => $saldo,
+                "pagado" => $monto_cobrado,
+                // "saldo" => $saldo,
                 "idforma_pago" => $qwe['forma_pago'],
                 "forma_pago" => $fp['nombre'],
                 "archivo" => $qwe['archivo']
@@ -787,7 +826,7 @@ while ($qwe = $this->dbc->fetch($registro)) {
         echo json_encode($lista);
     }
 
-    public function listar_recibo_por_id_otras_cuentas_pagar($idcomprobante)
+    public function listar_comprobantes_de_recibo_pago($idcomprobante)
     {
         // ini_set('display_errors', 1);
         // ini_set('display_startup_errors', 1);
@@ -823,18 +862,27 @@ while ($qwe = $this->dbc->fetch($registro)) {
             $recibo= $this->dbc->query("SELECT * FROM recibo WHERE idrecibo = '$comprobante[idrecibo]'");
             $rec = $recibo->fetch_assoc();
 
+            if($comprobante['estado'] == '1'){ //ACTIVO
+                $estado_documento = "activo";
+            }elseif($comprobante['estado'] == '2'){ // PENDIENTE DE ANULACION
+                $estado_documento = "pendiente anulacion";
+            }elseif($comprobante['estado'] == '3'){ // PENDIENTE DE ELIMINACION
+                $estado_documento = "pendiente eliminacion";
+            }elseif($comprobante['estado'] == '4'){ // ANULADO
+                $estado_documento = "anulado";
+            }elseif($comprobante['estado'] == '5'){// PENDIENTE DE ACTIVACION
+                $estado_documento = "pendiente activacion";
+            }
+
             if($comprobante['concepto'] == null){
                 $concepto_comprobante = "Recibo N°: ".$rec['nro_recibo']. " Fecha: ". $rec['fecha'].", ".$rec['concepto'];
             }else{
                 $concepto_comprobante = $comprobante['concepto'];
             }
-            // if($ft['cobrado'] != 0){
-            //     $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $ft['proveedorcliente_idproveedorcliente'] . "'");
-            //     $cl = $cliente->fetch_assoc();
-            // }else{
+
                 $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='" . $rec['cliente_proveedor'] . "'");
                 $cl = $proveedor->fetch_assoc();
-            // }
+            
 
             $detalle_facturas = array(
 
@@ -845,6 +893,7 @@ while ($qwe = $this->dbc->fetch($registro)) {
                 "idotras_cuentas" => $rec['idrecibo'],
                 "fecha_oc" => $rec['fecha'],
                 "nro_otras_cuentas" => $rec['nro_recibo'],
+                "estado_documento" => $estado_documento,
                 "nombre" => $cl['nombre'],
                 "direccion" => $cl['direccion'],
                 "nit" => $cl['nit'],
@@ -896,6 +945,18 @@ while ($qwe = $this->dbc->fetch($registro)) {
         $recibo= $this->dbc->query("SELECT * FROM recibo WHERE idotras_cuentas = '$comprobante[idotras_cuentas]'");
         $rec = $recibo->fetch_assoc();
 
+        if($comprobante['estado'] == '1'){ //ACTIVO
+                $estado_documento = "activo";
+            }elseif($comprobante['estado'] == '2'){ // PENDIENTE DE ANULACION
+                $estado_documento = "pendiente anulacion";
+            }elseif($comprobante['estado'] == '3'){ // PENDIENTE DE ELIMINACION
+                $estado_documento = "pendiente eliminacion";
+            }elseif($comprobante['estado'] == '4'){ // ANULADO
+                $estado_documento = "anulado";
+            }elseif($comprobante['estado'] == '5'){// PENDIENTE DE ACTIVACION
+                $estado_documento = "pendiente activacion";
+            }
+
         if($comprobante['concepto'] == null){
             $concepto_comprobante = "Recibo N°: ".$rec['nro_recibo']. " ". $rec['fecha'];
         }else{
@@ -915,6 +976,7 @@ while ($qwe = $this->dbc->fetch($registro)) {
             "idfactura" => $rec['idrecibo'],
             "fecha_factura" => $rec['fecha'],
             "nro_factura" => $rec['nro_recibo'],
+            "estado_documento" => $estado_documento,
             "nombre" => $cl['nombre'],
             "direccion" => $cl['direccion'],
             "nit" => $cl['nit'],
@@ -929,9 +991,9 @@ while ($qwe = $this->dbc->fetch($registro)) {
     }
 
     public function listar_otras_cuentas_pagar($empresa) {
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
         $lista = [];
         $idempresa = $this->getidempresa($empresa);
     
@@ -947,9 +1009,27 @@ while ($qwe = $this->dbc->fetch($registro)) {
             $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='" . $qwe['id_cliente_proveedor'] . "'");
             $pro = $this->dbcm->fetch($proveedor);
 
-            $cobras = $this->dbc->query("SELECT SUM(monto) FROM cuentaspor WHERE idotras_cuentas='$qwe[0]'"); //173
-                    $asd = $this->dbc->fetch($cobras);
-                    $saldo = $qwe['precio'] - $asd[0];
+            //{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+
+            $listado_union_aux = $this->dbc->query("SELECT monto AS monto
+                FROM recibo
+                WHERE idotras_cuentas = '$qwe[0]'
+                UNION ALL
+                SELECT montofactura AS monto
+                FROM factura
+                WHERE idotras_cuentas = '$qwe[0]'
+            ");
+
+
+            $monto_pagado = 0;
+            // if($listado_recibo_aux->num_rows > 0){ //RECIBOS
+                while ($zxc = $this->dbc->fetch($listado_union_aux)) {
+
+                    $monto_pagado = $monto_pagado + $zxc['monto'];
+                    
+                }
+             
+            //{}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
 
             $getTipo = $this->dbc->query("SELECT nombre FROM tipo WHERE idtipo = '$qwe[idtipo]'");
             $resultado2 = $getTipo->fetch_assoc();
@@ -977,8 +1057,8 @@ while ($qwe = $this->dbc->fetch($registro)) {
                 "condiciones" => $qwe['condiciones'],
                 "observaciones" => $qwe['observaciones'],
                 "precio" => $qwe['precio'],
-                "pagado" => $asd[0],
-                "saldo" => $saldo,
+                "pagado" => $monto_pagado,
+                // "saldo" => $saldo,
                 "idforma_pago" => $qwe['forma_pago'],
                 "forma_pago" => $fp['nombre'],
                 "archivo" => $qwe['archivo']
@@ -1346,6 +1426,145 @@ while ($qwe = $this->dbc->fetch($registro)) {
     
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
+
+    public function listar_otras_cuentas_reporte($fecha_ini,$fecha_fin,$vigentes_vencidas,$cobros_pagos,$empresa) {
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
+        $lista = [];
+        $idempresa = $this->getidempresa($empresa);
+    
+        if($fecha_ini == 0){ // tambien la fecha_fin debe ser cero
+            $fecha_rango = "";
+        }else{
+            $fecha_rango = "AND fecha BETWEEN '$fecha_ini' AND '$fecha_fin'";
+        }
+
+        if($vigentes_vencidas == 'vigentes'){// LISTAR SOLO VIGENTES 
+
+        
+            if($cobros_pagos == 'cobros'){// LISTAR SOLO VIGENTES COBROS
+
+                $getPedido = $this->dbc->query("SELECT *
+                    FROM otras_cuentas 
+                    WHERE clase_otras_cuentas='2' AND idempresa='$idempresa'AND CURDATE() <= fecha_venci 
+                    $fecha_rango ORDER BY idotras_cuentas DESC");
+
+            }elseif($cobros_pagos == 'pagos'){//LISTAR SOLO VIGENTES PAGOS
+                $getPedido = $this->dbc->query("SELECT *
+                    FROM otras_cuentas
+                    WHERE clase_otras_cuentas='1' AND idempresa='$idempresa'AND CURDATE() <= fecha_venci 
+                    $fecha_rango ORDER BY idotras_cuentas DESC");
+            }elseif($cobros_pagos == 'todos'){//LISTAR SOLO VIGENTES COBROS Y PAGOS
+                $getPedido = $this->dbc->query("SELECT *
+                    FROM otras_cuentas 
+                    WHERE idempresa='$idempresa'AND CURDATE() <= fecha_venci
+                    $fecha_rango ORDER BY idotras_cuentas DESC");
+            }
+
+        }elseif($vigentes_vencidas == 'vencidas'){//LISTAR SOLO VENCIDAS 
+
+            if($cobros_pagos == 'cobros'){// LISTAR SOLO VENCIDAS COBROS
+
+                $getPedido = $this->dbc->query("SELECT *
+                    FROM otras_cuentas 
+                    WHERE clase_otras_cuentas='2' AND idempresa='$idempresa'AND CURDATE() > fecha_venci 
+                    $fecha_rango ORDER BY idotras_cuentas DESC");
+
+            }elseif($cobros_pagos == 'pagos'){//LISTAR SOLO VENCIDAS PAGOS
+
+                $getPedido = $this->dbc->query("SELECT *
+                    FROM otras_cuentas 
+                    WHERE clase_otras_cuentas='1' AND idempresa='$idempresa'AND CURDATE() > fecha_venci 
+                    $fecha_rango ORDER BY idotras_cuentas DESC");
+
+            }elseif($cobros_pagos == 'todos'){//LISTAR SOLO VENCIDAS COBROS Y PAGOS
+
+            $getPedido = $this->dbc->query("SELECT *
+                    FROM otras_cuentas 
+                    WHERE idempresa='$idempresa'AND CURDATE() > fecha_venci 
+                    $fecha_rango ORDER BY idotras_cuentas DESC");
+
+            }
+
+        }elseif($vigentes_vencidas == 'todos'){//LISTAR VIGENTES Y VENCIDAS
+
+            if($cobros_pagos == 'cobros'){// LISTAR VIGENTES Y VENCIDAS COBROS
+
+                $getPedido = $this->dbc->query("SELECT *
+                    FROM otras_cuentas 
+                    WHERE clase_otras_cuentas='2' AND idempresa='$idempresa'
+                    $fecha_rango ORDER BY idotras_cuentas DESC");
+
+            }elseif($cobros_pagos == 'pagos'){//LISTAR VIGENTES Y VENCIDAS PAGOS
+
+                $getPedido = $this->dbc->query("SELECT *
+                    FROM otras_cuentas 
+                    WHERE clase_otras_cuentas='1' AND idempresa='$idempresa'
+                    $fecha_rango ORDER BY idotras_cuentas DESC");
+
+            }elseif($cobros_pagos == 'todos'){//LISTAR VIGENTES Y VENCIDAS COBROS Y PAGOS
+
+                $getPedido = $this->dbc->query("SELECT *
+                    FROM otras_cuentas 
+                    WHERE idempresa='$idempresa'
+                    $fecha_rango ORDER BY idotras_cuentas DESC");
+            }
+        }
+
+        while ($qwe = $this->dbc->fetch($getPedido)) {
+
+            $proveedor = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $qwe['id_cliente_proveedor'] . "'");
+            $pro = $this->dbcm->fetch($proveedor);
+
+            // $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='" . $qwe['id_cliente_proveedor'] . "'");
+            // $pro = $this->dbcm->fetch($proveedor);
+
+            $cobras = $this->dbc->query("SELECT SUM(monto) FROM cuentaspof WHERE idotras_cuentas='$qwe[0]'"); //173
+                    $asd = $this->dbc->fetch($cobras);
+                    $saldo = $qwe['precio'] - $asd[0];
+
+            // $cobras2 = $this->dbc->query("SELECT SUM(monto) FROM cuentaspof WHERE idfactura='$qwe[0]'"); //173
+            // $asd2 = $this->dbc->fetch($cobras2);
+
+            $getTipo = $this->dbc->query("SELECT nombre FROM tipo WHERE idtipo = '$qwe[idtipo]'");
+            $resultado2 = $getTipo->fetch_assoc();
+
+            $forma_pago = $this->dbc->query("SELECT nombre FROM forma_pago WHERE idforma_pago = '$qwe[forma_pago]'");
+            $fp = $forma_pago->fetch_assoc();
+
+            $aux_concepto = "s/g Contrato: ". $qwe['concepto'].", N° ".$qwe['nro_otras_cuentas'].", ".$qwe['fecha'];
+
+            $res = array(
+                "idotras_cuentas" => $qwe['idotras_cuentas'],
+                "fecha" => $qwe['fecha'],
+                "fecha_venci" => $qwe['fecha_venci'],
+                "nro_otras_cuentas" => $qwe['nro_otras_cuentas'],
+                "lugar" => $qwe['lugar'],
+                "id_cliente_proveedor" => $qwe['id_cliente_proveedor'],
+                "nombrep" => $pro['nombre'],
+                "nro_tributario" => $qwe['nro_tributario'],
+                "contacto" => $qwe['contacto'],
+                "nro_doc_identidad" => $qwe['nro_doc_identidad'],
+                "idtipo" => $qwe['idtipo'],
+                "concepto" => $qwe['concepto'],
+                "concepto_con_formato" => "(".$aux_concepto.")",
+                "nombre_tipo" => $resultado2['nombre'],
+                "condiciones" => $qwe['condiciones'],
+                "observaciones" => $qwe['observaciones'],
+                "precio" => $qwe['precio'],
+                "pagado" => $asd[0],
+                "saldo" => $saldo,
+                "idforma_pago" => $qwe['forma_pago'],
+                "forma_pago" => $fp['nombre'],
+                "archivo" => $qwe['archivo']
+            );
+            array_push($lista, $res);
+        }
+    
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
+
     public function getidempresa($md5)
     {
         $registro = $this->dbe->query("select * from organizacion where md5(idorganizacion)='$md5'");
@@ -1367,5 +1586,5 @@ while ($qwe = $this->dbc->fetch($registro)) {
         $qwe = $this->dbe->fetch($registro);
         return $qwe['idsucursalcontable'];
     }
-    //listar_recibo_por_id_otras_cuentas_pagar precio_restante editar monto_total
+    //listar_recibo_por_id_otras_cuentas_pagar precio_restante editar monto_total listar_otras_cuentas_reporte
 }

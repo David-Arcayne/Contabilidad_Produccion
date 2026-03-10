@@ -1350,15 +1350,22 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                          if($qwe4['es_calculable'] == 'si'){ // ES CALCULABLE
                             //ESTO ES NIVEL 3
                 
-                                $suma_cuentas = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(haber) - SUM(debe) AS total FROM transacciones t
+                                $suma_cuentas = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total_deudor,SUM(haber)-SUM(debe) AS total_acreedor FROM transacciones t
                                 INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
                                 INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
                                 where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$nombre_cuenta3[idplandecuenta]'
                                 AND t.estado NOT IN (4, 5, 6) AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
 
                                 $valor = $suma_cuentas->fetch_assoc();
-                                $suma_nivel_3 = $suma_nivel_3 + $valor['total'];
-                                if($valor['total'] == null || $valor['total'] == '0'){
+
+                                if($valor['total_deudor']>=0){
+                                    $valor_total=$valor['total_deudor'];
+                                }elseif($valor['total_acreedor']>=0){
+                                    $valor_total=$valor['total_acreedor'];
+                                }
+
+                                $suma_nivel_3 = $suma_nivel_3 + $valor_total;
+                                if($valor_total == null || $valor_total == '0'){
                                     //NO MOSTRARIA NADA PORQ EL VALOR ES CERO
                                 }else{
                                     $res4 = array(
@@ -1369,7 +1376,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                     "idplandecuenta" => $nombre_cuenta3['idplandecuenta'], 
                                     "codigo" => $nombre_cuenta3['numero'],   
                                     "nombre_nivel_3" => $nombre_cuenta3['nombreplan'],
-                                    "valor" => $valor['total'],
+                                    "valor" => $valor_total,
                                     "profundidad" => '3',
                                     "nivel_4" => [] //activo   
                                     );
@@ -1404,15 +1411,22 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                             if($qwe5['es_calculable'] == 'si'){ // ES CALCULABLE
                                 
                             //ESTO ES NIVEL 4
-                                $suma_cuentas = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(haber) - SUM(debe) AS total FROM transacciones t
+                                $suma_cuentas = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total_deudor,SUM(haber)-SUM(debe) AS total_acreedor FROM transacciones t
                                 INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
                                 INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
                                 where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$nombre_cuenta4[idplandecuenta]'
                                 AND t.estado NOT IN (4, 5, 6) AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
 
                                 $valor = $suma_cuentas->fetch_assoc();
-                                $suma_nivel_4 = $suma_nivel_4 + $valor['total'];
-                                if($valor['total'] == null || $valor['total'] == '0'){
+
+                                if($valor['total_deudor']>=0){
+                                    $valor_total=$valor['total_deudor'];
+                                }elseif($valor['total_acreedor']>=0){
+                                    $valor_total=$valor['total_acreedor'];
+                                }
+
+                                $suma_nivel_4 = $suma_nivel_4 + $valor_total;
+                                if($valor_total == null || $valor_total == '0'){
                                     //--------------------------------------------
                                 }else{
                                     // $suma_nivel_4 = $suma_nivel_4 + $valor['total'];
@@ -1424,7 +1438,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                     "idplandecuenta" => $nombre_cuenta4['idplandecuenta'], 
                                     "codigo" => $nombre_cuenta4['numero'],   
                                     "nombre_nivel_4" => $nombre_cuenta4['nombreplan'],
-                                    "valor" => $valor['total'],
+                                    "valor" => $valor_total,
                                     "suma_nivel_5" => 0,
                                     "profundidad" => '4',
                                     "nivel_5" => [] //activo   
@@ -1452,17 +1466,24 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                         while ($qwe6 = $this->dbc->fetch($get_nivel_6)) { //esto ya es nivel 5 = CALCULABLE
                             $cuenta5 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe6[idplandecuenta]'");// caja_general, banco
                             $nombre_cuenta5 = $cuenta5->fetch_assoc();
-                            $suma_cuentas2 = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(haber) - SUM(debe) AS total FROM transacciones t
+                            $suma_cuentas2 = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total_deudor,SUM(haber)-SUM(debe) AS total_acreedor FROM transacciones t
                                 INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
                                 INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
                                 where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$nombre_cuenta5[idplandecuenta]'
                                 AND t.estado NOT IN (4, 5, 6) AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
 
                                 $valor2 = $suma_cuentas2->fetch_assoc();
-                                $suma_nivel_5 = $suma_nivel_5 + $valor2['total'];
+
+                                if($valor2['total_deudor']>=0){
+                                    $valor_total=$valor2['total_deudor'];
+                                }elseif($valor2['total_acreedor']>=0){
+                                    $valor_total=$valor2['total_acreedor'];
+                                }
+
+                                $suma_nivel_5 = $suma_nivel_5 + $valor_total;
                                     // $aux_sum_5 = $suma_nivel_5;
 
-                                if($valor2['total'] == null || $valor2['total'] == '0'){
+                                if($valor_total == null || $valor_total == '0'){
         //------------------------------------------------------------------------------
                                 }else{
                                     $res6 = array(
@@ -1473,7 +1494,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                 "idplandecuenta" => $nombre_cuenta5['idplandecuenta'], 
                                 "codigo" => $nombre_cuenta5['numero'],   
                                 "nombre_nivel_5" => $nombre_cuenta5['nombreplan'],
-                                "valor" => $valor2['total'],
+                                "valor" => $valor_total,
                                 "profundidad" => '5',
                                 "nivel_6" => [] //activo   
                                 );
@@ -1774,7 +1795,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
         // echo json_encode($lista, JSON_NUMERIC_CHECK);  
         return $lista;
     }
-    public function reporte_balance_general_consolidado($idplantilla_reporte,$fecha_ini,$fecha_fin,$empresa) {
+    private function reporte_balance_general_consolidado($idplantilla_reporte,$fecha_ini,$fecha_fin,$empresa) {
         ini_set('display_errors', 1); 
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
@@ -2203,15 +2224,20 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                          if($qwe4['es_calculable'] == 'si'){ // ES CALCULABLE
                             //ESTO ES NIVEL 3
                 
-                                $suma_cuentas = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total FROM transacciones t
+                                $suma_cuentas = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total_deudor,SUM(haber)-SUM(debe) AS total_acreedor FROM transacciones t
                                 INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
                                 INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
                                 where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$nombre_cuenta3[idplandecuenta]'
                                 AND t.estado NOT IN (4, 5, 6) AND t.consolidar = 2 AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
 
                                 $valor = $suma_cuentas->fetch_assoc();
-                                $suma_nivel_3 = $suma_nivel_3 + $valor['total'];
-                                if($valor['total'] == null || $valor['total'] == '0'){
+                                if($valor['total_deudor']>=0){
+                                    $valor_total=$valor['total_deudor'];
+                                }elseif($valor['total_acreedor']>=0){
+                                    $valor_total=$valor['total_acreedor'];
+                                }
+                                $suma_nivel_3 = $suma_nivel_3 + $valor_total;
+                                if($valor_total == null || $valor_total == '0'){
                                     //NO MOSTRARIA NADA PORQ EL VALOR ES CERO
                                 }else{
                                     $res4 = array(
@@ -2222,7 +2248,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                     "idplandecuenta" => $nombre_cuenta3['idplandecuenta'], 
                                     "codigo" => $nombre_cuenta3['numero'],   
                                     "nombre_nivel_3" => $nombre_cuenta3['nombreplan'],
-                                    "valor" => $valor['total'],
+                                    "valor" => $valor_total,
                                     "nivel_4" => [] //activo   
                                     );
                                     array_push($res3['nivel_3'], $res4); 
@@ -2255,15 +2281,23 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                             if($qwe5['es_calculable'] == 'si'){ // ES CALCULABLE
                                 
                             //ESTO ES NIVEL 4
-                                $suma_cuentas = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total FROM transacciones t
+                                $suma_cuentas = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total_deudor,SUM(haber)-SUM(debe) AS total_acreedor FROM transacciones t
                                 INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
                                 INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
                                 where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$nombre_cuenta4[idplandecuenta]'
                                 AND t.estado NOT IN (4, 5, 6) AND t.consolidar = 2 AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
 
                                 $valor = $suma_cuentas->fetch_assoc();
-                                $suma_nivel_4 = $suma_nivel_4 + $valor['total'];
-                                if($valor['total'] == null || $valor['total'] == '0'){
+                                if($valor['total_deudor']>=0){
+                                    $valor_total=$valor['total_deudor'];
+                                }elseif($valor['total_acreedor']>=0){
+                                    $valor_total=$valor['total_acreedor'];
+                                }
+                                // else{
+                                //     $valor_total=0;
+                                // }
+                                $suma_nivel_4 = $suma_nivel_4 + $valor_total;
+                                if($valor_total == null || $valor_total == '0'){
                                     //--------------------------------------------
                                 }else{
                                     // $suma_nivel_4 = $suma_nivel_4 + $valor['total'];
@@ -2275,7 +2309,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                     "idplandecuenta" => $nombre_cuenta4['idplandecuenta'], 
                                     "codigo" => $nombre_cuenta4['numero'],   
                                     "nombre_nivel_4" => $nombre_cuenta4['nombreplan'],
-                                    "valor" => $valor['total'],
+                                    "valor" => $valor_total,
                                     "suma_nivel_5" => 0,
                                     "nivel_5" => [] //activo   
                                     );
@@ -2301,17 +2335,22 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                         while ($qwe6 = $this->dbc->fetch($get_nivel_6)) { //esto ya es nivel 5 = CALCULABLE
                             $cuenta5 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe6[idplandecuenta]'");// caja_general, banco
                             $nombre_cuenta5 = $cuenta5->fetch_assoc();
-                            $suma_cuentas2 = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total FROM transacciones t
+                            $suma_cuentas2 = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total_deudor,SUM(haber)-SUM(debe) AS total_acreedor FROM transacciones t
                                 INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
                                 INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
                                 where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$nombre_cuenta5[idplandecuenta]'
                                 AND t.estado NOT IN (4, 5, 6) AND t.consolidar = 2 AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
 
                                 $valor2 = $suma_cuentas2->fetch_assoc();
-                                $suma_nivel_5 = $suma_nivel_5 + $valor2['total'];
+                                if($valor2['total_deudor']>=0){
+                                    $valor_total=$valor2['total_deudor'];
+                                }elseif($valor2['total_acreedor']>=0){
+                                    $valor_total=$valor2['total_acreedor'];
+                                }
+                                $suma_nivel_5 = $suma_nivel_5 + $valor_total;
                                     // $aux_sum_5 = $suma_nivel_5;
 
-                                if($valor2['total'] == null || $valor2['total'] == '0'){
+                                if($valor_total == null || $valor_total == '0'){
         //------------------------------------------------------------------------------
                                 }else{
                                     $res6 = array(
@@ -2322,7 +2361,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                 "idplandecuenta" => $nombre_cuenta5['idplandecuenta'], 
                                 "codigo" => $nombre_cuenta5['numero'],   
                                 "nombre_nivel_5" => $nombre_cuenta5['nombreplan'],
-                                "valor" => $valor2['total'],
+                                "valor" => $valor_total,
                                 "nivel_6" => [] //activo   
                                 );
                                 array_push($res5['nivel_5'], $res6); 
@@ -2618,7 +2657,8 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
         }     
         
         // array_push($lista, $res2);
-        echo json_encode($lista, JSON_NUMERIC_CHECK);  
+        // echo json_encode($lista, JSON_NUMERIC_CHECK);
+        return $lista;  
     }
     // public function editar_configuracion_reporte($id,$idplandecuenta,$es_activo_fijo,$es_calculable,$orden,$negrilla_cursiva,$empresa) {
     //     $idempresa = $this->getidempresa($empresa);
@@ -3917,7 +3957,65 @@ public function reporte_balance_general_por_niveles(
 echo json_encode($array, JSON_NUMERIC_CHECK);
     // return $array;
 }
+public function reporte_balance_general_por_niveles_consolidados(
+    $idplantilla_reporte,
+    $fecha_ini,
+    $fecha_fin,
+    $empresa,
+    $maxProfundidad
+) {
+    $array = $this->reporte_balance_general_consolidado(
+        $idplantilla_reporte,
+        $fecha_ini,
+        $fecha_fin,
+        $empresa
+    );
 
+//     $array = array_filter(
+//     (array) $this->reporte_balance_general_consolidado(
+//         $idplantilla_reporte,
+//         $fecha_ini,
+//         $fecha_fin,
+//         $empresa
+//     ),
+//     fn($item) => $item !== null
+// );
+
+    $limpiar = function (&$items) use (&$limpiar, $maxProfundidad) {
+
+    // if (is_array($items) || is_object($items)) {
+    if ($items === null) {
+        $items = "";
+    }else{
+        foreach ($items as &$item) {
+
+            // 1️⃣ BORRAR TODOS los niveles mayores al permitido
+            foreach ($item as $key => $value) {
+                if (preg_match('/^nivel_(\d+)$/', $key, $m)) {
+                    if ((int)$m[1] > $maxProfundidad) {
+                        unset($item[$key]);
+                    }
+                }
+            }
+
+            // 2️⃣ SOLO recorrer niveles permitidos
+            for ($i = 1; $i <= $maxProfundidad; $i++) {
+                $nivel = 'nivel_' . $i;
+                if (isset($item[$nivel]) && is_array($item[$nivel])) {
+                    $limpiar($item[$nivel]);
+                }
+            }
+        }
+    }
+    // }else{
+
+    // }
+    };
+
+    $limpiar($array);
+echo json_encode($array, JSON_NUMERIC_CHECK);
+    // return $array;
+}
 
 
     public function getidempresa($md5)
@@ -3941,6 +4039,6 @@ echo json_encode($array, JSON_NUMERIC_CHECK);
     //     //$res=array("id"=>,"nombre"=>$qwe['nombre']); listapagarfactura
     //     return $qwe['idgestion'];
     // } editar_registros_padres_BG
-//activo--1    pasivo --2  patrimonio---3    ingresos---4   egresos_gastos --5  orden ---6  eliminar    editar
+//activo--1    pasivo --2  patrimonio---3    ingresos---4   egresos_gastos --5  orden ---6  eliminar    editar  reporte_balance_general_consolidado
 }
 ?>

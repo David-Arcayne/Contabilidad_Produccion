@@ -1114,7 +1114,7 @@ class PlantillaReporte extends DB{
     //     }
     //     echo json_encode($lista, JSON_NUMERIC_CHECK);
     // }
-    public function reporte_estado_resultados_actualizado($idplantilla_reporte,$fecha_ini,$fecha_fin,$empresa) {
+    private function reporte_estado_resultados_actualizado($idplantilla_reporte,$fecha_ini,$fecha_fin,$empresa) {
         //    ini_set('display_errors', 1); 
         // ini_set('display_startup_errors', 1);
         // error_reporting(E_ALL);
@@ -1508,7 +1508,8 @@ class PlantillaReporte extends DB{
             // array_push($lista, $res);  
             $lista_aux_buscador = [];        
         }
-        echo json_encode($lista, JSON_NUMERIC_CHECK);
+        // echo json_encode($lista, JSON_NUMERIC_CHECK);
+        return $lista;
     }
 
     private function calculables_estado_resultados($id_agru_rubro, $idempresa, $gestion,$idplandecuenta,$fecha_ini,$fecha_fin,$idplantilla)
@@ -2458,7 +2459,7 @@ class PlantillaReporte extends DB{
         echo json_encode($lista);
     }
 
-    public function reporte_estado_resultados_actualizado_consolidado($idplantilla_reporte,$fecha_ini,$fecha_fin,$empresa) {
+    private function reporte_estado_resultados_actualizado_consolidado($idplantilla_reporte,$fecha_ini,$fecha_fin,$empresa) {
         //    ini_set('display_errors', 1); 
         // ini_set('display_startup_errors', 1);
         // error_reporting(E_ALL);
@@ -2798,7 +2799,8 @@ class PlantillaReporte extends DB{
             // array_push($lista, $res);  
             $lista_aux_buscador = [];        
         }
-        echo json_encode($lista, JSON_NUMERIC_CHECK);
+        // echo json_encode($lista, JSON_NUMERIC_CHECK);
+        return $lista;
     }
 
     private function calculables_estado_resultados_consolidado($id_agru_rubro, $idempresa, $gestion,$idplandecuenta,$fecha_ini,$fecha_fin,$idplantilla)
@@ -2947,6 +2949,114 @@ class PlantillaReporte extends DB{
             
             echo json_encode($res);
     }
-    //reporte_estado_resultados_actualizado_consolidado
+    public function reporte_estado_resultados_actualizado_por_niveles(
+        $idplantilla_reporte,
+        $fecha_ini,
+        $fecha_fin,
+        $empresa,
+        $maxProfundidad
+    ) {
+        $array = $this->reporte_estado_resultados_actualizado(
+            $idplantilla_reporte,
+            $fecha_ini,
+            $fecha_fin,
+            $empresa
+        );
+
+        $limpiar = function (&$items) use (&$limpiar, $maxProfundidad) {
+
+        // if (is_array($items) || is_object($items)) {
+        if ($items === null) {
+            $items = "";
+        }else{
+            foreach ($items as &$item) {
+
+                // 1️⃣ BORRAR TODOS los niveles mayores al permitido
+                foreach ($item as $key => $value) {
+                    if (preg_match('/^nivel_(\d+)$/', $key, $m)) {
+                        if ((int)$m[1] > $maxProfundidad) {
+                            unset($item[$key]);
+                        }
+                    }
+                }
+
+                // 2️⃣ SOLO recorrer niveles permitidos
+                for ($i = 1; $i <= $maxProfundidad; $i++) {
+                    $nivel = 'nivel_' . $i;
+                    if (isset($item[$nivel]) && is_array($item[$nivel])) {
+                        $limpiar($item[$nivel]);
+                    }
+                }
+            }
+        }
+        // }else{
+
+        // }
+        };
+
+        $limpiar($array);
+    echo json_encode($array, JSON_NUMERIC_CHECK);
+        // return $array;
+    }
+    public function reporte_estado_resultados_actualizado_consolidado_por_niveles(
+        $idplantilla_reporte,
+        $fecha_ini,
+        $fecha_fin,
+        $empresa,
+        $maxProfundidad
+    ) {
+        $array = $this->reporte_estado_resultados_actualizado_consolidado(
+            $idplantilla_reporte,
+            $fecha_ini,
+            $fecha_fin,
+            $empresa
+        );
+
+    //     $array = array_filter(
+    //     (array) $this->reporte_balance_general_consolidado(
+    //         $idplantilla_reporte,
+    //         $fecha_ini,
+    //         $fecha_fin,
+    //         $empresa
+    //     ),
+    //     fn($item) => $item !== null
+    // );
+
+        $limpiar = function (&$items) use (&$limpiar, $maxProfundidad) {
+
+        // if (is_array($items) || is_object($items)) {
+        if ($items === null) {
+            $items = "";
+        }else{
+            foreach ($items as &$item) {
+
+                // 1️⃣ BORRAR TODOS los niveles mayores al permitido
+                foreach ($item as $key => $value) {
+                    if (preg_match('/^nivel_(\d+)$/', $key, $m)) {
+                        if ((int)$m[1] > $maxProfundidad) {
+                            unset($item[$key]);
+                        }
+                    }
+                }
+
+                // 2️⃣ SOLO recorrer niveles permitidos
+                for ($i = 1; $i <= $maxProfundidad; $i++) {
+                    $nivel = 'nivel_' . $i;
+                    if (isset($item[$nivel]) && is_array($item[$nivel])) {
+                        $limpiar($item[$nivel]);
+                    }
+                }
+            }
+        }
+        // }else{
+
+        // }
+        };
+
+        $limpiar($array);
+    echo json_encode($array, JSON_NUMERIC_CHECK);
+        // return $array;
+    }
+
 }
 ?>

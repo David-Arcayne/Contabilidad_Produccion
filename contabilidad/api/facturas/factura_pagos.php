@@ -591,7 +591,7 @@ class Factura_pagos extends DB{
             AND f.cuenta='0'
             AND f.pagado != '0'
             ORDER BY
-            f.fecha ASC");
+            f.fecha DESC");
         while ($qwe = $this->dbc->fetch($facture)) {
             if ($qwe['clasefactura'] == 2) {
                 $cliente = $this->dbcm->query("select * from cliente where id_cliente='" . $qwe['proveedorcliente_idproveedorcliente'] . "'");

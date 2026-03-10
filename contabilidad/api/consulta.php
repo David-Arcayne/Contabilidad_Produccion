@@ -317,12 +317,12 @@ $cont->listaimpuestoentreplan($ver[1]);
 }elseif($ver[0]=="eliminar_caja_bancos"){
     $cont=new Plandecuentas();
     $cont->eliminar_caja_bancos($ver[1]);
-}elseif($ver[0]=="listar_recibo_por_id"){
+}elseif($ver[0]=="listar_comprobantes_de_factura_cobro"){
     $cont=new Cuentaspof();
-    $cont->listar_recibo_por_id($ver[1]);
-}elseif($ver[0]=="listar_recibo_pago_por_id"){
+    $cont->listar_comprobantes_de_factura_cobro($ver[1]);
+}elseif($ver[0]=="listar_comprobantes_de_factura_pago"){
     $cont=new Cuentaspor();
-    $cont->listar_recibo_pago_por_id($ver[1]);
+    $cont->listar_comprobantes_de_factura_pago($ver[1]);
 }elseif($ver[0]=="listar_cajas_bancos_por_recibo"){
     $cont=new Cuentaspof();
     $cont->listar_cajas_bancos_por_recibo($ver[1]);
@@ -341,16 +341,16 @@ $cont->listaimpuestoentreplan($ver[1]);
 }elseif($ver[0]=="listar_recibo_otras_cuentas"){
     $cont=new Recibo_otras_cuentas();
     $cont->listar_recibo_otras_cuentas($ver[1]);
-}elseif($ver[0]=="listar_recibo_por_id_otras_cuentas"){
+}elseif($ver[0]=="listar_comprobantes_de_recibo_cobro"){
     $cont=new Documento_cobro();
-    $cont->listar_recibo_por_id_otras_cuentas($ver[1]);
+    $cont->listar_comprobantes_de_recibo_cobro($ver[1]);
 }
 elseif($ver[0]=="listar_recibo_otras_cuentas_pagar"){
     $cont=new Recibo_otras_cuentas();
     $cont->listar_recibo_otras_cuentas_pagar($ver[1]);
-}elseif($ver[0]=="listar_recibo_por_id_otras_cuentas_pagar"){
+}elseif($ver[0]=="listar_comprobantes_de_recibo_pago"){
     $cont=new Documento_cobro();
-    $cont->listar_recibo_por_id_otras_cuentas_pagar($ver[1]);
+    $cont->listar_comprobantes_de_recibo_pago($ver[1]);
 }elseif($ver[0]=="listar_otras_cuentas_pagar"){
     $cont=new Documento_cobro();
     $cont->listar_otras_cuentas_pagar($ver[1],$ver[2]);
@@ -611,10 +611,16 @@ elseif($ver[0]=="listar_datos_contrataciones_cajas"){
 }elseif($ver[0]=="lista_padres_plandecuentas"){
     $cont=new Transacciones();
     $cont->lista_padres_plandecuentas($ver[1]);
-}elseif($ver[0]=="reporte_balance_general_consolidado"){
+}
+// elseif($ver[0]=="reporte_balance_general_consolidado"){
+//     $cont=new Reporte_confi();
+//     $cont->reporte_balance_general_consolidado($ver[1],$ver[2],$ver[3],$ver[4]);
+// }
+elseif($ver[0]=="reporte_balance_general_por_niveles_consolidados"){
     $cont=new Reporte_confi();
-    $cont->reporte_balance_general_consolidado($ver[1],$ver[2],$ver[3],$ver[4]);
-}elseif($ver[0]=="reporte_estado_resultados_actualizado_consolidado"){
+    $cont->reporte_balance_general_por_niveles_consolidados($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
+}
+elseif($ver[0]=="reporte_estado_resultados_actualizado_consolidado"){
     $cont=new PlantillaReporte();
     $cont->reporte_estado_resultados_actualizado_consolidado($ver[1],$ver[2],$ver[3],$ver[4]);
 }
@@ -687,16 +693,20 @@ elseif($ver[0]=="listar_reportes_referencia"){
 }elseif($ver[0]=="reporte_balance_general_por_niveles"){
     $cont=new Reporte_confi();
     $cont->reporte_balance_general_por_niveles($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
-}elseif($ver[0]=="listar_recibos_asignado_cuentas"){
+}
+//-----------------------------------------------------------------------------------no esta subido a mistersoft lo de abajo
+elseif($ver[0]=="listar_recibos_asignado_cuentas"){
     $cont=new Cuentas_transacciones();
     $cont->listar_recibos_asignado_cuentas($ver[1]);
 }elseif($ver[0]=="listar_recibos_cobro_pago"){
     $cont=new Cuentas_transacciones();
     $cont->listar_recibos_cobro_pago($ver[1],$ver[2]);
-}elseif($ver[0]=="listafactura_cobro_trans_comercial"){
+}
+elseif($ver[0]=="listafactura_cobro_trans_comercial"){
     $cont=new Factura_comercial();
     $cont->listafactura_cobro_trans_comercial($ver[1]);
-}elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
+}
+elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
     $cont=new Filtrado_facturas();
     $cont->facturas_perteneciente_a_cuenta($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
 }elseif($ver[0]=="listar_facturas_comercial_cobro"){
@@ -720,20 +730,32 @@ elseif($ver[0]=="listar_reportes_referencia"){
 }elseif($ver[0]=="listar_comprobantes_de_factura"){
     $cont=new Filtrado_facturas();
     $cont->listar_comprobantes_de_factura($ver[1]);
+}elseif($ver[0]=="listar_todos_documentos_asignado_cuenta"){
+    $cont=new Cuentas_transacciones();
+    $cont->listar_todos_documentos_asignado_cuenta($ver[1]);
+}elseif($ver[0]=="listar_otras_cuentas_reporte"){
+    $cont=new Documento_cobro();
+    $cont->listar_otras_cuentas_reporte($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
+}elseif($ver[0]=="reporte_estado_resultados_actualizado_por_niveles"){
+    $cont=new PlantillaReporte();
+    $cont->reporte_estado_resultados_actualizado_por_niveles($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
+}elseif($ver[0]=="reporte_estado_resultados_actualizado_consolidado_por_niveles"){
+    $cont=new PlantillaReporte();
+    $cont->reporte_estado_resultados_actualizado_consolidado_por_niveles($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
 }
 
-// reportedetalle listar_recibo_por_id listar_recibo_por_id_otras_cuentas   eliminarcobrados lista_cobrar lista_plande listafactura listaproveedores getgestionactual -- listar_facturas
-// listar_factura           listar_facturas_cobro_pago             listar_datos_contrataciones_cajas    listar_recibo_por_caja_bancos                             listar_recibo_por_id   --> caja bancos  lista_plande_subcuentas
-// reemplazar facturas_perteneciente_a_cuenta     listadegestion   getgestion "archivo" => $qwe['archivo'],  listar_recibo_por_id_otras_cuentas      listar_recibo_por_id_otras_cuentas_pagar ---> esos dos son de recibos
+// reportedetalle listar_recibo_por_id listar_recibo_por_id_otras_cuentas listaclientes listar_recibo_por_caja_bancos
+// listar_factura           listar_facturas_cobro_pago      
+// reemplazar facturas_perteneciente_a_cuenta 
 
-// recibos_perteneciente_a_cuenta  reporteactivodisponible es_cuenta_de_orden busqueda_facturas_contabilidad listar_facturas_comercial_cobro
-//    listar_recibo_otras_cuentas  listar_recibo_otras_cuentas_pagar       listar_factura           listar_recibo_pago_por_id   listafactura_pago_trans                                           listar_recibo_por_id   --> caja bancos 
-// milista  reporteactivodisponible es_cuenta_de_orden listar_otras_cuentas_cobrar lista_cobrar_cobrado_factura listar_facturas_cobro_pago listar_recibo_por_id_otras_cuentas
-//    listar_recibo_otras_cuentas  listar_recibo_otras_cuentas_pagar       listar_factura           listar_recibo_pago_por_id                                              listar_recibo_por_id   --> caja bancos 
-// listar_tipo_plandecuenta listar_anular listapagos listapagos_individuales listar_recibo_otras_cuentas reportedetalletransaccion reportedetallefpt listar_otras_cuentas_cobrar_vencidas 
-// l listar_recibo_por_caja_bancos listar_agrupacion_rubro_plandecuenta listar_tipo_reportes_activos  listar_recibo_por_id
-//reporte_balance_general_por_niveles mayorcuentacontable listar_facturas_cobro_pago listar_recibo  listafactura_cobro_trans_comercial listafactura_cobro_trans
-//   listar_facturas_comercial_asignado_cuentas    listadegestion  anular listar_facturas_comercial_asignado_cuentas listar_facturas_comercial_cobro listar_datos_contrataciones_cajas 
+// recibos_perteneciente_a_cuenta  listar_otras_cuentas_cobrar
+//    listar_recibo_otras_cuentas    listar_recibos_asignado_cuentas
+// milista   lista_pagar_pagado_factura lista_cobrar_cobrado_factura listar_otras_cuentas_cobrar
+//    listar_recibo_otras_cuentas     listar_recibo_por_caja_bancos listar_otras_cuentas_pagar_select
+// reportedetallefpt listar_otras_cuentas_cobrar_vencidas  listar_otras_cuentas_cobrar listar_recibo_facturas_otras_cuentas
+// listar_recibo_por_id listar_recibo_por_id_otras_cuentas reporte_balance_general listar_facturas_comercial_asignado_cuentas
+//reporte_balance_general_por_niveles listar_factura_pago_sin_cuentas listar_recibo_facturas_otras_cuentas
+//   
 
 
 ?>

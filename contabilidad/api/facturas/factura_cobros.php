@@ -574,7 +574,7 @@ class Factura_cobros extends DB{
             AND f.cuenta='0'
             AND f.cobrado != '0'
             ORDER BY
-            f.fecha ASC");
+            f.fecha DESC");
         
         if($facture->num_rows > 0){
             while ($qwe = $this->dbc->fetch($facture)) {
@@ -775,9 +775,35 @@ class Factura_cobros extends DB{
                     if($solicitud['tipo_documento'] == 'factura'){// ES FACTURA
                         $update_docu=$this->dbc->query("UPDATE factura SET estado = '1' 
                         WHERE idfactura = '$id_documento'");  
+
+                        $factu = $this->dbc->query("SELECT * FROM factura WHERE idfactura='$id_documento'");
+                        $factu_comprob = $factu->fetch_assoc();
+
+                        //ESTAMOS DENEGANDO LOS COMPROBANTES DE LA FACTURA QUE SE QUERIA ANULAR
+                        if($factu_comprob['clasefactura'] == '2'){ // COBROS
+                            $update_comprob=$this->dbc->query("UPDATE cuentaspof SET estado = '1' 
+                            WHERE idfactura = '$id_documento'"); 
+                        }else{ // PAGOS
+                            $update_comprob=$this->dbc->query("UPDATE cuentaspor SET estado = '1' 
+                            WHERE idfactura = '$id_documento'"); 
+                        }
+ 
                     }else{ // ES RECIBO
                         $update_docu=$this->dbc->query("UPDATE recibo SET estado = '1' 
                         WHERE idrecibo = '$id_documento'");  
+
+                        $reci = $this->dbc->query("SELECT * FROM recibo WHERE idrecibo='$id_documento'");
+                        $reci_comprob = $reci->fetch_assoc();
+
+                        //ESTAMOS DENEGANDO LOS COMPROBANTES DE EL RECIBO QUE SE QUERIA ANULAR
+                        if($reci_comprob['cobrado'] != '0'){ // COBROS
+                            $update_comprob=$this->dbc->query("UPDATE cuentaspof SET estado = '1' 
+                            WHERE idrecibo = '$id_documento'"); 
+                        }else{ // PAGOS
+                            $update_comprob=$this->dbc->query("UPDATE cuentaspor SET estado = '1' 
+                            WHERE idrecibo = '$id_documento'"); 
+                        }
+
                     } 
                   
                     $res = array("success", "Se Denego el permiso para anular", "cambiarEstado_anular_eliminar_documento");

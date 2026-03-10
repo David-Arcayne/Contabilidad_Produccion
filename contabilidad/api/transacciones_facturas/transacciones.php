@@ -1360,9 +1360,9 @@ if($filtrado->num_rows > 0){
 }
 
 public function asignar_facturas_A_cuentas($data) {
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
     
         $idempresa = $this->getidempresa($data['idempresa']);
         // $idsucursal = $this->getidsucursal($data['idsucursal']); 

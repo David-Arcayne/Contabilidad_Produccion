@@ -5,9 +5,9 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
     {
         // echo json_encode(array($idfactura, $idtransaccion,$caja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$archivo));
 
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
     
         // Establecer la zona horaria recibida
         date_default_timezone_set($zn);
@@ -54,10 +54,10 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
             $registropago2 = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
         VALUES(NULL,'$nrecibo','$fecha_completa','$lugar','0','$persona','$ci','$monto','0','$idotras_cuentas','$idrecibo_nuevo','0','0',NULL,'cobrado_recibo_otras_cuentas')");
 
-            $idrecibo = $this->dbc->insert_id;
+            $idcomprobante = $this->dbc->insert_id;
 
         }elseif($idtransaccion > 0 && $asiento == ""){
-            //SE CREA LA FACTURA CON LA TRANSACCION EXISTENTE QUE YA TE PASARON
+            //SE CREA EL RECIBO CON LA TRANSACCION EXISTENTE QUE YA TE PASARON
 
         if($cuenta == ""){ // SOLO SE ASIGNARA TRANSACCION Y NO LA CUENTA
                    
@@ -458,9 +458,9 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
     {
         // echo json_encode(array($idfactura, $idtransaccion,$caja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$archivo));
 
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
     
         // Establecer la zona horaria recibida
         date_default_timezone_set($zn);
@@ -1540,7 +1540,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
         $res = "";
         $registro = $this->dbc->query("select * from gestion where idempresa='$empresa' and estado='2' Limit 1");
         $qwe = $this->dbc->fetch($registro);
-        //$res=array("id"=>,"nombre"=>$qwe['nombre']); listar_recibo_otras_cuentas cliente precio_restante monto_total
+        //$res=array("id"=>,"nombre"=>$qwe['nombre']); listar_recibo_otras_cuentas cliente precio_restante monto_total 
         return $qwe['idgestion'];
     }
 }

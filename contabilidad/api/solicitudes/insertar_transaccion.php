@@ -4,35 +4,115 @@ session_start();
 require_once "../../db/db.php";
 class Insertar_transaccion extends DB{
     // $codigo, $fecha, $tipocambio, $tipotransaccion, $glosa, $empresa, $sucursal
-public function registrar_transaccionEn_espera($idtransaccion,$estado,$hora,$fecha,$fecha_del_usuario,$fecha_siguiente,$idusuario,$codigo,$tipocambio, $tipotransaccion, $glosa,$idempresa,$sucursal){
-        $res="";
-        $usuario=$this->getidusuario($idusuario);
-        $idsucursal = $this->getidsucursal($sucursal);
-        $empresa=$this->getidempresa($idempresa);
-        $gestion = $this->getgestionactualid($empresa);
-        // $codigo=date("Ymd").rand(100,1000);
-// idusuario codigotransaccion tipodecambio ndocumento glosa consolidar tipotransaccion_idtipotransaccion sucursal idempresa idgestion
+    public function registrar_transaccionEn_espera($idtransaccion,$estado,$hora,$fecha,$fecha_del_usuario,$fecha_siguiente,$idusuario,$codigo,$tipocambio, $tipotransaccion, $glosa,$idempresa,$sucursal){
+    $res="";
+    $usuario=$this->getidusuario($idusuario);
+    $idsucursal = $this->getidsucursal($sucursal);
+    $empresa=$this->getidempresa($idempresa);
+    $gestion = $this->getgestionactualid($empresa);
 
-        $trans_act=$this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones='$idtransaccion'");
-        $resu_trans = $trans_act->fetch_assoc();
+    $trans_act=$this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones='$idtransaccion'");
+    $resu_trans = $trans_act->fetch_assoc();
 
-        if($fecha_del_usuario >= $fecha_siguiente && $fecha_del_usuario <= $resu_trans['fechatransaccion']){ 
-            // SI SE PODRA REGISTRAR LA TRANSACCION PORQUE ESTA DENTRO DEL RANGO DE FECHAS
+    // Convertir fechas a timestamp (enteros)
+    $fechaUsuario     = strtotime($fecha_del_usuario);
+    $fechaTransaccion = !empty($resu_trans['fechatransaccion']) ? strtotime($resu_trans['fechatransaccion']) : null;
+    $fechaSiguiente   = !empty($fecha_siguiente) ? strtotime($fecha_siguiente) : null;
 
-            $registro=$this->dbc->query("INSERT INTO transaccionEn_espera(transacciones_idtransacciones,estado,hora,fecha,idusuario,fecha_trans_del_usuario,codigotransaccion, tipodecambio, ndocumento, glosa, consolidar, tipotransaccion_idtipotransaccion, sucursal,idempresa,idgestion)
-            VALUES('$idtransaccion','$estado','$hora','$fecha','$usuario','$fecha_del_usuario','$codigo','$tipocambio','0', '$glosa','1', '$tipotransaccion','$idsucursal','$empresa','$gestion')");
-        }else{
+    // Validación
+    if ($fechaSiguiente !== null && $fechaTransaccion !== null) {
+        // Caso con ambos límites
+        if ($fechaUsuario >= $fechaSiguiente && $fechaUsuario <= $fechaTransaccion) {
+            $registro = $this->dbc->query("INSERT INTO transaccionEn_espera(
+                transacciones_idtransacciones,estado,hora,fecha,idusuario,fecha_trans_del_usuario,
+                codigotransaccion, tipodecambio, ndocumento, glosa, consolidar,
+                tipotransaccion_idtipotransaccion, sucursal,idempresa,idgestion
+            ) VALUES(
+                '$idtransaccion','$estado','$hora','$fecha','$usuario','$fecha_del_usuario',
+                '$codigo','$tipocambio','0','$glosa','1','$tipotransaccion',
+                '$idsucursal','$empresa','$gestion'
+            )");
+        } else {
             $registro = FALSE;
         }
-        
-        if($registro===TRUE){
-            $res = array("success", "Se Registro Correctamente", "registrar_transaccionEn_espera");
-        }else{
-            $res = array("danger", "La fecha del registro no esta dentro del rango :".$fecha_siguiente." y ". $resu_trans['fechatransaccion']);
+    } elseif ($fechaTransaccion !== null) {
+        // Caso en que fecha_siguiente es NULL, solo validar contra la transacción
+        if ($fechaUsuario <= $fechaTransaccion) {
+            $registro = $this->dbc->query("INSERT INTO transaccionEn_espera(
+                transacciones_idtransacciones,estado,hora,fecha,idusuario,fecha_trans_del_usuario,
+                codigotransaccion, tipodecambio, ndocumento, glosa, consolidar,
+                tipotransaccion_idtipotransaccion, sucursal,idempresa,idgestion
+            ) VALUES(
+                '$idtransaccion','$estado','$hora','$fecha','$usuario','$fecha_del_usuario',
+                '$codigo','$tipocambio','0','$glosa','1','$tipotransaccion',
+                '$idsucursal','$empresa','$gestion'
+            )");
+        } else {
+            $registro = FALSE;
         }
-        echo json_encode($res);
-
+    } else {
+        // Si no hay ningún límite válido, no se puede validar
+        $registro = FALSE;
     }
+
+    if($registro===TRUE){
+        $res = array("success", "Se Registro Correctamente", "registrar_transaccionEn_espera");
+    }else{
+        $res = array("danger", "La fecha del registro no está dentro del rango: "
+            . ($fechaSiguiente !== null && $fechaTransaccion !== null
+                ? date("Y-m-d H:i:s",$fechaSiguiente)." y ".date("Y-m-d H:i:s",$fechaTransaccion)
+                : ($fechaTransaccion !== null ? date("Y-m-d H:i:s",$fechaTransaccion) : "sin límites definidos")));
+    }
+    echo json_encode($res);
+}
+
+
+// public function registrar_transaccionEn_espera($idtransaccion,$estado,$hora,$fecha,$fecha_del_usuario,$fecha_siguiente,$idusuario,$codigo,$tipocambio, $tipotransaccion, $glosa,$idempresa,$sucursal){
+//         $res="";
+//         $usuario=$this->getidusuario($idusuario);
+//         $idsucursal = $this->getidsucursal($sucursal);
+//         $empresa=$this->getidempresa($idempresa);
+//         $gestion = $this->getgestionactualid($empresa);
+//         // $codigo=date("Ymd").rand(100,1000);
+// // idusuario codigotransaccion tipodecambio ndocumento glosa consolidar tipotransaccion_idtipotransaccion sucursal idempresa idgestion
+
+//         $trans_act=$this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones='$idtransaccion'");
+//         $resu_trans = $trans_act->fetch_assoc();
+
+        
+//         // if($fecha_del_usuario >= $fecha_siguiente && $fecha_del_usuario <= $resu_trans['fechatransaccion']){ 
+//         //     // SI SE PODRA REGISTRAR LA TRANSACCION PORQUE ESTA DENTRO DEL RANGO DE FECHAS
+
+//         //     $registro=$this->dbc->query("INSERT INTO transaccionEn_espera(transacciones_idtransacciones,estado,hora,fecha,idusuario,fecha_trans_del_usuario,codigotransaccion, tipodecambio, ndocumento, glosa, consolidar, tipotransaccion_idtipotransaccion, sucursal,idempresa,idgestion)
+//         //     VALUES('$idtransaccion','$estado','$hora','$fecha','$usuario','$fecha_del_usuario','$codigo','$tipocambio','0', '$glosa','1', '$tipotransaccion','$idsucursal','$empresa','$gestion')");
+//         // }else{
+//         //     $registro = FALSE;
+//         // }
+        
+//         if ($fecha_siguiente != null) { // Caso en que sí existe fecha_siguiente 
+//             if ($fecha_del_usuario >= $fecha_siguiente && $fecha_del_usuario <= $resu_trans['fechatransaccion']) {
+//                 $registro = $this->dbc->query("INSERT INTO transaccionEn_espera( transacciones_idtransacciones,estado,hora,fecha,idusuario,fecha_trans_del_usuario, codigotransaccion, tipodecambio, ndocumento, glosa, consolidar, tipotransaccion_idtipotransaccion, sucursal,idempresa,idgestion ) 
+//                 VALUES( '$idtransaccion','$estado','$hora','$fecha','$usuario','$fecha_del_usuario', '$codigo','$tipocambio','0','$glosa','1','$tipotransaccion', '$idsucursal','$empresa','$gestion' )"); 
+//             }else { 
+//                 $registro = FALSE; 
+//                 } 
+//         } else { 
+//             // Caso en que fecha_siguiente es NULL 
+//             if ($fecha_del_usuario <= $resu_trans['fechatransaccion']) { 
+//                 $registro = $this->dbc->query("INSERT INTO transaccionEn_espera( transacciones_idtransacciones,estado,hora,fecha,idusuario,fecha_trans_del_usuario, codigotransaccion, tipodecambio, ndocumento, glosa, consolidar, tipotransaccion_idtipotransaccion, sucursal,idempresa,idgestion ) 
+//                 VALUES( '$idtransaccion','$estado','$hora','$fecha','$usuario','$fecha_del_usuario', '$codigo','$tipocambio','0','$glosa','1','$tipotransaccion', '$idsucursal','$empresa','$gestion' )"); 
+//             } else {
+//                      $registro = FALSE;
+//             } 
+//         }
+//         if($registro===TRUE){
+//             $res = array("success", "Se Registro Correctamente", "registrar_transaccionEn_espera");
+//         }else{
+//             $res = array("danger", "La fecha del registro no esta dentro del rango :".$fecha_siguiente." y ". $resu_trans['fechatransaccion']);
+//         }
+//         echo json_encode($res);
+
+//     }
 
     public function cambiarestadotransaccionEn_espera($idtran_espera,$estado,$fecha,$hora,$idusuario_admin){
         //actualizar esto:
