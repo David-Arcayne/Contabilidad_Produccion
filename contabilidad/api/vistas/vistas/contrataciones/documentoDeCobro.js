@@ -1,44 +1,44 @@
-import { crearFormulario } from "../../funciones/CrearFormulario.js";
 import { ajustarAlturaTabla, crearFilaTotalTabla, manejarListadoTabla, tablaResponsiva, validarListadoTabla } from "../../funciones/CrearTabla.js";
 import { CT_URLAPI, getEmpresaId, getSucursalId } from "../../funciones/DatosAuxiliares.js";
-import { botonEnCarga, cambiarVista, crearElemento, crearFiltrosTabla, crearGestorTabla, divOpcionesVista, elementoBoton, formatoDecimal, formatoFecha, seccionDriverJS, seccionEncabezado } from "../../funciones/Funciones.js";
-import { botonModalRegistro } from "../../funciones/OpcionesBasicas.js";
-import { obtenerDatos } from "../../funciones/Solicitudes.js";
-import { formularioDocumentoDePago } from "./Formularios.js";
-import { ContratosDePagoVencidos } from "./Funcionalidades/CdPVencidos.js";
-import { pdfMakeReporteDeContratos } from "./Funcionalidades/ReportesContrataciones.js";
+import { botonMostrarAdjunto, cambiarVista, crearElemento, crearFiltrosTabla, crearGestorTabla, divOpcionesVista, elementoBoton, formatoDecimal, formatoFecha, manejarEliminarArchivoDesdeFormulario, seccionDriverJS, seccionEncabezado } from "../../funciones/Funciones.js";
+import { botonModalEditar, botonModalEliminar, botonModalRegistro } from "../../funciones/OpcionesBasicas.js";
+import { formularioDocumentoDeCobro } from "./Formularios.js";
+import { ContratosDeCobroVencidos } from "./Funcionalidades/CdCVencidos.js";
+import { ListaCobrados } from "./Funcionalidades/ListaCobrados.js";
+import { pdfMakeContratosDeCobro } from "./Funcionalidades/ReportesContrataciones.js";
 
 /**
  * Función: Crea el contenido principal del menú
- * Descripción: Esta función genera el contenido principal del menú para la gestión de contratos de pago.
+ * Descripción: Esta función genera el contenido principal del menú para la gestión de documentos de cobro
+ *              Permite registrar y editar documentos de cobro.
  * Fecha: 20 de junio de 2024
  * Autor: Joel Choque
  */
 /**
  * Contenido de la ventana.
  * @param {PermisosVista} permisos - Permisos del usuario sobre la vista.
- * @param {HTMLElement} vistaDocumentoPago - Contenedor principal donde se renderiza la vista de documentos de pago.
+ * @param {HTMLElement} vistaDocumentoCobro - Contenedor principal donde se renderiza la vista de documentos de cobro.
  * @param {DatosMenuBotones} datosVistaPrincipal - Información de la vista: código, permisos, título.
  */
-export function DocumentoReportes(permisos, vistaDocumentoPago, datosVistaPrincipal) {
+export function DocumentoDeCobro(permisos, vistaDocumentoCobro, datosVistaPrincipal) {
     const PUEDE_EDITAR = permisos.editar === "1";
     const PUEDE_ELIMINAR = permisos.eliminar === "1";
     const PUEDE_ESCRIBIR = permisos.escritura === "1";
     const SUCURSAL_ID = getSucursalId();
     const EMPRESA_ID = getEmpresaId();
     const URL = CT_URLAPI;
-    const URL_LT = `${URL}listar_otras_cuentas_pagar/${EMPRESA_ID}`;
+    const URL_LT = `${URL}listar_otras_cuentas_cobrar/${EMPRESA_ID}`;
 
     // Controlador de la tabla para gestionar los datos y filtros
     const controladorTabla = crearGestorTabla();
 
     const vistaPrincipal = crearElemento("div", { "data-pane-id": "principal" });
     const vistaContratosVencidos = crearElemento("div", { class: "d-none", "data-pane-id": "contratos-vencidos" });
-    const vistaContratosPagados = crearElemento("div", { class: "d-none", "data-pane-id": "contratos-pagados" });
-    vistaDocumentoPago.append(vistaPrincipal, vistaContratosVencidos, vistaContratosPagados);
+    const vistaContratosCobrados = crearElemento("div", { class: "d-none", "data-pane-id": "contratos-cobrados" });
+    vistaDocumentoCobro.append(vistaPrincipal, vistaContratosVencidos, vistaContratosCobrados);
 
     // Creación de elementos para la vista Principal
-    const encabezadoVista = seccionEncabezado({titulo: "Listado de Documentos de Pago"});
+    const encabezadoVista = seccionEncabezado({titulo: "Listado de Documentos de Cobro"});
     vistaPrincipal.appendChild(encabezadoVista);
     const contenedorDeAlertas = crearElemento("div");
     vistaPrincipal.appendChild(contenedorDeAlertas);
@@ -47,16 +47,16 @@ export function DocumentoReportes(permisos, vistaDocumentoPago, datosVistaPrinci
     const contratosVencidos = elementoBoton({
         texto: "Contratos Vencidos",
         icono: "file-earmark-x",
-        id: "docpago-btn-vencidos",
+        id: "doccobro-btn-vencidos",
         callback: () => {
             cambiarVista(vistaPrincipal, vistaContratosVencidos);
-            ContratosDePagoVencidos({
+            ContratosDeCobroVencidos({
                 codigo: datosVistaPrincipal.codigo,
                 permisos,
-                vistaDocumentosDePago: vistaPrincipal,
+                vistaDocumentosDeCobro: vistaPrincipal,
                 vistaContratosVencidos,
-                urlDocsDePago: URL_LT,
-                cargarContenidoTablaDocsDePago: cargarContenidoTabla,
+                urlDocsDeCobro: URL_LT,
+                cargarContenidoTablaDocsDeCobro: cargarContenidoTabla,
             });
         }
     });
@@ -68,7 +68,7 @@ export function DocumentoReportes(permisos, vistaDocumentoPago, datosVistaPrinci
                 contenedorDeAlertas,
                 URL_FORM: URL,
                 URL_LISTAR: URL_LT,
-                camposDeFormulario: formularioDocumentoDePago,
+                camposDeFormulario: formularioDocumentoDeCobro,
                 cargarContenidoTabla,
                 configuracionModal: {
                     tituloModal: "Registro de Nuevo Contrato",
@@ -77,13 +77,13 @@ export function DocumentoReportes(permisos, vistaDocumentoPago, datosVistaPrinci
                     ver: "registrar_otras_cuentas",
                     empresa: EMPRESA_ID,
                     sucursal: SUCURSAL_ID,
-                    clase_otras_cuentas: "1",
-                    cobrado: "0",
-                    pagado: "1",
+                    clase_otras_cuentas: "2",
+                    cobrado: "1",
+                    pagado: "0",
                 },
             },
             vistaPrincipal,
-            { texto: "Nuevo Contrato de Pago" }
+            { texto: "Nuevo Contrato de Cobro" }
         );
         // Opciones de la vista principal
         const opcionesBtns = divOpcionesVista([
@@ -100,7 +100,7 @@ export function DocumentoReportes(permisos, vistaDocumentoPago, datosVistaPrinci
         "Lugar",
         "Fecha",
         "Fecha final",
-        "Cliente/Proveedor",
+        "Cliente",
         "N° Tributario",
         "Representante/Contacto",
         "N° Doc. Identidad",
@@ -109,28 +109,24 @@ export function DocumentoReportes(permisos, vistaDocumentoPago, datosVistaPrinci
         "Condiciones",
         "Observaciones",
         "Precio",
-        "Cobrado/Pagado",
+        "Cobrado",
         "Forma de pago",
-        // "Adjunto",
-        // "Opciones",
+        "Adjunto",
+        "Opciones",
     ];
 
     const [divTabla, tabla, tbody, footer] = tablaResponsiva(encabezadoTabla, { pieDeTabla: 1 });
 
-    const [contenedorFiltros, formularioFiltros] = RFiltroYFecha(cargarContenidoTabla);
-
-
     // Crear los filtros de la tabla y la opción para generar el reporte PDF.
     const divFiltros = crearFiltrosTabla({
-        obtenerContenidoReporte: pdfMakeReporteDeContratos(controladorTabla.getDatosOriginales),
+        obtenerContenidoReporte: pdfMakeContratosDeCobro(controladorTabla.getDatosOriginales),
         configuracionPdfMake: {
             orientacion: "landscape",
         },
         controladorTabla,
         contenedorPrincipal: vistaPrincipal,
-        filtroFecha: false,
     });
-    vistaPrincipal.append(contenedorFiltros, divFiltros, divTabla);
+    vistaPrincipal.append(divFiltros, divTabla);
 
     // Inicialización del controlador de la tabla para gestionar los datos y filtros
     controladorTabla.suscribir("tabla", (lista) => {
@@ -165,9 +161,77 @@ export function DocumentoReportes(permisos, vistaDocumentoPago, datosVistaPrinci
                 crearElemento("td", { class: "text-end" }, [formatoDecimal(registro.precio)]),
                 crearElemento("td", { class: "text-end" }, [formatoDecimal(registro.pagado)]),
                 crearElemento("td", undefined, [registro.forma_pago || "-"]),
-                // crearElemento("td", { class: "text-center" }, [botonMostrarAdjunto(vistaPrincipal, registro.archivo) || "-"]),
+                crearElemento("td", { class: "text-center" }, [botonMostrarAdjunto(vistaPrincipal, registro.archivo) || "-"]),
             ];
 
+            const tdOpciones = crearElemento("td", { class: "text-nowrap" });
+            // Botón para ver los cobros realizados de un documento de cobro
+            const listaCobrados = botonListarCobros(
+                () => {
+                    cambiarVista(vistaPrincipal, vistaContratosCobrados);
+                    ListaCobrados({
+                        permisos,
+                        vistaDocumentosDeCobro: vistaPrincipal,
+                        vistaContratosCobrados,
+                        urlDocsDeCobro: URL_LT,
+                        cargarContenidoTablaDocsDeCobro: cargarContenidoTabla,
+                        registro
+                    });
+                }
+            );
+            tdOpciones.append(listaCobrados, " ");
+
+            if (PUEDE_EDITAR || PUEDE_ELIMINAR) {
+                if (PUEDE_EDITAR) {
+                    // Crear el botón para eliminar el archivo adjunto desde el formulario de edición
+                    const crearBotonEliminarArchivo = manejarEliminarArchivoDesdeFormulario({
+                        contenedorDeAlertas,
+                        vistaPrincipal,
+                        cargarContenidoTabla,
+                        urlListadoTabla: URL_LT,
+                        llaves: {
+                            archivo: "archivo",
+                            idRegistro: "idotras_cuentas"
+                        }
+                    });
+                    // Agregar la opción de eliminar archivo al formulario de edición
+                    formularioDocumentoDeCobro[formularioDocumentoDeCobro.length -1].opcionesInput = { callback: crearBotonEliminarArchivo };
+
+                    // Crear botón editar con modal de formulario
+                    const botonEditar= botonModalEditar(
+                        {
+                            contenedorDeAlertas,
+                            camposDeFormulario: formularioDocumentoDeCobro,
+                            URL_FORM: URL,
+                            URL_LISTAR: URL_LT,
+                            configuracionModal: {
+                                tituloModal: "Edición de Contrato de Cobro",
+                            },
+                            camposAdicionales: {
+                                ver: "editar_otras_cuentas",
+                                idotras_cuentas: registro.idotras_cuentas,
+                            },
+                            datosRegistro: registro,
+                            cargarContenidoTabla,
+                        },
+                        vistaPrincipal
+                    );
+                    tdOpciones.append(botonEditar, " ");
+                }
+                if (PUEDE_ELIMINAR) {
+                    // Crear botón eliminar con modal de confirmación
+                    const botonEliminar = botonModalEliminar(
+                        {
+                            URL: `${URL}eliminar_otras_cuentas/${registro.idotras_cuentas}`,
+                            contenedorDeAlertas,
+                            datosTabla: { elementoTd: tdOpciones },
+                        },
+                        vistaPrincipal
+                    );
+                    tdOpciones.append(botonEliminar, " ");
+                }
+            }
+            celdas.push(tdOpciones);
             const fila = crearElemento("tr", undefined, [ ...celdas]);
             fragment.appendChild(fila);
         }
@@ -183,6 +247,7 @@ export function DocumentoReportes(permisos, vistaDocumentoPago, datosVistaPrinci
         tbody.replaceChildren(fragment);
     });
 
+    // Función para cargar el contenido de la tabla con los registros obtenidos
     function cargarContenidoTabla(listaRegistros) {
         if (!Array.isArray(listaRegistros)) {
             controladorTabla.setDatosRegistro(null);
@@ -228,8 +293,8 @@ export function DocumentoReportes(permisos, vistaDocumentoPago, datosVistaPrinci
     const informacionDJs = [
         {
             popover: {
-                title: "Documentos de Pago",
-                description: "Vista principal para gestionar los documentos de pago registrados en el sistema.",
+                title: "Documentos de Cobro",
+                description: "Vista principal para gestionar los documentos de cobro registrados en el sistema.",
             },
         },
         {
@@ -242,10 +307,10 @@ export function DocumentoReportes(permisos, vistaDocumentoPago, datosVistaPrinci
         },
         {
             mainElement: vistaPrincipal,
-            element: "[data-id='docpago-btn-vencidos']",
+            element: "[data-id='doccobro-btn-vencidos']",
             popover: {
                 title: "Contratos Vencidos",
-                description: "Abre una ventana donde se muestran los contratos de pago que han vencido.",
+                description: "Abre una ventana donde se muestran los contratos de cobro que han vencido.",
             },
         },
         {
@@ -289,12 +354,20 @@ export function DocumentoReportes(permisos, vistaDocumentoPago, datosVistaPrinci
         },
         {
             mainElement: tabla,
-            element: "button[title='Detalle Pagos']",
+            element: "button[title='Detalle Cobros']",
             popover: {
-                title: "Detalle Pagos",
-                description: "Abre una ventana para ver los pagos del documento seleccionado.",
+                title: "Detalle Cobros",
+                description: "Abre una ventana para ver los cobros del documento seleccionado.",
             },
         },
+        // {
+        //     mainElement: tabla,
+        //     element: "td a[title='Estado de cuenta']",
+        //     popover: {
+        //         title: "Estado de cuenta",
+        //         description: "Permite ver el estado de cuenta del documento seleccionado, con opción de descarga en formato PDF.",
+        //     },
+        // },
         {
             mainElement: tabla,
             element: "button[title='Editar']",
@@ -308,7 +381,7 @@ export function DocumentoReportes(permisos, vistaDocumentoPago, datosVistaPrinci
             element: "button[title='Eliminar']",
             popover: {
                 title: "Eliminar documento",
-                description: "Permite eliminar el registro del documento seleccionado, previa confirmación. (Solo si no tiene pagos asociados).",
+                description: "Permite eliminar el registro del documento seleccionado, previa confirmación. (Solo si no tiene cobros asociados).",
             },
         }
     ];
@@ -316,99 +389,16 @@ export function DocumentoReportes(permisos, vistaDocumentoPago, datosVistaPrinci
     ajustarAlturaTabla(divTabla);
 }
 
+// =========================================================
+// FUNCIONES BOTONES DE TABLA
+// =========================================================
 
-export const RFiltroYFecha = (cargarContenidoTabla) => {
-    const EMPRESA_ID = getEmpresaId();
-
-/** @type {DatosInput[]}*/
-    const formularioFiltros = [
-        {
-            id: "documentoreporte-fechainicio",
-            label: "Fecha Inicio",
-            forma: "input",
-            tipo: "date",
-            valor: "fecha",
-            nombre: "fecha_inicio",
-        },
-        {
-            id: "documentoreporte-fechafin",
-            label: "Fecha Fin",
-            forma: "input",
-            tipo: "date",
-            valor: "fecha",
-            nombre: "fecha_fin",
-        },
-        {
-            id: "documentoreporte-tipo",
-            label: "Tipo",
-            forma: "select",
-            opcionesPredefinidas: [
-                { clave: "todos", valor: "Todos" },
-                { clave: "cobros", valor: "Cobros" },
-                { clave: "pagos", valor: "Pagos" },
-            ],
-            nombre: "cobros_pagos",
-            requerido: true,
-            opcionPorDefecto: false,
-        },
-        {
-            id: "documentoreporte-estado",
-            label: "Estado ",
-            forma: "select",
-            opcionesPredefinidas: [
-                { clave: "todos", valor: "Todos" },
-                { clave: "vigentes", valor: "Vigentes" },
-                { clave: "vencidas", valor: "Vencidas" },
-            ],
-            nombre: "vigentes_vencidas",
-            requerido: true,
-            opcionPorDefecto: false,
-        },
-        // {
-        //     id: "documentoreporte-formapago",
-        //     label: "Frecuencia de Pago",
-        //     forma: "select",
-        //     urlSolicitud: `${CT_URLAPI}listar_forma_pago/${EMPRESA_ID}`,
-        //     llavesOpciones: { valor: "idforma_pago", detalle: ["nombre"] },
-        //     nombre: "forma_pago",
-        //     llaveRegistro: "idforma_pago",
-        //     requerido: true
-        // },
-    ]
-
-    const nuevoformulario = crearFormulario(formularioFiltros, {
-        opcionesParaBotones: {
-            clasesEnviar: "btn btn-info px-1 px-sm-4",
-            nombreEnviar: "Filtrar",
-        },
+// Crea el botón para listar los cobros realizados de un documento de cobro
+function botonListarCobros(callback) {
+    const icono = crearElemento("i", { class: "bi bi-receipt" });
+    const boton = crearElemento("button", {class: "btn btn-primary btn-sm", title: "Detalle Cobros", type: "button"}, [icono]);
+    boton.addEventListener("click", () => {
+        callback();
     });
-
-    nuevoformulario.classList.remove("g-3");
-    nuevoformulario.classList.add("g-2");
-
-    nuevoformulario.addEventListener("submit", async (e) => {
-        const boton = nuevoformulario.querySelector("#btn-enviar-formulario");
-        const fnBotonInicial = botonEnCarga(boton);
-        e.preventDefault();
-        const formData = new FormData(nuevoformulario);
-        const datos = Object.fromEntries(formData.entries());
-
-        const fecha_inicio = datos.fecha_inicio || "";
-        const fecha_fin = datos.fecha_fin || "";
-        const tipo = datos.cobros_pagos || "";
-        const estado = datos.vigentes_vencidas || "";
-
-        let registros = await obtenerDatos(`${CT_URLAPI}listar_otras_cuentas_reporte/${fecha_inicio || 0}/${fecha_fin || 0}/${estado || 0}/${tipo || 0}/${EMPRESA_ID}`);
-
-        if (!registros) {
-            fnBotonInicial();
-            return;
-        }
-        cargarContenidoTabla(registros);
-        fnBotonInicial();
-    });
-
-    const div = crearElemento("div", { class: "mb-3" }, [nuevoformulario]);
-
-    return [div, nuevoformulario];
+    return boton;
 }
