@@ -26,6 +26,7 @@ require_once "./configuracion/plantilla_admin.php";
 require_once "./facturas/factura_cobros.php";
 require_once "./facturas/factura_pagos.php";
 require_once "./transacciones_facturas/cuentas_transacciones.php";
+require_once "./configuracion/tipo_cliente_comercial.php";
 
 $ver=explode("/",$_GET['ver']); //dividiendo los "/"  ver[0],ver[1],ver[x]  listafacturaapi_pagado eliminarasiento tipo 
 if($ver[0]=="verificacion"){
@@ -742,16 +743,22 @@ elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
 }elseif($ver[0]=="reporte_estado_resultados_actualizado_consolidado_por_niveles"){
     $cont=new PlantillaReporte();
     $cont->reporte_estado_resultados_actualizado_consolidado_por_niveles($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
+}elseif($ver[0]=="listar_tipo_cliente"){
+    $cont=new Tipo_cliente_comercial();
+    $cont->listar_tipo_cliente($ver[1]);
+}elseif($ver[0]=="eliminar_tipo_cliente"){
+    $cont=new Tipo_cliente_comercial();
+    $cont->eliminar_tipo_cliente($ver[1]);
 }
 
 // reportedetalle listar_recibo_por_id listar_recibo_por_id_otras_cuentas listaclientes listar_recibo_por_caja_bancos
 // listar_factura           listar_facturas_cobro_pago      
-// reemplazar facturas_perteneciente_a_cuenta 
+// reemplazar facturas_perteneciente_a_cuenta  lista_cobrar_cobrado_factura
 
-// recibos_perteneciente_a_cuenta  listar_otras_cuentas_cobrar
-//    listar_recibo_otras_cuentas    listar_recibos_asignado_cuentas
+// recibos_perteneciente_a_cuenta  listar_otras_cuentas_cobrar listatransacciones_comercial
+//    listar_recibo_otras_cuentas    listar_recibos_asignado_cuentas listafacturaapi_cobrado listafacturaapi_pagado
 // milista   lista_pagar_pagado_factura lista_cobrar_cobrado_factura listar_otras_cuentas_cobrar
-//    listar_recibo_otras_cuentas     listar_recibo_por_caja_bancos listar_otras_cuentas_pagar_select
+//    listar_recibo_otras_cuentas     listar_recibo_por_caja_bancos listar_otras_cuentas_pagar_select listar_comprobantes_de_factura_cobro
 // reportedetallefpt listar_otras_cuentas_cobrar_vencidas  listar_otras_cuentas_cobrar listar_recibo_facturas_otras_cuentas
 // listar_recibo_por_id listar_recibo_por_id_otras_cuentas reporte_balance_general listar_facturas_comercial_asignado_cuentas
 //reporte_balance_general_por_niveles listar_factura_pago_sin_cuentas listar_recibo_facturas_otras_cuentas

@@ -886,11 +886,25 @@ class Factura_cobros extends DB{
                 idusuario_admin = '$idusuario_admin'
                 WHERE idsolicitud_anular_eliminar = '$idsoli'");   
 
+            if($estado_solicitud == 2){ //ACEPTADO
             if($solicitud['tipo_documento'] == 'factura'){// ES FACTURA
+
 
                 // ACTIVAREMOS LA FACTURA
                 $update_fact=$this->dbc->query("UPDATE factura SET estado = '1'
                 WHERE idfactura = '$id_documento'");  
+
+                $factu = $this->dbc->query("SELECT * FROM factura WHERE idfactura='$id_documento'");
+                        $factu_comprob = $factu->fetch_assoc();
+
+                        //ESTAMOS ANULANDO LOS COMPROBANTES DE LA FACTURA ANULADA
+                        if($factu_comprob['clasefactura'] == '2'){ // COBROS
+                            $update_comprob=$this->dbc->query("UPDATE cuentaspof SET estado = '1' 
+                            WHERE idfactura = '$id_documento'"); 
+                        }else{ // PAGOS
+                            $update_comprob=$this->dbc->query("UPDATE cuentaspor SET estado = '1' 
+                            WHERE idfactura = '$id_documento'"); 
+                        }
 
             }else{ // ES RECIBO
 
@@ -898,7 +912,44 @@ class Factura_cobros extends DB{
                 $update_fact=$this->dbc->query("UPDATE recibo SET estado = '1'
                 WHERE idrecibo = '$id_documento'");  
 
+                $reci = $this->dbc->query("SELECT * FROM recibo WHERE idrecibo='$id_documento'");
+                        $reci_comprob = $reci->fetch_assoc();
+
+                        //ESTAMOS ANULANDO LOS COMPROBANTES DE LA FACTURA ANULADA
+                        if($reci_comprob['cobrado'] > '0'){ // COBROS
+                            $update_comprob=$this->dbc->query("UPDATE cuentaspof SET estado = '1' 
+                            WHERE idrecibo = '$id_documento'"); 
+                        }else{ // PAGOS
+                            $update_comprob=$this->dbc->query("UPDATE cuentaspor SET estado = '1' 
+                            WHERE idrecibo = '$id_documento'"); 
+                        }
             }
+
+            }else{ // ES DENEGADO
+
+            }
+            // if($estado_solicitud == 2){ //ACEPTADO
+            //     $consulta_detalle=$this->dbc->query("SELECT * FROM detalletransaccion WHERE transacciones_idtransacciones='$idtransaccion'");
+
+            //     $update_trans=$this->dbc->query("UPDATE transacciones SET estado = '1' 
+            //         WHERE idtransacciones = '$idtransaccion'");  
+
+            //     if ($consulta_detalle->num_rows > 0) {  
+
+            //         $update_det=$this->dbc->query("UPDATE detalletransaccion SET estado = '1' 
+            //         WHERE transacciones_idtransacciones = '$idtransaccion'");        
+            //     }else{
+                
+
+            //     }
+
+            //     $res = array("success", "Se Acepto la anulacion de la transaccion", "cambiarEstado_anular_eliminar_transaccion");
+
+            // }else{ //DENEGADO --> estado_solicitud == 3
+            //     //NO SE ANULARA NI CAMBIARA ESTADO DE TRANSACCION NI DETALLE TRANSACCION  
+            //     $res = array("success", "Se Denego el permiso para anular", "cambiarEstado_anular_eliminar_transaccion");
+
+            // }
             }       
 
             echo json_encode($res);
@@ -959,7 +1010,118 @@ class Factura_cobros extends DB{
     
         // Retornar la lista en formato JSON
         echo json_encode($lista);
-}     
+}
+
+public function registrar_anular_eliminar_activar_factura_tributario_transaccion($id_documento,$tipo_documento,$registro_desde,$motivo,$estado_opci,$estado_soli,$hora,$fecha,$usuario,$empresa)
+    { // EN ESTA API LA FACTURA Y EL COMPROBANTE SE ANULAN, ELIMINAN Y ACTIVAN AL MISMO TIEMPO, PORQUE FUERON CREADO JUNTOS
+
+        //estado_opci --> 1--> anular, 2--> eliminar, 3--> activar
+        // estado_soli --> 1 = pendiente, 2= aceptado, 3=denegado
+        //transaccion estados --> 1=activo, 2=proceso_anulac , 3=proceso_elimina, 4= anulado, 5=proceso_activacion
+
+
+        // EN CUALQUIERA DE LOS CASOS SE PODRA SOLICITAR LA ANULACION
+        //CASO I --> vacio SI,  consolidado NO 
+        $idusuario=$this->getidusuario($usuario);
+        $idempresa=$this->getidempresa($empresa);
+        $gestion = $this->getgestionactualC($empresa);
+        $idgestion = $gestion["id"];
+        $res = "";
+
+        if($tipo_documento == 'factura'){ // ES FACTURA
+
+            $nombre_documento_aux = 'factura';
+            $id_documento_nombre = 'idfactura';
+
+        }else{ // ES RECIBO
+
+            // $iddocumento_aux = $rec_aux['idrecibo'];
+            $nombre_documento_aux = 'recibo';
+            $id_documento_nombre = 'idrecibo';
+            // $tipo_comprobante = 'comprobante_cobro';
+        }
+
+        $factura_recibo_tipo = $this->dbc->query("SELECT * FROM $nombre_documento_aux WHERE $id_documento_nombre = '$id_documento'");
+        $fact_rec_tip = $this->dbc->fetch($factura_recibo_tipo);
+
+        if($fact_rec_tip['cobrado'] != '0'){ // LA FACTURA SERA DE COBRO
+
+            $comprob = $this->dbc->query("SELECT * FROM cuentaspof WHERE $id_documento_nombre = '$id_documento'");
+            // $comprobante = $this->dbc->fetch($comprob);
+    
+            if($comprob->num_rows > 0){ // EXISTEN COMPROBANTES DENTRO DE LA FACTURA
+                
+                // $editar=$this->dbc->query("UPDATE $nombre_documento_aux SET estado = '2' WHERE $id_documento_nombre = '$id_documento'");  
+                    $array_lista = [];
+                    while ($zxc = $this->dbc->fetch($comprob)) {
+                        $array_lista = $zxc['idcuentaspof'];
+                        // $editar_comprobante=$this->dbc->query("UPDATE $nombre_comprobante SET estado = '2' WHERE $idcomprobante_nombre = '$zxc[idcuentaspof]'");  
+                    }
+                    $array_string = implode(",", $array_lista);
+                }else{ // NO EXISTEN COMPROBANTES DENTRO DE LA FACTURA
+                    // $editar=$this->dbc->query("UPDATE $nombre_documento_aux SET estado = '2' WHERE $id_documento_nombre = '$id_documento'");  
+                }
+
+            // $idcomprobante = $comprobante['idcuentaspof'];
+            $nombre_comprobante = 'cuentaspof';
+            $idcomprobante_nombre = 'idcuentaspof';
+            $tipo_comprobante = 'comprobante_pago';
+
+        }else{ // LA FACTURA SERA DE PAGO
+            $comprob = $this->dbc->query("SELECT * FROM cuentaspor WHERE $id_documento_nombre = '$id_documento'");
+            $comprobante = $this->dbc->fetch($comprob);
+
+            $idcomprobante = $comprobante['idcuentaspor'];
+            $nombre_comprobante = 'cuentaspor';
+            $idcomprobante_nombre = 'idcuentaspor';
+            $tipo_comprobante = 'comprobante_cobro';
+        }
+
+        $registro_factura=$this->dbc->query("INSERT INTO solicitud_anular_eliminar_documento(id_documento, tipo_documento, registro_desde, motivo, estado_opcion, estado_solicitud, hora,fecha, idusuario, idempresa, idgestion)
+        VALUES('$id_documento','$tipo_documento','$registro_desde','$motivo','$estado_opci','$estado_soli','$hora','$fecha','$idusuario','$idempresa','$idgestion')");
+
+        // $registro_comprobante=$this->dbc->query("INSERT INTO solicitud_anular_eliminar_documento(id_documento,tipo_documento, registro_desde,motivo,estado_opcion,estado_solicitud,hora,fecha,idusuario,idempresa,idgestion)
+        // VALUES('$idcomprobante','$tipo_comprobante','$registro_desde','$motivo','$estado_opci','$estado_soli','$hora','$fecha','$idusuario','$idempresa','$idgestion')");
+
+
+        if($registro_factura===TRUE){
+            if($estado_opci == 1){ //estado_opcion= 1 anular
+                // estado_factura = 2--> pendiente de anulacion 
+
+                $comprob_aux = $this->dbc->query("SELECT * FROM cuentaspof WHERE $id_documento_nombre = '$id_documento'");
+                if($comprob_aux->num_rows > 0){ // EXISTEN COMPROBANTES DENTRO DE LA FACTURA
+                    $editar=$this->dbc->query("UPDATE $nombre_documento_aux SET estado = '2' WHERE $id_documento_nombre = '$id_documento'");    
+                    $editar_comprobante=$this->dbc->query("UPDATE $nombre_comprobante SET estado = '2' WHERE $idcomprobante_nombre IN($array_string)");  
+                }else{ // NO EXISTEN COMPROBANTES
+                    $editar=$this->dbc->query("UPDATE $nombre_documento_aux SET estado = '2' WHERE $id_documento_nombre = '$id_documento'");    
+
+                }
+                // $editar=$this->dbc->query("UPDATE $nombre_documento_aux SET estado = '2' WHERE $id_documento_nombre = '$id_documento'");  
+                //     // while ($zxc = $this->dbc->fetch($comprob)) {
+                //     //     $editar_comprobante=$this->dbc->query("UPDATE $nombre_comprobante SET estado = '2' WHERE $idcomprobante_nombre = '$zxc[idcuentaspof]'");  
+                //     // }
+                // }else{ // NO EXISTEN COMPROBANTES DENTRO DE LA FACTURA
+                //     $editar=$this->dbc->query("UPDATE $nombre_documento_aux SET estado = '2' WHERE $id_documento_nombre = '$id_documento'");  
+                // }
+
+            }elseif($estado_opci == 2){ //estado_opcion= 2 eliminar
+                // estado_factura = 3--> pendiente de eliminacion 
+                $editar=$this->dbc->query("UPDATE $nombre_documento_aux SET estado = '3' WHERE $id_documento_nombre = '$id_documento'");  
+                $editar_comprobante=$this->dbc->query("UPDATE $nombre_comprobante SET estado = '3' WHERE $idcomprobante_nombre = '$idcomprobante'");    
+
+            }else{//estado_opcion= 3 activar
+             // estado_factura = 5--> pendiente de activacion 
+             $editar=$this->dbc->query("UPDATE $nombre_documento_aux SET estado = '5' WHERE $id_documento_nombre = '$id_documento'");  
+             $editar_comprobante=$this->dbc->query("UPDATE $nombre_comprobante SET estado = '5' WHERE $idcomprobante_nombre = '$idcomprobante'");  
+            }
+            
+            $res = array("success", "Modificacion exitosa","anular_transaccion",$id_documento,$tipo_documento,$registro_desde,$motivo,$estado_opci,$estado_soli,$hora,$fecha,$usuario,$empresa);
+        }else{
+            $res = array("danger", "No se pudo anular");
+        }
+        
+        echo json_encode($res);
+    }
 
     public function getgestionactualC($empresa)
 {

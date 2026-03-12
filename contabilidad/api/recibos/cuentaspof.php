@@ -411,9 +411,9 @@ $caja_bancos = json_decode($cajasBancos, true);
 
     public function listar_comprobantes_de_factura_cobro($idrecibo)
     {
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
         // $lista = [];
         // $detalle_facturas = [];
 

@@ -22,6 +22,7 @@ require_once "./configuracion/reporte_confi.php";
 require_once "./configuracion/rp_plantilla_reporte.php";
 require_once "./otras_cuentas/forma_pago.php";
 require_once "./configuracion/plantilla_admin.php";
+require_once "./configuracion/tipo_cliente_comercial.php";
 // require_once "./recibos/caja_bancos_contrataciones.php";
 
 $ver=$_POST['ver'];
@@ -820,6 +821,26 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     }elseif($data['ver'] == "desvincular_recibos_de_cuentas") {
         $cont=new Transacciones();
         $cont->desvincular_recibos_de_cuentas($data);
+    }elseif($ver == "registrar_tipo_cliente"){
+
+        if(isset($_POST['tipo'],$_POST['descripcion'],$_POST['estado'],$_POST['empresa'])){
+            // decode echo json_encode(array("danger", "Faltan parámetros en la solicitud", $_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$facturas));
+            $cont=new Tipo_cliente_comercial();
+            $cont->registrar_tipo_cliente($_POST['tipo'],$_POST['descripcion'],$_POST['estado'],$_POST['empresa']);
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['tipo'],$_POST['descripcion'],$_POST['estado'],$_POST['empresa']));
+        }
+    }elseif($ver == "editar_tipo_cliente"){
+
+        if(isset($_POST['idtipo_cliente'],$_POST['tipo'],$_POST['descripcion'],$_POST['estado'])){
+            // decode echo json_encode(array("danger", "Faltan parámetros en la solicitud", $_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$facturas));
+            $cont=new Tipo_cliente_comercial();
+            $cont->editar_tipo_cliente($_POST['idtipo_cliente'],$_POST['tipo'],$_POST['descripcion'],$_POST['estado']);
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idtipo_cliente'],$_POST['tipo'],$_POST['descripcion'],$_POST['estado']));
+        }
     }
     
 // asignar asiento registrar_recibo_cobro_cajaBancos_en_otras_cuentas editar_recibo_caja_bancos
@@ -830,5 +851,5 @@ if($data['ver'] == "asignar_asiento_A_factura") {
 }
 // registrar_factura_recibo_cobro_cajaBancos registrar_factura_cobro_otras_cuentas editar_caja_bancos_facturas editar_recibo_caja_bancos
 //   cobro_asignacion_factura_comercial registrar_recibo_cobro_cajaBancos_en_otras_cuentas registrar_recibo_cobro_cajaBancos_en_otras_cuentas desconsolidar
-//  registrar_factura_pagos_tributario  registrar_recibo_pago_cajaBancos_en_otras_cuentas registrar_recibo_cobro_cajaBancos_en_otras_cuentas
+//  registrar_factura_pagos_tributario  registrar_recibo_pago_cajaBancos_en_otras_cuentas registrar_recibo_cobro_cajaBancos_en_otras_cuentas crearsolofacturasapif5 
 ?> 
