@@ -73,7 +73,7 @@ class Tipo_cliente_comercial extends DB{
     
             foreach ($relacionadas as $relacion) {
                 $query = "SELECT 1 FROM {$relacion['tabla']} WHERE {$relacion['campo']} = $id";
-                $result = $this->dbc->query($query);
+                $result = $this->dbcm->query($query);
                 if ($result->num_rows > 0) {
                     throw new Exception($relacion['mensaje']);
                 }

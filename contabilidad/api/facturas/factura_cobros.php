@@ -816,7 +816,7 @@ class Factura_cobros extends DB{
                     hora_proceso = '$hora_proceso',
                     fecha_proceso = '$fecha_proceso',
                     idusuario_admin = '$idusuario_admin'
-                        WHERE idsolicitud_anular_eliminar = '$idsoli'");   
+                        WHERE idsolicitud_anular_eliminar_documento = '$idsoli'");   
 
                 if($estado_solicitud == 2){ //ACEPTADO
             
@@ -830,10 +830,16 @@ class Factura_cobros extends DB{
                             // ELIMINAMOS COMPROBANTE
                             $eliminar_comprob=$this->dbc->query("DELETE FROM cuentaspof
                             WHERE idfactura = '$id_documento'"); 
+                            
+                            $eliminar_comprob=$this->dbc->query("DELETE FROM detalle_caja_bancos_cobrar
+                            WHERE idfactura = '$id_documento'"); 
 
                         }else{ // PAGOS
                             $eliminar_comprob=$this->dbc->query("DELETE FROM cuentaspor
                             WHERE idfactura = '$id_documento'");  
+
+                            $eliminar_comprob=$this->dbc->query("DELETE FROM detalle_caja_bancos_pagar
+                            WHERE idfactura = '$id_documento'"); 
 
                         }
 
@@ -848,11 +854,25 @@ class Factura_cobros extends DB{
 
                         //ESTAMOS ELIMINANDO COMPROBANTES DE FACTURA ELIMINADA
                         if($reci_comprob['cobrado'] != '0'){ // COBROS
+
+                            $comprob = $this->dbc->query("SELECT * FROM cuentaspof WHERE idrecibo='$id_documento'");
+                            $id_compr = $comprob->fetch_assoc();
+
+                            $eliminar_dt_comprob=$this->dbc->query("DELETE FROM detalle_caja_bancos_cobrar
+                            WHERE idcuentaspof = '$id_compr[idcuentaspof]'"); 
+
                             // ELIMINAMOS COMPROBANTE
                             $eliminar_comprob=$this->dbc->query("DELETE FROM cuentaspof
                             WHERE idrecibo = '$id_documento'"); 
-
+                            
                         }else{ // PAGOS
+
+                            $comprob = $this->dbc->query("SELECT * FROM cuentaspor WHERE idrecibo='$id_documento'");
+                            $id_compr = $comprob->fetch_assoc();
+
+                            $eliminar_dt_comprob=$this->dbc->query("DELETE FROM detalle_caja_bancos_pagar
+                            WHERE idcuentaspor = '$id_compr[idcuentaspor]'"); 
+                            // ELIMINAMOS COMPROBANTE
                             $eliminar_comprob=$this->dbc->query("DELETE FROM cuentaspor
                             WHERE idrecibo = '$id_documento'");  
 
@@ -879,12 +899,12 @@ class Factura_cobros extends DB{
                     $res = array("success", "Se Denego el permiso para anular", "cambiarEstado_anular_eliminar_documento");
                 }
             }else{// ACTIVAR --> estado_opcion = 3
-                $update_soli=$this->dbc->query("UPDATE solicitud_anular_eliminar 
+                $update_soli=$this->dbc->query("UPDATE solicitud_anular_eliminar_documento 
                 SET estado_solicitud = '$estado_solicitud',
                 hora_proceso = '$hora_proceso',
                 fecha_proceso = '$fecha_proceso',
                 idusuario_admin = '$idusuario_admin'
-                WHERE idsolicitud_anular_eliminar = '$idsoli'");   
+                WHERE idsolicitud_anular_eliminar_documento = '$idsoli'");   
 
             if($estado_solicitud == 2){ //ACEPTADO
             if($solicitud['tipo_documento'] == 'factura'){// ES FACTURA
@@ -928,28 +948,7 @@ class Factura_cobros extends DB{
             }else{ // ES DENEGADO
 
             }
-            // if($estado_solicitud == 2){ //ACEPTADO
-            //     $consulta_detalle=$this->dbc->query("SELECT * FROM detalletransaccion WHERE transacciones_idtransacciones='$idtransaccion'");
-
-            //     $update_trans=$this->dbc->query("UPDATE transacciones SET estado = '1' 
-            //         WHERE idtransacciones = '$idtransaccion'");  
-
-            //     if ($consulta_detalle->num_rows > 0) {  
-
-            //         $update_det=$this->dbc->query("UPDATE detalletransaccion SET estado = '1' 
-            //         WHERE transacciones_idtransacciones = '$idtransaccion'");        
-            //     }else{
-                
-
-            //     }
-
-            //     $res = array("success", "Se Acepto la anulacion de la transaccion", "cambiarEstado_anular_eliminar_transaccion");
-
-            // }else{ //DENEGADO --> estado_solicitud == 3
-            //     //NO SE ANULARA NI CAMBIARA ESTADO DE TRANSACCION NI DETALLE TRANSACCION  
-            //     $res = array("success", "Se Denego el permiso para anular", "cambiarEstado_anular_eliminar_transaccion");
-
-            // }
+         
             }       
 
             echo json_encode($res);

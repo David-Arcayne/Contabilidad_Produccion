@@ -752,13 +752,13 @@ elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
 }
 
 // reportedetalle listar_recibo_por_id listar_recibo_por_id_otras_cuentas listaclientes listar_recibo_por_caja_bancos
-// listar_factura           listar_facturas_cobro_pago      
-// reemplazar facturas_perteneciente_a_cuenta  lista_cobrar_cobrado_factura
+// listar_factura           listar_facturas_cobro_pago      listaclientes
+// reemplazar facturas_perteneciente_a_cuenta 
 
-// recibos_perteneciente_a_cuenta  listar_otras_cuentas_cobrar listatransacciones_comercial
-//    listar_recibo_otras_cuentas    listar_recibos_asignado_cuentas listafacturaapi_cobrado listafacturaapi_pagado
+// recibos_perteneciente_a_cuenta  listar_otras_cuentas_cobrar lista_pagar_pagado_factura
+//    listar_recibo_otras_cuentas    listar_recibos_asignado_cuentas listar_factura_comercial_por_id
 // milista   lista_pagar_pagado_factura lista_cobrar_cobrado_factura listar_otras_cuentas_cobrar
-//    listar_recibo_otras_cuentas     listar_recibo_por_caja_bancos listar_otras_cuentas_pagar_select listar_comprobantes_de_factura_cobro
+//    listar_recibo_otras_cuentas     listar_recibo_por_caja_bancos listar_otras_cuentas_pagar_select
 // reportedetallefpt listar_otras_cuentas_cobrar_vencidas  listar_otras_cuentas_cobrar listar_recibo_facturas_otras_cuentas
 // listar_recibo_por_id listar_recibo_por_id_otras_cuentas reporte_balance_general listar_facturas_comercial_asignado_cuentas
 //reporte_balance_general_por_niveles listar_factura_pago_sin_cuentas listar_recibo_facturas_otras_cuentas

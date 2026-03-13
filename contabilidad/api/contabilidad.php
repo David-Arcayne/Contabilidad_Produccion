@@ -565,19 +565,51 @@ WHERE md5(p.organizacion_idorganizacion)='$ide'");
     }
 
     public function listaclientes($id)
-    {
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
-        $lista = [];
-        $ide = $this->getidempresa($id);
-        $registro = $this->dbcm->query("SELECT c.id_cliente,c.nombre, c.nombrecomercial, c.tipo , c.codigo,c.nit, c.detalle,c.direccion,c.telefono,c.mobil,c.email,c.web,c.pais, c.ciudad,c.zona,c.contacto, c.tipodocumento FROM cliente as c where c.idempresa='$ide' order by c.nombre asc");
-        while ($qwe = $this->dbcm->fetch($registro)) {
-            $res = array("id" => $qwe[0], "nsocial" => $qwe[1], "ncomercial" => $qwe[2], "tipo" => $qwe[3], "codigo" => $qwe[4], "nit" => $qwe[5], "detalle" => $qwe[6], "direccion" => $qwe[7], "telefono" => $qwe[8], "mobil" => $qwe[9], "email" => $qwe[10], "web" => $qwe[11], "pais" => $qwe[12], "ciudad" => $qwe[13], "zona" => $qwe[14], "contacto" => $qwe[15], "tdocumento" => $qwe[16]);
-            array_push($lista, $res);
-        }
-        echo  json_encode($lista);
+{
+    // ini_set('display_errors', 1);
+    // ini_set('display_startup_errors', 1);
+    // error_reporting(E_ALL);
+
+    $lista = [];
+    $ide = $this->getidempresa($id);
+
+    $registro = $this->dbcm->query("SELECT c.id_cliente,c.nombre, c.nombrecomercial, c.tipo , c.codigo,c.nit, c.detalle,c.direccion,c.telefono,c.mobil,c.email,c.web,c.pais, c.ciudad,c.zona,c.contacto, c.tipodocumento 
+                                    FROM cliente as c 
+                                    WHERE c.idempresa='$ide' 
+                                    ORDER BY c.nombre ASC");
+
+    while ($qwe = $registro->fetch_assoc()) {
+        // aquí ya puedes acceder con nombres de columna
+        $tip_cliente = $this->dbcm->query("SELECT * FROM tipocliente WHERE idtipocliente='{$qwe['tipo']}'");
+        $t_cl = $tip_cliente->fetch_assoc();
+
+        $res = array(
+            "id" => $qwe['id_cliente'],
+            "nsocial" => $qwe['nombre'],
+            "ncomercial" => $qwe['nombrecomercial'],
+            "tipo" => $qwe['tipo'],
+            "codigo" => $qwe['codigo'],
+            "nit" => $qwe['nit'],
+            "detalle" => $qwe['detalle'],
+            "direccion" => $qwe['direccion'],
+            "telefono" => $qwe['telefono'],
+            "mobil" => $qwe['mobil'],
+            "email" => $qwe['email'],
+            "web" => $qwe['web'],
+            "pais" => $qwe['pais'],
+            "ciudad" => $qwe['ciudad'],
+            "zona" => $qwe['zona'],
+            "contacto" => $qwe['contacto'],
+            "tdocumento" => $qwe['tipodocumento'],
+            "tipo_cliente" => $t_cl['tipo']
+        );
+
+        $lista[] = $res;
     }
+
+    echo json_encode($lista);
+}
+
 
     public function eliminarcliente($id)
     {
