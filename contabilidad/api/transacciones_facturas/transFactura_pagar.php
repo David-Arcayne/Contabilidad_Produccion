@@ -260,7 +260,7 @@ foreach($facturas as $factura){
         $lista = [];
         $cf = 1;
         $idsucursal = $this->getidsucursal($sucursal);
-        $registro = $this->dbc->query("SELECT f.idfactura,f.fecha,f.nfactura, f.montofactura,f.proveedorcliente_idproveedorcliente,f.transacciones_idtransacciones,f.cuenta,f.pagado,f.por_concepto_de
+        $registro = $this->dbc->query("SELECT f.idfactura,f.fecha,f.nfactura, f.montofactura,f.proveedorcliente_idproveedorcliente,f.transacciones_idtransacciones,f.cuenta,f.pagado,f.por_concepto_de,f.registro_desde
          FROM factura f
          WHERE f.clasefactura='$cf' AND f.sucursal='$idsucursal' 
          ORDER BY f.idfactura DESC");
@@ -270,6 +270,18 @@ foreach($facturas as $factura){
         //  ORDER BY f.idfactura DESC");
         while ($qwe = $this->dbc->fetch($registro)) {
             $pagados=[];
+
+            if($qwe['estado'] == '1'){
+                $estado_documento = 'activo';
+            }elseif($qwe['estado'] == '2'){
+                $estado_documento = 'pendiente anulacion';
+            }elseif($qwe['estado'] == '3'){
+                $estado_documento = 'pendiente eliminacion';
+            }elseif($qwe['estado'] == '4'){
+                $estado_documento = 'anulado';
+            }elseif($qwe['estado'] == '5'){
+                $estado_documento = 'pendiente activacion';
+            }
 
             $codi_trans = $this->dbc->query(" SELECT * FROM transacciones WHERE idtransacciones = '$qwe[5]'");
             $cod_transaccion = $codi_trans->fetch_assoc();
@@ -293,7 +305,7 @@ foreach($facturas as $factura){
                     FROM cuentaspor WHERE idfactura = '$qwe[0]'");
 
                      while ($zxc = $this->dbc->fetch($mostrarIndi)) {
-                        $pes = array("nrecibo" => $zxc[0], "fechar" => $zxc[1], "persona" => $zxc[2], "ci" => $zxc[3], "monto" => $zxc[4], "id" => $zxc[5]);
+                        $pes = array("nrecibo" => $zxc[0], "fechar" => $zxc[1], "persona" => $zxc[2], "ci" => $zxc[3], "monto" => $zxc[4], "id" => $zxc[5],"estado_comprobante" => "comprobante_pago");
                         array_push($pagados, $pes);
                     }
     
@@ -303,24 +315,24 @@ foreach($facturas as $factura){
                $datosRecibo2 = $this->dbc->query("SELECT nrecibo,fecha,persona,ci,monto,idcuentaspor FROM cuentaspor WHERE idcuentaspor='$idrecibo2'");
                
                while ($www = $this->dbc->fetch($datosRecibo2)) {
-                   $pes2 = array("nrecibo" => $www[0], "fechar" => $www[1], "persona" => $www[2], "ci" => $www[3], "monto" => $resultado33['monto'], "id" => $www[5]);
+                   $pes2 = array("nrecibo" => $www[0], "fechar" => $www[1], "persona" => $www[2], "ci" => $www[3], "monto" => $resultado33['monto'], "id" => $www[5],"estado_comprobante" => "comprobante_pago");
                    array_push($pagados, $pes2);
                }
-               $res = array("id" => $qwe[0], "fecha" => $qwe[1], "numero" => $qwe[2], "codigo" => $cod_transaccion['codigotransaccion'], "idproveedor" => $qwe[4], "nombrep" => $pro['nombre'], "monto" => $qwe[3], "cobrado" => $resultado33['monto'], "saldo" => 0, "transaccion" => $qwe[5], "cuenta" => $qwe[6],"por_concepto_de" => $qwe['por_concepto_de'], "detalle" => $pagados);
+               $res = array("id" => $qwe[0], "fecha" => $qwe[1], "numero" => $qwe[2], "codigo" => $cod_transaccion['codigotransaccion'], "idproveedor" => $qwe[4], "nombrep" => $pro['nombre'], "monto" => $qwe[3], "cobrado" => $resultado33['monto'], "saldo" => 0, "transaccion" => $qwe[5], "cuenta" => $qwe[6],"por_concepto_de" => $qwe['por_concepto_de'],"registro_desde" => $qwe['registro_desde'],"estado_documento" => $estado_documento,"estado_comprobante" => "comprobante_pago", "detalle" => $pagados);
                array_push($lista, $res);
 
                 }else{
                     //hay solo individuales
                     
-                    $cobras = $this->dbc->query("SELECT SUM(monto) FROM cuentaspor WHERE idfactura='$qwe[0]'"); //173
+                    $cobras = $this->dbc->query("SELECT SUM(monto) FROM cuentaspor WHERE idfactura='$qwe[0]' AND (estado != '4' OR estado IS NULL)"); //173
                     $asd = $this->dbc->fetch($cobras);
                     $saldo = $qwe[3] - $asd[0];
                     $cuentacobrar2 = $this->dbc->query("SELECT nrecibo,fecha,persona,ci,monto,idcuentaspor FROM cuentaspor WHERE idfactura='$qwe[0]'");
                             while ($zxc = $this->dbc->fetch($cuentacobrar2)) {
-                                $pes = array("nrecibo" => $zxc[0], "fechar" => $zxc[1], "persona" => $zxc[2], "ci" => $zxc[3], "monto" => $zxc[4], "id" => $zxc[5]);
+                                $pes = array("nrecibo" => $zxc[0], "fechar" => $zxc[1], "persona" => $zxc[2], "ci" => $zxc[3], "monto" => $zxc[4], "id" => $zxc[5],"estado_comprobante" => "comprobante_pago");
                                 array_push($pagados, $pes);
                             }
-                    $res = array("id" => $qwe[0], "fecha" => $qwe[1], "numero" => $qwe[2], "codigo" => $cod_transaccion['codigotransaccion'], "idproveedor" => $qwe[4], "nombrep" => $pro['nombre'], "monto" => $qwe[3], "cobrado" => $asd[0], "saldo" => $saldo, "transaccion" => $qwe[5], "cuenta" => $qwe[6],"por_concepto_de" => $qwe['por_concepto_de'], "detalle" => $pagados);
+                    $res = array("id" => $qwe[0], "fecha" => $qwe[1], "numero" => $qwe[2], "codigo" => $cod_transaccion['codigotransaccion'], "idproveedor" => $qwe[4], "nombrep" => $pro['nombre'], "monto" => $qwe[3], "cobrado" => $asd[0], "saldo" => $saldo, "transaccion" => $qwe[5], "cuenta" => $qwe[6],"por_concepto_de" => $qwe['por_concepto_de'],"registro_desde" => $qwe['registro_desde'],"estado_documento" => $estado_documento,"estado_comprobante" => "comprobante_pago", "detalle" => $pagados);
                     array_push($lista, $res);
                 }
             }elseif($hayGrupales > 0){
@@ -331,10 +343,10 @@ foreach($facturas as $factura){
                 $datosRecibo = $this->dbc->query("SELECT nrecibo,fecha,persona,ci,monto,idcuentaspor FROM cuentaspor WHERE idcuentaspor='$idrecibo'");
                 
                 while ($zxc = $this->dbc->fetch($datosRecibo)) {
-                    $pes = array("nrecibo" => $zxc[0], "fechar" => $zxc[1], "persona" => $zxc[2], "ci" => $zxc[3], "monto" => $resultado3['monto'], "id" => $zxc[5]);
+                    $pes = array("nrecibo" => $zxc[0], "fechar" => $zxc[1], "persona" => $zxc[2], "ci" => $zxc[3], "monto" => $resultado3['monto'], "id" => $zxc[5],"estado_comprobante" => "comprobante_pago");
                     array_push($pagados, $pes);
                 }
-                $res = array("id" => $qwe[0], "fecha" => $qwe[1], "numero" => $qwe[2], "codigo" => $cod_transaccion['codigotransaccion'], "idproveedor" => $qwe[4], "nombrep" => $pro['nombre'], "monto" => $qwe[3], "cobrado" => $resultado3['monto'], "saldo" => 0, "transaccion" => $qwe[5], "cuenta" => $qwe[6],"por_concepto_de" => $qwe['por_concepto_de'], "detalle" => $pagados);
+                $res = array("id" => $qwe[0], "fecha" => $qwe[1], "numero" => $qwe[2], "codigo" => $cod_transaccion['codigotransaccion'], "idproveedor" => $qwe[4], "nombrep" => $pro['nombre'], "monto" => $qwe[3], "cobrado" => $resultado3['monto'], "saldo" => 0, "transaccion" => $qwe[5], "cuenta" => $qwe[6],"por_concepto_de" => $qwe['por_concepto_de'],"registro_desde" => $qwe['registro_desde'],"estado_documento" => $estado_documento,"estado_comprobante" => "comprobante_pago", "detalle" => $pagados);
                 array_push($lista, $res);
             }
             elseif($qwe[7] == 2){
@@ -359,6 +371,9 @@ foreach($facturas as $factura){
                  "transaccion" => $qwe[5],
                "cuenta" => $qwe[6],
                "por_concepto_de" => $qwe['por_concepto_de'],
+               "registro_desde" => $qwe['registro_desde'],
+               "estado_documento" => $estado_documento,
+               "estado_comprobante" => "comprobante_pago",
                 "detalle" => $pagados);
             array_push($lista, $res);
             
@@ -369,7 +384,7 @@ foreach($facturas as $factura){
             $res = array("id" => $qwe[0], "fecha" => $qwe[1], "numero" => $qwe[2],
              "codigo" => $cod_transaccion['codigotransaccion'], "idproveedor" => $qwe[4], "nombrep" => $pro['nombre'],
               "monto" => $qwe[3], "cobrado" => 0, "saldo" => $qwe[3], "transaccion" => $qwe[5],
-               "cuenta" => $qwe[6],"por_concepto_de" => $qwe['por_concepto_de'], "detalle" => $pagados);
+               "cuenta" => $qwe[6],"por_concepto_de" => $qwe['por_concepto_de'],"registro_desde" => $qwe['registro_desde'],"estado_documento" => $estado_documento,"estado_comprobante" => "comprobante_pago", "detalle" => $pagados);
             array_push($lista, $res);
             
         }
@@ -552,5 +567,5 @@ public function listapagos_individuales($idfactura)
         }
         echo json_encode($res);
     }
-    //lista_pagar_pagado_factura
+    //lista_pagar_pagado_factura lista_pagar_pagado_factura
 }

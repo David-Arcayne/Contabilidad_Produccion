@@ -2751,6 +2751,1175 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
 
+    public function listar_recibo_por_caja_bancos_saldo($cadena_cajaBancos,$tipo_filtro) {
+
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
+        $lista = [];
+        // $idempresa = $this->getidempresa($empresa);
+
+        $array_cajaBancos = array_map('intval', explode(",", $cadena_cajaBancos));
+        $caja_bancos = implode(",", $array_cajaBancos);
+
+    if($tipo_filtro == '1'){ //TIPO = 1 --> INGRESO,  2-->EGRESO, 3--> AMBOS
+
+    $getPedido = $this->dbc->query("SELECT cp.idrecibo,cp.idcuentaspof,cp.nrecibo,cp.lugar,cp.persona,cp.ci,cp.fecha,cp.estado,cp.transaccion,cp.cliente,cp.idfactura,cp.idotras_cuentas,cp.archivo,cp.registro_desde,cp.concepto, dc.idcaja_bancos,dc.monto
+    FROM detalle_caja_bancos_cobrar dc
+    INNER JOIN cuentaspof cp ON cp.idcuentaspof = dc.idcuentaspof
+    WHERE dc.idcaja_bancos IN ($caja_bancos)
+    -- AND cp.fecha >= '$fecha_ini'
+    -- AND cp.fecha <= '$fecha_fin'
+    ORDER BY cp.fecha ASC;");
+
+    $aux_contador = 0;
+    $saldo = 0;
+    $saldo_inicial = 0;
+        while ($qwe = $this->dbc->fetch($getPedido)) {
+            // $cuentaspof = $this->dbc->query("SELECT * FROM cuentaspof WHERE r= '$qwe[r]'");
+            // $cp = $cuentaspof->fetch_assoc();
+
+             $transac = $this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones= '$qwe[transaccion]'");
+                 $tr = $transac->fetch_assoc();
+            //     $cp['transaccion']
+
+            if($qwe['idfactura'] != 0){
+                //es cliente y se puede obtener del campo cliente directamente 
+                // $proveedor = $this->dbcm->query("select * from proveedor where id_proveedor='" . $qwe[18] . "'");
+                $factura = $this->dbc->query("SELECT * 
+                FROM factura 
+                WHERE idfactura = '$qwe[idfactura]'");
+
+                $fact = $factura->fetch_assoc();
+
+                if($fact['estado'] == '1'){ //ACTIVO
+                    $estado_documento = "activo";
+                }elseif($fact['estado'] == '2'){ // PENDIENTE DE ANULACION
+                    $estado_documento = "pendiente anulacion";
+                }elseif($fact['estado'] == '3'){ // PENDIENTE DE ELIMINACION
+                    $estado_documento = "pendiente eliminacion";
+                }elseif($fact['estado'] == '4'){// ANULADO
+                    $estado_documento = "anulado";
+                }elseif($fact['estado'] == '5'){// PENDIENTE DE ACTIVACION
+                    $estado_documento = "pendiente activacion";
+                }
+
+                $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente= '$fact[proveedorcliente_idproveedorcliente]'");
+                $cl = $cliente->fetch_assoc();
+
+            }elseif($qwe['idrecibo'] == 0){
+                // hacer consulta a la tabla cuentascobrar_grupal y sacar de ahi factura
+                $getTabla = $this->dbc->query("SELECT * 
+                FROM cuentascobrar_grupal 
+                WHERE idfactura = '$qwe[idfactura]'");
+$cuentas_cobro_grupal = $getTabla->fetch_assoc();
+// while ($ccg = $this->dbc->fetch($getTabla)) {
+    $factura = $this->dbc->query("SELECT * 
+                FROM factura 
+                WHERE idfactura = '$cuentas_cobro_grupal[idfactura]'");
+// }
+                // $cuentas_cobro_grupal = $getTabla->fetch_assoc();
+
+                $fact = $factura->fetch_assoc();
+                
+                $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente= '$fact[proveedorcliente_idproveedorcliente]'");
+                $cl = $cliente->fetch_assoc();
+            }else{
+                // hacer consulta a la tabla otras_cuentas y ahi estara id_cliente_proveedor
+
+                $recibo = $this->dbc->query("SELECT * 
+                FROM recibo
+                WHERE idrecibo = '$qwe[idrecibo]'");
+
+                $reci = $recibo->fetch_assoc();
+
+                if($reci['estado'] == '1'){ //ACTIVO
+                    $estado_documento = "activo";
+                }elseif($reci['estado'] == '2'){ // PENDIENTE DE ANULACION
+                    $estado_documento = "pendiente anulacion";
+                }elseif($reci['estado'] == '3'){ // PENDIENTE DE ELIMINACION
+                    $estado_documento = "pendiente eliminacion";
+                }elseif($reci['estado'] == '4'){// ANULADO
+                    $estado_documento = "anulado";
+                }elseif($reci['estado'] == '5'){// PENDIENTE DE ACTIVACION
+                    $estado_documento = "pendiente activacion";
+                }
+                $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente= '$reci[cliente_proveedor]'");
+                $cl = $cliente->fetch_assoc();
+            }
+
+            if($qwe['idrecibo'] != '0'){
+
+                $fecha_nueva = date("d/m/Y", strtotime($reci['fecha']));
+
+                $otras_cuentas = $this->dbc->query("SELECT * 
+                FROM otras_cuentas
+                WHERE idotras_cuentas = '$reci[idotras_cuentas]'");
+
+                $oc = $otras_cuentas->fetch_assoc();
+
+                    // if($oc['cobrado'] == '-1' && $oc['pagado'] == '-1'){ //CONTRATO GENERAL
+                    //     $aux_descripcion = $reci['concepto'];
+                    // }else{
+                    //     $aux_descripcion = $reci['concepto']."("."s/g Contrato: ". $oc['concepto'].", N° ".$oc['nro_otras_cuentas'].", ".$oc['fecha'].")"; // NO ES CONTRATO GENERAL
+                    // }
+
+                if($aux_contador == 0){ //ESTAMOS EN PRIMERA FILA, SUMAR LAS ANTERIORES FILAS A LA FECHA
+
+                    $fuera_rango = $this->dbc->query("SELECT cp.idcuentaspof,cp.nrecibo,cp.fecha,cp.estado,cp.transaccion,cp.cliente,cp.idfactura,cp.idotras_cuentas,cp.archivo, dc.idcaja_bancos,dc.monto,dc.idfactura
+                    FROM detalle_caja_bancos_cobrar dc
+                    INNER JOIN cuentaspof cp ON cp.idcuentaspof = dc.idcuentaspof
+                    WHERE dc.idcaja_bancos IN ($caja_bancos)
+                    -- AND cp.fecha < '$fecha_ini'
+                    ");
+                // $saldo = 0;
+                // while ($zxc = $this->dbc->fetch($fuera_rango)) {
+                //     if($zxc['estado'] == '4'){
+                //         // no sumara nada porque el documento esta anulado
+                //     }else{
+                //         $saldo = $saldo + $zxc['monto'];
+                //     }
+                // }
+
+                // $saldo_inicial = $saldo;
+
+                if($qwe['estado'] == '4'){
+                        // no sumara nada porque el documento esta anulado
+                }else{
+                        $saldo = $saldo + $qwe['monto'];
+                }
+
+                    $res = array(
+                        "fecha_nueva" => $fecha_nueva,
+                        "tipo_documento" => 3,
+                        "fecha" => $qwe['fecha'],
+                        "idcomprobante" => $qwe['idcuentaspof'],
+                        "nrecibo" => $qwe['nrecibo'],
+                        "lugar" => $qwe['lugar'],
+                        "persona" => $qwe['persona'],
+                        "ci" => $qwe['ci'],
+                        "factura_recibo" => "recibo",
+                        "idrecibo" => "$reci[idrecibo]",
+                        "nro_documento" => "$reci[nro_recibo]",
+                        "por_concepto_de" => "$reci[concepto]",
+                        "idotras_cuentas" => "$reci[idotras_cuentas]",
+                        "estado_documento" => $estado_documento,
+                        // "idtipo" => "$reci[idtipo]",
+                        "codigotransaccion" => $tr['codigotransaccion'],
+                        "id_cliente" => $cl['id_cliente'],
+                        "nombre_cliente" => $cl['nombre'],
+                        //descripcion saldra de la factura o otras cuentas 
+                        "descripcion" => $reci['concepto'],
+                        // "descripcion" => $aux_descripcion,
+                        //"(".$aux_concepto.")"
+                        "archivo" => $qwe['archivo'],
+                        "ingreso" => $qwe['monto'],
+                        "monto" => $qwe['monto'],
+                        "saldo_inicial" => $saldo_inicial,
+                        "saldo" => $saldo,
+                        "registro_desde" => $qwe['registro_desde'],
+                        "pertenece_contratacion  " => "si"
+    
+                    );
+
+                    //AUMENTAR EL AUX_CONTADOR + 1 PARA QUE YANO VUELVA A ENTRAR A ESTA CONDICION
+                    $aux_contador = 1;
+                }else{ // ESTAMOS FILAS DESPUES DE LA PRIMERA FILA
+
+                if($estado_documento == 'anulado'){
+                        // no sumara nada porque el documento esta anulado
+                }else{
+                        $saldo = $saldo + $qwe['monto'];
+                }
+ 
+                $res = array(
+                    "fecha_nueva" => $fecha_nueva,
+                    "tipo_documento" => 3,
+                    "fecha" => $qwe['fecha'],
+                    "idcomprobante" => $qwe['idcuentaspof'],
+                    "nrecibo" => $qwe['nrecibo'],
+                    "lugar" => $qwe['lugar'],
+                    "persona" => $qwe['persona'],
+                    "ci" => $qwe['ci'],
+                    "factura_recibo" => "recibo",
+                    "idrecibo" => "$reci[idrecibo]",
+                    "nro_documento" => "$reci[nro_recibo]",
+                    "por_concepto_de" => "$reci[concepto]",
+                    "idotras_cuentas" => "$reci[idotras_cuentas]",
+                    "estado_documento" => $estado_documento,
+                    // "idtipo" => "$oc[idtipo]",
+                    "codigotransaccion" => $tr['codigotransaccion'],
+                    "id_cliente" => $cl['id_cliente'],
+                    "nombre_cliente" => $cl['nombre'],
+                    //descripcion saldra de la factura o otras cuentas
+                    "descripcion" => $reci['concepto'], 
+                    // "descripcion" => $aux_descripcion,
+                    "archivo" => $qwe['archivo'],
+                    "ingreso" => $qwe['monto'],
+                    "monto" => $qwe['monto'],
+                    "saldo_inicial" => $saldo_inicial,
+                    "saldo" => $saldo,
+                    "registro_desde" => $qwe['registro_desde'],
+                    "pertenece_contratacion  " => "si"
+
+                );
+            }
+
+            }else{
+
+                if($fact['tipo_factura'] == 'contado'){ //factura al contado
+                    $aux_descripcion = $fact['por_concepto_de'];
+                    $nro_documento = $fact['nfactura'];
+                }else{ // factura a credito
+                    $aux_descripcion = $qwe['concepto'];
+                    $nro_documento = '-';
+                }
+
+                // $fecha_nueva = date("d/m/Y", strtotime($fact['fecha']));
+                // $aux_descripcion = "s/g doc N° $fact[nfactura] de: $fecha_nueva";
+
+                 $aux_factura = "cero $fact[nfactura]";
+                 $factu = str_replace("cero ", "", $aux_factura);
+
+                 if($aux_contador == 0){ //ESTAMOS EN PRIMERA FILA, SUMAR LAS ANTERIORES FILAS A LA FECHA
+
+                    $fuera_rango = $this->dbc->query("SELECT cp.idcuentaspof,cp.nrecibo,cp.fecha,cp.transaccion,cp.cliente,cp.idfactura,cp.idotras_cuentas,cp.archivo, dc.idcaja_bancos,dc.monto,dc.idfactura
+                    FROM detalle_caja_bancos_cobrar dc
+                    INNER JOIN cuentaspof cp ON cp.idcuentaspof = dc.idcuentaspof
+                    WHERE dc.idcaja_bancos IN ($caja_bancos)
+                    -- AND cp.fecha < '$fecha_ini';
+                    ");
+                // $saldo = 0;
+                // while ($zxc = $this->dbc->fetch($fuera_rango)) {
+                //     if($zxc['estado'] == '4'){
+                //         // no sumara nada porque el documento esta anulado
+                //     }else{
+                //         $saldo = $saldo + $zxc['monto'];
+                //     }
+                // }
+
+                // $saldo_inicial = $saldo;
+
+                if($qwe['estado'] == '4'){
+                        // no sumara nada porque el documento esta anulado
+                }else{
+                        $saldo = $saldo + $qwe['monto'];
+                }
+
+                    $res = array(
+                        // "fecha_nueva" => $fecha_nueva,
+                        "tipo_documento" => 1,
+                        "idcomprobante" => $qwe['idcuentaspof'],
+                        "fecha" => $qwe['fecha'],
+                        "nrecibo" => $qwe['nrecibo'],
+                        "lugar" => $qwe['lugar'],
+                        "persona" => $qwe['persona'],
+                        "ci" => $qwe['ci'],
+                        "factura_recibo" => "factura",
+                        "idfactura" => $fact['idfactura'],
+                        "nro_documento" => "$nro_documento",
+                        "por_concepto_de" => "$fact[por_concepto_de]",
+                        "idotras_cuentas" => "$fact[idotras_cuentas]",
+                        "estado_documento" => $estado_documento,
+                        "codigotransaccion" => $tr['codigotransaccion'],
+                        "id_cliente" => $cl['id_cliente'],
+                        "nombre_cliente" => $cl['nombre'],
+                        //descripcion saldra de la factura o otras cuentas 
+                        "descripcion" => $aux_descripcion,
+                        "archivo" => $qwe['archivo'],
+                        "ingreso" => $qwe['monto'],
+                        "monto" => $qwe['monto'],
+                        "saldo_inicial" => $saldo_inicial,
+                        "saldo" => $saldo,
+                        "registro_desde" => $qwe['registro_desde'],
+                        "pertenece_contratacion" => 'si'
+    
+                    );
+
+                    //AUMENTAR EL AUX_CONTADOR + 1 PARA QUE YANO VUELVA A ENTRAR A ESTA CONDICION
+                    $aux_contador = 1;
+                }else{ // ESTAMOS FILAS DESPUES DE LA PRIMERA FILA
+
+                if($estado_documento == 'anulado'){
+                        // no sumara nada porque el documento esta anulado
+                }else{
+                        $saldo = $saldo + $qwe['monto'];
+                }
+
+                $res = array(
+                    // "fecha_nueva" => $fecha_nueva,
+                    "tipo_documento" => 1,
+                    "idcomprobante" => $qwe['idcuentaspof'],
+                    "fecha" => $qwe['fecha'],
+                    "nrecibo" => $qwe['nrecibo'],
+                    "lugar" => $qwe['lugar'],
+                    "persona" => $qwe['persona'],
+                    "ci" => $qwe['ci'],
+                    "factura_recibo" => "factura",
+                    "idfactura" => $fact['idfactura'],
+                    "nro_documento" => "$nro_documento",
+                    "por_concepto_de" => "$fact[por_concepto_de]",
+                    "idotras_cuentas" => "$fact[idotras_cuentas]",
+                    "estado_documento" => $estado_documento,
+                    "codigotransaccion" => $tr['codigotransaccion'],
+                    "id_cliente" => $cl['id_cliente'],
+                    "nombre_cliente" => $cl['nombre'],
+                    //descripcion saldra de la factura o otras cuentas 
+                    "descripcion" => $aux_descripcion,
+                    "archivo" => $qwe['archivo'],
+                    "ingreso" => $qwe['monto'],
+                    "monto" => $qwe['monto'],
+                    "saldo_inicial" => $saldo_inicial,
+                    "saldo" => $saldo,
+                    "registro_desde" => $qwe['registro_desde'],
+                    "pertenece_contratacion" => 'si'
+                );
+            }
+
+            }
+          
+            array_push($lista, $res);
+        }
+    
+    }elseif($tipo_filtro == '2'){// tipo = 2 --> EGRESO     }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+//         ini_set('display_errors', 1);
+//         ini_set('display_startup_errors', 1);
+//         error_reporting(E_ALL);
+
+        $getPedido = $this->dbc->query("SELECT cp.idrecibo,cp.idcuentaspor,cp.nrecibo,cp.lugar,cp.persona,cp.ci,cp.fecha,cp.transaccion,cp.cliente,cp.idfactura,cp.idotras_cuentas,cp.archivo,cp.registro_desde,cp.concepto, dc.idcaja_bancos,dc.monto
+        FROM detalle_caja_bancos_pagar dc
+        INNER JOIN cuentaspor cp ON cp.idcuentaspor = dc.idcuentaspor
+        WHERE dc.idcaja_bancos IN ($caja_bancos)
+        -- AND cp.fecha >= '$fecha_ini'
+        -- AND cp.fecha <= '$fecha_fin'
+        ORDER BY cp.fecha ASC
+        ");
+    
+    $aux_contador = 0;
+    $saldo = 0;
+    $saldo_inicial = 0;
+            while ($qwe = $this->dbc->fetch($getPedido)) {
+    
+                 $transac = $this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones= '$qwe[transaccion]'");
+                     $tr = $transac->fetch_assoc();
+                //     $cp['transaccion']
+    
+                if($qwe['idfactura'] != 0){
+                    //es cliente y se puede obtener del campo cliente directamente 
+                    // $proveedor = $this->dbcm->query("select * from proveedor where id_proveedor='" . $qwe[18] . "'");
+                    $factura = $this->dbc->query("SELECT * 
+                    FROM factura 
+                    WHERE idfactura = '$qwe[idfactura]'");
+    
+                    $fact = $factura->fetch_assoc();
+    
+                    if($fact['estado'] == '1'){ //ACTIVO
+                            $estado_documento = "activo";
+                        }elseif($fact['estado'] == '2'){ // PENDIENTE DE ANULACION
+                            $estado_documento = "pendiente anulacion";
+                        }elseif($fact['estado'] == '3'){ // PENDIENTE DE ELIMINACION
+                            $estado_documento = "pendiente eliminacion";
+                        }elseif($fact['estado'] == '4'){ // ANULADO
+                            $estado_documento = "anulado";
+                        }elseif($fact['estado'] == '5'){// PENDIENTE DE ACTIVACION
+                            $estado_documento = "pendiente activacion";
+                        }
+
+                    $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor= '$fact[proveedorcliente_idproveedorcliente]'");
+                    $prov = $proveedor->fetch_assoc();
+    
+                }elseif($qwe['idrecibo'] == 0){
+                    // hacer consulta a la tabla cuentascobrar_grupal y sacar de ahi factura
+                    $getTabla = $this->dbc->query("SELECT * 
+                    FROM cuentaspagar_grupal 
+                    WHERE idfactura = '$qwe[idfactura]'");
+    $cuentas_cobro_grupal = $getTabla->fetch_assoc();
+    // while ($ccg = $this->dbc->fetch($getTabla)) {
+        $factura = $this->dbc->query("SELECT * 
+                    FROM factura 
+                    WHERE idfactura = '$cuentas_cobro_grupal[idfactura]'");
+    // }
+                    // $cuentas_cobro_grupal = $getTabla->fetch_assoc();
+    
+                    
+    
+                    $fact = $factura->fetch_assoc();
+                    
+                    $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor= '$fact[proveedorcliente_idproveedorcliente]'");
+                    $prov = $proveedor->fetch_assoc();
+                }else{
+                    // hacer consulta a la tabla otras_cuentas y ahi estara id_cliente_proveedor
+    
+                    $recibo = $this->dbc->query("SELECT * 
+                    FROM recibo
+                    WHERE idrecibo = '$qwe[idrecibo]'");
+    
+                    $reci = $recibo->fetch_assoc();
+    
+                    if($reci['estado'] == '1'){ //ACTIVO
+                            $estado_documento = "activo";
+                        }elseif($reci['estado'] == '2'){ // PENDIENTE DE ANULACION
+                            $estado_documento = "pendiente anulacion";
+                        }elseif($reci['estado'] == '3'){ // PENDIENTE DE ELIMINACION
+                            $estado_documento = "pendiente eliminacion";
+                        }elseif($reci['estado'] == '4'){ // ANULADO
+                            $estado_documento = "anulado";
+                        }elseif($reci['estado'] == '5'){// PENDIENTE DE ACTIVACION
+                            $estado_documento = "pendiente activacion";
+                        }
+                    $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor= '$reci[cliente_proveedor]'");
+                    $prov = $proveedor->fetch_assoc();
+                }
+    
+                if($qwe['idrecibo'] != 0){
+                    $fecha_nueva = date("d/m/Y", strtotime($reci['fecha']));
+
+                    // $otras_cuentas = $this->dbc->query("SELECT * 
+                    // FROM recibo
+                    // WHERE idrecibo = '$qwe[idrecibo]'");
+                    $otras_cuentas = $this->dbc->query("SELECT * 
+                    FROM otras_cuentas
+                    WHERE idotras_cuentas = '$reci[idotras_cuentas]'");
+
+                    $oc = $otras_cuentas->fetch_assoc();
+
+                    // if($oc['cobrado'] == '-1' && $oc['pagado'] == '-1'){ //CONTRATO GENERAL
+                    //     $aux_descripcion = $reci['concepto'];
+                    // }else{
+                    //     $aux_descripcion = $reci['concepto']."("."s/g Contrato: ". $oc['concepto'].", N° ".$oc['nro_otras_cuentas'].", ".$oc['fecha'].")"; // NO ES CONTRATO GENERAL
+                    // }
+    
+                    if($aux_contador == 0){ //ESTAMOS EN PRIMERA FILA, SUMAR LAS ANTERIORES FILAS A LA FECHA
+    
+                        $fuera_rango = $this->dbc->query("SELECT cp.idcuentaspor,cp.nrecibo,cp.fecha,cp.transaccion,cp.cliente,cp.idfactura,cp.idotras_cuentas,cp.archivo, dc.idcaja_bancos,dc.monto,dc.idfactura
+                        FROM detalle_caja_bancos_pagar dc
+                        INNER JOIN cuentaspor cp ON cp.idcuentaspor = dc.idcuentaspor
+                        WHERE dc.idcaja_bancos IN ($caja_bancos)
+                        -- AND cp.fecha < '$fecha_ini'
+                        ORDER BY cp.fecha ASC;");
+                    // $saldo = 0;
+                    // while ($zxc = $this->dbc->fetch($fuera_rango)) {
+                    //     if($zxc['estado'] == '4'){
+                    //         // no sumara nada porque el documento esta anulado
+                    //     }else{
+                    //         $saldo = $saldo + $zxc['monto'];
+                    //     }
+                    // }
+
+                    // $saldo_inicial = $saldo;
+
+                    if($qwe['estado'] == '4'){
+                            // no sumara nada porque el documento esta anulado
+                    }else{
+                            $saldo = $saldo + $qwe['monto'];
+                    }
+                        $res = array(
+                            "fecha_nueva" => $fecha_nueva,
+                            "tipo_documento" => 4,
+                            "idcomprobante" => $qwe['idcuentaspor'],
+                            "fecha" => $qwe['fecha'],
+                            "nrecibo" => $qwe['nrecibo'],
+                            "lugar" => $qwe['lugar'],
+                            "persona" => $qwe['persona'],
+                            "ci" => $qwe['ci'],
+                            "factura_recibo" => "recibo",
+                            "idrecibo" => "$reci[idrecibo]",
+                            "nro_documento" => "$reci[nro_recibo]",
+                            "por_concepto_de" => "$reci[concepto]",
+                            "idotras_cuentas" => "$reci[idotras_cuentas]",
+                            "estado_documento" => $estado_documento,
+                            // "idtipo" => "$oc[idtipo]",
+                            "codigotransaccion" => $tr['codigotransaccion'],
+                            "id_cliente" => $prov['id_proveedor'],
+                            "nombre_cliente" => $prov['nombre'],
+                            //descripcion saldra de la factura o otras cuentas 
+                            // "descripcion" => $aux_descripcion,
+                            "descripcion" => $reci['concepto'],
+                            "archivo" => $qwe['archivo'],
+                            "egreso" => $qwe['monto'],
+                            "monto" => $qwe['monto'],
+                            "saldo_inicial" => $saldo_inicial,
+                            "saldo" => $saldo,
+                            "registro_desde" => $qwe['registro_desde'],
+                            "pertenece_contratacion" => "si"
+        
+                        );
+    
+                        //AUMENTAR EL AUX_CONTADOR + 1 PARA QUE YANO VUELVA A ENTRAR A ESTA CONDICION
+                        $aux_contador = 1;
+                    }else{ // ESTAMOS FILAS DESPUES DE LA PRIMERA FILA
+    
+                    if($estado_documento == 'anulado'){
+                        // no sumara nada porque el documento esta anulado
+                    }else{
+                            $saldo = $saldo + $qwe['monto'];
+                    }
+
+                    $res = array(
+                        "fecha_nueva" => $fecha_nueva,
+                        "tipo_documento" => 4,
+                        "idcomprobante" => $qwe['idcuentaspor'],
+                        "fecha" => $qwe['fecha'],
+                        "nrecibo" => $qwe['nrecibo'],
+                        "lugar" => $qwe['lugar'],
+                        "persona" => $qwe['persona'],
+                        "ci" => $qwe['ci'],
+                        "factura_recibo" => "recibo",
+                        "idrecibo" => "$reci[idrecibo]",
+                        "nro_documento" => "$reci[nro_recibo]",
+                        "por_concepto_de" => "$reci[concepto]",
+                        "idotras_cuentas" => "$reci[idotras_cuentas]",
+                        "estado_documento" => $estado_documento,
+                        // "idtipo" => "$oc[idtipo]",
+                        "codigotransaccion" => $tr['codigotransaccion'],
+                        "id_cliente" => $prov['id_proveedor'],
+                        "nombre_cliente" => $prov['nombre'],
+                        //descripcion saldra de la factura o otras cuentas 
+                        // "descripcion" => $aux_descripcion,
+                        "descripcion" => $reci['concepto'],
+                        "archivo" => $qwe['archivo'],
+                        "egreso" => $qwe['monto'],
+                        "monto" => $qwe['monto'],
+                        "saldo_inicial" => $saldo_inicial,
+                        "saldo" => $saldo,
+                        "registro_desde" => $qwe['registro_desde'],
+                        "pertenece_contratacion" => "si"
+    
+                    );
+                }
+    
+                }else{
+
+                    if($fact['tipo_factura'] == 'contado'){ //factura al contado
+                        $aux_descripcion = $fact['por_concepto_de'];
+                        $nro_documento = $fact['nfactura'];
+                    }else{ // factura a credito
+                        $aux_descripcion = $qwe['concepto'];
+                        $nro_documento = '-';
+                    }
+
+                     $aux_factura = "cero $fact[nfactura]";
+                     $factu = str_replace("cero ", "", $aux_factura);
+    
+                     if($aux_contador == 0){ //ESTAMOS EN PRIMERA FILA, SUMAR LAS ANTERIORES FILAS A LA FECHA
+    
+                        $fuera_rango = $this->dbc->query("SELECT cp.idcuentaspor,cp.nrecibo,cp.fecha,cp.transaccion,cp.cliente,cp.idfactura,cp.idotras_cuentas,cp.archivo, dc.idcaja_bancos,dc.monto,dc.idfactura
+                        FROM detalle_caja_bancos_pagar dc
+                        INNER JOIN cuentaspor cp ON cp.idcuentaspor = dc.idcuentaspor
+                        WHERE dc.idcaja_bancos IN ($caja_bancos)
+                        -- AND cp.fecha < '$fecha_ini';
+                        ");
+                    // $saldo = 0;
+                    // while ($zxc = $this->dbc->fetch($fuera_rango)) {
+                    //     if($zxc['estado'] == '4'){
+                    //         // no sumara nada porque el documento esta anulado
+                    //     }else{
+                    //         $saldo = $saldo + $zxc['monto'];
+                    //     }
+                    // }
+
+                    // $saldo_inicial = $saldo;
+
+                    if($qwe['estado'] == '4'){
+                            // no sumara nada porque el documento esta anulado
+                    }else{
+                            $saldo = $saldo + $qwe['monto'];
+                    }
+                        $res = array(
+                            // "fecha_nueva" => $fecha_nueva,
+                            "tipo_documento" => 2,
+                            "idcomprobante" => $qwe['idcuentaspor'],
+                            "fecha" => $qwe['fecha'],
+                            "nrecibo" => $qwe['nrecibo'],
+                            "lugar" => $qwe['lugar'],
+                            "persona" => $qwe['persona'],
+                            "ci" => $qwe['ci'],
+                            "factura_recibo" => "factura",
+                            "idfactura" => $fact['idfactura'],
+                            "nro_documento" => "$nro_documento",
+                            "por_concepto_de" => $fact['por_concepto_de'],
+                            "idotras_cuentas" => "$fact[idotras_cuentas]",
+                            "estado_documento" => $estado_documento,
+                            "codigotransaccion" => $tr['codigotransaccion'],
+                            "id_cliente" => $prov['id_proveedor'],
+                            "nombre_cliente" => $prov['nombre'],
+                            //descripcion saldra de la factura o otras cuentas 
+                            "descripcion" => $aux_descripcion,
+                            "archivo" => $qwe['archivo'],
+                            "egreso" => $qwe['monto'],
+                            "monto" => $qwe['monto'],
+                            "saldo_inicial" => $saldo_inicial,
+                            "saldo" => $saldo,
+                            "registro_desde" => $qwe['registro_desde'],
+                            "pertenece_contratacion" => 'si'
+        
+                        );
+    
+                        //AUMENTAR EL AUX_CONTADOR + 1 PARA QUE YANO VUELVA A ENTRAR A ESTA CONDICION
+                        $aux_contador = 1;
+                    }else{ // ESTAMOS FILAS DESPUES DE LA PRIMERA FILA
+    
+                    if($qwe['estado'] == '4'){
+                        // no sumara nada porque el documento esta anulado
+                    }else{
+                            $saldo = $saldo + $qwe['monto'];
+                    }
+                    $res = array(
+                        "fecha" => $qwe['fecha'],
+                        "tipo_documento" => 2,
+                        "idcomprobante" => $qwe['idcuentaspor'],
+                        "nrecibo" => $qwe['nrecibo'],
+                        "lugar" => $qwe['lugar'],
+                        "persona" => $qwe['persona'],
+                        "ci" => $qwe['ci'],
+                        "factura_recibo" => "factura",
+                        "idfactura" => $fact['idfactura'],
+                        "nro_documento" => "$nro_documento",
+                        "por_concepto_de" => "$fact[por_concepto_de]",
+                        "idotras_cuentas" => "$fact[idotras_cuentas]",
+                        "estado_documento" => $estado_documento,
+                        "codigotransaccion" => $tr['codigotransaccion'],
+                        "id_cliente" => $prov['id_proveedor'],
+                        "nombre_cliente" => $prov['nombre'],
+                        //descripcion saldra de la factura o otras cuentas 
+                        "descripcion" => $aux_descripcion,
+                        "archivo" => $qwe['archivo'],
+                        "egreso" => $qwe['monto'],
+                        "monto" => $qwe['monto'],
+                        "saldo_inicial" => $saldo_inicial,
+                        "saldo" => $saldo,
+                        "registro_desde" => $qwe['registro_desde'],
+                        "pertenece_contratacion" => 'si'
+    
+                    );
+                }
+                }
+              
+                array_push($lista, $res);
+            }
+
+    }else{// TIPO = 3 --> TODOS 
+
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
+        $getPedido = $this->dbc->query("SELECT 
+            cp.idcuentaspor AS id_cuenta,
+            cp.idrecibo,
+            cp.nrecibo,
+            cp.lugar,
+            cp.persona,
+            cp.ci, 
+            cp.fecha, 
+            cp.transaccion, 
+            cp.cliente, 
+            cp.idfactura, 
+            cp.idotras_cuentas, 
+            cp.archivo, 
+            cp.registro_desde, 
+            cp.concepto,
+            dc.idcaja_bancos, 
+            dc.monto, 
+            dc.idfactura,
+            'PAGAR' AS tipo
+        FROM detalle_caja_bancos_pagar dc
+        INNER JOIN cuentaspor cp ON cp.idcuentaspor = dc.idcuentaspor
+        WHERE dc.idcaja_bancos IN ($caja_bancos)
+        -- AND cp.fecha BETWEEN '$fecha_ini' AND '$fecha_fin'
+
+        UNION
+
+        SELECT 
+            cp.idcuentaspof AS id_cuenta,
+            cp.idrecibo, 
+            cp.nrecibo,
+            cp.lugar,
+            cp.persona,
+            cp.ci,  
+            cp.fecha,
+            cp.transaccion, 
+            cp.cliente,  
+            cp.idfactura, 
+            cp.idotras_cuentas, 
+            cp.archivo,
+            cp.registro_desde, 
+            cp.concepto,
+            dc.idcaja_bancos, 
+            dc.monto, 
+            dc.idfactura,
+            'COBRAR' AS tipo
+        FROM detalle_caja_bancos_cobrar dc
+        INNER JOIN cuentaspof cp ON cp.idcuentaspof = dc.idcuentaspof
+        WHERE dc.idcaja_bancos IN ($caja_bancos)
+        -- AND cp.fecha BETWEEN '$fecha_ini' AND '$fecha_fin'
+
+        ORDER BY fecha ASC;");
+    
+    $aux_contador = 0;
+    $saldo = 0;
+    $saldo_inicial = 0;
+            while ($qwe = $this->dbc->fetch($getPedido)) {
+    
+                 $transac = $this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones= '$qwe[transaccion]'");
+                     $tr = $transac->fetch_assoc();
+                     
+                //     $cp['transaccion']
+    
+                if($qwe['tipo'] == 'COBRAR'){
+
+                    if($qwe['idfactura'] != 0){
+                        //es cliente y se puede obtener del campo cliente directamente 
+                        // $proveedor = $this->dbcm->query("select * from proveedor where id_proveedor='" . $qwe[18] . "'");
+                        $factura = $this->dbc->query("SELECT * 
+                        FROM factura 
+                        WHERE idfactura = '$qwe[idfactura]'");
+        
+                        $fact = $factura->fetch_assoc();
+        
+                        if($fact['estado'] == '1'){ //ACTIVO
+                            $estado_documento = "activo";
+                        }elseif($fact['estado'] == '2'){ // PENDIENTE DE ANULACION
+                            $estado_documento = "pendiente anulacion";
+                        }elseif($fact['estado'] == '3'){ // PENDIENTE DE ELIMINACION
+                            $estado_documento = "pendiente eliminacion";
+                        }elseif($fact['estado'] == '4'){ // ANULADO
+                            $estado_documento = "anulado";
+                        }elseif($fact['estado'] == '5'){// PENDIENTE DE ACTIVACION
+                            $estado_documento = "pendiente activacion";
+                        }
+
+                        $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente= '$fact[proveedorcliente_idproveedorcliente]'");
+                        $cl = $cliente->fetch_assoc();
+        
+                    }elseif($qwe['idrecibo'] == 0){
+                        // hacer consulta a la tabla cuentascobrar_grupal y sacar de ahi factura
+                        $getTabla = $this->dbc->query("SELECT * 
+                        FROM cuentascobrar_grupal 
+                        WHERE idfactura = '$qwe[idfactura]'");
+        $cuentas_cobro_grupal = $getTabla->fetch_assoc();
+        // while ($ccg = $this->dbc->fetch($getTabla)) {
+            $factura = $this->dbc->query("SELECT * 
+                        FROM factura 
+                        WHERE idfactura = '$cuentas_cobro_grupal[idfactura]'");
+        // }
+                        // $cuentas_cobro_grupal = $getTabla->fetch_assoc();
+                        $fact = $factura->fetch_assoc();
+                        
+                        // if($fact['estado'] == '1'){ //ACTIVO
+                        //     $estado_documento = "activo";
+                        // }elseif($fact['estado'] == '2'){ // PENDIENTE DE ANULACION
+                        //     $estado_documento = "pendiente anulacion";
+                        // }elseif($fact['estado'] == '3'){ // PENDIENTE DE ELIMINACION
+                        //     $estado_documento = "pendiente eliminacion";
+                        // }elseif($fact['estado'] == '5'){// PENDIENTE DE ACTIVACION
+                        //     $estado_documento = "pendiente activacion";
+                        // }
+
+                        $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente= '$fact[proveedorcliente_idproveedorcliente]'");
+                        $cl = $cliente->fetch_assoc();
+                    }else{
+                        // hacer consulta a la tabla otras_cuentas y ahi estara id_cliente_proveedor
+        
+                        $recibo = $this->dbc->query("SELECT * 
+                        FROM recibo
+                        WHERE idrecibo = '$qwe[idrecibo]'");
+        
+                        $reci = $recibo->fetch_assoc();
+        
+                        if($reci['estado'] == '1'){ //ACTIVO
+                            $estado_documento = "activo";
+                        }elseif($reci['estado'] == '2'){ // PENDIENTE DE ANULACION
+                            $estado_documento = "pendiente anulacion";
+                        }elseif($reci['estado'] == '3'){ // PENDIENTE DE ELIMINACION
+                            $estado_documento = "pendiente eliminacion";
+                        }elseif($reci['estado'] == '4'){ // ANULADO
+                            $estado_documento = "anulado";
+                        }elseif($reci['estado'] == '5'){// PENDIENTE DE ACTIVACION
+                            $estado_documento = "pendiente activacion";
+                        }
+
+                        $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente= '$reci[cliente_proveedor]'");
+                        $cl = $cliente->fetch_assoc();
+                    }
+
+                }else{// PAGAR
+                    
+                    if($qwe['idfactura'] != 0){
+                        //es cliente y se puede obtener del campo cliente directamente 
+                        // $proveedor = $this->dbcm->query("select * from proveedor where id_proveedor='" . $qwe[18] . "'");
+                        $factura = $this->dbc->query("SELECT * 
+                        FROM factura 
+                        WHERE idfactura = '$qwe[idfactura]'");
+        
+                        $fact = $factura->fetch_assoc();
+        
+                        if($fact['estado'] == '1'){ //ACTIVO
+                            $estado_documento = "activo";
+                        }elseif($fact['estado'] == '2'){ // PENDIENTE DE ANULACION
+                            $estado_documento = "pendiente anulacion";
+                        }elseif($fact['estado'] == '3'){ // PENDIENTE DE ELIMINACION
+                            $estado_documento = "pendiente eliminacion";
+                        }elseif($fact['estado'] == '4'){ // ANULADO
+                            $estado_documento = "anulado";
+                        }elseif($fact['estado'] == '5'){// PENDIENTE DE ACTIVACION
+                            $estado_documento = "pendiente activacion";
+                        }
+
+                        $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor= '$fact[proveedorcliente_idproveedorcliente]'");
+                        $cl = $proveedor->fetch_assoc();
+        
+                    }elseif($qwe['idrecibo'] == 0){
+                        // hacer consulta a la tabla cuentascobrar_grupal y sacar de ahi factura
+                        $getTabla = $this->dbc->query("SELECT * 
+                        FROM cuentaspagar_grupal 
+                        WHERE idfactura = '$qwe[idfactura]'");
+
+                        $cuentas_pago_grupal = $getTabla->fetch_assoc();
+                        // while ($ccg = $this->dbc->fetch($getTabla)) {
+                            $factura = $this->dbc->query("SELECT * 
+                                        FROM factura 
+                                        WHERE idfactura = '$cuentas_pago_grupal[idfactura]'");
+                        // }
+                                        // $cuentas_cobro_grupal = $getTabla->fetch_assoc();
+                        
+                        $fact = $factura->fetch_assoc();
+                        
+                        // if($fact['estado'] == '1'){ //ACTIVO
+                        //     $estado_documento = "activo";
+                        // }elseif($fact['estado'] == '2'){ // PENDIENTE DE ANULACION
+                        //     $estado_documento = "pendiente anulacion";
+                        // }elseif($fact['estado'] == '3'){ // PENDIENTE DE ELIMINACION
+                        //     $estado_documento = "pendiente eliminacion";
+                        // }elseif($fact['estado'] == '5'){// PENDIENTE DE ACTIVACION
+                        //     $estado_documento = "pendiente activacion";
+                        // }
+
+                        $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor= '$fact[proveedorcliente_idproveedorcliente]'");
+                        $cl = $proveedor->fetch_assoc();
+                    }else{
+                        // hacer consulta a la tabla otras_cuentas y ahi estara id_cliente_proveedor
+        
+                        $recibo = $this->dbc->query("SELECT * 
+                        FROM recibo
+                        WHERE idrecibo = '$qwe[idrecibo]'");
+        
+                        $reci = $recibo->fetch_assoc();
+
+                        if($reci['estado'] == '1'){ //ACTIVO
+                            $estado_documento = "activo";
+                        }elseif($reci['estado'] == '2'){ // PENDIENTE DE ANULACION
+                            $estado_documento = "pendiente anulacion";
+                        }elseif($reci['estado'] == '3'){ // PENDIENTE DE ELIMINACION
+                            $estado_documento = "pendiente eliminacion";
+                        }elseif($reci['estado'] == '4'){ // ANULADO
+                            $estado_documento = "anulado";
+                        }elseif($reci['estado'] == '5'){// PENDIENTE DE ACTIVACION
+                            $estado_documento = "pendiente activacion";
+                        }
+
+                        $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor= '$reci[cliente_proveedor]'");
+                        $cl = $proveedor->fetch_assoc();
+                    }
+
+                } //FIN DEL ELSE DE PAGAR
+                //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+                if($aux_contador == 0){ //ESTAMOS EN PRIMERA FILA, SUMAR LAS ANTERIORES FILAS A LA FECHA
+
+                    $fuera_rango = $this->dbc->query("SELECT 
+                cp.idcuentaspof AS id_cuenta,
+                cp.nrecibo, 
+                cp.fecha,
+                cp.transaccion, 
+                cp.cliente, 
+                cp.idfactura, 
+                cp.idotras_cuentas, 
+                cp.archivo, 
+                dc.idcaja_bancos, 
+                dc.monto, 
+                dc.idfactura,
+                'COBRAR' AS tipo
+            FROM detalle_caja_bancos_cobrar dc
+            INNER JOIN cuentaspof cp ON cp.idcuentaspof = dc.idcuentaspof
+            WHERE dc.idcaja_bancos IN ($caja_bancos)
+            -- AND cp.fecha < '$fecha_ini'
+
+            UNION
+
+            SELECT 
+                cp.idcuentaspor AS id_cuenta,
+                cp.nrecibo, 
+                cp.fecha, 
+                cp.transaccion, 
+                cp.cliente, 
+                cp.idfactura, 
+                cp.idotras_cuentas, 
+                cp.archivo, 
+                dc.idcaja_bancos, 
+                dc.monto, 
+                dc.idfactura,
+                'PAGAR' AS tipo
+            FROM detalle_caja_bancos_pagar dc
+            INNER JOIN cuentaspor cp ON cp.idcuentaspor = dc.idcuentaspor
+            WHERE dc.idcaja_bancos IN ($caja_bancos)
+            -- AND cp.fecha < '$fecha_ini'
+
+            ORDER BY fecha ASC, nrecibo ASC;");
+                // $saldo = 0;
+                // while ($zxc = $this->dbc->fetch($fuera_rango)) {
+                //     if($zxc['estado'] == '4'){
+                //         // no sumara nada porque el documento esta anulado
+                //     }else{
+                //         if($zxc['tipo'] == 'COBRAR'){
+                //             $saldo = $saldo + $zxc['monto'];
+                //         }else{
+                //             $saldo = $saldo - $zxc['monto'];
+                //         }
+                //     }
+                    
+                // }
+                // $saldo_inicial = $saldo;
+
+                    //AUMENTAR EL AUX_CONTADOR + 1 PARA QUE YANO VUELVA A ENTRAR A ESTA CONDICION
+                    $aux_contador = 1;
+                }else{ // ESTAMOS FILAS DESPUES DE LA PRIMERA FILA
+
+                // $saldo = $saldo + $qwe['monto'];
+     
+            }
+                //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+                if($qwe['tipo'] == 'COBRAR'){
+
+                    if($estado_documento == 'anulado'){
+                        // no sumara nada porque el documento esta anulado
+                    }else{
+                            $saldo = $saldo + $qwe['monto'];
+                    }
+
+                    if($qwe['idrecibo'] != 0){
+                        //Según documento N° 11 de 24/04/2025
+                        $fecha_nueva = date("d/m/Y", strtotime($reci['fecha']));
+                        // $aux_descripcion = "s/g doc N° $reci[nro_recibo] de: $fecha_nueva";
+                        $otras_cuentas = $this->dbc->query("SELECT * 
+                        FROM otras_cuentas
+                        WHERE idotras_cuentas = '$reci[idotras_cuentas]'");
+
+                        $oc = $otras_cuentas->fetch_assoc();
+
+                        // if($oc['cobrado'] == '-1' && $oc['pagado'] == '-1'){ //CONTRATO GENERAL
+                        //     $aux_descripcion = $reci['concepto'];
+                        // }else{
+                        //     $aux_descripcion = $reci['concepto']."("."s/g Contrato: ". $oc['concepto'].", N° ".$oc['nro_otras_cuentas'].", ".$oc['fecha'].")"; // NO ES CONTRATO GENERAL
+                        // }
+
+                  
+                        $res = array(
+                            "fecha" => $qwe['fecha'],
+                            "tipo_documento" => 3,
+                            "idcomprobante" => $qwe['id_cuenta'],
+                            "nrecibo" => $qwe['nrecibo'],
+                            "lugar" => $qwe['lugar'],
+                            "persona" => $qwe['persona'],
+                            "ci" => $qwe['ci'],
+                            "factura_recibo" => "recibo",
+                            "idrecibo" => "$reci[idrecibo]",
+                            "nro_documento" => "$reci[nro_recibo]",
+                            "por_concepto_de" => "$reci[concepto]",
+                            "idotras_cuentas" => "$reci[idotras_cuentas]",
+                            "estado_documento" => $estado_documento,
+                            // "idtipo" => "$oc[idtipo]",
+                            "codigotransaccion" => $tr['codigotransaccion'],
+                            "id_cliente" => $cl['id_cliente'],
+                            "nombre_cliente" => $cl['nombre'],
+                            //descripcion saldra de la factura o otras cuentas 
+                            "descripcion" => $reci['concepto'],
+                            "archivo" => $qwe['archivo'],
+                            "ingreso" => $qwe['monto'],
+                            "monto" => $qwe['monto'],
+                            "saldo_inicial" => $saldo_inicial,
+                            "saldo" => $saldo,
+                            "registro_desde" => $qwe['registro_desde'],
+                            "pertenece_contratacion" => "si"
+                        );
+                    }else{
+                        $fecha_nueva = date("d/m/Y", strtotime($fact['fecha']));
+
+                        // if($fact['idotras_cuentas'] == '0' || $fact['idotras_cuentas'] == null){ //ESTA FACTURA NOO PERTENECE A CONTRATO, NO TENDRA "s/g Contrato"
+                        //     $aux_descripcion = $fact['por_concepto_de'];
+                        //     $pertenece_contrato = "no";
+                        // }else{
+                        //     //ESTA FACTURA SII PERTENECE A CONTRATO
+                   
+                        //     $otras_cuentas = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idotras_cuentas = '$fact[idotras_cuentas]'");
+                        //     $oc = $otras_cuentas->fetch_assoc();
+
+                        //     if($oc['cobrado'] == '-1' && $oc['pagado'] == '-1'){ //CONTRATO GENERAL
+                        //         $aux_descripcion = $fact['por_concepto_de'];
+                        //     }else{
+                        //         $aux_descripcion = $fact['por_concepto_de']."("."s/g Contrato: ". $oc['concepto'].", N° ".$oc['nro_otras_cuentas'].", ".$oc['fecha'].")"; // NO ES CONTRATO GENERAL
+                        //     }
+
+                        //     $pertenece_contrato = "si";
+                        // }
+        
+                        if($fact['tipo_factura'] == 'contado'){ //factura al contado
+                            $aux_descripcion = $fact['por_concepto_de'];
+                            $nro_documento = $fact['nfactura'];
+                        }else{ // factura a credito
+                            $aux_descripcion = $qwe['concepto'];
+                            $nro_documento = '-';
+                        }
+
+                         $aux_factura = "cero $fact[nfactura]";
+                         $factu = str_replace("cero ", "", $aux_factura);
+                        $res = array(
+                            "fecha" => $qwe['fecha'],
+                            "tipo_documento" => 1,
+                            "idcomprobante" => $qwe['id_cuenta'],
+                            "nrecibo" => $qwe['nrecibo'],
+                            "lugar" => $qwe['lugar'],
+                            "persona" => $qwe['persona'],
+                            "ci" => $qwe['ci'],
+                            "factura_recibo" => "factura",
+                            "idfactura" => $fact['idfactura'],
+                            "nro_documento" => $nro_documento,
+                            "por_concepto_de" => $fact['por_concepto_de'],
+                            "idotras_cuentas" => "$fact[idotras_cuentas]",
+                            "estado_documento" => $estado_documento,
+                            "codigotransaccion" => $tr['codigotransaccion'],
+                            "id_cliente" => $cl['id_cliente'],
+                            "nombre_cliente" => $cl['nombre'],
+                            //descripcion saldra de la factura o otras cuentas 
+                            "descripcion" => $aux_descripcion,
+                            "archivo" => $qwe['archivo'],
+                            "ingreso" => $qwe['monto'],
+                            "monto" => $qwe['monto'],
+                            "saldo_inicial" => $saldo_inicial,
+                            "saldo" => $saldo,
+                            "registro_desde" => $qwe['registro_desde'],
+                            "pertenece_contratacion" => 'si'
+                        );
+                    }
+                }else{ // PAGAR
+
+
+                    if($estado_documento == 'anulado'){
+                        // no sumara nada porque el documento esta anulado
+                    }else{
+                            $saldo = $saldo - $qwe['monto'];
+                    }
+                    if($qwe['idrecibo'] != 0){
+                        $fecha_nueva = date("d/m/Y", strtotime($reci['fecha']));
+                        // $aux_descripcion = "s/g doc N° $reci[nro_recibo] de: $fecha_nueva";
+                        $otras_cuentas = $this->dbc->query("SELECT * 
+                        FROM otras_cuentas
+                        WHERE idotras_cuentas = '$reci[idotras_cuentas]'");
+
+                        $oc = $otras_cuentas->fetch_assoc();
+
+                        // if($oc['cobrado'] == '-1' && $oc['pagado'] == '-1'){ //CONTRATO GENERAL
+                        //     $aux_descripcion = $reci['concepto'];
+                        // }else{
+                        //     $aux_descripcion = $reci['concepto']."("."s/g Contrato: ". $oc['concepto'].", N° ".$oc['nro_otras_cuentas'].", ".$oc['fecha'].")"; // NO ES CONTRATO GENERAL
+                        // }
+        
+                        $res = array(
+                            "fecha" => $qwe['fecha'],
+                            "tipo_documento" => 4,
+                            "idcomprobante" => $qwe['id_cuenta'],
+                            "nrecibo" => $qwe['nrecibo'],
+                            "lugar" => $qwe['lugar'],
+                            "persona" => $qwe['persona'],
+                            "ci" => $qwe['ci'],
+                            "factura_recibo" => "recibo",
+                            "idrecibo" => "$reci[idrecibo]",
+                            "nro_documento" => "$reci[nro_recibo]",
+                            "por_concepto_de" => "$reci[concepto]",
+                            "idotras_cuentas" => "$reci[idotras_cuentas]",
+                            "estado_documento" => $estado_documento,
+                            // "idtipo" => "$oc[idtipo]",
+                            "codigotransaccion" => $tr['codigotransaccion'],
+                            "id_cliente" => $cl['id_proveedor'],
+                            "nombre_cliente" => $cl['nombre'],
+                            //descripcion saldra de la factura o otras cuentas 
+                            "descripcion" => $reci['concepto'],
+                            "archivo" => $qwe['archivo'],
+                            "egreso" => $qwe['monto'],
+                            "monto" => $qwe['monto'],
+                            "saldo_inicial" => $saldo_inicial,
+                            "saldo" => $saldo,
+                            "registro_desde" => $qwe['registro_desde'],
+                            "pertenece_contratacion" => "si"
+                        );
+                    }else{
+                        $fecha_nueva = date("d/m/Y", strtotime($fact['fecha']));
+
+                        // if($fact['idotras_cuentas'] == '0' || $fact['idotras_cuentas'] == null){ //ESTA FACTURA NO PERTENECE A CONTRATO, NO TENDRA "s/g Contrato"
+                        //     $aux_descripcion = $fact['por_concepto_de'];
+                        //     $pertenece_contrato = "no";
+                        // }else{
+                        //     //ESTA FACTURA SII PERTENECE A CONTRATO
+                   
+                        //     $otras_cuentas = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idotras_cuentas = '$fact[idotras_cuentas]'");
+                        //     $oc = $otras_cuentas->fetch_assoc();
+
+                        //     if($oc['cobrado'] == '-1' && $oc['pagado'] == '-1'){ //CONTRATO GENERAL
+                        //         $aux_descripcion = $fact['por_concepto_de'];
+                        //     }else{
+                        //         $aux_descripcion = $fact['por_concepto_de']."("."s/g Contrato: ". $oc['concepto'].", N° ".$oc['nro_otras_cuentas'].", ".$oc['fecha'].")"; // NO ES CONTRATO GENERAL
+                        //     }
+
+                        //     $pertenece_contrato = "si";
+                        // }
+        
+                        if($fact['tipo_factura'] == 'contado'){ //factura al contado
+                            $aux_descripcion = $fact['por_concepto_de'];
+                            $nro_documento = $fact['nfactura'];
+                        }else{ // factura a credito
+                            $aux_descripcion = $qwe['concepto'];
+                            $nro_documento = '-';
+                        }
+
+                         $aux_factura = "cero $fact[nfactura]";
+                         $factu = str_replace("cero ", "", $aux_factura);
+                        $res = array(
+                            "fecha" => $qwe['fecha'],
+                            "tipo_documento" => 2,
+                            "idcomprobante" => $qwe['id_cuenta'],
+                            "nrecibo" => $qwe['nrecibo'],
+                            "lugar" => $qwe['lugar'],
+                            "persona" => $qwe['persona'],
+                            "ci" => $qwe['ci'],
+                            "factura_recibo" => "factura",
+                            "idfactura" => $fact['idfactura'],
+                            "nro_documento" => $nro_documento,
+                            "por_concepto_de" => $fact['por_concepto_de'],
+                            "idotras_cuentas" => "$fact[idotras_cuentas]",
+                            "estado_documento" => $estado_documento,
+                            "codigotransaccion" => $tr['codigotransaccion'],
+                            "id_cliente" => $cl['id_proveedor'],
+                            "nombre_cliente" => $cl['nombre'],
+                            //descripcion saldra de la factura o otras cuentas 
+                            "descripcion" => $aux_descripcion,
+                            "archivo" => $qwe['archivo'],
+                            "egreso" => $qwe['monto'],
+                            "monto" => $qwe['monto'],
+                            "saldo_inicial" => $saldo_inicial,
+                            "saldo" => $saldo,
+                            "registro_desde" => $qwe['registro_desde'],
+                            "pertenece_contratacion" => 'si'
+                        );
+                    }
+                }
+                
+              
+                array_push($lista, $res);
+            }
+
+    }
+    $ultimo = end($lista);
+    $saldo_final = $ultimo['saldo'];
+        echo json_encode($saldo_final, JSON_NUMERIC_CHECK);
+    }
     public function registrar_caja_bancos_usuarios($idcaja_bancos,$idtrabajador,$funcion,$permiso_registrar,$empresa){
         // $idempresa = Empresa::getidempresa($empresa);
         $idempresa = $this->getidempresa($empresa);
