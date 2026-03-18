@@ -1583,35 +1583,67 @@ WHERE
         if($hayIndividuales > 0){
             if($hayGrupales > 0){
                 // hay grupales e individuales
-                        $mostrarIndi = $this->dbc->query("SELECT nrecibo,fecha,persona,ci,monto,idcuentaspof,transaccion,archivo,lugar,concepto 
+                        $mostrarIndi = $this->dbc->query("SELECT nrecibo,fecha,persona,ci,monto,idcuentaspof,transaccion,archivo,lugar,concepto,estado,registro_desde 
                         FROM cuentaspof WHERE idfactura = '$idfactura'");
     
                         while ($zxc = $this->dbc->fetch($mostrarIndi)) {
-                            $res = array("recibo" => $zxc[0], "fecha" => $zxc[1], "persona" => $zxc[2], "ci" => $zxc[3], "monto" => $zxc[4], "id" => $zxc[5],"transaccion" => $zxc[6],"nombre_archivo" => $zxc[7],"lugar" => $zxc[8],"nit" => $cl['nit'],"direccion" => $cl['direccion'],"concepto" => $zxc['concepto']);
+                            if($zxc['estado'] == '1'){ //ACTIVO
+                                $estado_documento = "activo";
+                            }elseif($zxc['estado'] == '2'){ // PENDIENTE DE ANULACION
+                                $estado_documento = "pendiente anulacion";
+                            }elseif($zxc['estado'] == '3'){ // PENDIENTE DE ELIMINACION
+                                $estado_documento = "pendiente eliminacion";
+                            }elseif($zxc['estado'] == '4'){// ANULADO
+                                $estado_documento = "anulado";
+                            }elseif($zxc['estado'] == '5'){// PENDIENTE DE ACTIVACION
+                                $estado_documento = "pendiente activacion";
+                            }
+                            $res = array("recibo" => $zxc[0], "fecha" => $zxc[1], "persona" => $zxc[2], "ci" => $zxc[3], "monto" => $zxc[4], "id" => $zxc[5],"transaccion" => $zxc[6],"nombre_archivo" => $zxc[7],"lugar" => $zxc[8],"nit" => $cl['nit'],"direccion" => $cl['direccion'],"concepto" => $zxc['concepto'],"estado_documento" => $estado_documento,"registro_desde" => $zxc['registro_desde']);
                             array_push($lista, $res);
                         }
     
                 $listaGrup2 = $this->dbc->query("SELECT * FROM cuentascobrar_grupal WHERE idfactura='$idfactura'");
                 $resultado33 = $listaGrup2->fetch_assoc();
                 $idrecibo2 = $resultado33['idcuentaspof'];
-                $datosRecibo2 = $this->dbc->query("SELECT nrecibo,fecha,persona,ci,monto,idcuentaspof,transaccion,archivo,lugar,concepto FROM cuentaspof WHERE idcuentaspof='$idrecibo2'");
+                $datosRecibo2 = $this->dbc->query("SELECT nrecibo,fecha,persona,ci,monto,idcuentaspof,transaccion,archivo,lugar,concepto,estado,registro_desde FROM cuentaspof WHERE idcuentaspof='$idrecibo2'");
                 
                 while ($www = $this->dbc->fetch($datosRecibo2)) {
+                    if($www['estado'] == '1'){ //ACTIVO
+                        $estado_documento = "activo";
+                    }elseif($www['estado'] == '2'){ // PENDIENTE DE ANULACION
+                        $estado_documento = "pendiente anulacion";
+                    }elseif($www['estado'] == '3'){ // PENDIENTE DE ELIMINACION
+                        $estado_documento = "pendiente eliminacion";
+                    }elseif($www['estado'] == '4'){// ANULADO
+                        $estado_documento = "anulado";
+                    }elseif($www['estado'] == '5'){// PENDIENTE DE ACTIVACION
+                        $estado_documento = "pendiente activacion";
+                    }
                     $trans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE idtransacciones='$www[transaccion]'");
                     $idtr = $trans->fetch_assoc();
-                    $res2 = array("recibo" => $www[0], "fecha" => $www[1], "persona" => $www[2], "ci" => $www[3], "monto" => $resultado33['monto'], "id" => $www[5],"transaccion" => $www[6],"codigotransaccion" => $idtr['codigotransaccion'],"nombre_archivo" => $www[7],"lugar" => $www[8],"nit" => $cl['nit'],"direccion" => $cl['direccion'],"concepto" => $www['concepto']);
+                    $res2 = array("recibo" => $www[0], "fecha" => $www[1], "persona" => $www[2], "ci" => $www[3], "monto" => $resultado33['monto'], "id" => $www[5],"transaccion" => $www[6],"codigotransaccion" => $idtr['codigotransaccion'],"nombre_archivo" => $www[7],"lugar" => $www[8],"nit" => $cl['nit'],"direccion" => $cl['direccion'],"concepto" => $www['concepto'],"estado_documento" => $estado_documento,"registro_desde" => $www['registro_desde']);
                     array_push($lista, $res2);
                 }
     
             }else{
                 //SOLO HAY INDIVIDUALES
-                $registro = $this->dbc->query("SELECT c.idcuentaspof,c.nrecibo,c.fecha,c.monto,c.persona,c.ci,c.transaccion,c.archivo,c.lugar,c.concepto FROM cuentaspof as c WHERE c.idfactura='$idfactura'");
+                $registro = $this->dbc->query("SELECT c.idcuentaspof,c.nrecibo,c.fecha,c.monto,c.persona,c.ci,c.transaccion,c.archivo,c.lugar,c.concepto,c.estado,c.registro_desde FROM cuentaspof as c WHERE c.idfactura='$idfactura'");
                 while ($qwe = $this->dbc->fetch($registro)) {
-                    
+                    if($qwe['estado'] == '1'){ //ACTIVO
+                        $estado_documento = "activo";
+                    }elseif($qwe['estado'] == '2'){ // PENDIENTE DE ANULACION
+                        $estado_documento = "pendiente anulacion";
+                    }elseif($qwe['estado'] == '3'){ // PENDIENTE DE ELIMINACION
+                        $estado_documento = "pendiente eliminacion";
+                    }elseif($qwe['estado'] == '4'){// ANULADO
+                        $estado_documento = "anulado";
+                    }elseif($qwe['estado'] == '5'){// PENDIENTE DE ACTIVACION
+                        $estado_documento = "pendiente activacion";
+                    }
                     $trans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE idtransacciones='$qwe[transaccion]'");
                     $idtr = $trans->fetch_assoc();
                   
-                    $res = array("id" => $qwe[0], "recibo" => $qwe[1], "fecha" => $qwe[2], "monto" => $qwe[3], "persona" => $qwe[4], "ci" => $qwe[5],"transaccion" => $qwe[6],"codigotransaccion" => $idtr['codigotransaccion'],"nombre_archivo" => $qwe[7],"lugar" => $qwe[8],"nit" => $cl['nit'],"direccion" => $cl['direccion'],"concepto" => $qwe['concepto']);
+                    $res = array("id" => $qwe[0], "recibo" => $qwe[1], "fecha" => $qwe[2], "monto" => $qwe[3], "persona" => $qwe[4], "ci" => $qwe[5],"transaccion" => $qwe[6],"codigotransaccion" => $idtr['codigotransaccion'],"nombre_archivo" => $qwe[7],"lugar" => $qwe[8],"nit" => $cl['nit'],"direccion" => $cl['direccion'],"concepto" => $qwe['concepto'],"estado_documento" => $estado_documento,"registro_desde" => $qwe['registro_desde']);
                     array_push($lista, $res);
                 }
         }
@@ -1620,14 +1652,25 @@ WHERE
                        $listaGrup = $this->dbc->query("SELECT * FROM cuentascobrar_grupal WHERE idfactura='$idfactura'");
                        $resultado3 = $listaGrup->fetch_assoc();
                        $idrecibo = $resultado3['idcuentaspof'];
-                       $datosRecibo = $this->dbc->query("SELECT nrecibo,fecha,persona,ci,monto,idcuentaspof,transaccion,archivo,concepto FROM cuentaspof WHERE idcuentaspof='$idrecibo'");
+                       $datosRecibo = $this->dbc->query("SELECT nrecibo,fecha,persona,ci,monto,idcuentaspof,transaccion,archivo,concepto,estado,registro_desde FROM cuentaspof WHERE idcuentaspof='$idrecibo'");
                        
                        while ($zxc = $this->dbc->fetch($datosRecibo)) {
 
+                       if($zxc['estado'] == '1'){ //ACTIVO
+                            $estado_documento = "activo";
+                        }elseif($zxc['estado'] == '2'){ // PENDIENTE DE ANULACION
+                            $estado_documento = "pendiente anulacion";
+                        }elseif($zxc['estado'] == '3'){ // PENDIENTE DE ELIMINACION
+                            $estado_documento = "pendiente eliminacion";
+                        }elseif($zxc['estado'] == '4'){// ANULADO
+                            $estado_documento = "anulado";
+                        }elseif($zxc['estado'] == '5'){// PENDIENTE DE ACTIVACION
+                            $estado_documento = "pendiente activacion";
+                        }
                         $trans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE idtransacciones='$zxc[transaccion]'");
                         $idtr = $trans->fetch_assoc();
 
-                           $res = array("recibo" => $zxc[0], "fecha" => $zxc[1], "persona" => $zxc[2], "ci" => $zxc[3], "monto" => $resultado3['monto'], "id" => $zxc[5],"transaccion" => $zxc[6],"codigotransaccion" => $idtr['codigotransaccion'],"nombre_archivo" => $zxc[7],"nit" => $cl['nit'],"direccion" => $cl['direccion'],"concepto" => $zxc['concepto']);
+                           $res = array("recibo" => $zxc[0], "fecha" => $zxc[1], "persona" => $zxc[2], "ci" => $zxc[3], "monto" => $resultado3['monto'], "id" => $zxc[5],"transaccion" => $zxc[6],"codigotransaccion" => $idtr['codigotransaccion'],"nombre_archivo" => $zxc[7],"nit" => $cl['nit'],"direccion" => $cl['direccion'],"concepto" => $zxc['concepto'],"estado_documento" => $estado_documento,"registro_desde" => $zxc['registro_desde']);
                            array_push($lista, $res);
                        }
                     //    $res = array("id" => $qwe[0], "fecha" => $qwe[1], "numero" => $qwe[2], "codigo" => $qwe[3], "idproveedor" => $qwe[5], "nombrep" => $pro['nombre'], "monto" => $qwe[4], "pagado" => $resultado3['monto'], "saldo" => 0, "transaccion" => $qwe[6], "cuenta" => $qwe[7], "detalle" => $pagados);

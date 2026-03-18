@@ -217,7 +217,7 @@ class Transacciones_facturas extends DB{
         echo json_encode($res);
     }
 
-    public function registrocobrarfacturaGrupal($fecha,$persona,$ci,$monto,$idtransaccion,$idcaja_bancos,$idasientotipo,$idempresa,$idsucursal,$archivo,$data,$zn)
+    public function registrocobrarfacturaGrupal($fecha,$persona,$ci,$monto,$idtransaccion,$idcaja_bancos,$idasientotipo,$idempresa,$idsucursal,$archivo,$data,$zn,$glosa)
     {
     if($idcaja_bancos == ""){
 // NO PASARA NADA
@@ -262,12 +262,12 @@ class Transacciones_facturas extends DB{
         $nrecibo = $res1['cant1'] + $res2['cant2']+ $res3['cant3'] + 1;
 
         $res = "";
-        $glosa = "Registro cobro '$nrecibo'";
+        // $glosa = "Registro cobro '$nrecibo'";
         // $gestion = $this->getgestionactualid($ide);
         $trans = "";
         
         if ($idasientotipo != "") { // SE CREARA UNA NUEVA TRANSACCION 
-            $glosa2 = $this->dbc->real_escape_string($glosa);
+            // $glosa2 = $this->dbc->real_escape_string($glosa);
             $fecha2 = $this->dbc->real_escape_string($fecha);
 
         // Construir rango dinámico (primer y último día del mes)
@@ -316,7 +316,7 @@ class Transacciones_facturas extends DB{
 
         // Insertar en transacciones
         $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion, fechatransaccion, tipodecambio, ndocumento, glosa, consolidar,estado, tipotransaccion_idtipotransaccion, organizacion_idorganizacion, sucursal, idgestion) 
-        VALUES ('$nroTransaccion2', '$fecha2', '1', '0', '$glosa2', '1','1', '$tt[idtipotransaccion]', '$ide', '$sucursal', '$gestion')");
+        VALUES ('$nroTransaccion2', '$fecha2', '1', '0', '$glosa', '1','1', '$tt[idtipotransaccion]', '$ide', '$sucursal', '$gestion')");
     
         // Obtener el ID del registro recién insertado
         $idtrans = $this->dbc->insert_id;
@@ -351,8 +351,8 @@ class Transacciones_facturas extends DB{
 
 //-------------------------------------------------------------------------------------------------
         if(empty($archivo['name'])){
-            $registropago = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,archivo)
-            VALUES(NULL,'$nrecibo','$fecha_completa','varios clientes','$persona','$ci','$monto','0','$idtrans','0',NULL)");
+            $registropago = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,estado,cliente,persona,ci,monto,idfactura,transaccion,cuenta,archivo)
+            VALUES(NULL,'$nrecibo','$fecha_completa','1','varios clientes','$persona','$ci','$monto','0','$idtrans','0',NULL)");
 
         if ($registropago === TRUE) {
 
@@ -391,8 +391,8 @@ class Transacciones_facturas extends DB{
         }
         if(move_uploaded_file($archivo_tmp, $ruta_destino)){
              //registrar pago, preguntar guardar la anterior transaccion o la nueva
-             $registropago2 = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,archivo)
-            VALUES(NULL,'$nrecibo','$fecha_completa','varios clientes','$persona','$ci','$monto','0','$idtrans','0','$unique_name')");
+             $registropago2 = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,estado,cliente,persona,ci,monto,idfactura,transaccion,cuenta,archivo)
+            VALUES(NULL,'$nrecibo','$fecha_completa','1','varios clientes','$persona','$ci','$monto','0','$idtrans','0','$unique_name')");
 
         if ($registropago2 === TRUE) {
             $idcuentaspof = $this->dbc->insert_id;

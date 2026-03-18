@@ -93,7 +93,7 @@ class Cuentaspof extends DB{
         $resultado122 = $nroTransa->fetch_assoc();
         $nroTransaccion = $resultado122['codigotransaccion'] + 1;
 
-        $glosa = "Registro cobro $nrecibo";
+        // $glosa = "Registro cobro $nrecibo";
     
         
         $trans = "";
@@ -102,7 +102,7 @@ class Cuentaspof extends DB{
 
             if($fecha_transaccion >= $resultado122['fechatransaccion']){  
                 $insertrans = $this->dbc->query("INSERT INTO `transacciones` (`idtransacciones`, `codigotransaccion`, `fechatransaccion`, `tipodecambio`, `ndocumento`, `glosa`, `consolidar`, `estado`, `tipotransaccion_idtipotransaccion`, `organizacion_idorganizacion`, `sucursal`, `idgestion`) 
-                VALUES (NULL, '$nroTransaccion', '$fecha_transaccion', '1', '0', '$glosa', '1', '1', '$tt[idtipotransaccion]', '$ide', '$sucursal', '$idgestion');");
+                VALUES (NULL, '$nroTransaccion', '$fecha_transaccion', '1', '0', '$concepto', '1', '1', '$tt[idtipotransaccion]', '$ide', '$sucursal', '$idgestion');");
                 //nuevat transaccion
                 $transis = $this->dbc->query("SELECT * FROM transacciones WHERE codigotransaccion='$nroTransaccion' AND  organizacion_idorganizacion='$ide' ORDER BY idtransacciones DESC LIMIT 1");
                 $ww = $this->dbc->fetch($transis);

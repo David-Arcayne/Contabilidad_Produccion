@@ -96,7 +96,7 @@ class Cuentaspor extends DB{
         // $transi = $this->dbc->query("SELECT * FROM transacciones WHERE organizacion_idorganizacion='$ide' AND idgestion='$idgestion' order by codigotransaccion desc Limit 1");
         // $qq = $this->dbc->fetch($transi);
         // $codigo = $qq['codigotransaccion'] + 1;
-        $glosa = "Registro cobro $nrecibo";
+        // $glosa = "Registro cobro $nrecibo";
         
         $bandera = TRUE;
 
@@ -104,7 +104,7 @@ class Cuentaspor extends DB{
 
         if($fecha_transaccion >= $resultado122['fechatransaccion']){  
         $insertrans = $this->dbc->query("INSERT INTO `transacciones` (`idtransacciones`, `codigotransaccion`, `fechatransaccion`, `tipodecambio`, `ndocumento`, `glosa`, `consolidar`,`estado`, `tipotransaccion_idtipotransaccion`, `organizacion_idorganizacion`, `sucursal`, `idgestion`) 
-        VALUES (NULL, '$nroTransaccion', '$fecha_transaccion', '1', '0', '$glosa', '1','1', '$tt[idtipotransaccion]', '$ide', '$sucursal', '$idgestion');");
+        VALUES (NULL, '$nroTransaccion', '$fecha_transaccion', '1', '0', '$concepto', '1','1', '$tt[idtipotransaccion]', '$ide', '$sucursal', '$idgestion');");
         //nuevat transaccion
         $transis = $this->dbc->query("select * from transacciones where codigotransaccion='$nroTransaccion' and  organizacion_idorganizacion='$ide' order by idtransacciones desc Limit 1");
         $ww = $this->dbc->fetch($transis);

@@ -51,8 +51,8 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
 
             $idrecibo_nuevo = $this->dbc->insert_id;
 
-            $registropago2 = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
-        VALUES(NULL,'$nrecibo','$fecha_completa','$lugar','0','$persona','$ci','$monto','0','$idotras_cuentas','$idrecibo_nuevo','0','0',NULL,'cobrado_recibo_otras_cuentas')");
+            $registropago2 = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,estado,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
+        VALUES(NULL,'$nrecibo','$fecha_completa','1','$lugar','0','$persona','$ci','$monto','0','$idotras_cuentas','$idrecibo_nuevo','0','0',NULL,'cobrado_recibo_otras_cuentas')");
 
             $idcomprobante = $this->dbc->insert_id;
 
@@ -66,8 +66,8 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
 
                 $idrecibo_nuevo = $this->dbc->insert_id;
 
-            $registropago2 = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
-            VALUES(NULL,'$nrecibo','$fecha_completa','$lugar','0','$persona','$ci','$monto','0','$idotras_cuentas','$idrecibo_nuevo','$idtransaccion','0',NULL,'cobrado_recibo_otras_cuentas')");
+            $registropago2 = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,'estado',lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
+            VALUES(NULL,'$nrecibo','$fecha_completa','1','$lugar','0','$persona','$ci','$monto','0','$idotras_cuentas','$idrecibo_nuevo','$idtransaccion','0',NULL,'cobrado_recibo_otras_cuentas')");
 
                
                 $idcomprobante = $this->dbc->insert_id;
@@ -78,8 +78,8 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
 
                 $idrecibo_nuevo = $this->dbc->insert_id;
 
-                $registropago2 = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
-        VALUES(NULL,'$nrecibo','$fecha_completa','$lugar','0','$persona','$ci','$monto','0','$idotras_cuentas','$idrecibo_nuevo','$idtransaccion','$cuenta',NULL,'cobrado_recibo_otras_cuentas')");
+                $registropago2 = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,estado,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
+        VALUES(NULL,'$nrecibo','$fecha_completa','1','$lugar','0','$persona','$ci','$monto','0','$idotras_cuentas','$idrecibo_nuevo','$idtransaccion','$cuenta',NULL,'cobrado_recibo_otras_cuentas')");
 
                 $idcomprobante = $this->dbc->insert_id;
 
@@ -174,10 +174,10 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
 
         if($fecha_transaccion >= $resultado122['fechatransaccion']){// REGISTRO CON UN NUEVO ASIENTO (TRANSACCION) {{{{{{{{{{{{{{{{{{{{{{{{{{}}}}}}}}}}}}}}}}}}}}}}}}}}
        
-        $glosa = "Registro cobro $nrecibo";
+        // $glosa = "Registro cobro $nrecibo";
 
             $insertrans = $this->dbc->query("INSERT INTO `transacciones` (`idtransacciones`, `codigotransaccion`, `fechatransaccion`, `tipodecambio`, `ndocumento`, `glosa`, `consolidar`, `tipotransaccion_idtipotransaccion`, `organizacion_idorganizacion`, `sucursal`, `idgestion`) 
-            VALUES (NULL, '$nroTransaccion', '$fecha_transaccion', '1', '0', '$glosa', '1', '$tt[idtipotransaccion]', '$ide', '$sucursal', '$gestion');");
+            VALUES (NULL, '$nroTransaccion', '$fecha_transaccion', '1', '0', '$concepto', '1', '$tt[idtipotransaccion]', '$ide', '$sucursal', '$gestion');");
             //nuevat transaccion
             $transis = $this->dbc->query("SELECT * FROM transacciones WHERE codigotransaccion='$nroTransaccion' AND  organizacion_idorganizacion='$ide' ORDER BY idtransacciones DESC LIMIT 1");
             $ww = $this->dbc->fetch($transis);
@@ -212,8 +212,8 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
 
             $idrecibo_nuevo = $this->dbc->insert_id;
 
-            $registropago2 = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
-            VALUES(NULL,'$nrecibo','$fecha_completa','$lugar','0','$persona','$ci','$monto','0','$idotras_cuentas','$idrecibo_nuevo','$trans','0',NULL,'cobrado_recibo_otras_cuentas')");
+            $registropago2 = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,estado,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
+            VALUES(NULL,'$nrecibo','$fecha_completa','1','$lugar','0','$persona','$ci','$monto','0','$idotras_cuentas','$idrecibo_nuevo','$trans','0',NULL,'cobrado_recibo_otras_cuentas')");
 
             $idcomprobante = $this->dbc->insert_id;
             
@@ -363,8 +363,20 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
         // $idempresa = $this->getidempresa($empresa); 
     
         // Preparar la consulta
-      $listado = $this->dbc->query("SELECT c.idrecibo,c.nro_recibo,c.fecha,c.monto,c.persona,c.ci,c.transaccion,c.archivo,c.lugar,c.concepto FROM recibo as c WHERE c.idotras_cuentas='$idotras_cuentas'");
+      $listado = $this->dbc->query("SELECT c.idrecibo,c.nro_recibo,c.fecha,c.monto,c.persona,c.ci,c.transaccion,c.archivo,c.lugar,c.concepto,c.estado,c.registro_desde FROM recibo as c WHERE c.idotras_cuentas='$idotras_cuentas'");
      while ($qwe = $this->dbc->fetch($listado)) {
+
+        if($qwe['estado'] == '1'){ //ACTIVO
+            $estado_documento = "activo";
+        }elseif($qwe['estado'] == '2'){ // PENDIENTE DE ANULACION
+            $estado_documento = "pendiente anulacion";
+        }elseif($qwe['estado'] == '3'){ // PENDIENTE DE ELIMINACION
+            $estado_documento = "pendiente eliminacion";
+        }elseif($qwe['estado'] == '4'){// ANULADO
+            $estado_documento = "anulado";
+        }elseif($qwe['estado'] == '5'){// PENDIENTE DE ACTIVACION
+            $estado_documento = "pendiente activacion";
+        }
         $comprobante = $this->dbc->query("SELECT * FROM cuentaspof WHERE idrecibo='$qwe[idrecibo]'");
         $compr = $comprobante->fetch_assoc();
 
@@ -375,7 +387,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
           "fecha" => $qwe[2], "monto" => $qwe[3], "persona" => $qwe[4],
            "ci" => $qwe[5],"transaccion" => $qwe[6],
             "codigotransaccion" => $idtr['codigotransaccion'],
-            "nombre_archivo" => $qwe[7],"lugar" => $qwe[8], "idcomprobante" => $compr['idcuentaspof'],"concepto" => $qwe['concepto'],"cliente_proveedor" => $qwe['cliente_proveedor']);
+            "nombre_archivo" => $qwe[7],"lugar" => $qwe[8], "idcomprobante" => $compr['idcuentaspof'],"concepto" => $qwe['concepto'],"cliente_proveedor" => $qwe['cliente_proveedor'],"estado_documento" => $estado_documento,"registro_desde" => $qwe['registro_desde']);
          array_push($lista, $res);
      }
     
@@ -505,8 +517,8 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
 
             $idrecibo_nuevo = $this->dbc->insert_id;
 
-            $registropago2 = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
-        VALUES(NULL,'$nrecibo','$fecha_completa','$lugar','0','$persona','$ci','$monto','0','$idotras_cuentas','$idrecibo_nuevo','0','0',NULL,'pagado_recibo_otras_cuentas')");
+            $registropago2 = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,estado,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
+        VALUES(NULL,'$nrecibo','$fecha_completa','1','$lugar','0','$persona','$ci','$monto','0','$idotras_cuentas','$idrecibo_nuevo','0','0',NULL,'pagado_recibo_otras_cuentas')");
 
             $idrecibo = $this->dbc->insert_id;
 
@@ -528,8 +540,8 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
 
                 $idrecibo_nuevo = $this->dbc->insert_id;
 
-                $registropago2 = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
-        VALUES(NULL,'$nrecibo','$fecha_completa','$lugar','0','$persona','$ci','$monto','0','$idotras_cuentas','$idrecibo_nuevo','$idtransaccion','0',NULL,'pagado_recibo_otras_cuentas')");
+                $registropago2 = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,estado,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
+        VALUES(NULL,'$nrecibo','$fecha_completa','1','$lugar','0','$persona','$ci','$monto','0','$idotras_cuentas','$idrecibo_nuevo','$idtransaccion','0',NULL,'pagado_recibo_otras_cuentas')");
 
             $idrecibo = $this->dbc->insert_id;
             }else{// SE ASIGNARA CUENTA MAS 
@@ -539,8 +551,8 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
 
                 $idrecibo_nuevo = $this->dbc->insert_id;
 
-                $registropago2 = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
-        VALUES(NULL,'$nrecibo','$fecha_completa','$lugar','0','$persona','$ci','$monto','0','$idotras_cuentas','$idrecibo_nuevo','$idtransaccion','$cuenta',NULL,'pagado_recibo_otras_cuentas')");
+                $registropago2 = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,estado,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
+        VALUES(NULL,'$nrecibo','$fecha_completa','1','$lugar','0','$persona','$ci','$monto','0','$idotras_cuentas','$idrecibo_nuevo','$idtransaccion','$cuenta',NULL,'pagado_recibo_otras_cuentas')");
 
                 $idcomprobante = $this->dbc->insert_id;
 
@@ -635,10 +647,10 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
 
          if($fecha_transaccion >= $resultado122['fechatransaccion']){// REGISTRO CON UN NUEVO ASIENTO (TRANSACCION) {{{{{{{{{{{{{{{{{{{{{{{{{{}}}}}}}}}}}}}}}}}}}}}}}}}}
        
-        $glosa = "Registro Pago $nrecibo";
+        // $glosa = "Registro Pago $nrecibo";
 
             $insertrans = $this->dbc->query("INSERT INTO `transacciones` (`idtransacciones`, `codigotransaccion`, `fechatransaccion`, `tipodecambio`, `ndocumento`, `glosa`, `consolidar`, `tipotransaccion_idtipotransaccion`, `organizacion_idorganizacion`, `sucursal`, `idgestion`) 
-            VALUES (NULL, '$nroTransaccion', '$fecha_transaccion', '1', '0', '$glosa', '1', '$tt[idtipotransaccion]', '$ide', '$sucursal', '$gestion');");
+            VALUES (NULL, '$nroTransaccion', '$fecha_transaccion', '1', '0', '$concepto', '1', '$tt[idtipotransaccion]', '$ide', '$sucursal', '$gestion');");
             //nuevat transaccion
             $transis = $this->dbc->query("SELECT * FROM transacciones WHERE codigotransaccion='$nroTransaccion' AND  organizacion_idorganizacion='$ide' ORDER BY idtransacciones DESC LIMIT 1");
             $ww = $this->dbc->fetch($transis);
@@ -672,8 +684,8 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
 
             $idrecibo_nuevo = $this->dbc->insert_id;
 
-            $registropago2 = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
-            VALUES(NULL,'$nrecibo','$fecha_completa','$lugar','0','$persona','$ci','$monto','0','$idotras_cuentas','$idrecibo_nuevo','$trans','0',NULL,'pagado_recibo_otras_cuentas')");
+            $registropago2 = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,estado,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
+            VALUES(NULL,'$nrecibo','$fecha_completa','1','$lugar','0','$persona','$ci','$monto','0','$idotras_cuentas','$idrecibo_nuevo','$trans','0',NULL,'pagado_recibo_otras_cuentas')");
 
             $idrecibo = $this->dbc->insert_id;
 
@@ -826,8 +838,8 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
         
             $idfact = $this->dbc->insert_id;
 
-            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$trans','0',NULL,'cobrado_factura_otras_cuentas')");
+            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,estado,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
+            VALUES('$nroRecibo','$fecha_completa','1','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$trans','0',NULL,'cobrado_factura_otras_cuentas')");
 
             $idrecibo = $this->dbc->insert_id;
 
@@ -840,8 +852,8 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
             
                 $idfact = $this->dbc->insert_id;
 
-                $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
-                VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$trans','0',NULL,'cobrado_factura_otras_cuentas')");
+                $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,estado,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
+                VALUES('$nroRecibo','$fecha_completa','1','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$trans','0',NULL,'cobrado_factura_otras_cuentas')");
 
                 $idrecibo = $this->dbc->insert_id;
             }else{// SE ASIGNARA CUENTA MAS 
@@ -851,8 +863,8 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
             
                 $idfact = $this->dbc->insert_id;
 
-                $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
-                VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$trans','$cuenta',NULL,'cobrado_factura_otras_cuentas')");
+                $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,estado,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
+                VALUES('$nroRecibo','$fecha_completa','1','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$trans','$cuenta',NULL,'cobrado_factura_otras_cuentas')");
 
                 $idrecibo = $this->dbc->insert_id;
 
@@ -950,7 +962,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
         if($fecha_transaccion >= $resultado122['fechatransaccion']){// REGISTRO CON UN NUEVO ASIENTO (TRANSACCION) {{{{{{{{{{{{{{{{{{{{{{{{{{}}}}}}}}}}}}}}}}}}}}}}}}}}
         // Insertar en transacciones
         $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion, fechatransaccion, tipodecambio, ndocumento, glosa, consolidar,estado, tipotransaccion_idtipotransaccion, organizacion_idorganizacion, sucursal, idgestion) 
-        VALUES ('$nroTransaccion', '$fecha_transaccion', '1', '0', 'Registro Cobro Caja Bancos', '1','1', '$tt[idtipotransaccion]', '$idempresa', '$idsucursal', '$gestion')");
+        VALUES ('$nroTransaccion', '$fecha_transaccion', '1', '0', '$por_concepto_de', '1','1', '$tt[idtipotransaccion]', '$idempresa', '$idsucursal', '$gestion')");
         
         $idtrans = $this->dbc->insert_id;
 // -----------------------------------------------------------------------------------------------------------------
@@ -981,8 +993,8 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
         
         $idfact = $this->dbc->insert_id;
 
-        $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$idtrans','0',NULL,'cobrado_factura_otras_cuentas')");
+        $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,estado,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
+            VALUES('$nroRecibo','$fecha_completa','1','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$idtrans','0',NULL,'cobrado_factura_otras_cuentas')");
 
         $idrecibo = $this->dbc->insert_id;
         if($registro === TRUE){
@@ -1121,8 +1133,8 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
         
             $idfact = $this->dbc->insert_id;
 
-            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$trans','0',NULL,'pagado_factura_otras_cuentas')");
+            $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,estado,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
+            VALUES('$nroRecibo','$fecha_completa','1','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$trans','0',NULL,'pagado_factura_otras_cuentas')");
 
             $idrecibo = $this->dbc->insert_id;
 
@@ -1143,8 +1155,8 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
             
                 $idfact = $this->dbc->insert_id;
 
-                $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
-                VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$trans','0',NULL,'pagado_factura_otras_cuentas')");
+                $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,estado,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
+                VALUES('$nroRecibo','$fecha_completa','1','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$trans','0',NULL,'pagado_factura_otras_cuentas')");
 
                 $idrecibo = $this->dbc->insert_id;
             }else{// SE ASIGNARA CUENTA MAS 
@@ -1154,8 +1166,8 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
             
                 $idfact = $this->dbc->insert_id;
 
-                $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
-                VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$trans','$cuenta',NULL,'cobrado_factura_otras_cuentas')");
+                $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,estado,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
+                VALUES('$nroRecibo','$fecha_completa','1','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$trans','$cuenta',NULL,'cobrado_factura_otras_cuentas')");
 
                 $idrecibo = $this->dbc->insert_id;
 
@@ -1253,7 +1265,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
         if($fecha_transaccion >= $resultado122['fechatransaccion']){// REGISTRO CON UN NUEVO ASIENTO (TRANSACCION) {{{{{{{{{{{{{{{{{{{{{{{{{{}}}}}}}}}}}}}}}}}}}}}}}}}}
         // Insertar en transacciones
         $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion, fechatransaccion, tipodecambio, ndocumento, glosa, consolidar,estado, tipotransaccion_idtipotransaccion, organizacion_idorganizacion, sucursal, idgestion) 
-        VALUES ('$nroTransaccion', '$fecha_transaccion', '1', '0', 'Registro Cobro Caja Bancos', '1','1', '$tt[idtipotransaccion]', '$idempresa', '$idsucursal', '$gestion')");
+        VALUES ('$nroTransaccion', '$fecha_transaccion', '1', '0', '$por_concepto_de', '1','1', '$tt[idtipotransaccion]', '$idempresa', '$idsucursal', '$gestion')");
         
         $idtrans = $this->dbc->insert_id;
 // -----------------------------------------------------------------------------------------------------------------
@@ -1285,8 +1297,8 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
         
         $idfact = $this->dbc->insert_id;
 
-        $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha_completa','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$idtrans','0',NULL,'pagado_factura_otras_cuentas')");
+        $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,estado,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
+            VALUES('$nroRecibo','$fecha_completa','1','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$idtrans','0',NULL,'pagado_factura_otras_cuentas')");
 
         $idrecibo = $this->dbc->insert_id;
 
@@ -1379,8 +1391,20 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
         // $idempresa = $this->getidempresa($empresa); 
     
         // Preparar la consulta
-      $listado = $this->dbc->query("SELECT c.idrecibo,c.nro_recibo,c.fecha,c.monto,c.persona,c.ci,c.transaccion,c.archivo,c.lugar,c.concepto FROM recibo as c WHERE c.idotras_cuentas='$idotras_cuentas'");
+      $listado = $this->dbc->query("SELECT c.idrecibo,c.nro_recibo,c.fecha,c.monto,c.persona,c.ci,c.transaccion,c.archivo,c.lugar,c.concepto,c.estado,c.registro_desde FROM recibo as c WHERE c.idotras_cuentas='$idotras_cuentas'");
      while ($qwe = $this->dbc->fetch($listado)) {
+
+        if($qwe['estado'] == '1'){ //ACTIVO
+            $estado_documento = "activo";
+        }elseif($qwe['estado'] == '2'){ // PENDIENTE DE ANULACION
+            $estado_documento = "pendiente anulacion";
+        }elseif($qwe['estado'] == '3'){ // PENDIENTE DE ELIMINACION
+            $estado_documento = "pendiente eliminacion";
+        }elseif($qwe['estado'] == '4'){// ANULADO
+            $estado_documento = "anulado";
+        }elseif($qwe['estado'] == '5'){// PENDIENTE DE ACTIVACION
+            $estado_documento = "pendiente activacion";
+        }
 
         $comprobante = $this->dbc->query("SELECT * FROM cuentaspor WHERE idrecibo='$qwe[idrecibo]'");
         $compr = $comprobante->fetch_assoc();
@@ -1392,7 +1416,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
           "fecha" => $qwe[2], "monto" => $qwe[3], "persona" => $qwe[4],
            "ci" => $qwe[5],"transaccion" => $qwe[6],
             "codigotransaccion" => $idtr['codigotransaccion'],
-            "nombre_archivo" => $qwe[7],"lugar" => $qwe[8],"idcomprobante" => $compr['idcuentaspor'],"concepto" => $qwe['concepto'],"cliente_proveedor" => $qwe['cliente_proveedor']);
+            "nombre_archivo" => $qwe[7],"lugar" => $qwe[8],"idcomprobante" => $compr['idcuentaspor'],"concepto" => $qwe['concepto'],"cliente_proveedor" => $qwe['cliente_proveedor'],"estado_documento" => $estado_documento,"registro_desde" => $qwe['registro_desde']);
          array_push($lista, $res);
      }
     
@@ -1433,7 +1457,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
             $cl = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='$qwe[proveedorcliente_idproveedorcliente]'");
             $clientSelect = $cl->fetch_assoc();
 
-            $res = array("idfactura" => $qwe['idfactura'], "fecha" => $qwe['fecha'], "nfactura" => $qwe['nfactura'], "montofactura" => $qwe['montofactura'],"codigotransaccion" => $idtr['codigotransaccion'],"por_concepto_de" => $qwe['por_concepto_de'],"prov_client" => $clientSelect['nombre'],"idcomprobante" => $compr['idcuentaspor'],"archivo" => $compr['archivo'],"estado_documento" => $estado_documento);
+            $res = array("idfactura" => $qwe['idfactura'], "fecha" => $qwe['fecha'], "nfactura" => $qwe['nfactura'], "montofactura" => $qwe['montofactura'],"codigotransaccion" => $idtr['codigotransaccion'],"por_concepto_de" => $qwe['por_concepto_de'],"prov_client" => $clientSelect['nombre'],"idcomprobante" => $compr['idcuentaspor'],"archivo" => $compr['archivo'],"estado_documento" => $estado_documento,"registro_desde" => $qwe['registro_desde']);
 
         }else{
 
@@ -1443,7 +1467,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
             $cl = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='$qwe[proveedorcliente_idproveedorcliente]'");
             $clientSelect = $cl->fetch_assoc();
 
-            $res = array("idfactura" => $qwe['idfactura'], "fecha" => $qwe['fecha'], "nfactura" => $qwe['nfactura'], "montofactura" => $qwe['montofactura'],"codigotransaccion" => $idtr['codigotransaccion'],"por_concepto_de" => $qwe['por_concepto_de'],"prov_client" => $clientSelect['nombre'],"idcomprobante" => $compr['idcuentaspof'],"archivo" => $compr['archivo'],"estado_documento" => $estado_documento);
+            $res = array("idfactura" => $qwe['idfactura'], "fecha" => $qwe['fecha'], "nfactura" => $qwe['nfactura'], "montofactura" => $qwe['montofactura'],"codigotransaccion" => $idtr['codigotransaccion'],"por_concepto_de" => $qwe['por_concepto_de'],"prov_client" => $clientSelect['nombre'],"idcomprobante" => $compr['idcuentaspof'],"archivo" => $compr['archivo'],"estado_documento" => $estado_documento,"registro_desde" => $qwe['registro_desde']);
 
         }
          array_push($lista, $res);

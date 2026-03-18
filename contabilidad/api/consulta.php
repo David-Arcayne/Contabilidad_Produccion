@@ -753,9 +753,9 @@ elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
     $cont=new Caja_bancos_recibos();
     $cont->listar_recibo_por_caja_bancos_saldo($ver[1],$ver[2]);
 }
-// reportedetalle listar_recibo_por_id listar_recibo_por_id_otras_cuentas listaclientes listar_recibo_por_caja_bancos
+// reportedetalle listar_recibo_por_id listar_recibo_por_id_otras_cuentas listaclientes listar_recibo_por_caja_bancos listapagos
 // listar_factura           listar_facturas_cobro_pago      listaclientes listafacturaapi_cobrado lista_cobrar_cobrado_factura
-// reemplazar facturas_perteneciente_a_cuenta  lista_pagar_pagado_factura
+// reemplazar facturas_perteneciente_a_cuenta  lista_pagar_pagado_factura listar_recibo_otras_cuentas_pagar listapagos_individuales
 
 // recibos_perteneciente_a_cuenta  listar_otras_cuentas_cobrar lista_pagar_pagado_factura lista_cobrar_cobrado_factura
 //    listar_recibo_otras_cuentas    listar_recibos_asignado_cuentas listar_factura_comercial_por_id lista_cobrar_cobrado_factura
