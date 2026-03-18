@@ -1410,6 +1410,18 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
       $listado = $this->dbc->query("SELECT * FROM factura WHERE idotras_cuentas='$idotras_cuentas'");
      while ($qwe = $this->dbc->fetch($listado)) {
 
+        if($qwe['estado'] == '1'){ //ACTIVO
+            $estado_documento = "activo";
+        }elseif($qwe['estado'] == '2'){ // PENDIENTE DE ANULACION
+            $estado_documento = "pendiente anulacion";
+        }elseif($qwe['estado'] == '3'){ // PENDIENTE DE ELIMINACION
+            $estado_documento = "pendiente eliminacion";
+        }elseif($qwe['estado'] == '4'){// ANULADO
+            $estado_documento = "anulado";
+        }elseif($qwe['estado'] == '5'){// PENDIENTE DE ACTIVACION
+            $estado_documento = "pendiente activacion";
+        }
+
         $trans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE idtransacciones='$qwe[transacciones_idtransacciones]'");
         $idtr = $trans->fetch_assoc();
 
@@ -1421,7 +1433,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
             $cl = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='$qwe[proveedorcliente_idproveedorcliente]'");
             $clientSelect = $cl->fetch_assoc();
 
-            $res = array("idfactura" => $qwe['idfactura'], "fecha" => $qwe['fecha'], "nfactura" => $qwe['nfactura'], "montofactura" => $qwe['montofactura'],"codigotransaccion" => $idtr['codigotransaccion'],"por_concepto_de" => $qwe['por_concepto_de'],"prov_client" => $clientSelect['nombre'],"idcomprobante" => $compr['idcuentaspor'],"archivo" => $compr['archivo']);
+            $res = array("idfactura" => $qwe['idfactura'], "fecha" => $qwe['fecha'], "nfactura" => $qwe['nfactura'], "montofactura" => $qwe['montofactura'],"codigotransaccion" => $idtr['codigotransaccion'],"por_concepto_de" => $qwe['por_concepto_de'],"prov_client" => $clientSelect['nombre'],"idcomprobante" => $compr['idcuentaspor'],"archivo" => $compr['archivo'],"estado_documento" => $estado_documento);
 
         }else{
 
@@ -1431,7 +1443,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
             $cl = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='$qwe[proveedorcliente_idproveedorcliente]'");
             $clientSelect = $cl->fetch_assoc();
 
-            $res = array("idfactura" => $qwe['idfactura'], "fecha" => $qwe['fecha'], "nfactura" => $qwe['nfactura'], "montofactura" => $qwe['montofactura'],"codigotransaccion" => $idtr['codigotransaccion'],"por_concepto_de" => $qwe['por_concepto_de'],"prov_client" => $clientSelect['nombre'],"idcomprobante" => $compr['idcuentaspof'],"archivo" => $compr['archivo']);
+            $res = array("idfactura" => $qwe['idfactura'], "fecha" => $qwe['fecha'], "nfactura" => $qwe['nfactura'], "montofactura" => $qwe['montofactura'],"codigotransaccion" => $idtr['codigotransaccion'],"por_concepto_de" => $qwe['por_concepto_de'],"prov_client" => $clientSelect['nombre'],"idcomprobante" => $compr['idcuentaspof'],"archivo" => $compr['archivo'],"estado_documento" => $estado_documento);
 
         }
          array_push($lista, $res);
