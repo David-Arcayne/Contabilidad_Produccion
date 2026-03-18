@@ -1812,7 +1812,7 @@ public function asignar_facturas_A_cuentas($data) {
             foreach ($data['facturas_contabilidad'] as $factura) {
 
                 // $montoFacturas += $factura['monto'];
-                $updatetranscodigo = $this->dbc->query("UPDATE factura SET transacciones_idtransacciones = '0' WHERE idfactura = '{$factura['idfactura']}'");
+                $updatetranscodigo = $this->dbc->query("UPDATE factura SET transacciones_idtransacciones = '0', cuenta ='0' WHERE idfactura = '{$factura['idfactura']}'");
 
             }
    

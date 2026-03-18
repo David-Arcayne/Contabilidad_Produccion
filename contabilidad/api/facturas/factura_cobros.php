@@ -1132,9 +1132,9 @@ public function registrar_anular_eliminar_activar_factura_tributario_transaccion
 
     public function cambiarEstado_anular_eliminar_activar_factura_tributario_transaccion($idsoli,$estado_opcion,$estado_solicitud,$fecha_proceso,$hora_proceso,$idusuario_admin){
         //actualizar esto:
-        // ini_set('display_errors', 1);
-        // ini_set('display_startup_errors', 1);
-        // error_reporting(E_ALL);
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
         // echo json_encode(array($idtran_espera,$estado,$fecha,$hora));
         $usuario=$this->getidusuario($idusuario_admin);
                 $res="";
@@ -1213,23 +1213,24 @@ public function registrar_anular_eliminar_activar_factura_tributario_transaccion
                             WHERE idfactura = '$id_documento'"); 
                         }
  
-                    }else{ // ES RECIBO
-                        $update_docu=$this->dbc->query("UPDATE recibo SET estado = '1' 
-                        WHERE idrecibo = '$id_documento'");  
+                    }
+                    // else{ // ES RECIBO
+                    //     $update_docu=$this->dbc->query("UPDATE recibo SET estado = '1' 
+                    //     WHERE idrecibo = '$id_documento'");  
 
-                        $reci = $this->dbc->query("SELECT * FROM recibo WHERE idrecibo='$id_documento'");
-                        $reci_comprob = $reci->fetch_assoc();
+                    //     $reci = $this->dbc->query("SELECT * FROM recibo WHERE idrecibo='$id_documento'");
+                    //     $reci_comprob = $reci->fetch_assoc();
 
-                        //ESTAMOS DENEGANDO LOS COMPROBANTES DE EL RECIBO QUE SE QUERIA ANULAR
-                        if($reci_comprob['cobrado'] != '0'){ // COBROS
-                            $update_comprob=$this->dbc->query("UPDATE cuentaspof SET estado = '1' 
-                            WHERE idrecibo = '$id_documento'"); 
-                        }else{ // PAGOS
-                            $update_comprob=$this->dbc->query("UPDATE cuentaspor SET estado = '1' 
-                            WHERE idrecibo = '$id_documento'"); 
-                        }
+                    //     //ESTAMOS DENEGANDO LOS COMPROBANTES DE EL RECIBO QUE SE QUERIA ANULAR
+                    //     if($reci_comprob['cobrado'] != '0'){ // COBROS
+                    //         $update_comprob=$this->dbc->query("UPDATE cuentaspof SET estado = '1' 
+                    //         WHERE idrecibo = '$id_documento'"); 
+                    //     }else{ // PAGOS
+                    //         $update_comprob=$this->dbc->query("UPDATE cuentaspor SET estado = '1' 
+                    //         WHERE idrecibo = '$id_documento'"); 
+                    //     }
 
-                    } 
+                    // } 
                   
                     $res = array("success", "Se Denego el permiso para anular", "cambiarEstado_anular_eliminar_documento");
 
@@ -1376,7 +1377,7 @@ public function registrar_anular_eliminar_activar_factura_tributario_transaccion
          
             }       
 
-            echo json_encode($res);
+            echo json_encode(array($idsoli,$estado_opcion,$estado_solicitud,$fecha_proceso,$hora_proceso,$idusuario_admin));
         
         }
 

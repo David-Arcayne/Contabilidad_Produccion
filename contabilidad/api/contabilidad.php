@@ -2181,7 +2181,7 @@ WHERE
     echo json_encode($lista);
 }
 
-// listaimpuestoentreplan getgestionactualid anular
+// listaimpuestoentreplan getgestionactualid anular lista_cobrar_cobrado_factura
 }// row cambiarestadoconsolidado crearfacturas editar listafacturaapi_cobrado
 // registrar_factura_cobros_tributario crearsolofacturasapif5
 // listafacturaapi_cobrado registrardesconsolidar   lista_cobrar_cobrado_factura lista_pagar_pagado_factura
