@@ -260,7 +260,7 @@ foreach($facturas as $factura){
         $lista = [];
         $cf = 1;
         $idsucursal = $this->getidsucursal($sucursal);
-        $registro = $this->dbc->query("SELECT f.idfactura,f.fecha,f.nfactura, f.montofactura,f.proveedorcliente_idproveedorcliente,f.transacciones_idtransacciones,f.cuenta,f.pagado,f.por_concepto_de,f.registro_desde
+        $registro = $this->dbc->query("SELECT f.idfactura,f.fecha,f.nfactura, f.montofactura,f.proveedorcliente_idproveedorcliente,f.transacciones_idtransacciones,f.cuenta,f.pagado,f.por_concepto_de,f.registro_desde,f.estado
          FROM factura f
          WHERE f.clasefactura='$cf' AND f.sucursal='$idsucursal' 
          ORDER BY f.idfactura DESC");
