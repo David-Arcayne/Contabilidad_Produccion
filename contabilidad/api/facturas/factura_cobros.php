@@ -1469,7 +1469,7 @@ public function registrar_anular_eliminar_activar_factura_tributario_transaccion
                             WHERE idcuentaspor = '$id_documento'");  
                         }
                      
-                    $res = array("success", "Se Acepto la anulacion del documento", "cambiarEstado_anular_eliminar_documento");
+                    $res = array("success", "Se Acepto la anulacion del documento", "cambiarEstado_anular_eliminar_documento",$idsoli,$tipo_documento,$estado_opcion,$estado_solicitud,$fecha_proceso,$hora_proceso,$idusuario_admin);
 
                 }else{ //DENEGADO --> estado_solicitud == 3
                     //NO SE ANULARA PERO SI CAMBIARA ESTADO DEL COMPROBANTE
@@ -1588,13 +1588,13 @@ public function registrar_anular_eliminar_activar_factura_tributario_transaccion
                             $update_comprob=$this->dbc->query("UPDATE cuentaspor SET estado = '4' 
                             WHERE idfactura = '$id_documento'"); 
                         }
-                $res = array("success", "Se Denego el permiso para activar", "cambiarEstado_anular_eliminar_documento");
+                $res = array("success", "Se Denego el permiso para activar", "cambiarEstado_anular_eliminar_documento",$idsoli,$tipo_documento,$estado_opcion,$estado_solicitud,$fecha_proceso,$hora_proceso,$idusuario_admin);
  
             }
          
             }       
-
-            echo json_encode($res);
+             echo json_encode($res);
+            // echo json_encode($idsoli,$tipo_documento,$estado_opcion,$estado_solicitud,$fecha_proceso,$hora_proceso,$idusuario_admin);
         
         }
     public function getgestionactualC($empresa)
