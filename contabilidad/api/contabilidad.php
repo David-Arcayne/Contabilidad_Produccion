@@ -125,6 +125,7 @@ class Contabilidad extends DB
                 d.hora, 
                 d.fecha, 
                 d.idusuario, 
+                d.idusuariob,
                 d.codigo,
                 d.horaproceso,
                 d.fechaproceso, 
@@ -153,7 +154,8 @@ class Contabilidad extends DB
                 d.estado, 
                 d.hora, 
                 d.fecha, 
-                d.idusuario, 
+                d.idusuario,
+                d.idusuariob, 
                 d.codigo,
                 d.horaproceso,
                 d.fechaproceso, 
@@ -178,7 +180,9 @@ class Contabilidad extends DB
             // Procesar los resultados
             while ($qwe = $this->dbc->fetch($sql)) {
                $usuario = $this->getusuario($qwe['idusuario']); // Asegúrate de que esta función retorne los campos esperados
-                $usuariob = isset($qwe['idusuariob']) ? $this->getusuario($qwe['idusuariob']) : null;
+                // $usuariob = isset($qwe['idusuariob']) ? $this->getusuario($qwe['idusuariob']) : null;
+                $usuario_admin = $this->getusuario($qwe['idusuariob']);
+
                 /*"
                     */
     
@@ -199,9 +203,9 @@ class Contabilidad extends DB
                     "usuario" => $usuario['usuario'] ?? null,
                     "nombre" => $usuario['nombre'] ?? null,
                     "apellido" => $usuario['apellido'] ?? null,
-                    "usuariob" => $usuariob['usuario'] ?? null,
-                    "nombreb" => $usuariob['nombre'] ?? null,
-                    "apellidob" => $usuariob['apellido'] ?? null
+                    "usuario_admin" => $usuario_admin['usuario'] ?? null,
+                    "nombre_admin" => $usuario_admin['nombre'] ?? null,
+                    "apellido_admin" => $usuario_admin['apellido'] ?? null
                 ];
             }
     
@@ -213,11 +217,12 @@ class Contabilidad extends DB
     }
          
 //DESCONSOLIDACION INDIVIDUAL
-    public function cambiarestadoconsolidado($grupo,$estado,$fecha,$hora,$idusuario){
+    public function cambiarestadoconsolidado($grupo,$estado,$fecha,$hora,$idusuario_admin){
 //actualizar esto:
 
         $res=""; // ESTADO = 1 ES ACEPTADO, 2 ES DENEGADO
-        $registro=$this->dbc->query("UPDATE desconsolidar SET estado='$estado',fechaproceso='$fecha',horaproceso='$hora' WHERE codigo='$grupo'");
+        $usuario=$this->getidusuario($idusuario_admin);
+        $registro=$this->dbc->query("UPDATE desconsolidar SET estado='$estado',fechaproceso='$fecha',horaproceso='$hora',idusuariob ='$usuario' WHERE codigo='$grupo'");
         //consolidar es 2 y desconsolidar es 1
         if($estado==1){
             $desconsolidar=$this->dbc->query("SELECT * FROM desconsolidar WHERE codigo='$grupo'");
@@ -1376,7 +1381,8 @@ WHERE
         //  WHERE f.clasefactura='$cf' AND f.sucursal='$idsucursal' 
         //  AND f.transacciones_idtransacciones=t.idtransacciones
         //  ORDER BY f.idfactura DESC");
-        $registro = $this->dbc->query("SELECT f.idfactura,f.fecha,f.nfactura, f.montofactura,f.proveedorcliente_idproveedorcliente,f.transacciones_idtransacciones,f.cuenta,f.cobrado,f.por_concepto_de,f.registro_desde,f.estado
+        $registro = $this->dbc->query("SELECT f.idfactura,f.fecha,f.nfactura, f.montofactura,f.proveedorcliente_idproveedorcliente,
+        f.transacciones_idtransacciones,f.cuenta,f.cobrado,f.por_concepto_de,f.registro_desde,f.estado,f.tipo_factura
          FROM factura f
          WHERE f.clasefactura='$cf' AND f.sucursal='$idsucursal' 
          ORDER BY f.idfactura DESC");
@@ -1430,13 +1436,16 @@ WHERE
                    array_push($pagados, $pes2);
                }
 
-               $res = array("id" => $qwe[0], "fecha" => $qwe[1], "numero" => $qwe[2], "codigo" => $cod_transaccion['codigotransaccion'], "idproveedor" => $qwe[4], "nombrep" => $pro['nombre'], "monto" => $qwe[3], "pagado" => $resultado33['monto'], "saldo" => 0, "transaccion" => $qwe[5], "cuenta" => $qwe[6],"por_concepto_de" => $qwe['por_concepto_de'],"registro_desde" => $qwe['registro_desde'],"estado_documento" => $estado_documento,"estado_comprobante" => "comprobante_cobro", "detalle" => $pagados);
+               $res = array("id" => $qwe[0], "fecha" => $qwe[1], "numero" => $qwe[2], "codigo" => $cod_transaccion['codigotransaccion'], "idproveedor" => $qwe[4],
+                "nombrep" => $pro['nombre'], "monto" => $qwe[3], "pagado" => $resultado33['monto'], "saldo" => 0, "transaccion" => $qwe[5],
+                 "cuenta" => $qwe[6],"por_concepto_de" => $qwe['por_concepto_de'],"registro_desde" => $qwe['registro_desde'],"estado_documento" => $estado_documento,
+                 "estado_comprobante" => "comprobante_cobro","tipo_factura" => $qwe['tipo_factura'], "detalle" => $pagados);
                array_push($lista, $res);
 
                 }else{
                     //hay solo individuales
                     
-                    $cobras = $this->dbc->query("SELECT SUM(monto) FROM cuentaspof WHERE idfactura='$qwe[0]' AND (estado != '4' OR estado IS NULL)"); //173
+                    $cobras = $this->dbc->query("SELECT SUM(monto) FROM cuentaspof WHERE idfactura='$qwe[0]' AND (estado NOT IN(4,5) OR estado IS NULL)"); //173
                     $asd = $this->dbc->fetch($cobras);
                     $saldo = $qwe[3] - $asd[0];
                     $cuentacobrar2 = $this->dbc->query("SELECT nrecibo,fecha,persona,ci,monto,idcuentaspof FROM cuentaspof WHERE idfactura='$qwe[0]'");
@@ -1444,7 +1453,9 @@ WHERE
                                 $pes = array("nrecibo" => $zxc[0], "fechar" => $zxc[1], "persona" => $zxc[2], "ci" => $zxc[3], "monto" => $zxc[4], "id" => $zxc[5],"estado_comprobante" => "comprobante_cobro");
                                 array_push($pagados, $pes);
                             }
-                    $res = array("id" => $qwe[0], "fecha" => $qwe[1], "numero" => $qwe[2], "codigo" => $cod_transaccion['codigotransaccion'], "idproveedor" => $qwe[4], "nombrep" => $pro['nombre'], "monto" => $qwe[3], "pagado" => $asd[0], "saldo" => $saldo, "transaccion" => $qwe[5], "cuenta" => $qwe[6],"por_concepto_de" => $qwe['por_concepto_de'],"registro_desde" => $qwe['registro_desde'],"estado_documento" => $estado_documento,"estado_comprobante" => "comprobante_cobro", "detalle" => $pagados);
+                    $res = array("id" => $qwe[0], "fecha" => $qwe[1], "numero" => $qwe[2], "codigo" => $cod_transaccion['codigotransaccion'], "idproveedor" => $qwe[4], "nombrep" => $pro['nombre'],
+                     "monto" => $qwe[3], "pagado" => $asd[0], "saldo" => $saldo, "transaccion" => $qwe[5], "cuenta" => $qwe[6],"por_concepto_de" => $qwe['por_concepto_de'],
+                     "registro_desde" => $qwe['registro_desde'],"estado_documento" => $estado_documento,"estado_comprobante" => "comprobante_cobro","tipo_factura" => $qwe['tipo_factura'], "detalle" => $pagados);
                     array_push($lista, $res);
                 }//listapagos
             }elseif($hayGrupales > 0){
@@ -1458,7 +1469,10 @@ WHERE
                     $pes = array("nrecibo" => $zxc[0], "fechar" => $zxc[1], "persona" => $zxc[2], "ci" => $zxc[3], "monto" => $resultado3['monto'], "id" => $zxc[5],"estado_comprobante" => "comprobante_cobro");
                     array_push($pagados, $pes);
                 }
-                $res = array("id" => $qwe[0], "fecha" => $qwe[1], "numero" => $qwe[2], "codigo" => $cod_transaccion['codigotransaccion'], "idproveedor" => $qwe[4], "nombrep" => $pro['nombre'], "monto" => $qwe[3], "pagado" => $resultado3['monto'], "saldo" => 0, "transaccion" => $qwe[5], "cuenta" => $qwe[6],"por_concepto_de" => $qwe['por_concepto_de'],"registro_desde" => $qwe['registro_desde'],"estado_documento" => $estado_documento,"estado_comprobante" => "comprobante_cobro", "detalle" => $pagados);
+                $res = array("id" => $qwe[0], "fecha" => $qwe[1], "numero" => $qwe[2], "codigo" => $cod_transaccion['codigotransaccion'], "idproveedor" => $qwe[4],
+                 "nombrep" => $pro['nombre'], "monto" => $qwe[3], "pagado" => $resultado3['monto'], "saldo" => 0, "transaccion" => $qwe[5], "cuenta" => $qwe[6],
+                 "por_concepto_de" => $qwe['por_concepto_de'],"registro_desde" => $qwe['registro_desde'],"estado_documento" => $estado_documento,
+                 "estado_comprobante" => "comprobante_cobro","tipo_factura" => $qwe['tipo_factura'], "detalle" => $pagados);
                 array_push($lista, $res);
             }
             elseif($qwe[7] == '2'){ // ESTA COBRADO
@@ -1468,7 +1482,8 @@ WHERE
             $res = array("id" => $qwe[0], "fecha" => $qwe[1], "numero" => $qwe[2],
              "codigo" => $cod_transaccion['codigotransaccion'], "idproveedor" => $qwe[4], "nombrep" => $nombrep,
               "monto" => $qwe[3], "pagado" => $qwe[3], "saldo" => 0, "transaccion" => $qwe[5],
-               "cuenta" => $qwe[6],"por_concepto_de" => $qwe['por_concepto_de'],"registro_desde" => $qwe['registro_desde'],"estado_documento" => $estado_documento,"estado_comprobante" => "comprobante_cobro", "detalle" => $pagados);
+               "cuenta" => $qwe[6],"por_concepto_de" => $qwe['por_concepto_de'],"registro_desde" => $qwe['registro_desde'],
+               "estado_documento" => $estado_documento,"estado_comprobante" => "comprobante_cobro","tipo_factura" => $qwe['tipo_factura'], "detalle" => $pagados);
             array_push($lista, $res);
             
             }
@@ -1478,7 +1493,8 @@ WHERE
             $res = array("id" => $qwe[0], "fecha" => $qwe[1], "numero" => $qwe[2],
              "codigo" => $cod_transaccion['codigotransaccion'], "idproveedor" => $qwe[4], "nombrep" => $pro['nombre'],
               "monto" => $qwe[3], "pagado" => 0, "saldo" => $qwe[3], "transaccion" => $qwe[5],
-               "cuenta" => $qwe[6],"por_concepto_de" => $qwe['por_concepto_de'],"registro_desde" => $qwe['registro_desde'],"estado_documento" => $estado_documento,"estado_comprobante" => "comprobante_cobro", "detalle" => $pagados);
+               "cuenta" => $qwe[6],"por_concepto_de" => $qwe['por_concepto_de'],"registro_desde" => $qwe['registro_desde'],
+               "estado_documento" => $estado_documento,"estado_comprobante" => "comprobante_cobro","tipo_factura" => $qwe['tipo_factura'], "detalle" => $pagados);
             array_push($lista, $res);
             
         }

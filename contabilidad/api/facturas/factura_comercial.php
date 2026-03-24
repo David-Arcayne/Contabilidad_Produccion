@@ -731,4 +731,35 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
     
         echo json_encode($res);
     }
+
+    public function registrar_caja_bancos_comercial($id_documento,$idcaja_bancos,$monto,$registro_desde,$estado,$empresa){
+        // $idempresa = Empresa::getidempresa($empresa);
+        $idempresa = $this->getidempresa($empresa);
+
+            // Insertar el nuevo registro
+            $registroProveedor = $this->dbc->query("INSERT INTO detalle_caja_bancos_comercial(id_documento,idcaja_bancos,monto,registro_desde,estado,idempresa) VALUES ('$id_documento','$idcaja_bancos','$monto','$registro_desde','$estado','$idempresa')");
+            if ($registroProveedor === TRUE) {                                                                                                                                                                
+                $res = array("success", "Registro exitoso","registroCaracteristicas");
+            } else {
+                $res = array("danger", "No se pudo registrar");
+            }
+        
+        echo json_encode($res);
+        
+    }
+    public function autorizacion_caja_bancos_comercial($id_documento,$registro_desde,$estado){
+        // $idempresa = Empresa::getidempresa($empresa);
+
+            // Insertar el nuevo registro
+            $registroProveedor = $this->dbc->query("UPDATE detalle_caja_bancos_comercial SET estado = '$estado' WHERE id_documento = '$id_documento' AND registro_desde ='$registro_desde'");
+
+            if ($registroProveedor === TRUE) {                                                                                                                                                                
+                $res = array("success", "Registro exitoso","registroCaracteristicas");
+            } else {
+                $res = array("danger", "No se pudo registrar");
+            }
+        
+        echo json_encode($res);
+        
+    }
 }

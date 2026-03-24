@@ -221,7 +221,7 @@ class Cuentas_transacciones extends DB{
 
         while ($cp = $this->dbc->fetch($cobros_pagos)) { 
                
-                $res = array("idcomprobante" => $cp['idcomprobante'], "fecha" => $cp['fecha'], "nrecibo" => $cp['nrecibo'], "monto" => $cp['monto'],"persona" => $cp['persona'],"tipo" => $cp[4]);   
+                $res = array("idcomprobante" => $cp['idcomprobante'], "fecha" => $cp['fecha'], "nrecibo" => $cp['nrecibo'], "monto" => $cp['monto'],"persona" => $cp['persona'],"tipo" => $cp[5]);   
                          
                 array_push($lista, $res);
             }
@@ -399,6 +399,36 @@ class Cuentas_transacciones extends DB{
             "pagado" => $qwe['pagado'],
             "concepto" => $qwe['concepto'],
             "cliente_proveedor" => $nombre
+        );
+        $lista[] = $res;
+    }
+
+    // COMPROBANTES
+    $registro = $this->dbc->query("SELECT idcuentaspof AS idcomprobante ,fecha, nrecibo, monto,persona, concepto,'comprobante de cobro' AS tipo FROM cuentaspof WHERE cuenta = '$idcuenta'
+        UNION
+        SELECT idcuentaspor AS idcomprobante ,fecha, nrecibo, monto,persona, concepto,'comprobante de pago' AS tipo FROM cuentaspor WHERE cuenta = '$idcuenta';
+        ");
+    while ($qwe = $this->dbc->fetch($registro)) {
+        // if ($qwe['cobrado'] != 0) {
+        //     $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $qwe['proveedorcliente_idproveedorcliente'] . "'");
+        //     $asd = $this->dbcm->fetch($cliente);
+        //     $nombre = $asd['nombre'];
+        // } else {
+        //     $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='" . $qwe['proveedorcliente_idproveedorcliente'] . "'");
+        //     $asd = $this->dbcm->fetch($proveedor);
+        //     $nombre = $asd['nombre'];
+        // }
+
+        $res = array(
+            "tipo" => $qwe['tipo'],
+            "id" => $qwe['idcomprobante'],
+            "fecha" => $qwe['fecha'],
+            "nro_documento" => $qwe['nrecibo'],
+            "monto" => $qwe['monto'],
+            // "cobrado" => $qwe['cobrado'],
+            // "pagado" => $qwe['pagado'],
+            "concepto" => $qwe['concepto'],
+            "cliente_proveedor" => $qwe['persona']
         );
         $lista[] = $res;
     }

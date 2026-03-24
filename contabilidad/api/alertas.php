@@ -80,47 +80,67 @@ class Alertas extends DB{
         array_push($lista, $res);
         // Retornar la lista en formato JSON
         echo json_encode($lista);
-}   
-public function alerta_anular_eliminar_transaccion($idempresa) {
-      ini_set('display_errors', 1); //,$nit,$cobro_pago,$cliente_proveedor,
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+    }   
+    public function alerta_anular_eliminar_transaccion($idempresa) {
+        ini_set('display_errors', 1); //,$nit,$cobro_pago,$cliente_proveedor,
+            ini_set('display_startup_errors', 1);
+            error_reporting(E_ALL);
 
-    $lista = [];
-    $gestion=$this->getidgestion($idempresa);
-    // Consulta SQL
-    $sql =$this->dbc->query("SELECT COUNT(*) AS cantidad FROM solicitud_anular_eliminar s
-    INNER JOIN transacciones t ON t.idtransacciones = s.transacciones_idtransacciones
-    WHERE md5(s.idempresa) = '$idempresa' AND s.estado_solicitud = '1' AND t.idgestion = '$gestion'");
-    $resultado = $sql->fetch_assoc();       
+        $lista = [];
+        $gestion=$this->getidgestion($idempresa);
+        // Consulta SQL
+        $sql =$this->dbc->query("SELECT COUNT(*) AS cantidad FROM solicitud_anular_eliminar s
+        INNER JOIN transacciones t ON t.idtransacciones = s.transacciones_idtransacciones
+        WHERE md5(s.idempresa) = '$idempresa' AND s.estado_solicitud = '1' AND t.idgestion = '$gestion'");
+        $resultado = $sql->fetch_assoc();       
 
-    $res = array(
-        "cantidad" => $resultado['cantidad']
-    );
-    // $res2= $contador;
-    array_push($lista, $res);
-    // Retornar la lista en formato JSON
-    echo json_encode($lista);
-}   
+        $res = array(
+            "cantidad" => $resultado['cantidad']
+        );
+        // $res2= $contador;
+        array_push($lista, $res);
+        // Retornar la lista en formato JSON
+        echo json_encode($lista);
+    }   
 
-public function alerta_transacciones_comercial($idempresa) {
-    $lista = [];
-    $gestion=$this->getidgestion($idempresa);
+    public function alerta_transacciones_comercial($idempresa) {
+        $lista = [];
+        $gestion=$this->getidgestion($idempresa);
 
-    // Consulta SQL
-    $sql =$this->dbc->query("SELECT COUNT(*) AS cantidad FROM transacciones WHERE md5(organizacion_idorganizacion) = '$idempresa' AND estado = '6' AND idgestion = '$gestion'");
-    $resultado = $sql->fetch_assoc();       
+        // Consulta SQL
+        $sql =$this->dbc->query("SELECT COUNT(*) AS cantidad FROM transacciones WHERE md5(organizacion_idorganizacion) = '$idempresa' AND estado = '6' AND idgestion = '$gestion'");
+        $resultado = $sql->fetch_assoc();       
 
-    $res = array(
-        "cantidad" => $resultado['cantidad']
-    );
+        $res = array(
+            "cantidad" => $resultado['cantidad']
+        );
 
-    // $res2= $contador;
-    array_push($lista, $res);
-    // Retornar la lista en formato JSON
-    echo json_encode($lista);
-}   
+        // $res2= $contador;
+        array_push($lista, $res);
+        // Retornar la lista en formato JSON
+        echo json_encode($lista);
+    }   
 
+    public function alerta_anular_eliminar_documentos($idempresa) {
+        ini_set('display_errors', 1); //,$nit,$cobro_pago,$cliente_proveedor,
+            ini_set('display_startup_errors', 1);
+            error_reporting(E_ALL);
+
+        $lista = [];
+        $gestion=$this->getidgestion($idempresa);
+        // Consulta SQL
+        $sql =$this->dbc->query("SELECT COUNT(*) AS cantidad FROM solicitud_anular_eliminar_documento 
+        WHERE md5(idempresa) = '$idempresa' AND estado_solicitud = '1' AND idgestion = '$gestion'");
+        $resultado = $sql->fetch_assoc();       
+
+        $res = array(
+            "cantidad" => $resultado['cantidad']
+        );
+        // $res2= $contador;
+        array_push($lista, $res);
+        // Retornar la lista en formato JSON
+        echo json_encode($lista);
+    }   
     public function getusuario($id) {
         $registro = $this->dbrh->query("
             SELECT u.nombre AS usuario_nombre, t.nombre AS trabajador_nombre, t.apellido, t.ci 

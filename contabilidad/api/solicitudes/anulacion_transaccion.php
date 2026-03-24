@@ -34,6 +34,7 @@ class Anulacion_transaccion extends DB{
             // Procesar los resultados
             while ($qwe = $this->dbc->fetch($sql)) {
                $usuario = $this->getusuario($qwe['idusuario']); // Asegúrate de que esta función retorne los campos esperados
+               $usuario_admin = $this->getusuario($qwe['idusuario_admin']);
                 // $usuariob = isset($qwe['idusuariob']) ? $this->getusuario($qwe['idusuariob']) : null;
                 /*" 
                     */
@@ -51,6 +52,8 @@ class Anulacion_transaccion extends DB{
                     "idusuario" => $qwe['idusuario'],
                     "nombre" => $usuario['nombre'] ?? null,
                     "apellido" => $usuario['apellido'] ?? null,
+                    "nombre_admin" => $usuario_admin['nombre'] ?? null,
+                    "apellido_admin" => $usuario_admin['apellido'] ?? null,
                     "motivo" => $qwe['motivo']
                 ];
             } 
@@ -119,7 +122,7 @@ public function registrar_anular_eliminar_activar_transaccion($idtransaccion,$mo
                     SET estado_solicitud = '$estado_solicitud',
                     hora_proceso = '$hora_proceso',
                     fecha_proceso = '$fecha_proceso',
-                    idusuario_admin = '$idusuario_admin'
+                    idusuario_admin = '$usuario'
                         WHERE idsolicitud_anular_eliminar = '$idsoli'");   
 
                 if($estado_solicitud == 2){ //ACEPTADO
@@ -152,7 +155,7 @@ public function registrar_anular_eliminar_activar_transaccion($idtransaccion,$mo
                     SET estado_solicitud = '$estado_solicitud',
                     hora_proceso = '$hora_proceso',
                     fecha_proceso = '$fecha_proceso',
-                    idusuario_admin = '$idusuario_admin'
+                    idusuario_admin = '$usuario'
                         WHERE idsolicitud_anular_eliminar = '$idsoli'");   
 
                 if($estado_solicitud == 2){ //ACEPTADO
@@ -279,7 +282,7 @@ public function registrar_anular_eliminar_activar_transaccion($idtransaccion,$mo
                 SET estado_solicitud = '$estado_solicitud',
                 hora_proceso = '$hora_proceso',
                 fecha_proceso = '$fecha_proceso',
-                idusuario_admin = '$idusuario_admin'
+                idusuario_admin = '$usuario'
                 WHERE idsolicitud_anular_eliminar = '$idsoli'");   
 
             if($estado_solicitud == 2){ //ACEPTADO

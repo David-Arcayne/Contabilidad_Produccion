@@ -247,6 +247,7 @@ class Insertar_transaccion extends DB{
                 // Procesar los resultados
                 while ($qwe = $this->dbc->fetch($sql)) {
                     $usuario = $this->getusuario($qwe['idusuario']); // Asegúrate de que esta función retorne los campos esperados
+                    $usuario_admin = $this->getusuario($qwe['idusuario_admin']);
                     // $usuariob = isset($qwe['idusuariob']) ? $this->getusuario($qwe['idusuariob']) : null;
                     /*"
                         */
@@ -262,7 +263,9 @@ class Insertar_transaccion extends DB{
                         "glosa" => $qwe['glosa'],
                         "idusuario" => $qwe['idusuario'],
                         "nombre" => $usuario['nombre'] ?? null,
-                        "apellido" => $usuario['apellido'] ?? null
+                        "apellido" => $usuario['apellido'] ?? null,
+                        "nombre_admin" => $usuario_admin['nombre'] ?? null,
+                        "apellido_admin" => $usuario_admin['apellido'] ?? null
                         ];
                     }
                         

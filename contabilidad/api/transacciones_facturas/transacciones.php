@@ -1602,7 +1602,7 @@ public function asignar_facturas_A_cuentas($data) {
         $ids_vinculados = [];
         
             foreach ($data['comprobantes'] as $comprobante) {
-                if($comprobante['tipo_comprobante'] == 'cobro'){  // COMPROBANTE COBROOO
+                if($comprobante['tipo_comprobante'] == 'venta'){  // COMPROBANTE COBROOO
 
                     $montoComprobantes += $comprobante['monto'];
                     $updatetranscodigo = $this->dbc->query("UPDATE cuentaspof SET cuenta = '$data[cuenta]', transaccion = '$dt[transacciones_idtransacciones]' WHERE idcuentaspof = '{$comprobante['idcomprobante']}'");
@@ -1642,11 +1642,6 @@ public function asignar_facturas_A_cuentas($data) {
                         AND idcuentaspor NOT IN ($ids_str)
                     ");
             
-            // UPDATE cuentaspof 
-        //                 SET cuenta = '0' 
-        //                 WHERE cuenta = '$cuenta' 
-        //                  AND idcuentaspof NOT IN ($idrecibo
-
             if($dt['debe'] > 0){
                 $nuevo_monto_dt = $montoComprobantes;
                 $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
@@ -1661,7 +1656,7 @@ public function asignar_facturas_A_cuentas($data) {
         
         // Respuesta
         if ($updatetranscodigo === TRUE) {
-            $res = array("success", "Se Registro Correctamente", "cobrofacturasaasientomodelo","hola");
+            $res = array("success", "Se Registro Correctamente", "cobrofacturasaasientomodelo","hola",$data['cuenta'],$data['comprobantes'],$data);
         } else {
             $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde");
         }
