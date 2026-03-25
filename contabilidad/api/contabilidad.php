@@ -2240,9 +2240,35 @@ WHERE
     echo json_encode($lista);
 }
 
+    public function listar_datos_de_usuario($usuario){
+    //actualizar esto:
+
+        $res=""; // ESTADO = 1 ES ACEPTADO, 2 ES DENEGADO
+        $id_usuario=$this->getidusuario($usuario);
+        $lista = [];
+            $datos=$this->dbrh->query("SELECT t.ci,t.nombre,t.apellido,c.cargo FROM usuario u
+            INNER JOIN trabajador t ON t.idtrabajador = u.trabajador_idtrabajador
+            INNER JOIN cargos c ON c.idcargos = t.cargos_idcargos
+            WHERE u.idusuario = '$id_usuario'");
+
+            $dts = $this->dbc->fetch($datos);
+            // while($qwe=$this->dbc->fetch($datos)){
+            //     $descTRan=$this->dbc->query("UPDATE transacciones SET consolidar='$estado', estado='1'  WHERE idtransacciones='$qwe[idtransaccion]'");
+            // }
+        
+            $res = array("ci" => $dts['ci'], "nombre_completo" => $dts['nombre'].$dts['apellido'], "cargo" => $dts['cargo']);
+            array_push($lista, $res);
+
+        // if($registro===TRUE){
+        //     $res=["ok"=>"success"];
+        // }else{
+        //     $res=["ok"=>"danger"];
+        // }
+        echo json_encode($lista);
+    }
 // listaimpuestoentreplan getgestionactualid anular lista_cobrar_cobrado_factura
 }// row cambiarestadoconsolidado crearfacturas editar listafacturaapi_cobrado
-// registrar_factura_cobros_tributario crearsolofacturasapif5
+// registrar_factura_cobros_tributario crearsolofacturasapif5  usuario
 // listafacturaapi_cobrado registrardesconsolidar   lista_cobrar_cobrado_factura lista_pagar_pagado_factura
 
 

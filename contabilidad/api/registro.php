@@ -889,7 +889,27 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idsolicitud_anular_eliminar'],$_POST['tipo_documento'],$_POST['estado_opcion'],$_POST['estado_solicitud'],$_POST['fecha_proceso'],$_POST['hora_proceso'],$_POST['idusuario_admin']));
         }
+    }elseif($data['ver'] == "desvincular_documentos_de_cuenta") {
+        $cont=new Transacciones();
+        $cont->desvincular_documentos_de_cuenta($data);
+    }elseif($ver == "activar_desactivar_tipo_cliente"){
+
+        if(isset($_POST['idtipocliente'])){
+            // decode echo json_encode(array("danger", "Faltan parámetros en la solicitud", $_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$facturas));
+            $cont=new Tipo_cliente_comercial();
+            $cont->activar_desactivar_tipo_cliente($_POST['idtipocliente']);
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idtipocliente']));
+        }
+    }elseif($data['ver'] == "registrar_caja_bancos_comercial") {
+        $cont=new Factura_comercial();
+        $cont->registrar_caja_bancos_comercial($data);
+    }elseif($data['ver'] == "autorizacion_caja_bancos_comercial") {
+        $cont=new Factura_comercial();
+        $cont->autorizacion_caja_bancos_comercial($data);
     }
+   
 // asignar asiento registrar_recibo_cobro_cajaBancos_en_otras_cuentas editar_recibo_caja_bancos registrocobrarfactura registrar_anular_eliminar_activar_factura_tributario_transaccion
 // editar_caja_bancos_facturas registrar_factura_cobro_otras_cuentas registrocobrarfactura registrar_recibo_otras_cuentas  cambiarEstado_anular_eliminar_activar_transaccion
 

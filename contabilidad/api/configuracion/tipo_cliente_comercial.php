@@ -117,6 +117,30 @@ class Tipo_cliente_comercial extends DB{
         echo json_encode($res);
     }
     
+    public function activar_desactivar_tipo_cliente($id){
+        $consulta = $this->dbcm->query("SELECT * FROM tipocliente WHERE idtipocliente = '$id'");
+        $resultado = $consulta->fetch_assoc();
+        $estado = $resultado['estado'];
+        // $idempresa = $resultado['idempresa'];
+
+        if($estado == '2'){ // esta desactivado
+            // $edicionDivisa = $this->dbp->query("UPDATE divisas SET estado = '1' WHERE id_divisas = '$id_divisas'");
+            $edicion_tipocliente = $this->dbcm->query("UPDATE tipocliente
+                                                SET estado = '1'
+                                                WHERE idtipocliente = '$id';
+        ");
+
+        }else{ // esta activado
+            $edicion_tipocliente = $this->dbcm->query("UPDATE tipocliente
+                                                SET estado = '2'
+                                                WHERE idtipocliente = '$id';
+        ");
+        }    
+        $res = array("success", "Actualizado correctamente","activar_divisa");  
+         
+        echo json_encode($res);
+    }
+
     public function getidempresa($md5)
     {
         $registro = $this->dbe->query("select * from organizacion where md5(idorganizacion)='$md5'");

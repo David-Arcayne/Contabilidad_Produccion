@@ -721,7 +721,6 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
             $editar_dt = TRUE;
         }
    
-        
         // Respuesta
         if ($editar_dt === TRUE) {
             $res = array("success", "Se Registro Correctamente", "asignar_facturas_A_cuentas",$data['cuenta'],$dt['transacciones_idtransacciones'],$nuevo_monto_dt,$montoFacturas,$idempresa,$data['idempresa'],gethostname());
@@ -732,12 +731,12 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
         echo json_encode($res);
     }
 
-    public function registrar_caja_bancos_comercial($id_documento,$idcaja_bancos,$monto,$registro_desde,$estado,$empresa){
+    public function registrar_caja_bancos_comercial($data){
         // $idempresa = Empresa::getidempresa($empresa);
-        $idempresa = $this->getidempresa($empresa);
+        $idempresa = $this->getidempresa($data['empresa']);
 
             // Insertar el nuevo registro
-            $registroProveedor = $this->dbc->query("INSERT INTO detalle_caja_bancos_comercial(id_documento,idcaja_bancos,monto,registro_desde,estado,idempresa) VALUES ('$id_documento','$idcaja_bancos','$monto','$registro_desde','$estado','$idempresa')");
+            $registroProveedor = $this->dbc->query("INSERT INTO detalle_caja_bancos_comercial(id_documento,idcaja_bancos,monto,registro_desde,estado,idempresa) VALUES ('$data[id_documento]','$data[idcaja_bancos]','$data[monto]','$data[registro_desde]','$data[estado]','$idempresa')");
             if ($registroProveedor === TRUE) {                                                                                                                                                                
                 $res = array("success", "Registro exitoso","registroCaracteristicas");
             } else {
@@ -747,11 +746,11 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
         echo json_encode($res);
         
     }
-    public function autorizacion_caja_bancos_comercial($id_documento,$registro_desde,$estado){
+    public function autorizacion_caja_bancos_comercial($data){
         // $idempresa = Empresa::getidempresa($empresa);
 
             // Insertar el nuevo registro
-            $registroProveedor = $this->dbc->query("UPDATE detalle_caja_bancos_comercial SET estado = '$estado' WHERE id_documento = '$id_documento' AND registro_desde ='$registro_desde'");
+            $registroProveedor = $this->dbc->query("UPDATE detalle_caja_bancos_comercial SET estado = '$data[estado]' WHERE id_documento = '$data[id_documento]' AND registro_desde ='$data[registro_desde]'");
 
             if ($registroProveedor === TRUE) {                                                                                                                                                                
                 $res = array("success", "Registro exitoso","registroCaracteristicas");

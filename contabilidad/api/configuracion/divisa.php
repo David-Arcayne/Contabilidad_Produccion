@@ -81,7 +81,7 @@ class Divisa extends DB{
                                                     ELSE 2
                                                 END
                                                 WHERE idempresa = '$idempresa';
-");
+        ");
 
             $res = array("success", "la divisa se activo exitosamente","activar_divisa");
         }        

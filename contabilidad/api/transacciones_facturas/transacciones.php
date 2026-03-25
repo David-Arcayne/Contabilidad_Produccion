@@ -1710,7 +1710,7 @@ public function asignar_facturas_A_cuentas($data) {
         $montoRecibos = 0;
             foreach ($data['recibos'] as $recibo) {
 
-                $montoFacturas += $recibo['monto'];
+                $montoRecibos += $recibo['monto'];
                 $updatetranscodigo = $this->dbc->query("UPDATE recibo SET cuenta = '0' WHERE idrecibo = '{$recibo['idrecibo']}'");
 
             }
@@ -1795,6 +1795,62 @@ public function asignar_facturas_A_cuentas($data) {
             $res = array("success", "Desvinculacion exitosa", "cobrofacturasaasientomodelo");
         } else {
             $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde",$factura['idfactura_comercial']);
+        }
+    
+        echo json_encode($res);
+    }
+    public function desvincular_documentos_de_cuenta($data) {
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
+    
+        $idempresa = $this->getidempresa($data['idempresa']);
+        // $idsucursal = $this->getidsucursal($data['idsucursal']); 
+        $gestion = $this->getgestionactualid($idempresa);
+        $monto_documento = 0;
+            foreach ($data['documentos'] as $docu) {
+
+                if($docu['tipo'] == 'factura_contabilidad'){
+
+                    $monto_documento += $docu['monto'];
+                    $updatetranscodigo = $this->dbc->query("UPDATE factura SET cuenta = '0' WHERE idfactura = '{$docu['id']}'");
+                }elseif($docu['tipo'] == 'factura_comercial'){
+
+
+                    $monto_documento += $docu['monto'];
+                    $updatetranscodigo = $this->dbc->query("UPDATE transaccion_factura_comercial SET cuenta = '0' WHERE idfactura_comercial = '{$docu['id']}'");
+                }elseif($docu['tipo'] == 'comprobante de cobro'){
+
+                    $monto_documento += $docu['monto'];
+                    $updatetranscodigo = $this->dbc->query("UPDATE cuentaspof SET cuenta = '0' WHERE idcuentaspof = '{$docu['id']}'");
+                }elseif($docu['tipo'] == 'comprobante de pago'){
+
+                    $monto_documento += $docu['monto'];
+                    $updatetranscodigo = $this->dbc->query("UPDATE cuentaspor SET cuenta = '0' WHERE idcuentaspor = '{$docu['id']}'");
+                }elseif($docu['tipo'] == 'recibo'){
+
+                    $monto_documento += $docu['monto'];
+                    $updatetranscodigo = $this->dbc->query("UPDATE recibo SET cuenta = '0' WHERE idrecibo = '{$docu['id']}'");
+                }
+
+            }
+                        
+        $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$data[cuenta]'");
+        $dt = $detalle_trans->fetch_assoc();
+
+            if($dt['debe'] > 0){
+                $nuevo_monto_dt = $dt['debe'] - $monto_documento;
+                $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
+            }else{
+                $nuevo_monto_dt = $dt['haber'] - $monto_documento;
+                $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
+            }
+   
+        // Respuesta
+        if ($editar_dt === TRUE) {
+            $res = array("success", "Se desvinculo Correctamente", "cobrofacturasaasientomodelo");
+        } else {
+            $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde");
         }
     
         echo json_encode($res);

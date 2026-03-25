@@ -724,7 +724,7 @@ class Factura_cobros extends DB{
                     SET estado_solicitud = '$estado_solicitud',
                     hora_proceso = '$hora_proceso',
                     fecha_proceso = '$fecha_proceso',
-                    idusuario_admin = '$idusuario_admin'
+                    idusuario_admin = '$usuario'
                         WHERE idsolicitud_anular_eliminar_documento = '$idsoli'");   
 
                 if($estado_solicitud == 2){ //ACEPTADO
@@ -815,7 +815,7 @@ class Factura_cobros extends DB{
                     SET estado_solicitud = '$estado_solicitud',
                     hora_proceso = '$hora_proceso',
                     fecha_proceso = '$fecha_proceso',
-                    idusuario_admin = '$idusuario_admin'
+                    idusuario_admin = '$usuario'
                         WHERE idsolicitud_anular_eliminar_documento = '$idsoli'");   
 
                 if($estado_solicitud == 2){ //ACEPTADO
@@ -928,7 +928,7 @@ class Factura_cobros extends DB{
                 SET estado_solicitud = '$estado_solicitud',
                 hora_proceso = '$hora_proceso',
                 fecha_proceso = '$fecha_proceso',
-                idusuario_admin = '$idusuario_admin'
+                idusuario_admin = '$usuario'
                 WHERE idsolicitud_anular_eliminar_documento = '$idsoli'");   
 
             if($estado_solicitud == 2){ //ACEPTADO
@@ -1454,7 +1454,7 @@ public function registrar_anular_eliminar_activar_factura_tributario_transaccion
                     SET estado_solicitud = '$estado_solicitud',
                     hora_proceso = '$hora_proceso',
                     fecha_proceso = '$fecha_proceso',
-                    idusuario_admin = '$idusuario_admin'
+                    idusuario_admin = '$usuario'
                         WHERE idsolicitud_anular_eliminar_documento = '$idsoli'");   
 
                 if($estado_solicitud == 2){ //ACEPTADO
@@ -1489,7 +1489,7 @@ public function registrar_anular_eliminar_activar_factura_tributario_transaccion
                     SET estado_solicitud = '$estado_solicitud',
                     hora_proceso = '$hora_proceso',
                     fecha_proceso = '$fecha_proceso',
-                    idusuario_admin = '$idusuario_admin'
+                    idusuario_admin = '$usuario'
                         WHERE idsolicitud_anular_eliminar_documento = '$idsoli'");   
             
                 if($estado_solicitud == 2){ //ACEPTADO
@@ -1531,7 +1531,7 @@ public function registrar_anular_eliminar_activar_factura_tributario_transaccion
                 SET estado_solicitud = '$estado_solicitud',
                 hora_proceso = '$hora_proceso',
                 fecha_proceso = '$fecha_proceso',
-                idusuario_admin = '$idusuario_admin'
+                idusuario_admin = '$usuario'
                 WHERE idsolicitud_anular_eliminar_documento = '$idsoli'");   
 
             if($estado_solicitud == 2){ //ACEPTADO
