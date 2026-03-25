@@ -755,6 +755,9 @@ elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
 }elseif($ver[0]=="alerta_anular_eliminar_documentos"){//listar_recibo_por_caja_bancos
     $cont=new Alertas();
     $cont->alerta_anular_eliminar_documentos($ver[1]);
+}elseif($ver[0]=="listar_tipo_cliente_activos"){//listar_recibo_por_caja_bancos
+    $cont=new Tipo_cliente_comercial();
+    $cont->listar_tipo_cliente_activos($ver[1]);
 }
 // reportedetalle listar_recibo_por_id listar_recibo_por_id_otras_cuentas listaclientes listar_recibo_por_caja_bancos listapagos alerta_anular_eliminar_transaccion
 // listar_factura           listar_facturas_cobro_pago      listaclientes listafacturaapi_cobrado lista_cobrar_cobrado_factura listar_todos_documentos_asignado_cuenta

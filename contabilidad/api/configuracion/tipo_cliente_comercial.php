@@ -50,8 +50,33 @@ class Tipo_cliente_comercial extends DB{
         $ide = $this->getidempresa($empresa);
         $registro = $this->dbcm->query("SELECT * FROM tipocliente where idempresa='$ide'");
         while ($qwe = $this->dbcm->fetch($registro)) {
-            $res = array("idtipocliente" => $qwe['idtipocliente'], "tipo" => $qwe['tipo'], "descripcion" => $qwe['descripcion'], "estado" => $qwe['estado'], "idempresa" => $qwe['idempresa']);
+            if($qwe['estado'] = '1'){
+                $estado = 'activo';
+            }else{ // 2
+                $estado = 'inactivo';
+            }
+            $res = array("idtipocliente" => $qwe['idtipocliente'], "tipo" => $qwe['tipo'],
+             "descripcion" => $qwe['descripcion'], "estado" => $estado, "idempresa" => $qwe['idempresa']);
             array_push($lista, $res);
+        }
+        echo  json_encode($lista);
+    }
+    public function listar_tipo_cliente_activos($empresa)
+    {
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+        $lista = [];
+        $ide = $this->getidempresa($empresa);
+        $registro = $this->dbcm->query("SELECT * FROM tipocliente where idempresa='$ide'");
+        while ($qwe = $this->dbcm->fetch($registro)) {
+            if($qwe['estado'] = '1'){
+                $res = array("idtipocliente" => $qwe['idtipocliente'], "tipo" => $qwe['tipo'],
+                "descripcion" => $qwe['descripcion'], "estado" => 'activo', "idempresa" => $qwe['idempresa']);
+                array_push($lista, $res);
+            }else{ // 2
+               //no listara nada
+            }
         }
         echo  json_encode($lista);
     }
