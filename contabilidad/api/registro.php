@@ -892,7 +892,8 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     }elseif($data['ver'] == "desvincular_documentos_de_cuenta") {
         $cont=new Transacciones();
         $cont->desvincular_documentos_de_cuenta($data);
-    }elseif($ver == "activar_desactivar_tipo_cliente"){
+    }
+    elseif($ver == "activar_desactivar_tipo_cliente"){
 
         if(isset($_POST['idtipocliente'])){
             // decode echo json_encode(array("danger", "Faltan parámetros en la solicitud", $_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$facturas));
@@ -916,7 +917,7 @@ if($data['ver'] == "asignar_asiento_A_factura") {
 //  editar_recibo_caja_bancos registrar_recibo_otras_cuentas registrar_factura_recibo_cobro_cajaBancos registropagarfactura registrar_recibo_pago_cajaBancos_en_otras_cuentas
 
 }
-// cambiarestadoconsolidado
+// cambiarestadoconsolidado registrar_factura_cobros_tributario
 //   cobro_asignacion_factura_comercial registrar_recibo_cobro_cajaBancos_en_otras_cuentas registrar_recibo_cobro_cajaBancos_en_otras_cuentas desconsolidar registrar_factura_cobro_otras_cuentas
 //  registrar_factura_pagos_tributario  registrar_recibo_pago_cajaBancos_en_otras_cuentas registrar_recibo_cobro_cajaBancos_en_otras_cuentas crearsolofacturasapif5  registrar_recibo_cobro_cajaBancos_en_facturas
 ?> 

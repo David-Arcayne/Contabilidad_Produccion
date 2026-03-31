@@ -355,10 +355,28 @@ class Cuentas_transacciones extends DB{
             $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $qwe['proveedorcliente_idproveedorcliente'] . "'");
             $asd = $this->dbcm->fetch($cliente);
             $nombre = $asd['nombre'];
+            $factura_cobro = "factura_cobro";
+
+            if($qwe['tipo_factura'] == 'contado'){
+                $comprob = $this->dbc->query("SELECT * FROM cuentaspof WHERE idfactura='$qwe[idfactura]'");
+                $cp = $this->dbc->fetch($comprob);
+                $idcomprobante = $cp['idcuentaspof'];
+            }else{
+                $idcomprobante = null;
+            }
+
         } else {
             $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='" . $qwe['proveedorcliente_idproveedorcliente'] . "'");
             $asd = $this->dbcm->fetch($proveedor);
             $nombre = $asd['nombre'];
+            $factura_cobro = "factura_pago";
+            if($qwe['tipo_factura'] == 'contado'){
+                $comprob = $this->dbc->query("SELECT * FROM cuentaspor WHERE idfactura='$qwe[idfactura]'");
+                $cp = $this->dbc->fetch($comprob);
+                $idcomprobante = $cp['idcuentaspor'];
+            }else{
+                $idcomprobante = null;
+            }
         }
 
         $res = array(
@@ -371,6 +389,9 @@ class Cuentas_transacciones extends DB{
             "cobrado" => $qwe['cobrado'],
             "pagado" => $qwe['pagado'],
             "concepto" => $qwe['por_concepto_de'],
+            "tipo_documento" => $qwe['tipo_factura'],
+            "documento_cobro_pago" => $factura_cobro,
+            "idcomprobante" => $idcomprobante,
             "cliente_proveedor" => $nombre
         );
         $lista[] = $res;
@@ -383,10 +404,20 @@ class Cuentas_transacciones extends DB{
             $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $qwe['proveedorcliente_idproveedorcliente'] . "'");
             $asd = $this->dbcm->fetch($cliente);
             $nombre = $asd['nombre'];
+            $recibo_cobro = "recibo_cobro";
+
+            $comprob = $this->dbc->query("SELECT * FROM cuentaspof WHERE idrecibo='$qwe[idrecibo]'");
+            $cp = $this->dbc->fetch($comprob);
+            $idcomprobante = $cp['idcuentaspof'];
         } else {
             $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='" . $qwe['proveedorcliente_idproveedorcliente'] . "'");
             $asd = $this->dbcm->fetch($proveedor);
             $nombre = $asd['nombre'];
+            $recibo_cobro = "recibo_pago";
+
+            $comprob = $this->dbc->query("SELECT * FROM cuentaspor WHERE idrecibo='$qwe[idrecibo]'");
+            $cp = $this->dbc->fetch($comprob);
+            $idcomprobante = $cp['idcuentaspor'];
         }
 
         $res = array(
@@ -398,17 +429,95 @@ class Cuentas_transacciones extends DB{
             "cobrado" => $qwe['cobrado'],
             "pagado" => $qwe['pagado'],
             "concepto" => $qwe['concepto'],
+            "tipo_documento" => 'contado',
+            "documento_cobro_pago" => $recibo_cobro,
+            "idcomprobante" => $idcomprobante,
             "cliente_proveedor" => $nombre
         );
         $lista[] = $res;
     }
 
     // COMPROBANTES
-    $registro = $this->dbc->query("SELECT idcuentaspof AS idcomprobante ,fecha, nrecibo, monto,persona, concepto,'comprobante de cobro' AS tipo FROM cuentaspof WHERE cuenta = '$idcuenta'
+    $registro = $this->dbc->query("SELECT idcuentaspof AS idcomprobante ,fecha, nrecibo,idfactura,idrecibo, monto,persona, concepto,'comprobante de cobro' AS tipo FROM cuentaspof WHERE cuenta = '$idcuenta'
         UNION
-        SELECT idcuentaspor AS idcomprobante ,fecha, nrecibo, monto,persona, concepto,'comprobante de pago' AS tipo FROM cuentaspor WHERE cuenta = '$idcuenta';
+        SELECT idcuentaspor AS idcomprobante ,fecha, nrecibo,idfactura,idrecibo, monto,persona, concepto,'comprobante de pago' AS tipo FROM cuentaspor WHERE cuenta = '$idcuenta';
         ");
     while ($qwe = $this->dbc->fetch($registro)) {
+        if($qwe['idfactura'] == null || $qwe['idfactura'] == '0'){ // ENTONCES EL COMPROBANTE PERTENECE A RECIBO
+            // $documento = $this->dbc->query("SELECT * FROM recibo WHERE idrecibo='$qwe[idrecibo]'");
+            // $rec = $this->dbc->fetch($documento);
+
+            // if($rec['cuenta'] == $idcuenta){ // EL RECIBO y el comprobante de ESE RECIBO pertenecen a la MISMA cuenta
+            //     // if($rec['tipo_factura'] == 'contado'){
+            //     //     // NO MOSTRARA EL COMPROBANTE PORQUE SINO SE VERA DUPLICADO 
+            //     // }else{
+            //     //     $res = array(
+            //     //     "tipo" => $qwe['tipo'],
+            //     //     "id" => $qwe['idcomprobante'],
+            //     //     "fecha" => $qwe['fecha'],
+            //     //     "nro_documento" => $qwe['nrecibo'],
+            //     //     "monto" => $qwe['monto'],
+            //     //     // "cobrado" => $qwe['cobrado'],
+            //     //     // "pagado" => $qwe['pagado'],
+            //     //     "concepto" => $qwe['concepto'],
+            //     //     "cliente_proveedor" => $qwe['persona']
+            //     // );
+            //     // $lista[] = $res;
+            //     // }
+            // }
+            // else{ //LA FACTURA Y EL COMPRANTE NO PERTENECEN A LA MISMA CUENTA 
+            //     $res = array(
+            //         "tipo" => $qwe['tipo'],
+            //         "id" => $qwe['idcomprobante'],
+            //         "fecha" => $qwe['fecha'],
+            //         "nro_documento" => $qwe['nrecibo'],
+            //         "monto" => $qwe['monto'],
+            //         // "cobrado" => $qwe['cobrado'],
+            //         // "pagado" => $qwe['pagado'],
+            //         "concepto" => $qwe['concepto'],
+            //         "cliente_proveedor" => $qwe['persona']
+            //     );
+            //     $lista[] = $res;
+            // }
+        }else{
+            $documento = $this->dbc->query("SELECT * FROM factura WHERE idfactura='$qwe[idfactura]'");
+            $ft = $this->dbc->fetch($documento);
+
+            if($ft['cuenta'] == $idcuenta){ // la factura y el comprobante de esa factura pertenecen a la cuenta
+                if($ft['tipo_factura'] == 'contado'){
+                    // NO MOSTRARA EL COMPROBANTE PORQUE SINO SE VERA DUPLICADO 
+                }else{
+                    $res = array(
+                    "tipo" => $qwe['tipo'],
+                    "id" => $qwe['idcomprobante'],
+                    "fecha" => $qwe['fecha'],
+                    "nro_documento" => $qwe['nrecibo'],
+                    "monto" => $qwe['monto'],
+                    // "cobrado" => $qwe['cobrado'],
+                    // "pagado" => $qwe['pagado'],
+                    "concepto" => $qwe['concepto'],
+                    "cliente_proveedor" => $qwe['persona']
+                );
+                $lista[] = $res;
+                }
+            }else{ //LA FACTURA Y EL COMPRANTE NO PERTENECEN A LA MISMA CUENTA 
+                $res = array(
+                    "tipo" => $qwe['tipo'],
+                    "id" => $qwe['idcomprobante'],
+                    "fecha" => $qwe['fecha'],
+                    "nro_documento" => $qwe['nrecibo'],
+                    "monto" => $qwe['monto'],
+                    // "cobrado" => $qwe['cobrado'],
+                    // "pagado" => $qwe['pagado'],
+                    "concepto" => $qwe['concepto'],
+                    "cliente_proveedor" => $qwe['persona']
+                );
+                $lista[] = $res;
+            }
+        }
+    
+        // $proveedor = $this->dbc->query("SELECT * FROM factura WHERE idfactura='$qwe[idfactura]'");
+
         // if ($qwe['cobrado'] != 0) {
         //     $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $qwe['proveedorcliente_idproveedorcliente'] . "'");
         //     $asd = $this->dbcm->fetch($cliente);
@@ -418,19 +527,7 @@ class Cuentas_transacciones extends DB{
         //     $asd = $this->dbcm->fetch($proveedor);
         //     $nombre = $asd['nombre'];
         // }
-
-        $res = array(
-            "tipo" => $qwe['tipo'],
-            "id" => $qwe['idcomprobante'],
-            "fecha" => $qwe['fecha'],
-            "nro_documento" => $qwe['nrecibo'],
-            "monto" => $qwe['monto'],
-            // "cobrado" => $qwe['cobrado'],
-            // "pagado" => $qwe['pagado'],
-            "concepto" => $qwe['concepto'],
-            "cliente_proveedor" => $qwe['persona']
-        );
-        $lista[] = $res;
+        
     }
 
     // ORDENAR POR FECHA

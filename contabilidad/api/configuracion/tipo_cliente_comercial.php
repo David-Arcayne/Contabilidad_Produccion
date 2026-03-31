@@ -50,7 +50,7 @@ class Tipo_cliente_comercial extends DB{
         $ide = $this->getidempresa($empresa);
         $registro = $this->dbcm->query("SELECT * FROM tipocliente where idempresa='$ide'");
         while ($qwe = $this->dbcm->fetch($registro)) {
-            if($qwe['estado'] = '1'){
+            if($qwe['estado'] == '1'){
                 $estado = 'activo';
             }else{ // 2
                 $estado = 'inactivo';
@@ -70,7 +70,7 @@ class Tipo_cliente_comercial extends DB{
         $ide = $this->getidempresa($empresa);
         $registro = $this->dbcm->query("SELECT * FROM tipocliente where idempresa='$ide'");
         while ($qwe = $this->dbcm->fetch($registro)) {
-            if($qwe['estado'] = '1'){
+            if($qwe['estado'] == '1'){
                 $res = array("idtipocliente" => $qwe['idtipocliente'], "tipo" => $qwe['tipo'],
                 "descripcion" => $qwe['descripcion'], "estado" => 'activo', "idempresa" => $qwe['idempresa']);
                 array_push($lista, $res);

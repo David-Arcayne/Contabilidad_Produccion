@@ -2256,7 +2256,7 @@ WHERE
             //     $descTRan=$this->dbc->query("UPDATE transacciones SET consolidar='$estado', estado='1'  WHERE idtransacciones='$qwe[idtransaccion]'");
             // }
         
-            $res = array("ci" => $dts['ci'], "nombre_completo" => $dts['nombre'].$dts['apellido'], "cargo" => $dts['cargo']);
+            $res = array("ci" => $dts['ci'], "nombre_completo" => $dts['nombre']." ".$dts['apellido'], "cargo" => $dts['cargo']);
             array_push($lista, $res);
 
         // if($registro===TRUE){
