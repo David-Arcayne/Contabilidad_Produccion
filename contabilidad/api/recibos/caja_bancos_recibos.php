@@ -1607,6 +1607,9 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
     AND cp.fecha <= '$fecha_fin'
     ORDER BY cp.fecha ASC;");
 
+    $get_comprobante_comercial = $this->dbc->query("SELECT * FROM comprobantes_comercial_caja_bancos 
+    WHERE idcaja_bancos IN ($caja_bancos) AND fecha BETWEEN '$fecha_ini' AND '$fecha_fin'");
+
     $aux_contador = 0;
     $saldo = 0;
     $saldo_inicial = 0;

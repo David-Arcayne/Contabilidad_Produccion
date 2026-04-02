@@ -731,28 +731,70 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
         echo json_encode($res);
     }
 
-    public function registrar_caja_bancos_comercial($data){
-        // $idempresa = Empresa::getidempresa($empresa);
+    // public function registrar_comprobantes_caja_bancos_comercial($data){
+    //     // $idempresa = Empresa::getidempresa($empresa);
+    //     $idempresa = $this->getidempresa($data['empresa']);
+
+    //     // nro comprobante y nro de documento yo lo pongo por defecto
+    //         // Insertar el nuevo registro
+    //         $registroProveedor = $this->dbc->query("INSERT INTO comprobantes_comercial_caja_bancos(lugar,cliente_proveedor,id_documento,nro_documento,nro_comprobante,registro_desde,concepto,idcaja_bancos,monto,estado,idempresa) 
+    //         VALUES ('$data[lugar]','$data[cliente_proveedor]','$data[id_documento]','$data[nro_documento]','correlativo','$data[registro_desde]','$data[concepto]','$data[idcaja_bancos]','$data[monto]','$data[estado]','$idempresa')");
+    //         if ($registroProveedor === TRUE) {                                                                                                                                                                
+    //             $res = array("success", "Registro exitoso","registroCaracteristicas");
+    //         } else {
+    //             $res = array("danger", "No se pudo registrar");
+    //         }
+        
+    //     echo json_encode($res);
+        
+    // }
+
+    public function registrar_comprobantes_caja_bancos_comercial($data){
         $idempresa = $this->getidempresa($data['empresa']);
 
-            // Insertar el nuevo registro
-            $registroProveedor = $this->dbc->query("INSERT INTO detalle_caja_bancos_comercial(id_documento,idcaja_bancos,monto,registro_desde,estado,idempresa) VALUES ('$data[id_documento]','$data[idcaja_bancos]','$data[monto]','$data[registro_desde]','$data[estado]','$idempresa')");
-            if ($registroProveedor === TRUE) {                                                                                                                                                                
-                $res = array("success", "Registro exitoso","registroCaracteristicas");
-            } else {
-                $res = array("danger", "No se pudo registrar");
-            }
-        
+        // Obtener el último correlativo para esa empresa y registro_desde
+        $sql = "SELECT MAX(nro_comprobante) as ultimo 
+                FROM comprobantes_comercial_caja_bancos 
+                WHERE idempresa = '$idempresa' 
+                AND registro_desde = '$data[registro_desde]'";
+        $result = $this->dbc->query($sql);
+        $row = $result->fetch_assoc();
+
+        $nuevo_correlativo = ($row['ultimo'] !== null) ? $row['ultimo'] + 1 : 1;
+
+        // Insertar el nuevo registro con el correlativo calculado
+        $registroComprobante_comercial = $this->dbc->query("INSERT INTO comprobantes_comercial_caja_bancos(
+            lugar, cliente_proveedor, id_documento, nro_documento, nro_comprobante, registro_desde, concepto, idcaja_bancos, monto, estado, idempresa
+        ) VALUES (
+            '{$data['lugar']}',
+            '{$data['cliente_proveedor']}',
+            '{$data['id_documento']}',
+            '{$data['nro_documento']}',
+            '$nuevo_correlativo',
+            '{$data['registro_desde']}',
+            '{$data['concepto']}',
+            '{$data['idcaja_bancos']}',
+            '{$data['monto']}',
+            '{$data['estado']}',
+            '$idempresa'
+        )");
+
+        if ($registroComprobante_comercial === TRUE) {
+            $res = array("success", "Registro exitoso", "registroCaracteristicas");
+        } else {
+            $res = array("danger", "No se pudo registrar");
+        }
+
         echo json_encode($res);
-        
     }
+
     public function autorizacion_caja_bancos_comercial($data){
         // $idempresa = Empresa::getidempresa($empresa);
 
             // Insertar el nuevo registro
-            $registroProveedor = $this->dbc->query("UPDATE detalle_caja_bancos_comercial SET estado = '$data[estado]' WHERE id_documento = '$data[id_documento]' AND registro_desde ='$data[registro_desde]'");
+            $autorizar = $this->dbc->query("UPDATE comprobantes_comercial_caja_bancos SET estado = '$data[estado]' WHERE id_documento = '$data[id_documento]' AND registro_desde ='$data[registro_desde]'");
 
-            if ($registroProveedor === TRUE) {                                                                                                                                                                
+            if ($autorizar === TRUE) {                                                                                                                                                                
                 $res = array("success", "Registro exitoso","registroCaracteristicas");
             } else {
                 $res = array("danger", "No se pudo registrar");

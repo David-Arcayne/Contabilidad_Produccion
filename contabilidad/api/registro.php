@@ -903,9 +903,9 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idtipocliente']));
         }
-    }elseif($data['ver'] == "registrar_caja_bancos_comercial") {
+    }elseif($data['ver'] == "registrar_comprobantes_caja_bancos_comercial") {
         $cont=new Factura_comercial();
-        $cont->registrar_caja_bancos_comercial($data);
+        $cont->registrar_comprobantes_caja_bancos_comercial($data);
     }elseif($data['ver'] == "autorizacion_caja_bancos_comercial") {
         $cont=new Factura_comercial();
         $cont->autorizacion_caja_bancos_comercial($data);

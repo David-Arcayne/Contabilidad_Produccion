@@ -773,7 +773,7 @@ elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
 // reportedetallefpt listar_otras_cuentas_cobrar_vencidas  listar_otras_cuentas_cobrar listar_recibo_facturas_otras_cuentas lista_pagar_pagado_factura
 //  listadesconsolidar lista_transaccionEn_espera listar_anular_eliminar_transaccion listar_factura_comercial
 //reporte_balance_general_por_niveles listar_factura_pago_sin_cuentas listar_recibo_facturas_otras_cuentas lista_pagar_pagado_factura  lista_cobrar_cobrado_factura
-//   insertar_transaccion.php   anulacion_transaccion.php   mayorcuentacontable
+//   insertar_transaccion.php   anulacion_transaccion.php   mayorcuentacontable listar_recibo_por_caja_bancos
 
 
 ?>
