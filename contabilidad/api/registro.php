@@ -229,7 +229,7 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         echo json_encode(array("danger", "Faltan parámetros en la solicitud", $_POST['fecha'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['idasientotipo'],$_POST['idtransaccion'],$_POST['cajasBancos'],$_POST['empresa'],$_POST['sucursal'],$_FILES['archivo'],$_POST['facturas'],$_POST['zona_horaria'],$_POST['glosa']));
     }
 }elseif($ver == "registrar_anular_eliminar_activar_transaccion"){
-    if(isset($_POST['transacciones_idtransacciones'],$_POST['motivo'],$_POST['estmado_opcion'],$_POST['estado_solicitud'],$_POST['hora'],$_POST['fecha'],$_POST['idusuario'],$_POST['idempresa'])){
+    if(isset($_POST['transacciones_idtransacciones'],$_POST['motivo'],$_POST['estado_opcion'],$_POST['estado_solicitud'],$_POST['hora'],$_POST['fecha'],$_POST['idusuario'],$_POST['idempresa'])){
         // decode echo json_encode(array("danger", "Faltan parámetros en la solicitud", $_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$facturas));
         $cont=new Anulacion_transaccion();
         $cont->registrar_anular_eliminar_activar_transaccion($_POST['transacciones_idtransacciones'],$_POST['motivo'],$_POST['estado_opcion'],$_POST['estado_solicitud'],$_POST['hora'],$_POST['fecha'],$_POST['idusuario'],$_POST['idempresa']);
@@ -441,8 +441,7 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         if(isset($_POST['idcaja_bancos'],$_POST['idtrabajador'],$_POST['funcion'],$_POST['permiso_registrar'],$_POST['empresa'])){
             $cont=new Caja_bancos_recibos();
             $cont->registrar_caja_bancos_usuarios($_POST['idcaja_bancos'],$_POST['idtrabajador'],$_POST['funcion'],$_POST['permiso_registrar'],$_POST['empresa']);
-        }
-        else{
+        }else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idcaja_bancos'],$_POST['idtrabajador'],$_POST['funcion'],$_POST['permiso_registrar'],$_POST['empresa']));
         }
     }elseif($ver=="registrar_detalle_transaccion_json"){
@@ -781,12 +780,6 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     }elseif($data['ver'] == "asignar_comprobantes_A_cuentas") {
         $cont=new Transacciones();
         $cont->asignar_comprobantes_A_cuentas($data);
-    }elseif($data['ver'] == "desvincular_facturas_de_cuentas") {
-        $cont=new Transacciones();
-        $cont->desvincular_facturas_de_cuentas($data);
-    }elseif($data['ver'] == "desvincular_comprobantes_de_cuentas") {
-        $cont=new Transacciones();
-        $cont->desvincular_comprobantes_de_cuentas($data);
     }elseif($data['ver'] == "asignar_recibos_A_cuentas") {
         $cont=new Transacciones();
         $cont->asignar_recibos_A_cuentas($data);
@@ -818,10 +811,9 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idsolicitud_anular_eliminar'],$_POST['estado_opcion'],$_POST['estado_solicitud'],$_POST['fecha_proceso'],$_POST['hora_proceso'],$_POST['idusuario_admin']));
         }
-    }elseif($data['ver'] == "desvincular_recibos_de_cuentas") {
-        $cont=new Transacciones();
-        $cont->desvincular_recibos_de_cuentas($data);
-    }elseif($ver == "registrar_tipo_cliente"){
+    }
+  
+    elseif($ver == "registrar_tipo_cliente"){
 
         if(isset($_POST['tipo'],$_POST['descripcion'],$_POST['estado'],$_POST['empresa'])){
             // decode echo json_encode(array("danger", "Faltan parámetros en la solicitud", $_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$facturas));
