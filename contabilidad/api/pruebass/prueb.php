@@ -1789,7 +1789,7 @@ public function asignar_facturas_A_cuentas($data) {
     
         echo json_encode($res);
     }
-    
+
     public function desvincular_facturas_comercial_de_transaccion($data) {
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
@@ -1824,21 +1824,8 @@ public function asignar_facturas_A_cuentas($data) {
 
                 if($docu['tipo'] == 'factura_contabilidad'){
 
-                    if($docu['tipo_documento'] == 'contado'){
-                        // se desvinculara el comprobante mas
-                        if($docu['documento_cobro_pago'] == 'factura_cobro'){
-                            $editar_comprobante = $this->dbc->query("UPDATE cuentaspof 
-                            SET cuenta = '0', transaccion = '0' WHERE idfactura = '{$docu['id']}'");
-                        }else{ // factura_pago
-                            $editar_comprobante = $this->dbc->query("UPDATE cuentaspor 
-                            SET cuenta = '0', transaccion = '0' WHERE idfactura = '{$docu['id']}'");
-                        }
-                    }else{ 
-                        // no pasara nada ya que solo se desvinculara la factura
-                    }
                     $monto_documento += $docu['monto'];
-                    $updatetranscodigo = $this->dbc->query("UPDATE factura SET cuenta = '0', transacciones_idtransacciones = '0' WHERE idfactura = '{$docu['id']}'");
-
+                    $updatetranscodigo = $this->dbc->query("UPDATE factura SET cuenta = '0' WHERE idfactura = '{$docu['id']}'");
                 }elseif($docu['tipo'] == 'factura_comercial'){
 
 
@@ -1854,18 +1841,8 @@ public function asignar_facturas_A_cuentas($data) {
                     $updatetranscodigo = $this->dbc->query("UPDATE cuentaspor SET cuenta = '0' WHERE idcuentaspor = '{$docu['id']}'");
                 }elseif($docu['tipo'] == 'recibo'){
 
-                     // se desvinculara el comprobante mas
-                        if($docu['documento_cobro_pago'] == 'recibo_cobro'){
-                            $editar_comprobante = $this->dbc->query("UPDATE cuentaspof 
-                            SET cuenta = '0', transaccion = '0' WHERE idrecibo = '{$docu['id']}'");
-                        }else{ // recibo_pago
-                            $editar_comprobante = $this->dbc->query("UPDATE cuentaspor 
-                            SET cuenta = '0', transaccion = '0' WHERE idrecibo = '{$docu['id']}'");
-                        }
-
                     $monto_documento += $docu['monto'];
-                    $updatetranscodigo = $this->dbc->query("UPDATE recibo SET cuenta = '0', transaccion = '0'
-                    WHERE idrecibo = '{$docu['id']}'");
+                    $updatetranscodigo = $this->dbc->query("UPDATE recibo SET cuenta = '0' WHERE idrecibo = '{$docu['id']}'");
                 }
 
             }
@@ -1883,7 +1860,7 @@ public function asignar_facturas_A_cuentas($data) {
    
         // Respuesta
         if ($editar_dt === TRUE) {
-            $res = array("success", "Se desvinculo Correctamente", "cobrofacturasaasientomodelo",$data['documentos']);
+            $res = array("success", "Se desvinculo Correctamente", "cobrofacturasaasientomodelo");
         } else {
             $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde");
         }
