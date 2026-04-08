@@ -227,9 +227,9 @@ class Transacciones_facturas extends DB{
         $facturas = json_decode($data, true);
     // echo json_encode(array("success","hola",$fecha,$nrecibo,$persona,$ci,$monto,$caja_bancos,$idasientotipo,$idempresa,$idsucursal,$archivo,$facturas));
 //---------------------------------------------------------------------------------------
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
     
         // Establecer la zona horaria recibida
         date_default_timezone_set($zn);

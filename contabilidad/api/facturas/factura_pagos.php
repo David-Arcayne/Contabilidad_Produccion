@@ -92,8 +92,7 @@ class Factura_pagos extends DB{
     
             }elseif($trans > 0 && $asiento == ""){
                 //SE CREA LA FACTURA CON LA TRANSACCION EXISTENTE QUE YA TE PASARON
-                // $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`,`tipo_factura`, `clasefactura`, `cobrado`, `pagado`,`idotras_cuentas`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) 
-                // VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento','$tipo_factura', '$clasefactura', '$co', '$pa','0', '$espesificacion', '1', '1', '$trans', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de','tributario_x_pagar');");
+                
                  if($cuenta == ""){ // SOLO SE ASIGNARA TRANSACCION Y NO LA CUENTA
                 //
                 $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`,`tipo_factura`, `clasefactura`, `cobrado`, `pagado`,`idotras_cuentas`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) 
@@ -203,6 +202,7 @@ class Factura_pagos extends DB{
                 // Obtener los asientos relacionados y calcular debe y haber
             $tasiento = $this->dbc->query("SELECT * FROM asiento WHERE idasientotipo='$asiento'");
             $orden = 1;
+            $id_cuenta = '0';
             while ($qwe = $tasiento->fetch_assoc()) {
                 $pcuenta = $qwe['idcuenta'];
                 if ($qwe['tipo'] == "DEBE") {
@@ -218,12 +218,18 @@ class Factura_pagos extends DB{
         
                 // Insertar en detalletransaccion Ocurrio un error al asignar la factura
                 $crear = $this->dbc->query("INSERT INTO detalletransaccion(debe, haber, nota, transacciones_idtransacciones, idplandecuenta, idcuentapresupuestaria, estado, cobrar, pagar, idorganizacion, idsucursal, orden) VALUES ('$debe', '$haber', '$nota', '$idtrans', '$pcuenta', '$ppresupuestario', '$estado', '2', '2', '$idempresa', '$idsucursal', '$orden')");
-                
+
+                if($cuenta == $pcuenta){ // se igualan los ids de plan de cuentas
+                    $id_cuenta = $this->dbc->insert_id;
+                }else{
+                    // $id_cuenta = '0';
+                }
+
                 $orden = $orden + 1;
             }
     //------------------------------------------------------------------------------
             $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`,`tipo_factura`, `clasefactura`, `cobrado`, `pagado`,`idotras_cuentas`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) 
-            VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento','$tipo_factura', '$clasefactura', '$co', '$pa','0', '$espesificacion', '1', '1', '$idtrans', '$cliente', '$idempresa', '0', '$idsucursal','$por_concepto_de','tributario_x_pagar');");
+            VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento','$tipo_factura', '$clasefactura', '$co', '$pa','0', '$espesificacion', '1', '1', '$idtrans', '$cliente', '$idempresa', '$id_cuenta', '$idsucursal','$por_concepto_de','tributario_x_pagar');");
 
             }else{  // FINALIZA CON UN NUEVO ASIENTO (TRANSACCION) {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
             $bandera = FALSE;
@@ -393,6 +399,7 @@ class Factura_pagos extends DB{
                 // Obtener los asientos relacionados y calcular debe y haber
             $tasiento = $this->dbc->query("SELECT * FROM asiento WHERE idasientotipo='$asiento'");
             $orden = 1;
+            $id_cuenta = '0';
             while ($qwe = $tasiento->fetch_assoc()) {
                 $pcuenta = $qwe['idcuenta'];
                 if ($qwe['tipo'] == "DEBE") {
@@ -409,16 +416,22 @@ class Factura_pagos extends DB{
                 // Insertar en detalletransaccion Ocurrio un error al asignar la factura
                 $crear = $this->dbc->query("INSERT INTO detalletransaccion(debe, haber, nota, transacciones_idtransacciones, idplandecuenta, idcuentapresupuestaria, estado, cobrar, pagar, idorganizacion, idsucursal, orden) VALUES ('$debe', '$haber', '$nota', '$idtrans', '$pcuenta', '$ppresupuestario', '$estado', '2', '2', '$idempresa', '$idsucursal', '$orden')");
                 
+                if($cuenta == $pcuenta){ // se igualan los ids de plan de cuentas
+                    $id_cuenta = $this->dbc->insert_id;
+                }else{
+                    // $id_cuenta = '0';
+                }
+
                 $orden = $orden + 1;
             }
     //------------------------------------------------------------------------------
             $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`,`tipo_factura`, `clasefactura`, `cobrado`, `pagado`,`idotras_cuentas`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) 
-            VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento','$tipo_factura', '$clasefactura', '$co', '$pa','0', '$espesificacion', '1', '1', '$idtrans', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de','tributario_pagado');");
+            VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento','$tipo_factura', '$clasefactura', '$co', '$pa','0', '$espesificacion', '1', '1', '$idtrans', '$cliente', '$idempresa', '$id_cuenta', '$idsucursal','$por_concepto_de','tributario_pagado');");
             
             $idfact = $this->dbc->insert_id;
 
             $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,estado,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,archivo,registro_desde)
-                VALUES('$nroRecibo','$fecha_completa','1','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$idtrans','0',NULL,'tributario_pagado')");
+                VALUES('$nroRecibo','$fecha_completa','1','lugar por defecto','varios clientes','$clientSelect[nombre]','$clientSelect[nit]','$monto','$idfact','0','$idtrans','$id_cuenta',NULL,'tributario_pagado')");
 
             $idrecibo = $this->dbc->insert_id;
 

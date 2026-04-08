@@ -1389,7 +1389,7 @@ public function asignar_facturas_A_cuentas($data) {
             // si esta vacio el ids
             $aux_consulta = "= ".'-100';
         }
-
+    
             foreach ($data['facturas'] as $factura) {
 
                 $montoFacturas += $factura['monto'];

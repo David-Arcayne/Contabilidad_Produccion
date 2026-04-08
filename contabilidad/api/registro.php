@@ -908,8 +908,8 @@ if($data['ver'] == "asignar_asiento_A_factura") {
 
 //  editar_recibo_caja_bancos registrar_recibo_otras_cuentas registrar_factura_recibo_cobro_cajaBancos registropagarfactura registrar_recibo_pago_cajaBancos_en_otras_cuentas
 
-}
-// cambiarestadoconsolidado registrar_factura_cobros_tributario
-//   cobro_asignacion_factura_comercial registrar_recibo_cobro_cajaBancos_en_otras_cuentas registrar_recibo_cobro_cajaBancos_en_otras_cuentas desconsolidar registrar_factura_cobro_otras_cuentas
+} 
+// registrar_recibo_otras_cuentas registrocobrarfacturaGrupal
+// desconsolidar registrar_factura_cobro_otras_cuentas registrar_factura_pagos_tributario registropagarfactura
 //  registrar_factura_pagos_tributario  registrar_recibo_pago_cajaBancos_en_otras_cuentas registrar_recibo_cobro_cajaBancos_en_otras_cuentas crearsolofacturasapif5  registrar_recibo_cobro_cajaBancos_en_facturas
 ?> 

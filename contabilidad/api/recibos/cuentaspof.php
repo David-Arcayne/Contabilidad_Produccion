@@ -113,6 +113,7 @@ class Cuentaspof extends DB{
                 $haber = 0;
                 $tasiento = $this->dbc->query("SELECT * FROM asiento WHERE idasientotipo='$asiento'");
                 $orden = 1;
+                $id_cuenta = '0';
                 while ($qwe = $this->dbc->fetch($tasiento)) {
                     $pcuenta = $qwe['idcuenta'];
                     if ($qwe['tipo'] == "DEBE") {
@@ -129,13 +130,18 @@ class Cuentaspof extends DB{
                     $crear = $this->dbc->query("INSERT INTO detalletransaccion(debe,haber,nota,transacciones_idtransacciones,idplandecuenta,idcuentapresupuestaria,estado,cobrar,pagar,idorganizacion,idsucursal,orden)
                     VALUES ('$debe','$haber','$nota','$trans','$pcuenta','$ppresupuestario','$estado','2','2','$ide','$sucursal','$orden')");
 
+                    if($cuenta == $pcuenta){ // se igualan los ids de plan de cuentas
+                        $id_cuenta = $this->dbc->insert_id;
+                    }else{
+                        // $id_cuenta = '0';
+                    }
                     $orden = $orden + 1;
                 }
             }else{
                 $bandera = FALSE;
             }
             
-        } elseif($idtransaccion == "" && $asiento == "") { // NO SE VINCULA A NINGUNA TRANSACCION NI SE CREA NUEVA 
+        }elseif($idtransaccion == "" && $asiento == "") { // NO SE VINCULA A NINGUNA TRANSACCION NI SE CREA NUEVA 
             $trans = 0;
             
         }else{ // ESTO OCURRE EN ESTE ELSE --> $idtransaccion > 0 && $asiento == ""
@@ -180,13 +186,15 @@ class Cuentaspof extends DB{
 
                 }
             }
+
+            $id_cuenta = $cuenta;
         }
         
         //------------------------------------------------------------------------------------
         if($bandera === TRUE){
             if(empty($archivo['name'])){
                 $registropago = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,estado,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,concepto,archivo,registro_desde)
-                VALUES(NULL,'$nrecibo','$fecha_completa','1','$lugar','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$cuenta','$concepto',NULL,'facturas_x_cobrar')");
+                VALUES(NULL,'$nrecibo','$fecha_completa','1','$lugar','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$id_cuenta','$concepto',NULL,'facturas_x_cobrar')");
 
                 if ($registropago === TRUE) {
 
@@ -222,7 +230,7 @@ class Cuentaspof extends DB{
                 if(move_uploaded_file($archivo_tmp, $ruta_destino)){
                     //registrar pago, preguntar guardar la anterior transaccion o la nueva
                 $registropago2 = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,estado,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,concepto,archivo,registro_desde)
-                VALUES(NULL,'$nrecibo','$fecha_completa','1','$lugar','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$cuenta','$concepto','$unique_name','facturas_x_cobrar')");
+                VALUES(NULL,'$nrecibo','$fecha_completa','1','$lugar','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$id_cuenta','$concepto','$unique_name','facturas_x_cobrar')");
 
                 
                 if ($registropago2 === TRUE) {

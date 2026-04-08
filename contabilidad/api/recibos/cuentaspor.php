@@ -9,6 +9,7 @@ class Cuentaspor extends DB{
         // error_reporting(E_ALL);
 
         // Establecer la zona horaria recibida
+
         date_default_timezone_set($zn);
                 
         // Obtener la hora actual del Pais en el que se registra
@@ -115,6 +116,7 @@ class Cuentaspor extends DB{
         $haber = 0;
         $tasiento = $this->dbc->query("select * from asiento where idasientotipo='$asiento'");
         $orden = 1;
+        $id_cuenta = '0';
         while ($qwe = $this->dbc->fetch($tasiento)) {
             $pcuenta = $qwe['idcuenta'];
             if ($qwe['tipo'] == "DEBE") {
@@ -131,6 +133,11 @@ class Cuentaspor extends DB{
             $crear = $this->dbc->query("INSERT INTO detalletransaccion(debe,haber,nota,transacciones_idtransacciones,idplandecuenta,idcuentapresupuestaria,estado,cobrar,pagar,idorganizacion,idsucursal,orden)
             VALUES ('$debe','$haber','$nota','$trans','$pcuenta','$ppresupuestario','$estado','2','2','$ide','$sucursal','$orden')");
 
+            if($cuenta == $pcuenta){ // se igualan los ids de plan de cuentas
+                $id_cuenta = $this->dbc->insert_id;
+            }else{
+                // $id_cuenta = '0';
+            }
             $orden = $orden + 1;
         }
         }else{
@@ -176,13 +183,15 @@ class Cuentaspor extends DB{
                 }else{ // SOLO VINCULA NO PASA NADA
 
                 }
+
+                $id_cuenta = $cuenta;
             }
     }
 // -------------------------------------------------------------------------------------------
     if($bandera === TRUE){
     if(empty($archivo['name'])){
         $registropago = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,estado,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,concepto,archivo,registro_desde)
-        VALUES(NULL,'$nrecibo','$fecha_completa','1','$lugar','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$idcuenta','$concepto',NULL,'facturas_x_pagar')");
+        VALUES(NULL,'$nrecibo','$fecha_completa','1','$lugar','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$id_cuenta','$concepto',NULL,'facturas_x_pagar')");
 
     if ($registropago === TRUE) {
         $idcuentaspor = $this->dbc->insert_id;
@@ -195,49 +204,49 @@ class Cuentaspor extends DB{
             }
         }
         
-        $res = array("success", "Registro Realizado", "registropagarfactura");
+        $res = array("success", "Registro Realizado", "registropagarfactura",$idcuenta,$cuenta,$id_cuenta);
     } else {
         $res = array("danger", "No se pudo realizar el registro");
     }
     }else{
-     // Manejar la carga del archivo
-    $archivo_nombre = "";
-    if ($archivo['error'] == UPLOAD_ERR_OK) {
-        $archivo_tmp = $archivo['tmp_name'];
-        $archivo_nombre = basename($archivo['name']);
-        // ----------------------------------
-        $unique_name = uniqid("img_", true) . '.' . $archivo_nombre;
-        // $target_file = $target_dir . $unique_name;
+        // Manejar la carga del archivo
+        $archivo_nombre = "";
+        if ($archivo['error'] == UPLOAD_ERR_OK) {
+            $archivo_tmp = $archivo['tmp_name'];
+            $archivo_nombre = basename($archivo['name']);
+            // ----------------------------------
+            $unique_name = uniqid("img_", true) . '.' . $archivo_nombre;
+            // $target_file = $target_dir . $unique_name;
 
-        // $ruta_destino = __DIR__ . "/archivos/" . $archivo_nombre;
-        $ruta_destino = "../archivos/" . $unique_name;
-        // $ruta_destino = "../archivos/" . $archivo_nombre;
-        // move_uploaded_file($archivo_tmp, $ruta_destino); grupal
-    }
-    if(move_uploaded_file($archivo_tmp, $ruta_destino)){
-         //registrar pago, preguntar guardar la anterior transaccion o la nueva
-    $registropago2 = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,estado,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,concepto,archivo,registro_desde)
-    VALUES(NULL,'$nrecibo','$fecha_completa','1','$lugar','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$idcuenta','$concepto','$unique_name','facturas_x_pagar')");
+            // $ruta_destino = __DIR__ . "/archivos/" . $archivo_nombre;
+            $ruta_destino = "../archivos/" . $unique_name;
+            // $ruta_destino = "../archivos/" . $archivo_nombre;
+            // move_uploaded_file($archivo_tmp, $ruta_destino); grupal
+        }
+        if(move_uploaded_file($archivo_tmp, $ruta_destino)){
+            //registrar pago, preguntar guardar la anterior transaccion o la nueva
+        $registropago2 = $this->dbc->query("INSERT INTO cuentaspor(idcuentaspor,nrecibo,fecha,estado,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,transaccion,cuenta,concepto,archivo,registro_desde)
+        VALUES(NULL,'$nrecibo','$fecha_completa','1','$lugar','$idcliente','$persona','$ci','$monto','$idfactura','0','$trans','$id_cuenta','$concepto','$unique_name','facturas_x_pagar')");
 
-    if ($registropago2 === TRUE) {
-        $idcuentaspor = $this->dbc->insert_id;
-        if($idcaja_bancos == ""){
+        if ($registropago2 === TRUE) {
+            $idcuentaspor = $this->dbc->insert_id;
+            if($idcaja_bancos == ""){
 
+            }else{
+                foreach($caja_bancos as $cajaBanco){
+                $registropago3 = $this->dbc->query("INSERT INTO detalle_caja_bancos_pagar(idcaja_bancos,monto,idcuentaspor,idfactura,idotras_cuentas)
+                VALUES('$cajaBanco[id]','$cajaBanco[monto]','$idcuentaspor','$idfactura','0')");
+            }
+            }
+        
+            $res = array("success", "Registro Realizado", "registropagarfactura",$idcuenta,$cuenta,$id_cuenta);
+        } else {
+            $res = array("danger", "No se pudo realizar el registro");
+        }
         }else{
-             foreach($caja_bancos as $cajaBanco){
-            $registropago3 = $this->dbc->query("INSERT INTO detalle_caja_bancos_pagar(idcaja_bancos,monto,idcuentaspor,idfactura,idotras_cuentas)
-            VALUES('$cajaBanco[id]','$cajaBanco[monto]','$idcuentaspor','$idfactura','0')");
+            $res = array("danger", "No se movio el archivo a la carpeta");
         }
-        }
-       
-        $res = array("success", "Registro Realizado", "registropagarfactura");
-    } else {
-        $res = array("danger", "No se pudo realizar el registro");
     }
-    }else{
-        $res = array("danger", "No se movio el archivo a la carpeta");
-    }
-}
     $suma_recibos = $this->dbc->query("SELECT SUM(monto) AS monto_suma FROM cuentaspor WHERE idfactura = '$idfactura'");
     $sum = $suma_recibos->fetch_assoc();
 
@@ -255,7 +264,7 @@ class Cuentaspor extends DB{
        
     }
         echo json_encode($res);
-        // echo json_encode($$idfactura,$lugar, $idtransaccion,$idcaja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$archivo,$zn);
+        //  echo json_encode(array($idfactura,$lugar, $idtransaccion,$idcaja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$concepto,$archivo,$zn,$fecha_transaccion,$cuenta,$tipo_cuenta));
     }
 
     public function registropagarfacturaf5($idrecibo,$lugar,$fecha, $persona, $ci,$idtransaccion,$archivo)

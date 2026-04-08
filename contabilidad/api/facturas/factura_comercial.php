@@ -679,18 +679,18 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
         foreach ($facturas as $factura) {
 
                 $montoFacturas += $factura['monto'];
-                $existe_fact_comercial = $this->dbc->query("SELECT * FROM transaccion_factura_comercial WHERE idfactura_comercial = '$factura[idfactura_comercial]'");
-                if($existe_fact_comercial->num_rows > 0){
-                    $updatetranscodigo = $this->dbc->query("UPDATE transaccion_factura_comercial SET cuenta = '$data[cuenta]',idtransaccion = '$dt[transacciones_idtransacciones]'  
-                    WHERE idfactura_comercial = '{$factura['idfactura_comercial']}'");
+                // $existe_fact_comercial = $this->dbc->query("SELECT * FROM transaccion_factura_comercial WHERE idfactura_comercial = '$factura[idfactura_comercial]'");
+                // if($existe_fact_comercial->num_rows > 0){
+                //     $updatetranscodigo = $this->dbc->query("UPDATE transaccion_factura_comercial SET cuenta = '$data[cuenta]',idtransaccion = '$dt[transacciones_idtransacciones]'  
+                //     WHERE idfactura_comercial = '{$factura['idfactura_comercial']}'");
 
-                }else{ // NO EXISTE EN LA TABLA ESA FACTURA
-                    $registrar_fact_trans = $this->dbc->query("INSERT INTO transaccion_factura_comercial(idfactura_comercial,idtransaccion,cuenta,idempresa)
-                    VALUES('$factura[idfactura_comercial]','$dt[transacciones_idtransacciones]','$data[cuenta]','$idempresa')");
+                // }else{ // NO EXISTE EN LA TABLA ESA FACTURA
+                //     $registrar_fact_trans = $this->dbc->query("INSERT INTO transaccion_factura_comercial(idfactura_comercial,idtransaccion,cuenta,idempresa)
+                //     VALUES('$factura[idfactura_comercial]','$dt[transacciones_idtransacciones]','$data[cuenta]','$idempresa')");
 
-                }   
-                // Guardamos el idfactura_comercial en el array 
-                $array_ids[] = $factura['idfactura_comercial'];
+                // }   
+                // // Guardamos el idfactura_comercial en el array 
+                // $array_ids[] = $factura['idfactura_comercial'];
                 
             }
                     
@@ -704,11 +704,18 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
             }
         }elseif($data['sumar_reemplazar'] == 'reemplazo'){ // REEMPLAZAR
 
+        // desvincular todos los documentos de esta cuenta
+            $desv_recibo = $this->dbc->query("UPDATE recibo SET cuenta = '0',transaccion = '0' WHERE cuenta = '$data[cuenta]'");
+            $desv_factura = $this->dbc->query("UPDATE factura SET cuenta = '0',transacciones_idtransacciones = '0' WHERE cuenta = '$data[cuenta]'");
+            $desv_comprob_cobr = $this->dbc->query("UPDATE cuentaspof SET cuenta = '0',transaccion = '0' WHERE cuenta = '$data[cuenta]'");
+            $desv_comprob_pag = $this->dbc->query("UPDATE cuentaspor SET cuenta = '0',transaccion = '0' WHERE cuenta = '$data[cuenta]'");
+            $desv_comer = $this->dbc->query("DELETE FROM transaccion_factura_comercial WHERE cuenta = '$data[cuenta]'");
+
         // Convertimos el array en una lista separada por comas 
-        $ids_vinculados = implode(",", $array_ids);
-            // DESVINCULAR LAS FACTURAS VINCULADAS
-            $desvincular_facturas = $this->dbc->query("UPDATE transaccion_factura_comercial 
-            SET cuenta = '0' WHERE cuenta = '$data[cuenta]' AND idfactura_comercial NOT IN ($ids_vinculados)");
+        // $ids_vinculados = implode(",", $array_ids);
+        //     // DESVINCULAR LAS FACTURAS VINCULADAS
+        //     $desvincular_facturas = $this->dbc->query("UPDATE transaccion_factura_comercial 
+        //     SET cuenta = '0' WHERE cuenta = '$data[cuenta]' AND idfactura_comercial NOT IN ($ids_vinculados)");
 
             if($dt['debe'] > 0){
                 $nuevo_monto_dt = $montoFacturas;
@@ -721,6 +728,24 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
             $editar_dt = TRUE;
         }
    
+        foreach ($facturas as $factura) {
+
+                // $montoFacturas += $factura['monto'];
+                $existe_fact_comercial = $this->dbc->query("SELECT * FROM transaccion_factura_comercial WHERE idfactura_comercial = '$factura[idfactura_comercial]'");
+                if($existe_fact_comercial->num_rows > 0){
+                    $updatetranscodigo = $this->dbc->query("UPDATE transaccion_factura_comercial SET cuenta = '$data[cuenta]',idtransaccion = '$dt[transacciones_idtransacciones]'  
+                    WHERE idfactura_comercial = '{$factura['idfactura_comercial']}'");
+
+                }else{ // NO EXISTE EN LA TABLA ESA FACTURA
+                    $registrar_fact_trans = $this->dbc->query("INSERT INTO transaccion_factura_comercial(idfactura_comercial,idtransaccion,cuenta,idempresa)
+                    VALUES('$factura[idfactura_comercial]','$dt[transacciones_idtransacciones]','$data[cuenta]','$idempresa')");
+
+                }   
+                // Guardamos el idfactura_comercial en el array 
+                // $array_ids[] = $factura['idfactura_comercial'];
+                
+        }
+
         // Respuesta
         if ($editar_dt === TRUE) {
             $res = array("success", "Se Registro Correctamente", "asignar_facturas_A_cuentas",$data['cuenta'],$dt['transacciones_idtransacciones'],$nuevo_monto_dt,$montoFacturas,$idempresa,$data['idempresa'],gethostname());

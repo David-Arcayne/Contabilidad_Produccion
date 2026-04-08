@@ -4700,6 +4700,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
              // Obtener los asientos relacionados y calcular debe y haber
         $tasiento = $this->dbc->query("SELECT * FROM asiento WHERE idasientotipo='$asiento'");
         $orden = 1;
+        $id_cuenta = '0';
         while ($qwe = $tasiento->fetch_assoc()) {
             $pcuenta = $qwe['idcuenta'];
             if ($qwe['tipo'] == "DEBE") {
@@ -4716,6 +4717,12 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             // Insertar en detalletransaccion Ocurrio un error al asignar la factura
             $crear = $this->dbc->query("INSERT INTO detalletransaccion(debe, haber, nota, transacciones_idtransacciones, idplandecuenta, idcuentapresupuestaria, estado, cobrar, pagar, idorganizacion, idsucursal, orden) VALUES ('$debe', '$haber', '$nota', '$idtrans', '$pcuenta', '$ppresupuestario', '$estado', '2', '2', '$idempresa', '$idsucursal', '$orden')");
             
+            if($cuenta == $pcuenta){ // se igualan los ids de plan de cuentas
+                $id_cuenta = $this->dbc->insert_id;
+            }else{
+                // $id_cuenta = '0';
+            }
+
             $orden = $orden + 1;
         }
 //------------------------------------------------------------------------------
@@ -4724,7 +4731,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         // $idfact = $this->dbc->insert_id;
 
         $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,estado,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,concepto,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha_completa','1','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','0','$idtrans','0','$concepto',NULL,'$registro_desde')");
+            VALUES('$nroRecibo','$fecha_completa','1','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','0','$idtrans','$id_cuenta','$concepto',NULL,'$registro_desde')");
 
         $idrecibo = $this->dbc->insert_id;
 
@@ -4993,6 +5000,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
              // Obtener los asientos relacionados y calcular debe y haber
         $tasiento = $this->dbc->query("SELECT * FROM asiento WHERE idasientotipo='$asiento'");
         $orden = 1;
+        $id_cuenta = '0';
         while ($qwe = $tasiento->fetch_assoc()) {
             $pcuenta = $qwe['idcuenta'];
             if ($qwe['tipo'] == "DEBE") {
@@ -5009,12 +5017,18 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             // Insertar en detalletransaccion Ocurrio un error al asignar la factura
             $crear = $this->dbc->query("INSERT INTO detalletransaccion(debe, haber, nota, transacciones_idtransacciones, idplandecuenta, idcuentapresupuestaria, estado, cobrar, pagar, idorganizacion, idsucursal, orden) VALUES ('$debe', '$haber', '$nota', '$idtrans', '$pcuenta', '$ppresupuestario', '$estado', '2', '2', '$idempresa', '$idsucursal', '$orden')");
             
+            if($cuenta == $pcuenta){ // se igualan los ids de plan de cuentas
+                $id_cuenta = $this->dbc->insert_id;
+            }else{
+                // $id_cuenta = '0';
+            }
+
             $orden = $orden + 1;
         }
 //------------------------------------------------------------------------------
 
         $nuevo_recibo = $this->dbc->query("INSERT INTO recibo(nro_recibo,fecha,estado,lugar,cliente_proveedor,persona,ci,monto,cobrado,pagado,idotras_cuentas,transaccion,cuenta,concepto,archivo,registro_desde,idempresa)
-            VALUES('$nro_recibo','$fecha','1','$lugar','$client_prov','$persona','$ci','$precio','1','0','$id_otras_cuentas_aux','$idtrans','0','$concepto',NULL,'$registro_desde','$idempresa')");
+            VALUES('$nro_recibo','$fecha','1','$lugar','$client_prov','$persona','$ci','$precio','1','0','$id_otras_cuentas_aux','$idtrans','$id_cuenta','$concepto',NULL,'$registro_desde','$idempresa')");
 
         $idrecibo_nuevo = $this->dbc->insert_id;
 
@@ -5022,7 +5036,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         // VALUES(NULL,'$nro_recibo','$fecha_completa','1','$lugar','0','$persona','$ci','$precio','0','$idotras_cuentas','$idrecibo_nuevo','$trans','$cuenta',NULL,'$registro_desde')");
 
         $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,estado,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha_completa','1','$lugar','0','$persona','$ci','$precio','0','$id_otras_cuentas_aux','$idrecibo_nuevo','$idtrans','0',NULL,'$registro_desde')");
+            VALUES('$nroRecibo','$fecha_completa','1','$lugar','0','$persona','$ci','$precio','0','$id_otras_cuentas_aux','$idrecibo_nuevo','$idtrans','$id_cuenta',NULL,'$registro_desde')");
 
         $idcomprobante = $this->dbc->insert_id;
 
@@ -5292,6 +5306,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
              // Obtener los asientos relacionados y calcular debe y haber
         $tasiento = $this->dbc->query("SELECT * FROM asiento WHERE idasientotipo='$asiento'");
         $orden = 1;
+        $id_cuenta = '0';
         while ($qwe = $tasiento->fetch_assoc()) {
             $pcuenta = $qwe['idcuenta'];
             if ($qwe['tipo'] == "DEBE") {
@@ -5308,17 +5323,22 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             // Insertar en detalletransaccion Ocurrio un error al asignar la factura
             $crear = $this->dbc->query("INSERT INTO detalletransaccion(debe, haber, nota, transacciones_idtransacciones, idplandecuenta, idcuentapresupuestaria, estado, cobrar, pagar, idorganizacion, idsucursal, orden) VALUES ('$debe', '$haber', '$nota', '$idtrans', '$pcuenta', '$ppresupuestario', '$estado', '2', '2', '$idempresa', '$idsucursal', '$orden')");
             
+            if($cuenta == $pcuenta){ // se igualan los ids de plan de cuentas
+                $id_cuenta = $this->dbc->insert_id;
+            }else{
+                // $id_cuenta = '0';
+            }
             $orden = $orden + 1;
         }
 //------------------------------------------------------------------------------
 
         $nuevo_recibo = $this->dbc->query("INSERT INTO recibo(nro_recibo,fecha,estado,lugar,cliente_proveedor,persona,ci,monto,cobrado,pagado,idotras_cuentas,transaccion,cuenta,concepto,archivo,registro_desde,idempresa)
-            VALUES('$nro_recibo','$fecha','1','$lugar','$client_prov','$persona','$ci','$precio','0','1','$id_otras_cuentas_aux','$idtrans','0','$concepto',NULL,'$registro_desde','$idempresa')");
+            VALUES('$nro_recibo','$fecha','1','$lugar','$client_prov','$persona','$ci','$precio','0','1','$id_otras_cuentas_aux','$idtrans','$id_cuenta','$concepto',NULL,'$registro_desde','$idempresa')");
 
         $idrecibo_nuevo = $this->dbc->insert_id;
 
         $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,estado,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha_completa','1','$lugar','0','$persona','$ci','$precio','0','$id_otras_cuentas_aux','$idrecibo_nuevo','$idtrans','0',NULL,'$registro_desde')");
+            VALUES('$nroRecibo','$fecha_completa','1','$lugar','0','$persona','$ci','$precio','0','$id_otras_cuentas_aux','$idrecibo_nuevo','$idtrans','$id_cuenta',NULL,'$registro_desde')");
 
         $idcomprobante = $this->dbc->insert_id;
         
