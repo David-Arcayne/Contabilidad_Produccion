@@ -764,8 +764,9 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
 
         // Insertar el nuevo registro con el correlativo calculado
         $registroComprobante_comercial = $this->dbc->query("INSERT INTO comprobantes_comercial_caja_bancos(
-            lugar, cliente_proveedor, id_documento, nro_documento, nro_comprobante, registro_desde, concepto, idcaja_bancos, monto, estado, idempresa
+            fecha, lugar, cliente_proveedor, id_documento, nro_documento, nro_comprobante, registro_desde, concepto, idcaja_bancos, monto, estado, idempresa
         ) VALUES (
+            '{$data['fecha']}',
             '{$data['lugar']}',
             '{$data['cliente_proveedor']}',
             '{$data['id_documento']}',

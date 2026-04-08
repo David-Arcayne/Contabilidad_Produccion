@@ -561,6 +561,7 @@ class Caja_bancos_recibos extends DB{
              // Obtener los asientos relacionados y calcular debe y haber
         $tasiento = $this->dbc->query("SELECT * FROM asiento WHERE idasientotipo='$asiento'");
         $orden = 1;
+        $id_cuenta = '0';
         while ($qwe = $tasiento->fetch_assoc()) {
             $pcuenta = $qwe['idcuenta'];
             if ($qwe['tipo'] == "DEBE") {
@@ -577,16 +578,22 @@ class Caja_bancos_recibos extends DB{
             // Insertar en detalletransaccion Ocurrio un error al asignar la factura cuentaspof
             $crear = $this->dbc->query("INSERT INTO detalletransaccion(debe, haber, nota, transacciones_idtransacciones, idplandecuenta, idcuentapresupuestaria, estado, cobrar, pagar, idorganizacion, idsucursal, orden) VALUES ('$debe', '$haber', '$nota', '$idtrans', '$pcuenta', '$ppresupuestario', '$estado', '2', '2', '$idempresa', '$idsucursal', '$orden')");
             
+            if($cuenta == $pcuenta){ // se igualan los ids de plan de cuentas
+                $id_cuenta = $this->dbc->insert_id;
+            }else{
+                // $id_cuenta = '0';
+            }
+
             $orden = $orden + 1;
         }
 //------------------------------------------------------------------------------
         $registro = $this->dbc->query("INSERT INTO `factura` (`idfactura`, `fecha`, `nfactura`, `nautorizacion`, `codigocontrol`, `montofactura`, `tasa0`, `export`, `npoliza`, `iceiecdhotros`, `descuentobonificacion`,`tipo_factura`, `clasefactura`, `cobrado`, `pagado`,`idotras_cuentas`, `espesificacion`, `estado`, `tipocompra`, `transacciones_idtransacciones`, `proveedorcliente_idproveedorcliente`, `idorganizacion`, `cuenta`, `sucursal`,`por_concepto_de`,`registro_desde`) 
-        VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento','contado', '$clasefactura', '$co', '$pa','$id_otras_cuentas_aux', '$espesificacion', '1', '1', '$idtrans', '$cliente', '$idempresa', '$cuenta', '$idsucursal','$por_concepto_de','$registro_desde');");
+        VALUES (NULL, '$fecha', '$nfactura', '$nautorizacion', '$codigocontrol', '$monto', '$tasacero', '$export', '$npoliza', '$ice', '$descuento','contado', '$clasefactura', '$co', '$pa','$id_otras_cuentas_aux', '$espesificacion', '1', '1', '$idtrans', '$cliente', '$idempresa', '$id_cuenta', '$idsucursal','$por_concepto_de','$registro_desde');");
         
         $idfact = $this->dbc->insert_id;
 
         $crearRecibo = $this->dbc->query("INSERT INTO cuentaspor(nrecibo,fecha,estado,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha_completa','1','lugar por defecto','varios clientes','$proveedor_select[nombre]','$proveedor_select[nit]','$monto','$idfact','0','0','$idtrans','0',NULL,'$registro_desde')");
+            VALUES('$nroRecibo','$fecha_completa','1','lugar por defecto','varios clientes','$proveedor_select[nombre]','$proveedor_select[nit]','$monto','$idfact','0','0','$idtrans','$id_cuenta',NULL,'$registro_desde')");
 
         $idrecibo = $this->dbc->insert_id;
 
@@ -4422,6 +4429,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
              // Obtener los asientos relacionados y calcular debe y haber
         $tasiento = $this->dbc->query("SELECT * FROM asiento WHERE idasientotipo='$asiento'");
         $orden = 1;
+        $id_cuenta = '0';
         while ($qwe = $tasiento->fetch_assoc()) {
             $pcuenta = $qwe['idcuenta'];
             if ($qwe['tipo'] == "DEBE") {
@@ -4438,6 +4446,12 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             // Insertar en detalletransaccion Ocurrio un error al asignar la factura
             $crear = $this->dbc->query("INSERT INTO detalletransaccion(debe, haber, nota, transacciones_idtransacciones, idplandecuenta, idcuentapresupuestaria, estado, cobrar, pagar, idorganizacion, idsucursal, orden) VALUES ('$debe', '$haber', '$nota', '$idtrans', '$pcuenta', '$ppresupuestario', '$estado', '2', '2', '$idempresa', '$idsucursal', '$orden')");
             
+            if($cuenta == $pcuenta){ // se igualan los ids de plan de cuentas
+                $id_cuenta = $this->dbc->insert_id;
+            }else{
+                // $id_cuenta = '0';
+            }
+
             $orden = $orden + 1;
         }
 //------------------------------------------------------------------------------
@@ -4446,7 +4460,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         // $idfact = $this->dbc->insert_id;
 
         $crearRecibo = $this->dbc->query("INSERT INTO cuentaspof(nrecibo,fecha,estado,lugar,cliente,persona,ci,monto,idfactura,idotras_cuentas,idrecibo,transaccion,cuenta,concepto,archivo,registro_desde)
-            VALUES('$nroRecibo','$fecha_completa','1','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','0','$idtrans','0','$concepto',NULL,'$registro_desde')");
+            VALUES('$nroRecibo','$fecha_completa','1','$lugar','varios clientes','$persona','$ci','$monto','$idfact','0','0','$idtrans','$id_cuenta','$concepto',NULL,'$registro_desde')");
 
         $idrecibo = $this->dbc->insert_id;
 
