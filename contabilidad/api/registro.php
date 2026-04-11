@@ -901,6 +901,9 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     }elseif($data['ver'] == "autorizacion_caja_bancos_comercial") {
         $cont=new Factura_comercial();
         $cont->autorizacion_caja_bancos_comercial($data);
+    }elseif($data['ver'] == "vincular_cobros_comercial_caja_bancos") {
+        $cont=new Factura_comercial();
+        $cont->vincular_cobros_comercial_caja_bancos($data);
     }
    
 // asignar asiento registrar_recibo_cobro_cajaBancos_en_otras_cuentas editar_recibo_caja_bancos registrocobrarfactura registrar_anular_eliminar_activar_factura_tributario_transaccion

@@ -108,9 +108,9 @@ class Factura_comercial extends DB{
     
     public function listar_factura_comercial_por_id($idventa)
     {
-         ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+        //  ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
         // $idempresa = $this->verificar->verificarIDEMPRESAMD5($idmd5);
         // $idempresa = $this->getidempresa($idmd5);
         $lista = [];
@@ -774,6 +774,53 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
         
     // }
 
+    public function vincular_cobros_comercial_caja_bancos($data){
+
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+        $idempresa = $this->getidempresa($data['empresa']);
+
+        foreach ($data['cobros'] as $cobro) {
+
+            // Obtener el último correlativo para esa empresa y registro_desde
+            $sql = "SELECT MAX(nro_comprobante) as ultimo 
+                    FROM comprobantes_comercial_caja_bancos 
+                    WHERE idempresa = '$idempresa' 
+                    AND registro_desde = '$data[registro_desde]'";
+            $result = $this->dbc->query($sql);
+            $row = $result->fetch_assoc();
+
+            $nuevo_correlativo = ($row['ultimo'] !== null) ? $row['ultimo'] + 1 : 1;
+
+            // Insertar el nuevo registro con el correlativo calculado
+            $registroComprobante_comercial = $this->dbc->query("INSERT INTO comprobantes_comercial_caja_bancos(
+                fecha, lugar, cliente_proveedor, id_documento, nro_documento, nro_comprobante, registro_desde, concepto, idcaja_bancos, monto, estado, idempresa
+            ) VALUES (
+                '{$cobro['fecha']}',
+                '{$cobro['almacen']}',
+                '{$cobro['cliente_proveedor']}',
+                '{$cobro['id_documento']}',
+                '{$cobro['nro_documento']}',
+                '$nuevo_correlativo',
+                '{$data['registro_desde']}',
+                '{$data['concepto']}',
+                '{$data['idcaja_bancos']}',
+                '{$cobro['monto']}',
+                '{$cobro['estado']}',
+                '$idempresa'
+            )");
+        }
+
+        if ($registroComprobante_comercial === TRUE) {
+            $res = array("success", "Registro exitoso", "registar_vinculacion");
+        } else {
+            $res = array("danger", "No se pudo registrar");
+        }
+
+        echo json_encode($res);
+    }
+
     public function registrar_comprobantes_caja_bancos_comercial($data){
         $idempresa = $this->getidempresa($data['empresa']);
 
@@ -813,7 +860,7 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
 
         echo json_encode($res);
     }
-
+    
     public function autorizacion_caja_bancos_comercial($data){
         // $idempresa = Empresa::getidempresa($empresa);
 

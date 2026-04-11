@@ -766,13 +766,13 @@ elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
 // listar_factura           listar_facturas_cobro_pago      listaclientes listafacturaapi_cobrado lista_cobrar_cobrado_factura listar_todos_documentos_asignado_cuenta
 // reemplazar facturas_perteneciente_a_cuenta  lista_pagar_pagado_factura listar_recibo_otras_cuentas_pagar listapagos_individuales listar_anular_eliminar_factura
 
-// lista_cobrar_cobrado_factura listar_comprobantes_cobro_pago listar_select_rango_codigos listar_agrupacion_rubro_plandecuenta listar_caja_bancos
-//    listar_recibo_otras_cuentas    listar_recibos_asignado_cuentas listar_factura_comercial_por_id lista_cobrar_cobrado_factura listar_anular_eliminar_factura
-// listar_recibo_por_caja_bancos listar_anular_eliminar_transaccion usuario listatransacciones_comercial listar_comprobantes_cobro_pago
-//    listar_recibo_otras_cuentas     listar_recibo_por_caja_bancos listar_otras_cuentas_pagar_select listafacturaapi_cobrado lista_pagar_pagado_factura
-// reportedetallefpt listar_otras_cuentas_cobrar_vencidas  listar_otras_cuentas_cobrar listar_recibo_facturas_otras_cuentas lista_pagar_pagado_factura
-//  listadesconsolidar lista_transaccionEn_espera listar_anular_eliminar_transaccion listar_factura_comercial listapagos  listaasientosc
-//reporte_balance_general_por_niveles listar_factura_pago_sin_cuentas listar_recibo_facturas_otras_cuentas lista_pagar_pagado_factura  lista_cobrar_cobrado_factura
+// listar_caja_bancos
+//  listar_anular_eliminar_factura
+// listar_comprobantes_cobro_pago
+// listar_factura_comercial_por_id listaCobrosContabilidad
+// lista_pagar_pagado_factura
+//  listadesconsolidar listar_factura_comercial_por_id
+//  lista_cobrar_cobrado_factura
 //   insertar_transaccion.php   anulacion_transaccion.php   mayorcuentacontable listar_recibo_por_caja_bancos listar_facturas_cobro_pago
 
 
