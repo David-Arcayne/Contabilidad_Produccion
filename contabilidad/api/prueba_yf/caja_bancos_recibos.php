@@ -2274,7 +2274,6 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             dc.idcaja_bancos, 
             dc.monto, 
             dc.idfactura,
-            'CONTABILIDAD' AS modulo,
             'PAGAR' AS tipo
         FROM detalle_caja_bancos_pagar dc
         INNER JOIN cuentaspor cp ON cp.idcuentaspor = dc.idcuentaspor
@@ -2301,51 +2300,25 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             dc.idcaja_bancos, 
             dc.monto, 
             dc.idfactura,
-            'CONTABILIDAD' AS modulo,
             'COBRAR' AS tipo
         FROM detalle_caja_bancos_cobrar dc
         INNER JOIN cuentaspof cp ON cp.idcuentaspof = dc.idcuentaspof
         WHERE dc.idcaja_bancos IN ($caja_bancos)
         AND cp.fecha BETWEEN '$fecha_ini' AND '$fecha_fin'
+
         ORDER BY fecha ASC;");
     
-    // Convertir resultado en arreglo
-    $array_1 = [];
-    while ($row = $getPedido->fetch_assoc()) {
-        $array_1[] = $row;
-    }
-
-    $comprobante_comercial = $this->dbc->query("SELECT cc.*, 'COBRAR' AS tipo, 'COMERCIAL' AS modulo FROM comprobantes_comercial_caja_bancos cc
-    WHERE cc.idcaja_bancos IN($caja_bancos) AND cc.fecha BETWEEN '$fecha_ini' AND '$fecha_fin' ORDER BY cc.fecha ASC;");
-
-    // Convertir resultado en arreglo
-    $array_2 = [];
-    while ($cc = $comprobante_comercial->fetch_assoc()) {
-        $array_2[] = $cc;
-    }
-
-    // 1. Unir ambos listados
-    $combinado = array_merge($array_1, $array_2);
-
-    // 2. Ordenar por fecha ascendente
-    usort($combinado, function($a, $b) {
-        return strtotime($a['fecha']) <=> strtotime($b['fecha']);
-    });
-
     $aux_contador = 0;
     $saldo = 0;
     $saldo_inicial = 0;
-            foreach ($combinado as $qwe){
-            // while ($qwe = $this->dbc->fetch($combinado)) {
+            while ($qwe = $this->dbc->fetch($getPedido)) {
     
                  $transac = $this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones= '$qwe[transaccion]'");
                      $tr = $transac->fetch_assoc();
                      
                 //     $cp['transaccion']
     
-                if($qwe['modulo'] == 'CONTABILIDAD'){
-
-                    if($qwe['tipo'] == 'COBRAR'){
+                if($qwe['tipo'] == 'COBRAR'){
 
                     if($qwe['idfactura'] != 0){
                         //es cliente y se puede obtener del campo cliente directamente 
@@ -2502,10 +2475,6 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                     }
 
                 } //FIN DEL ELSE DE PAGAR
-                }elseif($qwe['modulo'] == 'COMERCIAL'){
-
-                }
-                
                 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
                 if($aux_contador == 0){ //ESTAMOS EN PRIMERA FILA, SUMAR LAS ANTERIORES FILAS A LA FECHA
 
@@ -2550,33 +2519,9 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             AND cp.fecha < '$fecha_ini'
 
             ORDER BY fecha ASC, nrecibo ASC;");
-
-            // Convertir resultado en arreglo
-            $array_1_fuera_rango = [];
-            while ($hjk = $fuera_rango->fetch_assoc()) {
-                $array_1_fuera_rango[] = $hjk;
-            }
-
-            $fuera_rango_comprobante_comercial = $this->dbc->query("SELECT ccc.*, 'COBRAR' AS tipo FROM comprobantes_comercial_caja_bancos ccc
-            WHERE ccc.idcaja_bancos IN($caja_bancos) AND ccc.fecha < '$fecha_ini' ORDER BY ccc.fecha ASC;");
-
-            // Convertir resultado en arreglo
-            $array_2_fuera_rango = [];
-            while ($tyu = $fuera_rango_comprobante_comercial->fetch_assoc()) {
-                $array_2_fuera_rango[] = $tyu;
-            }
-
-            // 1. Unir ambos listados
-            $combinado_fuera_rango = array_merge($array_1_fuera_rango, $array_2_fuera_rango);
-
-            // 2. Ordenar por fecha ascendente
-            usort($combinado_fuera_rango, function($a, $b) {
-                return strtotime($a['fecha']) <=> strtotime($b['fecha']);
-            });
                 // $saldo = 0;
-                foreach ($combinado_fuera_rango as $zxc){
-                // while ($zxc = $this->dbc->fetch($combinado_fuera_rango)) {
-                    if($zxc['estado'] == '4' || $zxc['estado'] == 'no autorizado'){
+                while ($zxc = $this->dbc->fetch($fuera_rango)) {
+                    if($zxc['estado'] == '4'){
                         // no sumara nada porque el documento esta anulado
                     }else{
                         if($zxc['tipo'] == 'COBRAR'){
@@ -2597,9 +2542,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
      
             }
                 //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-                if($qwe['modulo'] == 'CONTABILIDAD'){
-
-                    if($qwe['tipo'] == 'COBRAR'){
+                if($qwe['tipo'] == 'COBRAR'){
 
                     if($estado_documento == 'anulado'){
                         // no sumara nada porque el documento esta anulado
@@ -2822,61 +2765,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         );
                     }
                 }
-
-                }elseif($qwe['modulo'] == 'COMERCIAL'){
-
-                    if($qwe['tipo'] == 'COBRAR'){
-
-                        if($qwe['estado'] == 'no autorizado'){
-                            // no sumara nada porque el documento esta anulado
-                        }else{
-                                $saldo = $saldo + $qwe['monto'];
-                        }
-
-                        $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente= '$qwe[cliente_proveedor]'");
-                        $cl = $cliente->fetch_assoc();
-                        $id_client_prov = $cl['id_cliente'];
-
-                    }else{
-                        if($qwe['estado'] == 'no autorizado'){
-                            // no sumara nada porque el documento esta anulado
-                        }else{
-                                $saldo = $saldo - $qwe['monto'];
-                        }
-                        $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor= '$qwe[cliente_proveedor]'");
-                        $cl = $proveedor->fetch_assoc();
-                        $id_client_prov = $cl['id_proveedor'];
-                    }
-
-
-                    $res = array(
-                            "fecha" => $qwe['fecha'],
-                            // "tipo_documento" => 2,
-                            // "idcomprobante" => $qwe['id_cuenta'],
-                            "nrecibo" => $qwe['nro_comprobante'],
-                            // "lugar" => $qwe['lugar'],
-                            // "persona" => $qwe['persona'],
-                            // "ci" => $qwe['ci'],
-                            "factura_recibo" => "cobro_comercial",
-                            // "idfactura" => $fact['idfactura'],
-                            "nro_documento" => $qwe['nro_documento'],
-                            "por_concepto_de" => $qwe['concepto'],
-                            // "idotras_cuentas" => "$fact[idotras_cuentas]",
-                            "estado_documento" => "activo",
-                            "codigotransaccion" => $tr['codigotransaccion'],
-                            "id_cliente" => $id_client_prov,
-                            "nombre_cliente" => $cl['nombre'],
-                            //descripcion saldra de la factura o otras cuentas 
-                            "descripcion" => $qwe['concepto'],
-                            // "archivo" => $qwe['archivo'],
-                            "ingreso" => $qwe['monto'],
-                            "monto" => $qwe['monto'],
-                            "saldo_inicial" => $saldo_inicial,
-                            "saldo" => $saldo,
-                            "registro_desde" => $qwe['registro_desde'],
-                            // "pertenece_contratacion" => 'si'
-                        );
-                }//}}}}}}}}}
+                
               
                 array_push($lista, $res);
             }
