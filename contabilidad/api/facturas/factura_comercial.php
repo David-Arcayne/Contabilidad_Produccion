@@ -88,7 +88,8 @@ class Factura_comercial extends DB{
          ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
-        $url = "https://mistersofts.com/app/cmv1/api/listaVentas/".$idmd5;
+        // $url = "https://mistersofts.com/app/cmv1/api/listaVentas/".$idmd5;
+        $url = "https://vivasoft.link/app/cmv1/api/listaVentas/".$idmd5;
         $data = json_decode(file_get_contents($url), true);
         $lista_factura_venta = [];
 
@@ -834,11 +835,13 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
 
         $nuevo_correlativo = ($row['ultimo'] !== null) ? $row['ultimo'] + 1 : 1;
 
+        $fechaConHora = date("Y-m-d", strtotime($data['fecha'])) . " " . date("H:i:s");
+
         // Insertar el nuevo registro con el correlativo calculado
         $registroComprobante_comercial = $this->dbc->query("INSERT INTO comprobantes_comercial_caja_bancos(
             fecha, lugar, cliente_proveedor, id_documento, nro_documento, nro_comprobante, registro_desde, concepto, idcaja_bancos, monto, estado, idempresa
         ) VALUES (
-            '{$data['fecha']}',
+            '$fechaConHora',
             '{$data['lugar']}',
             '{$data['cliente_proveedor']}',
             '{$data['id_documento']}',
@@ -875,5 +878,38 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
         
         echo json_encode($res);
         
+    }
+
+    public function listar_cobros_comercial($empresa)
+    {
+         ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+
+        $idempresa = $this->getidempresa($empresa); 
+        // $ide = $this->getidempresa($empresa);
+        $lista = [];
+       
+//´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´
+        $url = "https://vivasoft.link/app/cmv1/api/listaCobrosContabilidad/".$empresa;
+        // $url = "https://mistersofts.com/app/cmv1/api/listaCobrosContabilidad/".$empresa;
+        $data = json_decode(file_get_contents($url), true);
+        $lista_factura_venta = [];
+
+        foreach($data as $plantilla){
+            $comp_com = $this->dbc->query("SELECT * 
+                                            FROM comprobantes_comercial_caja_bancos 
+                                            WHERE id_documento = '{$plantilla['idventa']}' AND registro_desde = 'cobro_comercial'");
+            if($comp_com->num_rows > 0){
+                // Ya existe, no lo agregamos
+            } else {
+                // Guardamos todo el registro, no solo el id
+                $lista_factura_venta[] = $plantilla;
+            }
+        }
+
+        $lista_final = array_merge($lista, $lista_factura_venta);
+        
+        echo json_encode($lista_final);
     }
 }

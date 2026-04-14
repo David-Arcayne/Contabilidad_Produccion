@@ -761,15 +761,18 @@ elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
 }elseif($ver[0]=="listar_datos_de_usuario"){//listar_recibo_por_caja_bancos
     $cont=new Contabilidad();
     $cont->listar_datos_de_usuario($ver[1]);
+}elseif($ver[0]=="listar_cobros_comercial"){//listar_recibo_por_caja_bancos
+    $cont=new Factura_comercial();
+    $cont->listar_cobros_comercial($ver[1]);
 }
 // reportedetalle listar_recibo_por_id listar_recibo_por_id_otras_cuentas listaclientes listar_recibo_por_caja_bancos listapagos alerta_anular_eliminar_transaccion
 // listar_factura           listar_facturas_cobro_pago      listaclientes listafacturaapi_cobrado lista_cobrar_cobrado_factura listar_todos_documentos_asignado_cuenta
 // reemplazar facturas_perteneciente_a_cuenta  lista_pagar_pagado_factura listar_recibo_otras_cuentas_pagar listapagos_individuales listar_anular_eliminar_factura
 
-// listar_caja_bancos
+// listar_caja_bancos listar_facturas_comercial_cobro
 //  listar_anular_eliminar_factura
 // listar_comprobantes_cobro_pago
-// listar_factura_comercial_por_id listaCobrosContabilidad
+// listar_factura_comercial_por_id listaCobrosContabilidad listar_factura_comercial
 // lista_pagar_pagado_factura
 //  listadesconsolidar listar_factura_comercial_por_id
 //  lista_cobrar_cobrado_factura
