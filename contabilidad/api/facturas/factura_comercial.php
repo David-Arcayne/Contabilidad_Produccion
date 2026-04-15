@@ -85,11 +85,11 @@ class Factura_comercial extends DB{
     
     public function listar_factura_comercial($idmd5)
     {
-         ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
-        // $url = "https://mistersofts.com/app/cmv1/api/listaVentas/".$idmd5;
-        $url = "https://vivasoft.link/app/cmv1/api/listaVentas/".$idmd5;
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
+        $url = "https://mistersofts.com/app/cmv1/api/listaVentas/".$idmd5;
+        // $url = "https://vivasoft.link/app/cmv1/api/listaVentas/".$idmd5;
         $data = json_decode(file_get_contents($url), true);
         $lista_factura_venta = [];
 
