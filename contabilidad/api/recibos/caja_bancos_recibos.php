@@ -2275,7 +2275,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             dc.monto, 
             dc.idfactura,
             'CONTABILIDAD' AS modulo,
-            'PAGAR' AS tipo
+            'egreso' AS ingreso_egreso
         FROM detalle_caja_bancos_pagar dc
         INNER JOIN cuentaspor cp ON cp.idcuentaspor = dc.idcuentaspor
         WHERE dc.idcaja_bancos IN ($caja_bancos)
@@ -2302,7 +2302,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             dc.monto, 
             dc.idfactura,
             'CONTABILIDAD' AS modulo,
-            'COBRAR' AS tipo
+            'ingreso' AS ingreso_egreso
         FROM detalle_caja_bancos_cobrar dc
         INNER JOIN cuentaspof cp ON cp.idcuentaspof = dc.idcuentaspof
         WHERE dc.idcaja_bancos IN ($caja_bancos)
@@ -2315,7 +2315,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         $array_1[] = $row;
     }
 
-    $comprobante_comercial = $this->dbc->query("SELECT cc.*, 'COBRAR' AS tipo, 'COMERCIAL' AS modulo FROM comprobantes_comercial_caja_bancos cc
+    $comprobante_comercial = $this->dbc->query("SELECT cc.*, 'COMERCIAL' AS modulo FROM comprobantes_comercial_caja_bancos cc
     WHERE cc.idcaja_bancos IN($caja_bancos) AND cc.fecha BETWEEN '$fecha_ini' AND '$fecha_fin' ORDER BY cc.fecha ASC;");
 
     // Convertir resultado en arreglo
@@ -2345,7 +2345,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
     
                 if($qwe['modulo'] == 'CONTABILIDAD'){
 
-                    if($qwe['tipo'] == 'COBRAR'){
+                    if($qwe['ingreso_egreso'] == 'ingreso'){
 
                     if($qwe['idfactura'] != 0){
                         //es cliente y se puede obtener del campo cliente directamente 
@@ -2521,7 +2521,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                 dc.idcaja_bancos, 
                 dc.monto, 
                 dc.idfactura,
-                'COBRAR' AS tipo,
+                'ingreso' AS ingreso_egreso,
                 cp.estado
             FROM detalle_caja_bancos_cobrar dc
             INNER JOIN cuentaspof cp ON cp.idcuentaspof = dc.idcuentaspof
@@ -2542,7 +2542,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                 dc.idcaja_bancos, 
                 dc.monto, 
                 dc.idfactura,
-                'PAGAR' AS tipo,
+                'egreso' AS ingreso_egreso,
                 cp.estado
             FROM detalle_caja_bancos_pagar dc
             INNER JOIN cuentaspor cp ON cp.idcuentaspor = dc.idcuentaspor
@@ -2557,7 +2557,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                 $array_1_fuera_rango[] = $hjk;
             }
 
-            $fuera_rango_comprobante_comercial = $this->dbc->query("SELECT ccc.*, 'COBRAR' AS tipo FROM comprobantes_comercial_caja_bancos ccc
+            $fuera_rango_comprobante_comercial = $this->dbc->query("SELECT ccc.* FROM comprobantes_comercial_caja_bancos ccc
             WHERE ccc.idcaja_bancos IN($caja_bancos) AND ccc.fecha < '$fecha_ini' ORDER BY ccc.fecha ASC;");
 
             // Convertir resultado en arreglo
@@ -2579,7 +2579,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                     if($zxc['estado'] == '4' || $zxc['estado'] == 'no autorizado'){
                         // no sumara nada porque el documento esta anulado
                     }else{
-                        if($zxc['tipo'] == 'COBRAR'){
+                        if($zxc['ingreso_egreso'] == 'ingreso'){
                             $saldo = $saldo + $zxc['monto'];
                         }else{
                             $saldo = $saldo - $zxc['monto'];
@@ -2599,7 +2599,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                 //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
                 if($qwe['modulo'] == 'CONTABILIDAD'){
 
-                    if($qwe['tipo'] == 'COBRAR'){
+                    if($qwe['ingreso_egreso'] == 'ingreso'){
 
                     if($estado_documento == 'anulado'){
                         // no sumara nada porque el documento esta anulado
@@ -2825,7 +2825,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
                 }elseif($qwe['modulo'] == 'COMERCIAL'){
 
-                    if($qwe['tipo'] == 'COBRAR'){
+                    if($qwe['ingreso_egreso'] == 'ingreso'){
 
                         if($qwe['estado'] == 'no autorizado'){
                             // no sumara nada porque el documento esta anulado
@@ -2857,7 +2857,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             // "lugar" => $qwe['lugar'],
                             // "persona" => $qwe['persona'],
                             // "ci" => $qwe['ci'],
-                            "factura_recibo" => "cobro_comercial",
+                            "factura_recibo" => $qwe['registro_desde'],
                             // "idfactura" => $fact['idfactura'],
                             "nro_documento" => $qwe['nro_documento'],
                             "por_concepto_de" => $qwe['concepto'],

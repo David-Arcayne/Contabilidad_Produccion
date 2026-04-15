@@ -88,8 +88,8 @@ class Factura_comercial extends DB{
         // ini_set('display_errors', 1);
         // ini_set('display_startup_errors', 1);
         // error_reporting(E_ALL);
-        $url = "https://mistersofts.com/app/cmv1/api/listaVentas/".$idmd5;
-        // $url = "https://vivasoft.link/app/cmv1/api/listaVentas/".$idmd5;
+        // $url = "https://mistersofts.com/app/cmv1/api/listaVentas/".$idmd5;
+        $url = "https://vivasoft.link/app/cmv1/api/listaVentas/".$idmd5;
         $data = json_decode(file_get_contents($url), true);
         $lista_factura_venta = [];
 
@@ -217,7 +217,7 @@ class Factura_comercial extends DB{
         }
         echo json_encode($lista);
     }
-      public function cobro_asignacion_factura_comercial($fecha_transaccion,$monto_total,$monto_recibo,$idtransaccion,$idcaja_bancos,$idasientotipo,$idempresa,$idsucursal,$data,$zn,$tipo_cuenta,$cuenta)
+      public function cobro_asignacion_factura_comercial($registro_desde,$fecha_transaccion,$monto_total,$idtransaccion,$idcaja_bancos,$idasientotipo,$idempresa,$idsucursal,$data,$zn,$tipo_cuenta,$cuenta)
     {  
         $caja_bancos = json_decode($idcaja_bancos, true);
         $facturas = json_decode($data, true);
@@ -239,44 +239,18 @@ class Factura_comercial extends DB{
         $ide = $this->getidempresa($idempresa);
         $sucursal = $this->getidsucursal($idsucursal); 
         $gestion = $this->getgestionactualid($ide);
-        
-        $recibo_trans = $this->dbc->query("SELECT count(*) AS cant1 FROM cuentaspof cp 
-        INNER JOIN transacciones t ON t.idtransacciones=cp.transaccion 
-        WHERE t.organizacion_idorganizacion='$ide'");
-        $res1 = $recibo_trans->fetch_assoc();
-
-        $recibo_fact = $this->dbc->query("SELECT count(*) AS cant2 FROM cuentaspof cp
-            INNER JOIN factura f ON f.idfactura=cp.idfactura
-            WHERE f.idorganizacion='$ide' AND cp.transaccion = '0'");
-        $res2 = $recibo_fact->fetch_assoc();
-
-        $recibo_oc = $this->dbc->query("SELECT count(*) AS cant3 FROM cuentaspof cp
-        INNER JOIN otras_cuentas oc ON oc.idotras_cuentas=cp.idotras_cuentas
-        WHERE oc.idempresa='$ide' and cp.transaccion ='0'");
-        $res3 = $recibo_oc->fetch_assoc();
-
-        $nrecibo = $res1['cant1'] + $res2['cant2']+ $res3['cant3'] + 1;
-
-// Obtener el número de transacción más reciente y sumar 1  emp
-$nroTrans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE organizacion_idorganizacion = $ide AND idgestion='$gestion' ORDER BY codigotransaccion DESC LIMIT 1;");
-$resultado12 = $nroTrans->fetch_assoc();
-$nroTransaccion = $resultado12['codigotransaccion'] + 1;
 
         $res = "";
-        $glosa = "Registro cobro comercial $nrecibo";
+        $glosa = "Registro cobro comercial";
         // $gestion = $this->getgestionactualid($ide);
         $tipotransaccion = 1; //ingreso
         $trans = "";
-        // $glosa2 = $this->dbc->real_escape_string($glosa);
-        // $fecha2 = $this->dbc->real_escape_string($fecha);
-        // $nrecibo2 = $this->dbc->real_escape_string($nrecibo);
-        // $fecha2 = $this->dbc->real_escape_string($fecha);
         
         if ($idasientotipo != "") {
 
             $glosa2 = $this->dbc->real_escape_string($glosa);
             $fecha2 = $this->dbc->real_escape_string($fecha_transaccion);
-            $nroTransaccion2 = $this->dbc->real_escape_string($nroTransaccion);
+            // $nroTransaccion2 = $this->dbc->real_escape_string($nroTransaccion);
 
         // Construir rango dinámico (primer y último día del mes)
             $fecha_inicio = date("Y-m-01", strtotime($fecha2)); // "2025-03-01"
@@ -329,7 +303,7 @@ $nroTransaccion = $resultado12['codigotransaccion'] + 1;
 
         // Insertar en transacciones
         $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion, fechatransaccion, tipodecambio, ndocumento, glosa, consolidar,estado, tipotransaccion_idtipotransaccion, organizacion_idorganizacion, sucursal, idgestion) 
-        VALUES ('$nroTransaccion2', '$fecha_transaccion', '1', '0', '$glosa2', '1','1', '$tipotransaccion', '$ide', '$sucursal', '$gestion')");
+        VALUES ('$nroTransaccion', '$fecha_transaccion', '1', '0', '$glosa2', '1','1', '$tipotransaccion', '$ide', '$sucursal', '$gestion')");
     
         // Obtener el ID del registro recién insertado
         $idtrans = $this->dbc->insert_id;
@@ -339,6 +313,7 @@ $nroTransaccion = $resultado12['codigotransaccion'] + 1;
             $haber = 0;
             $tasiento = $this->dbc->query("SELECT * FROM asiento WHERE idasientotipo='$idasientotipo'");
             $orden = 1;
+            $id_cuenta = '0';
             while ($qwe = $this->dbc->fetch($tasiento)) {
                 $pcuenta = $qwe['idcuenta'];
                 if ($qwe['tipo'] == "DEBE") {
@@ -355,6 +330,12 @@ $nroTransaccion = $resultado12['codigotransaccion'] + 1;
                 // $crear = $this->dbc->query("INSERT INTO detalletransaccion(debe, haber, nota, transacciones_idtransacciones, idplandecuenta, idcuentapresupuestaria, estado, cobrar, pagar, idorganizacion, idsucursal) VALUES ('$debe', '$haber', '$nota', '$idtrans', '$pcuenta', '$ppresupuestario', '$estado', '2', '2', '$idempresa', '$idsucursal')");
                 $crear = $this->dbc->query("INSERT INTO detalletransaccion(debe,haber,nota,transacciones_idtransacciones,idplandecuenta,idcuentapresupuestaria,estado,cobrar,pagar,idorganizacion,idsucursal,orden)VALUES('$debe','$haber','$nota','$idtrans','$pcuenta','$ppresupuestario','$estado','2','2','$ide','$sucursal','$orden')");
                 
+                if($cuenta == $pcuenta){ // se igualan los ids de plan de cuentas
+                    $id_cuenta = $this->dbc->insert_id;
+                }else{
+                    // $id_cuenta = '0';
+                }
+
                 $orden = $orden + 1;
             }
         }else{
@@ -362,101 +343,103 @@ $nroTransaccion = $resultado12['codigotransaccion'] + 1;
         }
         }else {
             $idtrans = $idtransaccion;
+            $id_cuenta = $cuenta;
         }
 
         //-----------------------------------------------------------------------------------------------------------
 
        
         $aux_cont = 0;
-        foreach($facturas as $factura){
-
-        if($cuenta == ""){
-           $registrar_fact_trans = $this->dbc->query("INSERT INTO transaccion_factura_comercial(idfactura_comercial,idtransaccion,cuenta,idempresa)VALUES('$factura[idfactura]','$idtrans','0','$ide')");
-
-        }else{ // SE ASIGNARA CUENTA MAS
-           $registrar_fact_trans = $this->dbc->query("INSERT INTO transaccion_factura_comercial(idfactura_comercial,idtransaccion,cuenta,idempresa)VALUES('$factura[idfactura]','$idtrans','$cuenta','$ide')");
-           
-           $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$cuenta'");
-                $dt = $detalle_trans->fetch_assoc(); 
-
-           if($tipo_cuenta == 'suma'){ // SUMAR
-                    
-                    if($dt['debe'] > 0){
-                        $nuevo_monto_dt = $dt['debe'] + $monto_total;
-                        $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
-                    }else{
-                        $nuevo_monto_dt = $dt['haber'] + $monto_total;
-                        $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
-                    }
-            }elseif($tipo_cuenta == 'reemplazo'){ // REEMPLAZAR
-                    if($dt['debe'] > 0){
-                        $nuevo_monto_dt = $monto_total;
-                        $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
-                    }else{
-                        $nuevo_monto_dt = $monto_total;
-                        $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$cuenta'");
-                    }
-            }else{ // SOLO VINCULA NO PASA NADA
-
-            }
-        }
-            // $registrar_fact_trans = $this->dbc->query("INSERT INTO transaccion_factura_comercial(idfactura_comercial,idtransaccion,idempresa)VALUES('$factura[idfactura]','$idtrans','$ide')");
-
-           if($idcaja_bancos != ""){
-             if($factura['saldo'] > 0){
-
-                 if($aux_cont < 1){ //ENTRA POR PRIMERA VEZ DESPUES NUNCA MAS ENTRA
-
-                 $registropago = $this->dbc->query("INSERT INTO cuentaspof(idcuentaspof,nrecibo,fecha,cliente,persona,ci,monto,idfactura,transaccion,cuenta,archivo)
-                VALUES(NULL,'$nrecibo','$fecha_completa','varios clientes','persona_comercial','1111','$monto_recibo','0','$idtrans','0',NULL)");
-                
-                $idcuentaspof = $this->dbc->insert_id;
-                    $aux_cont++;
-                }
-
-                $cobras = $this->dbc->query("SELECT SUM(monto) AS montoSuma FROM cuentaspof WHERE idfactura='$factura[idfactura]'"); //173
-                // $asd = $this->dbc->fetch($cobras);
-                $asd = $cobras->fetch_assoc();
-                if($asd['montoSuma'] == NULL){
-                    $registrarTabla = $this->dbc->query("INSERT INTO cuentascobrar_grupal(idcuentaspof,idfactura,monto)VALUES('$idcuentaspof','$factura[idfactura]','$factura[saldo]')");
-                
-                }else{
-                    $montoSuma = $asd['montoSuma'];
-                    $montoCobrado = $factura['saldo'] - $montoSuma;
-                    $registrarTabla = $this->dbc->query("INSERT INTO cuentascobrar_grupal(idcuentaspof,idfactura,monto)VALUES('$idcuentaspof','$factura[idfactura]','$montoCobrado')");
-                }
-                
-                $lista_estadoCobro = $this->dbcm->query("SELECT * FROM estado_cobro WHERE venta_id_venta = '$factura[idfactura]'");
-                $cuota = $lista_estadoCobro->fetch_assoc();   
-
-                $lista_detalleCobro = $this->dbcm->query("SELECT SUM(ncuotas) AS nro_cuotas FROM detalle_cobro WHERE estado_cobro_id_estado_cobro = '$cuota[id_estado_cobro]'");
-                $cuota_sum = $lista_detalleCobro->fetch_assoc();     
-
-                $cuotas_faltantes = $cuota['Ncuotas'] - $cuota_sum['nro_cuotas'];
-
-                $monto_cuotas = $cuota['valorcuotas'] * $cuotas_faltantes;
-                $regis_det_cobr = $this->dbcm->query("INSERT INTO detalle_cobro(fecha_actual,ncuotas,valor_cuotas,monto,estado_cobro_id_estado_cobro)VALUES('$fecha_transaccion','$cuotas_faltantes','0','$monto_cuotas','$cuota[id_estado_cobro]')");
-
-                $update_estado_cobro = $this->dbcm->query("UPDATE estado_cobro SET saldo = '0', estado = '2' WHERE venta_id_venta = '$factura[idfactura]'");
-
-            }else{
-                //  NO HACE NADA
-            }
-           }else{
-            // NO SE REALIZARA EL COBRO
-           } 
-        }
-        if(empty($caja_bancos)){
-            //EL ARREGLO CAJA_BANCOS ESTA VACIO
+        if($idtrans == ""){
+            // NO PASARA NADA 
         }else{
+            foreach($facturas as $factura){
 
-            foreach($caja_bancos as $cajaBanco){
+                if($id_cuenta == ""){
+                $registrar_fact_trans = $this->dbc->query("INSERT INTO transaccion_factura_comercial(idfactura_comercial,idtransaccion,cuenta,idempresa)VALUES('$factura[idfactura]','$idtrans','0','$ide')");
 
-            $registropago3 = $this->dbc->query("INSERT INTO detalle_caja_bancos_cobrar(idcaja_bancos,monto,idcuentaspof,idfactura)
-            VALUES('$cajaBanco[id]','$cajaBanco[monto]','$idcuentaspof','$cajaBanco[idfactura]')");
-             
+                }else{ // SE ASIGNARA CUENTA MAS
+
+                $registrar_fact_trans = $this->dbc->query("INSERT INTO transaccion_factura_comercial(idfactura_comercial,idtransaccion,cuenta,idempresa)VALUES('$factura[idfactura]','$idtrans','$id_cuenta','$ide')");
+                
+                $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$id_cuenta'");
+                        $dt = $detalle_trans->fetch_assoc(); 
+
+                if($tipo_cuenta == 'suma'){ // SUMAR
+                            
+                            if($dt['debe'] > 0){
+                                $nuevo_monto_dt = $dt['debe'] + $monto_total;
+                                $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$id_cuenta'");
+                            }else{
+                                $nuevo_monto_dt = $dt['haber'] + $monto_total;
+                                $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$id_cuenta'");
+                            }
+                    }elseif($tipo_cuenta == 'reemplazo'){ // REEMPLAZAR
+                            if($dt['debe'] > 0){
+                                $nuevo_monto_dt = $monto_total;
+                                $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$id_cuenta'");
+                            }else{
+                                $nuevo_monto_dt = $monto_total;
+                                $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$id_cuenta'");
+                            }
+                    }else{ // SOLO VINCULA NO PASA NADA
+
+                    }
+                }
+                // $registrar_fact_trans = $this->dbc->query("INSERT INTO transaccion_factura_comercial(idfactura_comercial,idtransaccion,idempresa)VALUES('$factura[idfactura]','$idtrans','$ide')");
+
             }
         }
+
+        if($idcaja_bancos != ''){
+            foreach ($facturas as $factura) {
+
+                // Obtener el último correlativo para esa empresa y registro_desde
+                $sql = "SELECT COUNT(*) as total 
+                        FROM comprobantes_comercial_caja_bancos 
+                        WHERE idempresa = '$ide' 
+                        AND registro_desde = '$registro_desde'";
+                        
+                $result = $this->dbc->query($sql);
+                $row = $result->fetch_assoc();
+
+                $nuevo_correlativo = $row['total'] + 1;
+                // $nuevo_correlativo = ($row['ultimo'] !== null) ? $row['ultimo'] + 1 : 1;
+
+                // Insertar el nuevo registro con el correlativo calculado
+                $registroComprobante_comercial = $this->dbc->query("INSERT INTO comprobantes_comercial_caja_bancos(
+                    fecha, lugar, cliente_proveedor, id_documento, nro_documento, nro_comprobante, registro_desde, concepto, idcaja_bancos, monto, ingreso_egreso, estado, idempresa
+                ) VALUES (
+                    '{$factura['fecha']}',
+                    '{$factura['almacen']}',
+                    '{$factura['cliente_proveedor']}',
+                    '{$factura['idfactura']}',
+                    '{$factura['nro_documento']}',
+                    '$nuevo_correlativo',
+                    '$registro_desde',
+                    '$registro_desde',
+                    '$idcaja_bancos',
+                    '{$factura['monto']}',
+                    'ingreso',
+                    '{$factura['estado']}',
+                    '$ide'
+                )");
+            }
+        }else{
+            // NO SE VINCULARA A CAJA BANCOS
+        }
+
+        // if(empty($caja_bancos)){
+        //     //EL ARREGLO CAJA_BANCOS ESTA VACIO
+        // }else{
+
+        //     foreach($caja_bancos as $cajaBanco){
+
+        //     $registropago3 = $this->dbc->query("INSERT INTO detalle_caja_bancos_cobrar(idcaja_bancos,monto,idcuentaspof,idfactura)
+        //     VALUES('$cajaBanco[id]','$cajaBanco[monto]','$idcuentaspof','$cajaBanco[idfactura]')");
+             
+        //     }
+        // }
        
         if ($bandera === TRUE) {
             $res = array("success", "Registro Realizado", "registrocobrarfacturaGrupal",$fecha_transaccion,$fecha2,$resultado122['fechatransaccion']);
@@ -785,18 +768,20 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
         foreach ($data['cobros'] as $cobro) {
 
             // Obtener el último correlativo para esa empresa y registro_desde
-            $sql = "SELECT MAX(nro_comprobante) as ultimo 
-                    FROM comprobantes_comercial_caja_bancos 
-                    WHERE idempresa = '$idempresa' 
-                    AND registro_desde = '$data[registro_desde]'";
+            $sql = "SELECT COUNT(*) as total 
+            FROM comprobantes_comercial_caja_bancos 
+            WHERE idempresa = '$idempresa' 
+            AND registro_desde = '$data[registro_desde]'";
+            
             $result = $this->dbc->query($sql);
             $row = $result->fetch_assoc();
 
-            $nuevo_correlativo = ($row['ultimo'] !== null) ? $row['ultimo'] + 1 : 1;
+            $nuevo_correlativo = $row['total'] + 1;
+            // $nuevo_correlativo = ($row['ultimo'] !== null) ? $row['ultimo'] + 1 : 1;
 
             // Insertar el nuevo registro con el correlativo calculado
             $registroComprobante_comercial = $this->dbc->query("INSERT INTO comprobantes_comercial_caja_bancos(
-                fecha, lugar, cliente_proveedor, id_documento, nro_documento, nro_comprobante, registro_desde, concepto, idcaja_bancos, monto, estado, idempresa
+                fecha, lugar, cliente_proveedor, id_documento, nro_documento, nro_comprobante, registro_desde, concepto, idcaja_bancos, monto, ingreso_egreso, estado, idempresa
             ) VALUES (
                 '{$cobro['fecha']}',
                 '{$cobro['almacen']}',
@@ -808,6 +793,7 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
                 '{$data['concepto']}',
                 '{$data['idcaja_bancos']}',
                 '{$cobro['monto']}',
+                'ingreso',
                 '{$cobro['estado']}',
                 '$idempresa'
             )");
@@ -835,13 +821,13 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
 
         $nuevo_correlativo = ($row['ultimo'] !== null) ? $row['ultimo'] + 1 : 1;
 
-        $fechaConHora = date("Y-m-d", strtotime($data['fecha'])) . " " . date("H:i:s");
+        // $fechaConHora = date("Y-m-d", strtotime($data['fecha'])) . " " . date("H:i:s");
 
         // Insertar el nuevo registro con el correlativo calculado
         $registroComprobante_comercial = $this->dbc->query("INSERT INTO comprobantes_comercial_caja_bancos(
-            fecha, lugar, cliente_proveedor, id_documento, nro_documento, nro_comprobante, registro_desde, concepto, idcaja_bancos, monto, estado, idempresa
+            fecha, lugar, cliente_proveedor, id_documento, nro_documento, nro_comprobante, registro_desde, concepto, idcaja_bancos, monto, ingreso_egreso, estado, idempresa
         ) VALUES (
-            '$fechaConHora',
+            '{$data['fecha']}',
             '{$data['lugar']}',
             '{$data['cliente_proveedor']}',
             '{$data['id_documento']}',
@@ -851,6 +837,7 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
             '{$data['concepto']}',
             '{$data['idcaja_bancos']}',
             '{$data['monto']}',
+            '{$data['ingreso_egreso']}',
             '{$data['estado']}',
             '$idempresa'
         )");
@@ -862,13 +849,15 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
         }
 
         echo json_encode($res);
+        // echo json_encode(array($data));
+        //  return "hola richard";
     }
     
     public function autorizacion_caja_bancos_comercial($data){
         // $idempresa = Empresa::getidempresa($empresa);
 
             // Insertar el nuevo registro
-            $autorizar = $this->dbc->query("UPDATE comprobantes_comercial_caja_bancos SET estado = '$data[estado]' WHERE id_documento = '$data[id_documento]' AND registro_desde ='$data[registro_desde]'");
+            $autorizar = $this->dbc->query("UPDATE comprobantes_comercial_caja_bancos SET estado = '$data[estado]', monto = '$data[monto]' WHERE id_documento = '$data[id_documento]' AND registro_desde ='$data[registro_desde]'");
 
             if ($autorizar === TRUE) {                                                                                                                                                                
                 $res = array("success", "Registro exitoso","registroCaracteristicas");
@@ -899,7 +888,7 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
         foreach($data as $plantilla){
             $comp_com = $this->dbc->query("SELECT * 
                                             FROM comprobantes_comercial_caja_bancos 
-                                            WHERE id_documento = '{$plantilla['idventa']}' AND registro_desde = 'cobro_comercial'");
+                                            WHERE id_documento = '{$plantilla['idDetalleCobro']}' AND registro_desde = 'cobro_comercial'");
             if($comp_com->num_rows > 0){
                 // Ya existe, no lo agregamos
             } else {

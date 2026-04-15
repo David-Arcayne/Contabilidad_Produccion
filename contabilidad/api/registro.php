@@ -511,12 +511,12 @@ if($data['ver'] == "asignar_asiento_A_factura") {
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['transacciones']));
         }
     }elseif($ver=="cobro_asignacion_factura_comercial"){
-        if(isset($_POST['fecha'],$_POST['monto_total'],$_POST['monto_recibo'],$_POST['transaccion'],$_POST['cajasBancos'],$_POST['asiento_modelo'],$_POST['empresa'],$_POST['sucursal'],$_POST['facturas_comercial'],$_POST['zona_horaria'],$_POST['tipo'],$_POST['cuenta'])){
+        if(isset($_POST['registro_desde'],$_POST['fecha'],$_POST['monto_total'],$_POST['transaccion'],$_POST['idcaja_bancos'],$_POST['asiento_modelo'],$_POST['empresa'],$_POST['sucursal'],$_POST['facturas_comercial'],$_POST['zona_horaria'],$_POST['tipo'],$_POST['cuenta'])){
             $cont=new Factura_comercial();
-            $cont->cobro_asignacion_factura_comercial($_POST['fecha'],$_POST['monto_total'],$_POST['monto_recibo'],$_POST['transaccion'],$_POST['cajasBancos'],$_POST['asiento_modelo'],$_POST['empresa'],$_POST['sucursal'],$_POST['facturas_comercial'],$_POST['zona_horaria'],$_POST['tipo'],$_POST['cuenta']);
+            $cont->cobro_asignacion_factura_comercial($_POST['registro_desde'],$_POST['fecha'],$_POST['monto_total'],$_POST['transaccion'],$_POST['idcaja_bancos'],$_POST['asiento_modelo'],$_POST['empresa'],$_POST['sucursal'],$_POST['facturas_comercial'],$_POST['zona_horaria'],$_POST['tipo'],$_POST['cuenta']);
         }
         else{
-            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['fecha'],$_POST['monto_total'],$_POST['monto_recibo'],$_POST['transaccion'],$_POST['cajasBancos'],$_POST['asiento_modelo'],$_POST['empresa'],$_POST['sucursal'],$_POST['facturas_comercial'],$_POST['zona_horaria'],$_POST['tipo'],$_POST['cuenta']));
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['registro_desde'],$_POST['fecha'],$_POST['monto_total'],$_POST['transaccion'],$_POST['idcaja_bancos'],$_POST['asiento_modelo'],$_POST['empresa'],$_POST['sucursal'],$_POST['facturas_comercial'],$_POST['zona_horaria'],$_POST['tipo'],$_POST['cuenta']));
         }
     }elseif($ver=="registrar_firma_reporte"){
         if(isset($_POST['idtrabajador'],$_POST['funcion'],$_POST['tipo_reporte'],$_POST['matricula'],$_POST['empresa'])){
@@ -909,7 +909,7 @@ if($data['ver'] == "asignar_asiento_A_factura") {
 // asignar asiento registrar_recibo_cobro_cajaBancos_en_otras_cuentas editar_recibo_caja_bancos registrocobrarfactura registrar_anular_eliminar_activar_factura_tributario_transaccion
 // editar_caja_bancos_facturas registrar_factura_cobro_otras_cuentas registrocobrarfactura registrar_recibo_otras_cuentas  cambiarEstado_anular_eliminar_activar_transaccion
 
-//  editar_recibo_caja_bancos registrar_recibo_otras_cuentas registrar_factura_recibo_cobro_cajaBancos registropagarfactura registrar_recibo_pago_cajaBancos_en_otras_cuentas
+// cobro_asignacion_factura_comercial
 
 } 
 // registrar_recibo_otras_cuentas registrocobrarfacturaGrupal
