@@ -779,11 +779,11 @@ elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
 
 // listar_caja_bancos listar_facturas_comercial_cobro
 //  listar_anular_eliminar_factura
-// listar_comprobantes_cobro_pago
+// listar_comprobantes_cobro_pago reporte_estado_resultados_actualizado_consolidado_por_niveles
 // listar_factura_comercial_por_id listaCobrosContabilidad listar_factura_comercial
 // lista_pagar_pagado_factura
-//  listadesconsolidar listar_factura_comercial_por_id
-//  lista_cobrar_cobrado_factura
+//  listadesconsolidar listar_factura_comercial_por_id 
+//  lista_cobrar_cobrado_factura getListaplantillareporterubro
 
 //   insertar_transaccion.php   anulacion_transaccion.php   mayorcuentacontable listar_recibo_por_caja_bancos listar_facturas_cobro_pago
 

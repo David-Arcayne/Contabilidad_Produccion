@@ -2838,7 +2838,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         $id_client_prov = $cl['id_cliente'];
 
                     }else{
-                        if($qwe['estado'] == 'no autorizado'){
+                        if($qwe['estado'] == 'no_autorizado'){
                             // no sumara nada porque el documento esta anulado
                         }else{
                                 $saldo = $saldo - $qwe['monto'];
@@ -2848,8 +2848,8 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         $id_client_prov = $cl['id_proveedor'];
                     }
 
-
-                    $res = array(
+                    if($qwe['estado'] == 'autorizado'){
+                        $res = array(
                             "fecha" => $qwe['fecha'],
                             // "tipo_documento" => 2,
                             // "idcomprobante" => $qwe['id_cuenta'],
@@ -2876,6 +2876,10 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "registro_desde" => $qwe['registro_desde'],
                             // "pertenece_contratacion" => 'si'
                         );
+                    }else{
+                        // no esta autoizado no mostrara nada
+                    }
+                    
                 }//}}}}}}}}}
               
                 array_push($lista, $res);

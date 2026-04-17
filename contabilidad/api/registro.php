@@ -909,7 +909,7 @@ if($data['ver'] == "asignar_asiento_A_factura") {
 // asignar asiento registrar_recibo_cobro_cajaBancos_en_otras_cuentas editar_recibo_caja_bancos registrocobrarfactura registrar_anular_eliminar_activar_factura_tributario_transaccion
 // editar_caja_bancos_facturas registrar_factura_cobro_otras_cuentas registrocobrarfactura registrar_recibo_otras_cuentas  cambiarEstado_anular_eliminar_activar_transaccion
 
-// cobro_asignacion_factura_comercial
+// cobro_asignacion_factura_comercial registrar_estado_resultados_admin
 
 } 
 // registrar_recibo_otras_cuentas registrocobrarfacturaGrupal
