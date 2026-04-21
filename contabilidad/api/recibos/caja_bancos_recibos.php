@@ -28,9 +28,9 @@ class Caja_bancos_recibos extends DB{
     public function registrar_factura_recibo_cobro_cajaBancos($idotras_cuentas,$por_concepto_de,$fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento,$clasefactura,$cobro, $pagar, $espesificacion,$trans, $cliente, $empresa, $sucursal,$asiento,$idcaja_bancos,$archivo,$registro_desde,$zn,$fecha_transaccion,$cuenta,$tipo_cuenta)
     {
 
-         ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+        //  ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
 
         // Establecer la zona horaria recibida
         date_default_timezone_set($zn);
@@ -404,7 +404,7 @@ class Caja_bancos_recibos extends DB{
             }else{ // NO EXISTE CONTRATO GENERAL ENTONCES LO CREAREMOS
 
                 $reg_otrs_cuentas = $this->dbc->query("INSERT INTO otras_cuentas(fecha,pagado,cobrado,idempresa,registro_desde) 
-                VALUES ('$fecha','-1','-1','$idempresa',$registro_desde)");
+                VALUES ('$fecha','-1','-1','$idempresa','$registro_desde')");
         
                 $id_otras_cuentas_aux = $this->dbc->insert_id;
             }

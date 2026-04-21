@@ -23,6 +23,7 @@ require_once "./configuracion/rp_plantilla_reporte.php";
 require_once "./otras_cuentas/forma_pago.php";
 require_once "./configuracion/plantilla_admin.php";
 require_once "./configuracion/tipo_cliente_comercial.php";
+require_once "./configuracion/reporte_flujo_efectivo.php";
 // require_once "./recibos/caja_bancos_contrataciones.php";
 
 $ver=$_POST['ver'];
@@ -561,12 +562,12 @@ if($data['ver'] == "asignar_asiento_A_factura") {
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idconfiguracion_reporte'],$_POST['idplandecuenta'],$_POST['es_activo_fijo'],$_POST['es_calculable'],$_POST['orden'],$_POST['negrilla_cursiva'],$_POST['empresa']));
         }
     }elseif($ver=="registrar_tipo_reportes"){
-        if(isset($_POST['nombre'],$_POST['descripcion'],$_POST['tipo_reporte'],$_POST['empresa'])){
+        if(isset($_POST['nombre'],$_POST['descripcion'],$_POST['tipo_reporte'],$_POST['id_plantilla_reporte'],$_POST['empresa'])){
             $cont=new Reporte_confi();
-            $cont->registrar_tipo_reportes($_POST['nombre'],$_POST['descripcion'],$_POST['tipo_reporte'],$_POST['empresa']);
+            $cont->registrar_tipo_reportes($_POST['nombre'],$_POST['descripcion'],$_POST['tipo_reporte'],$_POST['id_plantilla_reporte'],$_POST['empresa']);
         }
         else{
-            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['nombre'],$_POST['descripcion'],$_POST['tipo_reporte'],$_POST['empresa']));
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['nombre'],$_POST['descripcion'],$_POST['tipo_reporte'],$_POST['id_plantilla_reporte'],$_POST['empresa']));
         }
     }elseif($ver=="editar_tipo_reportes"){
         if(isset($_POST['idtipo_reportes'],$_POST['nombre'],$_POST['descripcion'],$_POST['tipo_reporte'])){
@@ -904,12 +905,20 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     }elseif($data['ver'] == "vincular_cobros_comercial_caja_bancos") {
         $cont=new Factura_comercial();
         $cont->vincular_cobros_comercial_caja_bancos($data);
+    }elseif($ver=="registrar_plantilla_flujo_efectivo"){
+        if(isset($_POST['idconfiguracion_reporte'],$_POST['nombre_personalizado'],$_POST['tipo_operacion'],$_POST['nivel_registro'],$_POST['nombre_cuenta_superior'],$_POST['orden'],$_POST['negrilla_cursiva'],$_POST['empresa'])){
+            $cont=new Reporte_flujo_efectivo();
+            $cont->registrar_plantilla_flujo_efectivo($_POST['idconfiguracion_reporte'],$_POST['nombre_personalizado'],$_POST['tipo_operacion'],$_POST['nivel_registro'],$_POST['nombre_cuenta_superior'],$_POST['orden'],$_POST['negrilla_cursiva'],$_POST['empresa']);
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idconfiguracion_reporte'],$_POST['nombre_personalizado'],$_POST['tipo_operacion'],$_POST['nivel_registro'],$_POST['nombre_cuenta_superior'],$_POST['orden'],$_POST['negrilla_cursiva'],$_POST['empresa']));
+        }
     }
    
 // asignar asiento registrar_recibo_cobro_cajaBancos_en_otras_cuentas editar_recibo_caja_bancos registrocobrarfactura registrar_anular_eliminar_activar_factura_tributario_transaccion
 // editar_caja_bancos_facturas registrar_factura_cobro_otras_cuentas registrocobrarfactura registrar_recibo_otras_cuentas  cambiarEstado_anular_eliminar_activar_transaccion
 
-// cobro_asignacion_factura_comercial registrar_estado_resultados_admin
+// cobro_asignacion_factura_comercial registrar_estado_resultados_admin configuracion registrar_tipo_reportes registrar_factura_recibo_pago_cajaBancos
 
 } 
 // registrar_recibo_otras_cuentas registrocobrarfacturaGrupal

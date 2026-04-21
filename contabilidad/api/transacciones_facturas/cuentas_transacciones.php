@@ -344,6 +344,7 @@ class Cuentas_transacciones extends DB{
             "cobrado" => "cobro",
             "pagado" => "",
             "concepto" => "",
+            "cobro_pago" => "cobro",
             "cliente_proveedor" => $cl['nombre']
         );
         $lista[] = $res;
@@ -366,6 +367,7 @@ class Cuentas_transacciones extends DB{
                 $idcomprobante = null;
             }
 
+            $cobro_pago = "cobro";
         } else {
             $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='" . $qwe['proveedorcliente_idproveedorcliente'] . "'");
             $asd = $this->dbcm->fetch($proveedor);
@@ -378,6 +380,7 @@ class Cuentas_transacciones extends DB{
             }else{
                 $idcomprobante = null;
             }
+            $cobro_pago = "pago";
         }
 
         $res = array(
@@ -393,6 +396,7 @@ class Cuentas_transacciones extends DB{
             "tipo_documento" => $qwe['tipo_factura'],
             "documento_cobro_pago" => $factura_cobro,
             "idcomprobante" => $idcomprobante,
+            "cobro_pago" => $cobro_pago,
             "cliente_proveedor" => $nombre
         );
         $lista[] = $res;
@@ -410,6 +414,7 @@ class Cuentas_transacciones extends DB{
             $comprob = $this->dbc->query("SELECT * FROM cuentaspof WHERE idrecibo='$qwe[idrecibo]'");
             $cp = $this->dbc->fetch($comprob);
             $idcomprobante = $cp['idcuentaspof'];
+            $cobro_pago = "cobro";
         } else {
             $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='" . $qwe['proveedorcliente_idproveedorcliente'] . "'");
             $asd = $this->dbcm->fetch($proveedor);
@@ -419,6 +424,7 @@ class Cuentas_transacciones extends DB{
             $comprob = $this->dbc->query("SELECT * FROM cuentaspor WHERE idrecibo='$qwe[idrecibo]'");
             $cp = $this->dbc->fetch($comprob);
             $idcomprobante = $cp['idcuentaspor'];
+            $cobro_pago = "pago";
         }
 
         $res = array(
@@ -433,6 +439,7 @@ class Cuentas_transacciones extends DB{
             "tipo_documento" => 'contado',
             "documento_cobro_pago" => $recibo_cobro,
             "idcomprobante" => $idcomprobante,
+            "cobro_pago" => $cobro_pago,
             "cliente_proveedor" => $nombre
         );
         $lista[] = $res;

@@ -1535,6 +1535,12 @@ while ($qwe = $this->dbc->fetch($registro)) {
 
             $aux_concepto = "s/g Contrato: ". $qwe['concepto'].", N° ".$qwe['nro_otras_cuentas'].", ".$qwe['fecha'];
 
+            if($qwe['clase_otras_cuentas'] == '1'){
+                $cobro_pago = "pago";
+            }else{
+
+                $cobro_pago = "cobro";
+            }
             $res = array(
                 "idotras_cuentas" => $qwe['idotras_cuentas'],
                 "fecha" => $qwe['fecha'],
@@ -1553,6 +1559,7 @@ while ($qwe = $this->dbc->fetch($registro)) {
                 "condiciones" => $qwe['condiciones'],
                 "observaciones" => $qwe['observaciones'],
                 "precio" => $qwe['precio'],
+                "cobro_pago" => $cobro_pago,
                 "pagado" => $asd[0],
                 "saldo" => $saldo,
                 "idforma_pago" => $qwe['forma_pago'],
