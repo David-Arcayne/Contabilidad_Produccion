@@ -771,7 +771,11 @@ elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
 }elseif($ver[0]=="reporte_flujo_efectivo"){//listar_recibo_por_caja_bancos
     $cont=new Reporte_flujo_efectivo();
     $cont->reporte_flujo_efectivo($ver[1],$ver[2],$ver[3],$ver[4]);
+}elseif($ver[0]=="reporte_flujo_efectivo_actual"){//listar_recibo_por_caja_bancos
+    $cont=new Reporte_flujo_efectivo();
+    $cont->reporte_flujo_efectivo_actual($ver[1],$ver[2]);
 }
+
 // reportedetalle listar_recibo_por_id listar_recibo_por_id_otras_cuentas listaclientes listar_recibo_por_caja_bancos listapagos alerta_anular_eliminar_transaccion
 // listar_factura           listar_facturas_cobro_pago      listaclientes listafacturaapi_cobrado lista_cobrar_cobrado_factura listar_todos_documentos_asignado_cuenta
 // reemplazar facturas_perteneciente_a_cuenta  lista_pagar_pagado_factura listar_recibo_otras_cuentas_pagar listapagos_individuales listar_anular_eliminar_factura
@@ -788,7 +792,7 @@ elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
 //  listar_anular_eliminar_factura listar_anular_eliminar_factura listar_select_cuentas_balance_general
 // listar_comprobantes_cobro_pago reporte_estado_resultados_actualizado_consolidado_por_niveles
 // listar_factura_comercial_por_id listaCobrosContabilidad listar_factura_comercial
-// lista_pagar_pagado_factura listar_todos_documentos_asignado_cuenta
+// lista_pagar_pagado_factura listar_todos_documentos_asignado_cuenta reporte_balance_general_por_niveles_consolidados
 //  listadesconsolidar listar_factura_comercial_por_id listar_otras_cuentas
 //  lista_cobrar_cobrado_factura getListaplantillareporterubro listar_anular_eliminar_factura
 

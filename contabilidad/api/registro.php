@@ -913,6 +913,9 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idconfiguracion_reporte'],$_POST['nombre_personalizado'],$_POST['tipo_operacion'],$_POST['nivel_registro'],$_POST['nombre_cuenta_superior'],$_POST['orden'],$_POST['negrilla_cursiva'],$_POST['empresa']));
         }
+    }elseif($data['ver'] == "guardar_balance_general_por_gestion") {
+        $cont=new Reporte_confi();
+        $cont->guardar_balance_general_por_gestion($data);
     }
    
 // asignar asiento registrar_recibo_cobro_cajaBancos_en_otras_cuentas editar_recibo_caja_bancos registrocobrarfactura registrar_anular_eliminar_activar_factura_tributario_transaccion
@@ -921,7 +924,7 @@ if($data['ver'] == "asignar_asiento_A_factura") {
 // cobro_asignacion_factura_comercial registrar_estado_resultados_admin configuracion registrar_tipo_reportes registrar_factura_recibo_pago_cajaBancos
 
 } 
-// registrar_recibo_otras_cuentas registrocobrarfacturaGrupal
+// registrar_recibo_otras_cuentas registrocobrarfacturaGrupal cobro_asignacion_factura_comercial
 // desconsolidar registrar_factura_cobro_otras_cuentas registrar_factura_pagos_tributario registropagarfactura
 //  registrar_factura_pagos_tributario  registrar_recibo_pago_cajaBancos_en_otras_cuentas registrar_recibo_cobro_cajaBancos_en_otras_cuentas crearsolofacturasapif5  registrar_recibo_cobro_cajaBancos_en_facturas
 ?> 

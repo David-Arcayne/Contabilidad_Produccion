@@ -4,8 +4,158 @@ require_once "../../db/db.php";
 
 class Reporte_flujo_efectivo extends DB{
     
+public function reporte_flujo_efectivo_actual($gestion_ant, $gestion_act) {
+    $lista = [];
+
+    $get_balance = $this->dbc->query("
+        SELECT * 
+        FROM balance_general_por_gestion 
+        WHERE es_calculable = 'si' 
+          AND idgestion IN ('$gestion_ant', '$gestion_act')
+        ORDER BY grupo, idconfiguracion_reporte, idgestion
+    ");
+
+    $agrupados = [];
+
+    while ($row = $this->dbc->fetch($get_balance)) {
+        $idconf = $row['idconfiguracion_reporte'];
+
+        if (!isset($agrupados[$idconf])) {
+            $agrupados[$idconf] = [
+                "idconfiguracion_reporte" => $idconf,
+                "grupo" => $row['grupo'],
+                "nombre" => $row['nombre_actual'],
+                "nombre_cuenta_superior" => $row['nombre_cuenta_superior'],
+                "valor_anterior" => null,
+                "valor_actual" => null,
+            ];
+        }
+
+        if ($row['idgestion'] == $gestion_ant) {
+            $agrupados[$idconf]["valor_anterior"] = $row['valor'];
+        } else {
+            $agrupados[$idconf]["valor_actual"] = $row['valor'];
+        }
+    }
+
+    // Totales
+    $suma_activo_anterior = 0;
+    $suma_activo_actual = 0;
+    $suma_activo_origen = 0;
+    $suma_activo_aplicacion = 0;
+
+    $suma_pasi_patri_anterior = 0;
+    $suma_pasi_patri_actual = 0;
+    $suma_pasi_patri_origen = 0;
+    $suma_pasi_patri_aplicacion = 0;
+
+    foreach ($agrupados as $item) {
+        $valor_ant = $item["valor_anterior"] ?? 0;
+        $valor_act = $item["valor_actual"] ?? 0;
+
+        $resultado = $valor_act - $valor_ant;
+        $origen = $resultado > 0 ? $resultado : 0;
+        $aplicacion = $resultado < 0 ? $resultado : 0;
+
+        if ($item['grupo'] == '1') {
+            $suma_activo_anterior += $valor_ant;
+            $suma_activo_actual += $valor_act;
+            $suma_activo_origen += $origen;
+            $suma_activo_aplicacion += $aplicacion;
+        } else {
+            $suma_pasi_patri_anterior += $valor_ant;
+            $suma_pasi_patri_actual += $valor_act;
+            $suma_pasi_patri_origen += $origen;
+            $suma_pasi_patri_aplicacion += $aplicacion;
+        }
+
+        $lista[] = [
+            "idconfiguracion_reporte" => $item['idconfiguracion_reporte'],
+            "grupo" => $item['grupo'],
+            "nombre" => $item['nombre'],
+            "valor_anterior" => $valor_ant,
+            "valor_actual" => $valor_act,
+            "origen" => $origen,
+            "aplicacion" => $aplicacion,
+            "nombre_cuenta_superior" => $item['nombre_cuenta_superior'],
+        ];
+    }
+
+    // Totales por grupo
+    $lista[] = [
+        "grupo" => "1",
+        "nombre" => "TOTAL ACTIVOS",
+        "valor_anterior" => $suma_activo_anterior,
+        "valor_actual" => $suma_activo_actual,
+        "origen" => $suma_activo_origen,
+        "aplicacion" => $suma_activo_aplicacion,
+        "nombre_cuenta_superior" => null,
+    ];
+
+    $lista[] = [
+        "grupo" => "2",
+        "nombre" => "TOTAL PASIVO Y PATRIMONIO",
+        "valor_anterior" => $suma_pasi_patri_anterior,
+        "valor_actual" => $suma_pasi_patri_actual,
+        "origen" => $suma_pasi_patri_origen,
+        "aplicacion" => $suma_pasi_patri_aplicacion,
+        "nombre_cuenta_superior" => null,
+    ];
+
+    echo json_encode($lista, JSON_NUMERIC_CHECK);
+}
+
+
+    // public function reporte_flujo_efectivo_actual($gestion_ant,$gestion_act) {
+    //     $lista = [];
+    //     // $idempresa = $this->getidempresa($empresa);
+    
+    //     // Preparar la consulta
+    //     $get_balance = $this->dbc->query("SELECT * from balance_general_por_gestion where es_calculable ='si' and idgestion ='$gestion_act'");
+    
+    //     $suma_activo_anterior = 0;
+    //     $suma_activo_actual = 0;
+    //     $suma_pasi_patri_anterior = 0;
+    //     $suma_pasi_patri_actual = 0;
+    //     while ($qwe = $this->dbc->fetch($get_balance)) {
+
+    //     $balance_ante = $this->dbc->query("SELECT * from balance_general_por_gestion where idconfiguracion_reporte = '$qwe[idconfiguracion_reporte]' and idgestion ='$gestion_ant'");
+    //     $val_ante = $balance_ante->fetch_assoc();
+
+    //     $resultado = $qwe['valor'] - $val_ante['valor'];
+    //     if($resultado > 0){
+    //         $origen = $resultado; // el resultado de la resta es positivo
+    //         $aplicacion = 0;
+    //     }else{
+    //         $aplicacion = $resultado; // el resultado de la resta es negativo
+    //         $origen = 0;
+    //     }
+    
+    //     if($qwe['grupo'] == '1'){
+    //         $suma_activo_anterior = $suma_activo_anterior + $val_ante['valor'];
+    //         $suma_activo_actual = $suma_activo_actual + $qwe['valor'];
+    //     }else{
+    //         $suma_pasi_patri_anterior = $suma_pasi_patri_anterior + $val_ante['valor'];
+    //         $suma_pasi_patri_actual = $suma_pasi_patri_actual + $qwe['valor'];
+    //     }
+    //         $res = array(
+    //             "idconfiguracion_reporte" => $qwe['idconfiguracion_reporte'],
+    //             "grupo" => $qwe['grupo'],
+    //             "nombre" => $qwe['nombre_actual'],
+    //             "valor_anterior" => $val_ante['valor'],
+    //             "valor_actual" => $qwe['valor'],
+    //             "origen" => $origen,
+    //             "aplicacion" => $aplicacion,
+    //             "nombre_cuenta_superior" => $qwe['nombre_cuenta_superior'],
+                
+    //         );
+    //         array_push($lista, $res);
+    //     }
+    
+    //     echo json_encode($lista, JSON_NUMERIC_CHECK);
+    // }
     //-----------------------------------------------------------------------------
-    public function registrar_plantilla_flujo_efectivo ($idconfiguracion_reporte,$nombre_personalizado,$tipo_operacion,$nivel_registro,$nombre_cuenta_superior,$orden,$negrilla_cursiva,$empresa){
+    public function registrar_plantilla_flujo_efectivo($idconfiguracion_reporte,$nombre_personalizado,$tipo_operacion,$nivel_registro,$nombre_cuenta_superior,$orden,$negrilla_cursiva,$empresa){
       
         // $idempresa = Empresa::getidempresa($empresa);
         $idempresa = $this->getidempresa($empresa);
