@@ -1187,30 +1187,71 @@ public function listar_anular_eliminar_factura($empresa, $todos) {
             $recibo = $this->dbc->query("SELECT * FROM recibo WHERE idrecibo = '{$qwe['id_documento']}'");
             if ($rec = $recibo->fetch_assoc()) {
                 $nro_doc = $rec['nro_recibo'];
+                $monto = $rec['monto'];
                 if ($rec['cobrado'] != '0') {
+                    $comprobant = $this->dbc->query("SELECT * FROM cuentaspof WHERE idrecibo = '{$qwe['id_documento']}'");
+                    $cm = $comprobant->fetch_assoc();
+                    $dt_cmp = $this->dbc->query("SELECT * FROM detalle_caja_bancos_cobrar WHERE idcuentaspof = '{$cm['idcuentaspof']}'");
+                    $dt_cm = $dt_cmp->fetch_assoc();
+                    $caja_banco = $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '{$dt_cm['idcaja_bancos']}'");
+                    $cb = $caja_banco->fetch_assoc();
                     $cliente_prov = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente = '{$rec['cliente_proveedor']}'");
                 } else {
+                    $comprobant = $this->dbc->query("SELECT * FROM cuentaspor WHERE idrecibo = '{$qwe['id_documento']}'");
+                    $cm = $comprobant->fetch_assoc();
+                    $dt_cmp = $this->dbc->query("SELECT * FROM detalle_caja_bancos_pagar WHERE idcuentaspor = '{$cm['idcuentaspor']}'");
+                    $dt_cm = $dt_cmp->fetch_assoc();
+                    $caja_banco = $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '{$dt_cm['idcaja_bancos']}'");
+                    $cb = $caja_banco->fetch_assoc();
                     $cliente_prov = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor = '{$rec['cliente_proveedor']}'");
                 }
+                $tipo_cuenta = $cb['tipo_cuenta'];
+                $codigo = $cb['codigo'];
                 $cl = $cliente_prov->fetch_assoc();
                 $nombre_cl = $cl['nombre'] ?? null;
+            }else{
+                $tipo_cuenta =""; 
+                $codigo = "";
             }
         } elseif ($qwe['tipo_documento'] == 'factura') {
             $factura = $this->dbc->query("SELECT * FROM factura WHERE idfactura = '{$qwe['id_documento']}'");
             if ($fac = $factura->fetch_assoc()) {
                 $nro_doc = $fac['nfactura'];
+                $monto = $fac['montofactura'];
                 if ($fac['clasefactura'] == '2') {
+                    $comprobant = $this->dbc->query("SELECT * FROM cuentaspof WHERE idfactura = '{$qwe['id_documento']}'");
+                    $cm = $comprobant->fetch_assoc();
+                    $dt_cmp = $this->dbc->query("SELECT * FROM detalle_caja_bancos_cobrar WHERE idcuentaspof = '{$cm['idcuentaspof']}'");
+                    $dt_cm = $dt_cmp->fetch_assoc();
+                    $caja_banco = $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '{$dt_cm['idcaja_bancos']}'");
+                    $cb = $caja_banco->fetch_assoc();
                     $cliente_prov = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente = '{$fac['proveedorcliente_idproveedorcliente']}'");
                 } else {
+                    $comprobant = $this->dbc->query("SELECT * FROM cuentaspor WHERE idfactura = '{$qwe['id_documento']}'");
+                    $cm = $comprobant->fetch_assoc();
+                    $dt_cmp = $this->dbc->query("SELECT * FROM detalle_caja_bancos_pagar WHERE idcuentaspor = '{$cm['idcuentaspor']}'");
+                    $dt_cm = $dt_cmp->fetch_assoc();
+                    $caja_banco = $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '{$dt_cm['idcaja_bancos']}'");
+                    $cb = $caja_banco->fetch_assoc();
                     $cliente_prov = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor = '{$fac['proveedorcliente_idproveedorcliente']}'");
                 }
+                $tipo_cuenta = $cb['tipo_cuenta'];
+                $codigo = $cb['codigo'];
                 $cl = $cliente_prov->fetch_assoc();
                 $nombre_cl = $cl['nombre'] ?? null;
+            }else{
+                $tipo_cuenta =""; 
+                $codigo = "";
             }
         } elseif ($qwe['tipo_documento'] == 'comprobante_cobro') {
             $comprobante = $this->dbc->query("SELECT * FROM cuentaspof WHERE idcuentaspof = '{$qwe['id_documento']}'");
-            if ($cp = $comprobante->fetch_assoc()) {
+            if($cp = $comprobante->fetch_assoc()) {
+                $dt_cmp = $this->dbc->query("SELECT * FROM detalle_caja_bancos_cobrar WHERE idcuentaspof = '{$cp['idcuentaspof']}'");
+                    $dt_cm = $dt_cmp->fetch_assoc();
+                    $caja_banco = $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '{$dt_cm['idcaja_bancos']}'");
+                    $cb = $caja_banco->fetch_assoc();
                 $nro_doc = $cp['nrecibo'];
+                $monto = $cp['monto'];
                 if ($cp['idfactura'] != '0') {
                     $fac = $this->dbc->query("SELECT * FROM factura WHERE idfactura = '{$cp['idfactura']}'")->fetch_assoc();
                     $cliente_prov = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente = '{$fac['proveedorcliente_idproveedorcliente']}'");
@@ -1222,11 +1263,21 @@ public function listar_anular_eliminar_factura($empresa, $todos) {
                     $cl = $cliente_prov->fetch_assoc();
                     $nombre_cl = $cl['nombre'] ?? null;
                 }
+                $tipo_cuenta = $cb['tipo_cuenta']; 
+                $codigo = $cb['codigo'];
+            }else{
+                $tipo_cuenta =""; 
+                $codigo = "";
             }
         } elseif ($qwe['tipo_documento'] == 'comprobante_pago') {
             $comprobante = $this->dbc->query("SELECT * FROM cuentaspor WHERE idcuentaspor = '{$qwe['id_documento']}'");
             if ($cp = $comprobante->fetch_assoc()) {
+                $dt_cmp = $this->dbc->query("SELECT * FROM detalle_caja_bancos_pagar WHERE idcuentaspor = '{$cp['idcuentaspor']}'");
+                    $dt_cm = $dt_cmp->fetch_assoc();
+                    $caja_banco = $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '{$dt_cm['idcaja_bancos']}'");
+                    $cb = $caja_banco->fetch_assoc();
                 $nro_doc = $cp['nrecibo'];
+                $monto = $cp['monto'];
                 if ($cp['idfactura'] != '0') {
                     $fac = $this->dbc->query("SELECT * FROM factura WHERE idfactura = '{$cp['idfactura']}'")->fetch_assoc();
                     $cliente_prov = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor = '{$fac['proveedorcliente_idproveedorcliente']}'");
@@ -1238,6 +1289,11 @@ public function listar_anular_eliminar_factura($empresa, $todos) {
                     $cl = $cliente_prov->fetch_assoc();
                     $nombre_cl = $cl['nombre'] ?? null;
                 }
+                $tipo_cuenta = $cb['tipo_cuenta']; 
+                $codigo = $cb['codigo'];
+            }else{
+                $tipo_cuenta =""; 
+                $codigo = "";
             }
         }
 
@@ -1262,6 +1318,9 @@ public function listar_anular_eliminar_factura($empresa, $todos) {
             "nombre_admin" => $usuario_admin['nombre'] ?? null,
             "apellido_admin" => $usuario_admin['apellido'] ?? null,
             "cliente_proveedor" => $nombre_cl,
+            "nombre_caja_banco" => $tipo_cuenta,
+            "codigo_caja_banco" => $codigo,
+            "monto" => $monto,
             "motivo" => $qwe['motivo']
         ];
     }

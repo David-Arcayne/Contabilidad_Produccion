@@ -785,7 +785,7 @@ elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
 // listar_recibo_por_ usuario listatransacciones_comercial listar_comprobantes_cobro_pago listar_factura_comercial
 //    listar_recibo_otras_cuentas     listar_recibo_por_caja_bancos listar_otras_cuentas_pagar_select listafacturaapi_cobrado lista_pagar_pagado_factura
 // reportedetallefpt listar_otras_cuentas_cobrar_vencidas  listar_otras_cuentas_cobrar listar_recibo_facturas_otras_cuentas lista_pagar_pagado_factura
-//  listadesconsolidar lista_transaccionEn_espera listar_anular_eliminar_transaccion listar_factura_comercial listapagos  listaasientosc
+//  listadesconsolidar listar_anular_eliminar_factura 
 //reporte_balance_general_por_niveles listar_factura_pago_sin_cuentas listar_recibo_facturas_otras_cuentas lista_pagar_pagado_factura  lista_cobrar_cobrado_factura
 
 // listar_caja_bancos listar_facturas_comercial_cobro listar_tipo_reportes
