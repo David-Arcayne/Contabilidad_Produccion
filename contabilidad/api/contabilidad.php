@@ -1750,7 +1750,7 @@ WHERE
         }
         echo json_encode($lista);
     }
-    public function estadogestion($id, $estado, $empresa)
+    public function estadogestion($id, $estado, $empresa) // usuario como md5
     {
         $ide = $this->getidempresa($empresa);
         $res = "";
