@@ -1722,11 +1722,15 @@ WHERE
         }
         echo json_encode($res);
     }
-    public function listadegestion($empresa)
+    public function listadegestion($empresa, $usuario)
     {
         $lista = [];
+        
+        $usuario=$this->getidusuario($usuario);
+
         $ide = $this->getidempresa($empresa);
-        $registro = $this->dbc->query("select idgestion,nombre,fechaini,fechafin,estado,fecha,formato_transaccion,idempresa from gestion where idempresa='$ide'");
+        $registro = $this->dbc->query("SELECT idgestion,nombre,fechaini,fechafin,estado,fecha,formato_transaccion,idempresa 
+        FROM gestion WHERE idempresa='$ide'");
         while ($qwe = $this->dbc->fetch($registro)) {
 
             $existe_trans = $this->dbc->query("SELECT * FROM transacciones WHERE idgestion='$qwe[0]' and organizacion_idorganizacion='$ide'");
@@ -1736,6 +1740,10 @@ WHERE
             }else{
                 $tiene_trans = "no";
             }
+
+            $gestion_usuario = $this->dbc->query("SELECT * FROM gestion_por_usuario WHERE idgestion = ''");
+
+            if($qwe['idgestion']){}
 
             $res = array("id" => $qwe[0], "nombre" => $qwe[1], "fechaini" => $qwe[2], "fechafin" => $qwe[3], "estado" => $qwe[4], "fecha" => $qwe[5],"formato_transaccion" => $qwe[6], "tiene_transaccion" => $tiene_trans);
             array_push($lista, $res);
@@ -2266,6 +2274,11 @@ WHERE
         // }
         echo json_encode($lista);
     }
+    public function getidusuario($md5){
+    $registro=$this->dbrh->query("select * from usuario where md5(idusuario)='$md5'");
+    $qwe=$this->dbrh->fetch($registro);
+    return $qwe['idusuario'];
+} 
 // listaimpuestoentreplan getgestionactualid anular lista_cobrar_cobrado_factura
 }// row cambiarestadoconsolidado crearfacturas editar listafacturaapi_cobrado
 // registrar_factura_cobros_tributario crearsolofacturasapif5  usuario

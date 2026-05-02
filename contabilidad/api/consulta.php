@@ -142,7 +142,7 @@ $cont->eliminarfactura($ver[1]);
 // elseif($ver[0]=="listacobrarfactura"){
 // $cont=new Contabilidad();
 // $cont->listacobrarfactura($ver[1]);
-// }
+// } getgestionactual
 elseif($ver[0]=="listapagos"){
 $cont=new Contabilidad();
 $cont->listapagos($ver[1]);
@@ -151,7 +151,7 @@ $cont=new Contabilidad();
 $cont->eliminarpago($ver[1]);
 }elseif($ver[0]=="listadegestion"){
 $cont=new Contabilidad();
-$cont->listadegestion($ver[1]);
+$cont->listadegestion($ver[1],$ver[2]);
 }elseif($ver[0]=="listapagarfactura"){
 $cont=new Contabilidad();
 $cont->listapagarfactura($ver[1]);
@@ -778,10 +778,10 @@ elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
 
 // reportedetalle listar_recibo_por_id listar_recibo_por_id_otras_cuentas listaclientes listar_recibo_por_caja_bancos listapagos alerta_anular_eliminar_transaccion
 // listar_factura           listar_facturas_cobro_pago      listaclientes listafacturaapi_cobrado lista_cobrar_cobrado_factura listar_todos_documentos_asignado_cuenta
-// reemplazar facturas_perteneciente_a_cuenta  lista_pagar_pagado_factura listar_recibo_otras_cuentas_pagar listapagos_individuales listar_anular_eliminar_factura
+// listar_recibo_otras_cuentas_pagar listapagos_individuales listar_anular_eliminar_factura
 
 // lista_cobrar_cobrado_factura listar_comprobantes_cobro_pago listar_select_rango_codigos listar_agrupacion_rubro_plandecuenta listar_caja_bancos
-//    listar_recibo_otras_cuentas    listar_recibos_asignado_cuentas listar_factura_comercial_por_id lista_cobrar_cobrado_factura listar_anular_eliminar_factura
+//    listar_recibo_otras_cuentas listar_anular_eliminar_factura listadegestion
 // listar_recibo_por_ usuario listatransacciones_comercial listar_comprobantes_cobro_pago listar_factura_comercial
 //    listar_recibo_otras_cuentas     listar_recibo_por_caja_bancos listar_otras_cuentas_pagar_select listafacturaapi_cobrado lista_pagar_pagado_factura
 // reportedetallefpt listar_otras_cuentas_cobrar_vencidas  listar_otras_cuentas_cobrar listar_recibo_facturas_otras_cuentas lista_pagar_pagado_factura

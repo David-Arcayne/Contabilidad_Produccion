@@ -5,7 +5,7 @@ require_once "../../db/db.php";
 class Filtrado_facturas extends DB{
     public function listar_facturas_cobros_sin_transaccion($cobrado,$cadena_cajaBancos,$empresa) {
       // $idempresa = $this->getidempresa($empresa);
-                // echo json_encode(array($cobrado,$idcaja_bancos,$empresa));
+                // echo json_encode(array($cobrado,$idcaja_bancos,$empresa)); gestion
                 
                 // ini_set('display_errors', 1);
                 // ini_set('display_startup_errors', 1);
