@@ -454,7 +454,7 @@ elseif($ver[0]=="listar_facturas_cobros_sin_transaccion"){
     $cont->existe_cierre_de_gestion_anterior($ver[1]);
 }elseif($ver[0]=="listar_factura_comercial"){
     $cont=new Factura_comercial();
-    $cont->listar_factura_comercial($ver[1]);
+    $cont->listar_factura_comercial($ver[1],$ver[2]);
 }elseif($ver[0]=="listar_factura_comercial_con_transaccion"){
     $cont=new Factura_comercial();
     $cont->listar_factura_comercial_con_transaccion($ver[1]);
@@ -764,39 +764,42 @@ elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
     $cont->listar_datos_de_usuario($ver[1]);
 }elseif($ver[0]=="listar_cobros_comercial"){//listar_recibo_por_caja_bancos
     $cont=new Factura_comercial();
-    $cont->listar_cobros_comercial($ver[1]);
+    $cont->listar_cobros_comercial($ver[1],$ver[2]);
 }elseif($ver[0]=="listar_select_cuentas_balance_general"){//listar_recibo_por_caja_bancos
     $cont=new Reporte_flujo_efectivo();
     $cont->listar_select_cuentas_balance_general($ver[1]);
 }elseif($ver[0]=="reporte_flujo_efectivo"){//listar_recibo_por_caja_bancos
     $cont=new Reporte_flujo_efectivo();
     $cont->reporte_flujo_efectivo($ver[1],$ver[2],$ver[3],$ver[4]);
-}elseif($ver[0]=="reporte_flujo_efectivo_actual"){//listar_recibo_por_caja_bancos
+}elseif($ver[0]=="reporte_estado_origen_aplicacion "){//listar_recibo_por_caja_bancos
     $cont=new Reporte_flujo_efectivo();
-    $cont->reporte_flujo_efectivo_actual($ver[1],$ver[2]);
+    $cont->reporte_estado_origen_aplicacion ($ver[1],$ver[2]);
+}elseif($ver[0]=="filtro_plantilla_flujo_por_nivel"){//listar_recibo_por_caja_bancos
+    $cont=new Reporte_flujo_efectivo();
+    $cont->filtro_plantilla_flujo_por_nivel($ver[1],$ver[2],$ver[3]);
 }
 
-// reportedetalle listar_recibo_por_id listar_recibo_por_id_otras_cuentas listaclientes listar_recibo_por_caja_bancos listapagos alerta_anular_eliminar_transaccion
-// listar_factura           listar_facturas_cobro_pago      listaclientes listafacturaapi_cobrado lista_cobrar_cobrado_factura listar_todos_documentos_asignado_cuenta
-// listar_recibo_otras_cuentas_pagar listapagos_individuales listar_anular_eliminar_factura
+// reportedetalle 
+// listar_factura listar_facturas_cobro_pago  
+// listar_recibo_otras_cuentas_pagar 
 
-// lista_cobrar_cobrado_factura listar_comprobantes_cobro_pago listar_select_rango_codigos listar_agrupacion_rubro_plandecuenta listar_caja_bancos
-//    listar_recibo_otras_cuentas listar_anular_eliminar_factura listadegestion
-// listar_recibo_por_ usuario listatransacciones_comercial listar_comprobantes_cobro_pago listar_factura_comercial
-//    listar_recibo_otras_cuentas     listar_recibo_por_caja_bancos listar_otras_cuentas_pagar_select listafacturaapi_cobrado lista_pagar_pagado_factura
-// reportedetallefpt listar_otras_cuentas_cobrar_vencidas  listar_otras_cuentas_cobrar listar_recibo_facturas_otras_cuentas lista_pagar_pagado_factura
+// lista_cobrar_cobrado_factura listar_caja_bancos
+//   listar_recibo_otras_cuentas 
+// 
+// lista_pagar_pagado_factura
+// reportedetallefp lista_pagar_pagado_factura
 //  listadesconsolidar listar_anular_eliminar_factura 
-//reporte_balance_general_por_niveles listar_factura_pago_sin_cuentas listar_recibo_facturas_otras_cuentas lista_pagar_pagado_factura  lista_cobrar_cobrado_factura
+//
 
-// listar_caja_bancos listar_facturas_comercial_cobro listar_tipo_reportes listatransacciones
-//  listar_anular_eliminar_factura listar_anular_eliminar_factura listar_select_cuentas_balance_general
-// listar_comprobantes_cobro_pago reporte_estado_resultados_actualizado_consolidado_por_niveles estadogestion
-// listar_factura_comercial_por_id listaCobrosContabilidad listar_factura_comercial listar_select_cuentas_balance_general
-// lista_pagar_pagado_factura listar_todos_documentos_asignado_cuenta reporte_balance_general_por_niveles_consolidados
-//  listadesconsolidar listar_factura_comercial_por_id listar_otras_cuentas listar_agrupacion_plantilla rp_listar_plantilla
-//  lista_cobrar_cobrado_factura getListaplantillareporterubro listar_anular_eliminar_factura rp_listar_plantilla_normal
+// 
+//  listar_anular_eliminar_factura 
+//  estadogestion listar_factura_comercial
+// 
+// 
+//  
+//  lista_cobrar_cobrado_factura 
 
-//   insertar_transaccion.php   anulacion_transaccion.php   mayorcuentacontable listar_recibo_por_caja_bancos listar_facturas_cobro_pago
+//   insertar_transaccion.php   
 
 
 ?>

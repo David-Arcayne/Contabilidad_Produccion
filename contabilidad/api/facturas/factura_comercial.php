@@ -83,13 +83,18 @@ class Factura_comercial extends DB{
     //     echo json_encode($lista);
     // }
     
-    public function listar_factura_comercial($idmd5)
+    public function listar_factura_comercial($idmd5,$viv_mister_soft)
     {
         // ini_set('display_errors', 1);
         // ini_set('display_startup_errors', 1);
         // error_reporting(E_ALL);
-        // $url = "https://mistersofts.com/app/cmv1/api/listaVentas/".$idmd5;
-        $url = "https://vivasoft.link/app/cmv1/api/listaVentas/".$idmd5;
+   
+        if($viv_mister_soft == "vivasoft"){
+            $url = "https://vivasoft.link/app/cmv1/api/listaVentas/".$idmd5;
+        }else{ // mistersofts
+            $url = "https://mistersofts.com/app/cmv1/api/listaVentas/".$idmd5;
+        }
+        
         $data = json_decode(file_get_contents($url), true);
         $lista_factura_venta = [];
 
@@ -869,7 +874,7 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
         
     }
 
-    public function listar_cobros_comercial($empresa)
+    public function listar_cobros_comercial($empresa,$viv_mister_soft)
     {
          ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
@@ -880,8 +885,12 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
         $lista = [];
        
 //´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´
+    if($viv_mister_soft == "vivasoft"){
         $url = "https://vivasoft.link/app/cmv1/api/listaCobrosContabilidad/".$empresa;
-        // $url = "https://mistersofts.com/app/cmv1/api/listaCobrosContabilidad/".$empresa;
+    }else{ // mistersofts
+        $url = "https://mistersofts.com/app/cmv1/api/listaCobrosContabilidad/".$empresa;
+    }
+        
         $data = json_decode(file_get_contents($url), true);
         $lista_factura_venta = [];
 

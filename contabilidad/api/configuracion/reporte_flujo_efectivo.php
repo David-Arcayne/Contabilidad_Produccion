@@ -4,13 +4,13 @@ require_once "../../db/db.php";
 
 class Reporte_flujo_efectivo extends DB{
     
-public function reporte_flujo_efectivo_actual($gestion_ant, $gestion_act){
+public function reporte_estado_origen_aplicacion($gestion_ant, $gestion_act){
 
-$lista_report_flujo = $this->reporte_flujo_efectivo_privado($gestion_ant, $gestion_act);
+$lista_report_flujo = $this->reporte_estado_ori_apli_privado($gestion_ant, $gestion_act);
 
     echo json_encode($lista_report_flujo, JSON_NUMERIC_CHECK);
 }
-private function reporte_flujo_efectivo_privado($gestion_ant, $gestion_act) {
+private function reporte_estado_ori_apli_privado($gestion_ant, $gestion_act) {
     // ini_set('display_errors', 1); 
     //     ini_set('display_startup_errors', 1);
     //     error_reporting(E_ALL);
@@ -34,7 +34,7 @@ private function reporte_flujo_efectivo_privado($gestion_ant, $gestion_act) {
                 "idconfiguracion_reporte" => $idconf,
                 "grupo" => $row['grupo'],
                 "nombre" => $row['nombre_actual'],
-                "nombre_cuenta_superior" => $row['nombre_cuenta_superior'],
+                "id_plantilla_superior" => $row['id_plantilla_superior'],
                 "valor_anterior" => null,
                 "valor_actual" => null,
             ];
@@ -86,7 +86,7 @@ private function reporte_flujo_efectivo_privado($gestion_ant, $gestion_act) {
             "valor_actual" => $valor_act,
             "origen" => $origen,
             "aplicacion" => $aplicacion,
-            "nombre_cuenta_superior" => $item['nombre_cuenta_superior'],
+            "id_plantilla_superior" => $item['id_plantilla_superior'],
         ];
     }
 
@@ -98,7 +98,7 @@ private function reporte_flujo_efectivo_privado($gestion_ant, $gestion_act) {
         "valor_actual" => $suma_activo_actual,
         "origen" => $suma_activo_origen,
         "aplicacion" => $suma_activo_aplicacion,
-        "nombre_cuenta_superior" => null,
+        "id_plantilla_superior" => null,
     ];
 
     $lista[] = [
@@ -108,7 +108,7 @@ private function reporte_flujo_efectivo_privado($gestion_ant, $gestion_act) {
         "valor_actual" => $suma_pasi_patri_actual,
         "origen" => $suma_pasi_patri_origen,
         "aplicacion" => $suma_pasi_patri_aplicacion,
-        "nombre_cuenta_superior" => null,
+        "id_plantilla_superior" => null,
     ];
 
     // echo json_encode($lista, JSON_NUMERIC_CHECK);
@@ -165,14 +165,27 @@ private function reporte_flujo_efectivo_privado($gestion_ant, $gestion_act) {
     //     echo json_encode($lista, JSON_NUMERIC_CHECK);
     // }
     //-----------------------------------------------------------------------------
-    public function registrar_plantilla_flujo_efectivo($idconfiguracion_reporte,$nombre_personalizado,$tipo_operacion,$nivel_registro,$nombre_cuenta_superior,$orden,$negrilla_cursiva,$empresa){
+    public function getgestionactualC($empresa)
+{
+    $orga = $this->getidempresa($empresa); // recibe md5 de la id insert
+    $res = "";
+    $registro = $this->dbc->query("SELECT * FROM gestion WHERE idempresa='$orga' AND estado='2' LIMIT 1");
+    $qwe = $this->dbc->fetch($registro);
+
+    // Retorna un array asociativo con la información
+    return array("id" => $qwe['idgestion'], "nombre" => $qwe['nombre']);
+}
+    public function registrar_plantilla_flujo_efectivo($idplantilla_reporte,$obtiene_desde,$idconfiguracion_reporte,$nombre_registro,$tipo_operacion,$nivel_registro,$id_plantilla_superior,$orden,$negrilla_cursiva,$empresa){
       
         // $idempresa = Empresa::getidempresa($empresa);
         $idempresa = $this->getidempresa($empresa);
 
+        $gestion = $this->getgestionactualC($empresa);
+        $idgestion = $gestion["id"];
+
         // Insertar el nuevo registro
-                $registroProveedor = $this->dbc->query("INSERT INTO confi_reporte_flujo_efectivo(idconfiguracion_reporte,nombre_personalizado,tipo_operacion,nivel_registro,nombre_cuenta_superior,orden,negrilla_cursiva,idempresa) 
-                VALUES ('$idconfiguracion_reporte','$nombre_personalizado','$tipo_operacion','$nivel_registro','$nombre_cuenta_superior','$orden','$negrilla_cursiva','$idempresa')");
+                $registroProveedor = $this->dbc->query("INSERT INTO confi_reporte_flujo_efectivo(idplantilla_reporte,obtiene_desde,idconfiguracion_reporte,nombre_registro,tipo_operacion,nivel_registro,id_plantilla_superior,orden,negrilla_cursiva,idgestion,idempresa) 
+                VALUES ('$idplantilla_reporte','$obtiene_desde','$idconfiguracion_reporte','$nombre_registro','$tipo_operacion','$nivel_registro','$id_plantilla_superior','$orden','$negrilla_cursiva','$idgestion','$idempresa')");
                 if ($registroProveedor === TRUE) {                                                                                                                                                                
                     $res = array("success", "Registro exitoso","registroCaracteristicas");
                 } else {
@@ -199,6 +212,26 @@ private function reporte_flujo_efectivo_privado($gestion_ant, $gestion_act) {
         
         echo json_encode($res);
         
+    }
+    public function filtro_plantilla_flujo_por_nivel($idplantilla_reporte, $nivel, $idempresa)
+    {
+        $id_empresa = $this->getidempresa($idempresa);
+        $lista = [];
+
+        if ($nivel > 0) {
+            $sql = "SELECT * FROM confi_reporte_flujo_efectivo WHERE nivel_registro = '$nivel'
+            AND idempresa = '$id_empresa' AND idplantilla_reporte = '$idplantilla_reporte'";
+
+            $getPedido = $this->dbc->query($sql);
+            while ($row = $this->dbc->fetch($getPedido)) {
+                $lista[] = [
+                    "idconfi_reporte_flujo_efectivo" => $row['idconfi_reporte_flujo_efectivo'],
+                    "nombre_registro" => $row['nombre_registro']
+                ];
+            }
+        }
+
+        echo json_encode($lista);
     }
     public function listar_select_cuentas_balance_general($id_plantilla_referencia) {
         $lista = [];
@@ -393,16 +426,15 @@ private function reporte_flujo_efectivo_privado($gestion_ant, $gestion_act) {
         // ini_set('display_errors', 1); 
         // ini_set('display_startup_errors', 1);
         // error_reporting(E_ALL);
-        
+$aux_string ="";        
         $lista = [];
         $idempresa = $this->getidempresa($empresa);
         $gestion = $this->getidgestion($empresa);
 
         $res2 = "";
-        $lista_flujo_gestiones = $this->reporte_flujo_efectivo_privado($gestion_ant, $gestion_act);
+        $lista_flujo_gestiones = $this->reporte_estado_ori_apli_privado($gestion_ant, $gestion_act);
 
-        $lista =[];
-        $get_nivel_2 = $this->dbc->query("SELECT * from confi_reporte_flujo_efectivo where nombre_cuenta_superior = '' AND idempresa='$idempresa' 
+        $get_nivel_2 = $this->dbc->query("SELECT * from confi_reporte_flujo_efectivo where id_plantilla_superior = '' AND idempresa='$idempresa' 
         AND idplantilla_reporte ='$idplantilla_reporte' ORDER BY orden ASC");//
         $total_pasivo_patrimonio = 0;
         while ($qwe2 = $this->dbc->fetch($get_nivel_2)) {
@@ -430,18 +462,18 @@ private function reporte_flujo_efectivo_privado($gestion_ant, $gestion_act) {
                         foreach ($item['nivel_2'] as $nivel2) {
 
                             if ($nivel2['idconfi_reporte_flujo_efectivo'] === $buscarId['idplantilla_hijo']) {
-                            //agarro si es suma o resta y agarro su valor 
-                            if($buscarId['tipo_operacion'] == 'sumar'){
-                                $sum_rest = $sum_rest + $nivel2['valor'];
-                            }elseif($buscarId['tipo_operacion'] == 'restar'){
-                                $sum_rest = $sum_rest - $nivel2['suma_nivel_2'];
+                                //agarro si es suma o resta y agarro su valor 
+                                if($buscarId['tipo_operacion'] == 'sumar'){
+                                    $sum_rest = $sum_rest + $nivel2['valor'];
+                                }elseif($buscarId['tipo_operacion'] == 'restar'){
+                                    $sum_rest = $sum_rest - $nivel2['suma_nivel_2'];
+                                }
+                                // $item['suma_nivel_2'];
+                                // $encontrado = true;
+                                break;
+                            }else{
+                                //seguir buscando
                             }
-                            // $item['suma_nivel_2'];
-                            // $encontrado = true;
-                            break;
-                        }else{
-                            //seguir buscando
-                        }
 
                         }
                     }
@@ -456,9 +488,31 @@ private function reporte_flujo_efectivo_privado($gestion_ant, $gestion_act) {
                     "profundidad" => '1',
                     "nivel_2" => [] //activo
                     );
+        }elseif($qwe2['tipo_operacion'] == 'calculable'){
+
+                    if($qwe2['obtiene_desde'] == 'gestion_anterior'){
+
+                        $balance_gestion = $this->dbc->query("SELECT * FROM balance_general_por_gestion WHERE idconfiguracion_reporte = '$qwe2[idconfiguracion_reporte]'
+                        AND idgestion ='$gestion_ant'");//
+
+                    }else{ // gestion_actual
+                        $balance_gestion = $this->dbc->query("SELECT * FROM balance_general_por_gestion WHERE idconfiguracion_reporte = '$qwe2[idconfiguracion_reporte]'
+                        AND idgestion ='$gestion_act'");//
+                    }
+                    $bl_gest = $balance_gestion->fetch_assoc();
+
+                    $res2 = array(
+                    "idconfi_reporte_flujo_efectivo" => $qwe2['idconfi_reporte_flujo_efectivo'],
+                    "negrilla_cursiva" => $qwe2['negrilla_cursiva'],
+                    "tipo_operacion" => $qwe2['tipo_operacion'],
+                    "nombre_registro" => $qwe2['nombre_registro'],
+                    "suma_nivel_2" => $bl_gest['valor'],
+                    "profundidad" => '1',
+                    "nivel_2" => [] //activo
+                    );
         }
 
-            $hijs_flujo = $this->dbc->query("SELECT * from confi_reporte_flujo_efectivo where nombre_cuenta_superior = '$qwe2[idconfi_reporte_flujo_efectivo]'
+            $hijs_flujo = $this->dbc->query("SELECT * from confi_reporte_flujo_efectivo where id_plantilla_superior = '$qwe2[idconfi_reporte_flujo_efectivo]'
              AND idplantilla_reporte ='$idplantilla_reporte' ORDER BY orden ASC");//
             // $nombre_cuenta = $hijs_flujo->fetch_assoc();
 
@@ -483,6 +537,57 @@ private function reporte_flujo_efectivo_privado($gestion_ant, $gestion_act) {
                     }
 
                     $total_suma = $total_suma + $valor_obtenido;
+                }elseif($qwe3['tipo_operacion'] == 'operaciones_vinculacion'){
+
+                    $oper_vinc = $this->dbc->query("SELECT * FROM agrupacion_plantilla 
+                    WHERE idplantilla_padre = '$qwe3[idconfi_reporte_flujo_efectivo]' AND idtipo_reportes = '$idplantilla_reporte'");//
+
+                        $aux_sum_rest = 0;
+                        while ($busc_Agru = $this->dbc->fetch($oper_vinc)) { // 2agrupados
+                            $idBusc = $busc_Agru['idplantilla_hijo'];
+                            $resu = array_filter($lista_flujo_gestiones, function($item2) use ($idBusc) {
+                                return $item2['idconfiguracion_reporte'] == $idBusc;
+                            });
+                            $resu = reset($resu);
+
+                            if($busc_Agru['tipo_operacion'] == 'sumar'){
+                                
+                                if($busc_Agru['obtiene_desde'] == 'gestion_anterior'){
+                                    $aux_sum_rest = $aux_sum_rest + $resu['valor_anterior'];
+                                 
+                                }elseif($busc_Agru['obtiene_desde'] == 'gestion_actual'){
+                                    $aux_sum_rest = $aux_sum_rest + $resu['valor_actual'];
+                                    
+                                }elseif($busc_Agru['obtiene_desde'] == 'origen'){
+                                    $aux_sum_rest = $aux_sum_rest + $resu['origen'];
+                                    
+                                }else{ // APLICACION
+                                    $aux_sum_rest = $aux_sum_rest + $resu['aplicacion'];
+                                    
+                                }
+
+                            }elseif($busc_Agru['tipo_operacion'] == 'restar'){
+                   
+                                if($busc_Agru['obtiene_desde'] == 'gestion_anterior'){
+                                    $aux_sum_rest = $aux_sum_rest - $resu['valor_anterior'];
+                                    
+                                }elseif($busc_Agru['obtiene_desde'] == 'gestion_actual'){
+
+                                    $aux_sum_rest = $aux_sum_rest - $resu['valor_actual'];
+                                }elseif($busc_Agru['obtiene_desde'] == 'origen'){
+
+                                    $aux_sum_rest = $aux_sum_rest - $resu['origen'];
+                                }else{ // APLICACION
+
+                                    $aux_sum_rest = $aux_sum_rest - $resu['aplicacion'];
+                                }
+                            }
+
+                            $aux_string =$aux_string.",".$resu['valor_anterior'].$resu['origen'];
+                        }
+                        $valor_obtenido = $aux_sum_rest;
+                        $total_suma = $total_suma + $valor_obtenido;
+
                 }else{ // TOTAL_SUMA   nivel 2
                     $valor_obtenido = $total_suma;
                 }
@@ -493,6 +598,7 @@ private function reporte_flujo_efectivo_privado($gestion_ant, $gestion_act) {
                             "tipo_operacion" => $qwe3['tipo_operacion'],
                             "nombre_registro" => $qwe3['nombre_registro'],
                             "valor" => $valor_obtenido,
+                            "valor_Aux" => $aux_string,
                             "suma_nivel_2" => 0,
                             "profundidad" => '2',
                             "nivel_2" => [] //activo

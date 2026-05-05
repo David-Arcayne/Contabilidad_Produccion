@@ -906,12 +906,12 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         $cont=new Factura_comercial();
         $cont->vincular_cobros_comercial_caja_bancos($data);
     }elseif($ver=="registrar_plantilla_flujo_efectivo"){
-        if(isset($_POST['idconfiguracion_reporte'],$_POST['nombre_personalizado'],$_POST['tipo_operacion'],$_POST['nivel_registro'],$_POST['nombre_cuenta_superior'],$_POST['orden'],$_POST['negrilla_cursiva'],$_POST['empresa'])){
+        if(isset($_POST['idconfiguracion_reporte'],$_POST['nombre_registro'],$_POST['tipo_operacion'],$_POST['nivel_registro'],$_POST['id_plantilla_superior'],$_POST['orden'],$_POST['negrilla_cursiva'],$_POST['empresa'])){
             $cont=new Reporte_flujo_efectivo();
-            $cont->registrar_plantilla_flujo_efectivo($_POST['idconfiguracion_reporte'],$_POST['nombre_personalizado'],$_POST['tipo_operacion'],$_POST['nivel_registro'],$_POST['nombre_cuenta_superior'],$_POST['orden'],$_POST['negrilla_cursiva'],$_POST['empresa']);
+            $cont->registrar_plantilla_flujo_efectivo($_POST['idplantilla_reporte'],$_POST['obtiene_desde'],$_POST['idconfiguracion_reporte'],$_POST['nombre_registro'],$_POST['tipo_operacion'],$_POST['nivel_registro'],$_POST['id_plantilla_superior'],$_POST['orden'],$_POST['negrilla_cursiva'],$_POST['empresa']);
         }
         else{
-            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idconfiguracion_reporte'],$_POST['nombre_personalizado'],$_POST['tipo_operacion'],$_POST['nivel_registro'],$_POST['nombre_cuenta_superior'],$_POST['orden'],$_POST['negrilla_cursiva'],$_POST['empresa']));
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idconfiguracion_reporte'],$_POST['nombre_registro'],$_POST['tipo_operacion'],$_POST['nivel_registro'],$_POST['id_plantilla_superior'],$_POST['orden'],$_POST['negrilla_cursiva'],$_POST['empresa']));
         }
     }elseif($data['ver'] == "guardar_balance_general_por_gestion") {
         $cont=new Reporte_confi();
@@ -924,7 +924,7 @@ if($data['ver'] == "asignar_asiento_A_factura") {
 // cobro_asignacion_factura_comercial registrar_estado_resultados_admin configuracion registrar_tipo_reportes registrar_factura_recibo_pago_cajaBancos
 
 } 
-// registrar_recibo_otras_cuentas registrocobrarfacturaGrupal cobro_asignacion_factura_comercial
+// registrar_recibo_otras_cuentas registrocobrarfacturaGrupal cobro_asignacion_factura_comercial registrar_comprobantes
 // desconsolidar registrar_factura_cobro_otras_cuentas registrar_factura_pagos_tributario registropagarfactura
 //  registrar_factura_pagos_tributario  registrar_recibo_pago_cajaBancos_en_otras_cuentas registrar_recibo_cobro_cajaBancos_en_otras_cuentas crearsolofacturasapif5  registrar_recibo_cobro_cajaBancos_en_facturas
 ?> 

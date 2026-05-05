@@ -794,10 +794,10 @@ class PlantillaReporte extends DB{
                     );  
 
                 $pl_padre = $this->dbc->query("SELECT * FROM agrupacion_plantilla WHERE idplantilla_padre = '$pl_list[idplantilla]'
-                AND (tipo_operacion ='sumar' || tipo_operacion = 'restar')");// VENTAS->NOMBRE
+                AND (tipo_operacion ='sumar' || tipo_operacion = 'restar') AND idtipo_reportes = '$idplantilla_reporte'");// VENTAS->NOMBRE
                 
                 $pl_porcentaje = $this->dbc->query("SELECT * FROM agrupacion_plantilla WHERE idplantilla_hijo = '$pl_list[idplantilla]'
-                AND (tipo_operacion ='porcentaje')");// VENTAS->NOMBRE
+                AND (tipo_operacion ='porcentaje') AND idtipo_reportes = '$idplantilla_reporte'");// VENTAS->NOMBRE
 
                 // $es_plant_agrup = $pl_padre->num_rows > 0;
             $pl_padre_calcu = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla_padre = '$pl_list[idplantilla]'");// VENTAS->NOMBRE
@@ -1107,7 +1107,7 @@ class PlantillaReporte extends DB{
             // FIN DEL NIVEL 2 2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222 
             }else{ //ES UNA PLANTILLA SIN OPERACION (COSTO_PRODUCCION)
                 
-                $agru = $this->dbc->query("SELECT * from agrupacion_plantilla where idplantilla_hijo = '$pl_list[idplantilla]'");// HIJOS DE LAS PLANTILLAS AGRUPADORAS
+                $agru = $this->dbc->query("SELECT * from agrupacion_plantilla where idplantilla_hijo = '$pl_list[idplantilla]' AND idtipo_reportes = '$idplantilla_reporte'");// HIJOS DE LAS PLANTILLAS AGRUPADORAS
                 $agru_aux = $agru->fetch_assoc();
                 $res['suma_nivel_2'] = $agru_aux['monto']; //esto en caso de que el monto siempre sea mayor a cero
             }
@@ -1258,10 +1258,10 @@ class PlantillaReporte extends DB{
                     );  
 
                 $pl_padre = $this->dbc->query("SELECT * FROM agrupacion_plantilla WHERE idplantilla_padre = '$pl_list[idplantilla]'
-                AND (tipo_operacion ='sumar' || tipo_operacion = 'restar')");// VENTAS->NOMBRE
+                AND (tipo_operacion ='sumar' || tipo_operacion = 'restar') AND idtipo_reportes = '$idplantilla_reporte'");// VENTAS->NOMBRE
                 
                 $pl_porcentaje = $this->dbc->query("SELECT * FROM agrupacion_plantilla WHERE idplantilla_hijo = '$pl_list[idplantilla]'
-                AND (tipo_operacion ='porcentaje')");// VENTAS->NOMBRE
+                AND (tipo_operacion ='porcentaje') AND idtipo_reportes = '$idplantilla_reporte'");// VENTAS->NOMBRE
 
                 // $es_plant_agrup = $pl_padre->num_rows > 0;
             $pl_padre_calcu = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla_padre = '$pl_list[idplantilla]'");// VENTAS->NOMBRE
@@ -1544,7 +1544,7 @@ class PlantillaReporte extends DB{
             // FIN DEL NIVEL 2 2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222 
             }else{ //ES UNA PLANTILLA SIN OPERACION (COSTO_PRODUCCION)
                 
-                $agru = $this->dbc->query("SELECT * from agrupacion_plantilla where idplantilla_hijo = '$pl_list[idplantilla]'");// HIJOS DE LAS PLANTILLAS AGRUPADORAS
+                $agru = $this->dbc->query("SELECT * FROM agrupacion_plantilla WHERE idplantilla_hijo = '$pl_list[idplantilla]' AND idtipo_reportes = '$idplantilla_reporte'");// HIJOS DE LAS PLANTILLAS AGRUPADORAS
                 $agru_aux = $agru->fetch_assoc();
                 $res['suma_nivel_2'] = $agru_aux['monto']; //esto en caso de que el monto siempre sea mayor a cero
             }
@@ -1663,10 +1663,10 @@ class PlantillaReporte extends DB{
                     );  
 
                 $pl_padre = $this->dbc->query("SELECT * FROM agrupacion_plantilla WHERE idplantilla_padre = '$pl_list[idplantilla]'
-                AND (tipo_operacion ='sumar' || tipo_operacion = 'restar')");// VENTAS->NOMBRE
+                AND (tipo_operacion ='sumar' || tipo_operacion = 'restar') AND idtipo_reportes = '$idplantilla_reporte'");// VENTAS->NOMBRE
                 
                 $pl_porcentaje = $this->dbc->query("SELECT * FROM agrupacion_plantilla WHERE idplantilla_hijo = '$pl_list[idplantilla]'
-                AND (tipo_operacion ='porcentaje')");// VENTAS->NOMBRE
+                AND (tipo_operacion ='porcentaje') AND idtipo_reportes = '$idplantilla_reporte'");// VENTAS->NOMBRE
 
                 // $es_plant_agrup = $pl_padre->num_rows > 0;
             $pl_padre_calcu = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla_padre = '$pl_list[idplantilla]'");// VENTAS->NOMBRE
@@ -1949,7 +1949,7 @@ class PlantillaReporte extends DB{
             // FIN DEL NIVEL 2 2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222 
             }else{ //ES UNA PLANTILLA SIN OPERACION (COSTO_PRODUCCION)
                 
-                $agru = $this->dbc->query("SELECT * from agrupacion_plantilla where idplantilla_hijo = '$pl_list[idplantilla]'");// HIJOS DE LAS PLANTILLAS AGRUPADORAS
+                $agru = $this->dbc->query("SELECT * from agrupacion_plantilla where idplantilla_hijo = '$pl_list[idplantilla]' AND idtipo_reportes = '$idplantilla_reporte'");// HIJOS DE LAS PLANTILLAS AGRUPADORAS
                 $agru_aux = $agru->fetch_assoc();
                 $res['suma_nivel_2'] = $agru_aux['monto']; //esto en caso de que el monto siempre sea mayor a cero
             }
@@ -2173,10 +2173,10 @@ class PlantillaReporte extends DB{
                     );  
 
                 $pl_padre = $this->dbc->query("SELECT * from agrupacion_plantilla where idplantilla_padre = '$pl_list[idplantilla]'
-                AND (tipo_operacion ='sumar' || tipo_operacion = 'restar')");// VENTAS->NOMBRE
+                AND (tipo_operacion ='sumar' || tipo_operacion = 'restar') AND idtipo_reportes = '$idplantilla_reporte'");// VENTAS->NOMBRE
             // $es_plant_agrup = $pl_padre->num_rows > 0;
             $pl_porcentaje = $this->dbc->query("SELECT * FROM agrupacion_plantilla WHERE idplantilla_hijo = '$pl_list[idplantilla]'
-                AND (tipo_operacion ='porcentaje')");
+                AND (tipo_operacion ='porcentaje') AND idtipo_reportes = '$idplantilla_reporte'");
 
             $pl_padre_calcu = $this->dbc->query("SELECT * from pr_plantilla where idplantilla_padre = '$pl_list[idplantilla]'");// VENTAS->NOMBRE
             
@@ -2458,7 +2458,8 @@ class PlantillaReporte extends DB{
             }
             else{ //ES UNA PLANTILLA SIN OPERACION (COSTO_PRODUCCION)
                 
-                $agru = $this->dbc->query("SELECT * from agrupacion_plantilla where idplantilla_hijo = '$pl_list[idplantilla]'");// HIJOS DE LAS PLANTILLAS AGRUPADORAS
+                $agru = $this->dbc->query("SELECT * FROM agrupacion_plantilla WHERE idplantilla_hijo = '$pl_list[idplantilla]'
+                AND idtipo_reportes = '$idplantilla_reporte'");// HIJOS DE LAS PLANTILLAS AGRUPADORAS
                 $agru_aux = $agru->fetch_assoc();
                 $res['suma_nivel_2'] = $agru_aux['monto']; //esto en caso de que el monto siempre sea mayor a cero
             }
@@ -2685,7 +2686,7 @@ class PlantillaReporte extends DB{
             $empresa
         );
 
-    //     $array = array_filter(
+    //     $array = array_filter( 
     //     (array) $this->reporte_balance_general_consolidado(
     //         $idplantilla_reporte,
     //         $fecha_ini,
