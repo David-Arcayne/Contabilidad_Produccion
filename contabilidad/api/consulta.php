@@ -777,9 +777,12 @@ elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
 }elseif($ver[0]=="filtro_plantilla_flujo_por_nivel"){//listar_recibo_por_caja_bancos
     $cont=new Reporte_flujo_efectivo();
     $cont->filtro_plantilla_flujo_por_nivel($ver[1],$ver[2],$ver[3]);
+}elseif($ver[0]=="listar_plantilla_flujo_efectivo"){//listar_recibo_por_caja_bancos
+    $cont=new Reporte_flujo_efectivo();
+    $cont->listar_plantilla_flujo_efectivo($ver[1],$ver[2]);
 }
 
-// reportedetalle 
+// reportedetalle  rp
 // listar_factura listar_facturas_cobro_pago  
 // listar_recibo_otras_cuentas_pagar 
 
