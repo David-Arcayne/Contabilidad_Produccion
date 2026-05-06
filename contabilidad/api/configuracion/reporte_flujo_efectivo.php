@@ -68,12 +68,16 @@ public function listar_plantilla_flujo_efectivo($idplantilla_reporte,$empresa) {
         echo json_encode($lista, JSON_NUMERIC_CHECK);
 }
 public function reporte_estado_origen_aplicacion($gestion_ant, $gestion_act){
+    // ini_set('display_errors', 1); 
+    //     ini_set('display_startup_errors', 1);
+    //     error_reporting(E_ALL);
 
 $lista_report_flujo = $this->reporte_estado_ori_apli_privado($gestion_ant, $gestion_act);
 
-    echo json_encode($lista_report_flujo, JSON_NUMERIC_CHECK);
+    echo json_encode($lista_report_flujo, JSON_NUMERIC_CHECK); 
+    // echo json_encode(array($gestion_ant, $gestion_act,"hola","como"));
 }
-private function reporte_estado_ori_apli_privado($gestion_ant, $gestion_act) {
+private function reporte_estado_ori_apli_privado($gestion_ant, $gestion_act){
     // ini_set('display_errors', 1); 
     //     ini_set('display_startup_errors', 1);
     //     error_reporting(E_ALL);
@@ -140,6 +144,8 @@ private function reporte_estado_ori_apli_privado($gestion_ant, $gestion_act) {
             $suma_pasi_patri_origen += $origen;
             $suma_pasi_patri_aplicacion += $aplicacion;
         }
+        $confi = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE idconfiguracion_reporte='$item[idconfiguracion_reporte]'");
+        $cr = $this->dbc->fetch($confi);
 
         $lista[] = [
             "idconfiguracion_reporte" => $item['idconfiguracion_reporte'],
@@ -150,6 +156,7 @@ private function reporte_estado_ori_apli_privado($gestion_ant, $gestion_act) {
             "origen" => $origen,
             "aplicacion" => $aplicacion,
             "id_plantilla_superior" => $item['id_plantilla_superior'],
+            "nombre_cuenta_superior" => $cr['nombre_cuenta_superior'],
         ];
     }
 
@@ -285,6 +292,63 @@ public function registrar_plantilla_flujo_efectivo(
         }
     }
 
+    if($tipo_operacion == 'titulo'){ // solo deberia tener nombre personalizado para escoger
+
+        // nombre_registro SE MANTIENE COMO NOMBRE PERSONALIZADO
+        $nombre_aux = $nombre_registro;
+    }elseif($tipo_operacion == 'total_suma'){ // solo deberia tener nombre personalizado para escoger
+
+        // nombre_registro SE MANTIENE COMO NOMBRE PERSONALIZADO
+        $nombre_aux = $nombre_registro;
+    }elseif($tipo_operacion == 'calculable'){
+
+        // obtenemos el nombre_registro del idconfiguracion_reporte
+        $conf_report = $this->dbc->query("SELECT * from configuracion_reporte 
+                where idconfiguracion_reporte = '$idconfiguracion_reporte'");
+
+                $cr = $conf_report->fetch_assoc();
+
+                $plancuenta = $this->dbc->query("SELECT * from plandecuenta 
+                where idplandecuenta = '$cr[idplandecuenta]'");
+
+                $pl = $plancuenta->fetch_assoc();
+                $nombre_aux = $pl['nombreplan'];
+    }elseif($tipo_operacion == 'otras_operaciones'){ // solo deberia tener nombre personalizado para escoger
+    
+        // nombre_registro SE MANTIENE COMO NOMBRE PERSONALIZADO
+        $nombre_aux = $nombre_registro;
+    }elseif($tipo_operacion == 'operaciones_vinculacion'){ 
+
+        if($idconfiguracion_reporte == '0'){ // el nombre_Registro  es nombre personalizado
+            $nombre_aux = $nombre_registro;
+        }else{// obtenemos el nombre_registro del idconfiguracion_reporte
+            $conf_report = $this->dbc->query("SELECT * from configuracion_reporte 
+                where idconfiguracion_reporte = '$idconfiguracion_reporte'");
+
+                $cr = $conf_report->fetch_assoc();
+
+                $plancuenta = $this->dbc->query("SELECT * from plandecuenta 
+                where idplandecuenta = '$cr[idplandecuenta]'");
+
+                $pl = $plancuenta->fetch_assoc();
+                $nombre_aux = $pl['nombreplan'];
+        }
+    }elseif($tipo_operacion == 'vinculacion'){
+        if($nombre_registro == ""){ // obtenemos el nombre_registro del idconfiguracion_reporte
+            $conf_report = $this->dbc->query("SELECT * from configuracion_reporte 
+                where idconfiguracion_reporte = '$idconfiguracion_reporte'");
+
+                $cr = $conf_report->fetch_assoc();
+
+                $plancuenta = $this->dbc->query("SELECT * from plandecuenta 
+                where idplandecuenta = '$cr[idplandecuenta]'");
+
+                $pl = $plancuenta->fetch_assoc();
+                $nombre_aux = $pl['nombreplan'];
+        }else{ // el nombre_Registro  es nombre personalizado
+            $nombre_aux = $nombre_registro;
+        }
+    }
     // Insertar el nuevo registro con el orden calculado
     $sqlInsert = "INSERT INTO confi_reporte_flujo_efectivo(
         idplantilla_reporte,
@@ -302,7 +366,7 @@ public function registrar_plantilla_flujo_efectivo(
         '$idplantilla_reporte',
         '$obtiene_desde',
         '$idconfiguracion_reporte',
-        '$nombre_registro',
+        '$nombre_aux',
         '$tipo_operacion',
         '$nivel_registro',
         '$id_plantilla_superior',

@@ -24,6 +24,7 @@ require_once "./otras_cuentas/forma_pago.php";
 require_once "./configuracion/plantilla_admin.php";
 require_once "./configuracion/tipo_cliente_comercial.php";
 require_once "./configuracion/reporte_flujo_efectivo.php";
+require_once "./configuracion/usuario_gestion.php";
 // require_once "./recibos/caja_bancos_contrataciones.php";
 
 $ver=$_POST['ver'];
@@ -916,6 +917,9 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     }elseif($data['ver'] == "guardar_balance_general_por_gestion") {
         $cont=new Reporte_confi();
         $cont->guardar_balance_general_por_gestion($data);
+    }elseif($data['ver'] == "asignar_gestiones_a_usuario") {
+        $cont=new Usuario_gestion();
+        $cont->asignar_gestiones_a_usuario($data);
     }
    
 // asignar asiento registrar_recibo_cobro_cajaBancos_en_otras_cuentas editar_recibo_caja_bancos registrocobrarfactura registrar_anular_eliminar_activar_factura_tributario_transaccion
@@ -925,6 +929,6 @@ if($data['ver'] == "asignar_asiento_A_factura") {
 
 } 
 // registrar_recibo_otras_cuentas registrocobrarfacturaGrupal cobro_asignacion_factura_comercial registrar_comprobantes
-// desconsolidar registrar_factura_cobro_otras_cuentas registrar_factura_pagos_tributario registropagarfactura
+// desconsolidar registrar_factura_cobro_otras_cuentas registrar_factura_pagos_tributario registropagarfactura registrar_agrupacion_plantilla
 //  registrar_factura_pagos_tributario  registrar_recibo_pago_cajaBancos_en_otras_cuentas registrar_recibo_cobro_cajaBancos_en_otras_cuentas crearsolofacturasapif5  registrar_recibo_cobro_cajaBancos_en_facturas
 ?> 

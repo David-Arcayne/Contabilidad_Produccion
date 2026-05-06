@@ -2253,9 +2253,6 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
     }else{// TIPO = 3 --> TODOS 
 
-        // ini_set('display_errors', 1);
-        // ini_set('display_startup_errors', 1);
-        // error_reporting(E_ALL);
         $getPedido = $this->dbc->query("SELECT 
             cp.idcuentaspor AS id_cuenta,
             cp.idrecibo,
@@ -2887,6 +2884,8 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
     }
         echo json_encode($lista, JSON_NUMERIC_CHECK);
+        // echo json_encode($combinado, JSON_NUMERIC_CHECK);
+        
     }
 
     public function listar_recibo_por_caja_bancos_saldo($cadena_cajaBancos,$tipo_filtro) {

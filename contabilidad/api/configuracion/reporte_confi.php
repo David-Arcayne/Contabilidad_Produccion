@@ -4146,45 +4146,66 @@ public function reporte_balance_general_por_niveles_consolidados(
         // return $array;
     }
 
-//     public function guardar_balance_general_por_gestion($data, $nivel = 1) {
-//     $idempresa = $this->getidempresa($data['empresa']);
-//     $idgestion = $this->getidgestion($data['empresa']);
+// public function guardar_balance_general_por_gestion($data, $nivel = 1, $empresa = null, $idempresa = null, $idgestion = null) {
+//     // ini_set('display_errors', 1);
+//     // ini_set('display_startup_errors', 1);
+//     // error_reporting(E_ALL);
+//     // En el primer nivel inicializamos empresa y gestión
+//     if ($nivel === 1) {
+//         // Usamos directamente el dato que viene en $data
+//         $idempresa = $this->getidempresa($data['empresa']);
+//         $idgestion = $this->getidgestion($data['empresa']);
+//         $items = $data['contenido']; // raíz
+//     } else {
+//         $items = $data; // en niveles internos ya es directamente el array
+//     }
 
-//     foreach ($data['contenido'] as $item) {
-//         // Extraer valores comunes
+//     foreach ($items as $item) {
 //         $idconfiguracion = $item['idconfiguracion_reporte'] ?? null;
+//         $idplantilla_reporte = $item['idplantilla_reporte'] ?? null;
+//         $grupo = $item['grupo'] ?? null;
 //         $es_calculable = $item['es_calculable'] ?? null;
 //         $orden = $item['orden'] ?? null;
-//         $nombre_cuenta_superior = $item['nombre_cuenta_superior'] ?? null;
-//         $valor = $item['valor'] ?? null;
-//         $suma = $item['suma_nivel_'.($nivel+1)] ?? null;
 
-//         // Decidir qué guardar en el campo valor
+//         // nombre dinámico según nivel
+//         $nombreKey = 'nombre_nivel_'.$nivel;
+//         $nombre_actual = $item[$nombreKey] ?? null;
+//         $nombre_cuenta_superior = $item['nombre_cuenta_superior'] ?? null;
+//         // valor dinámico
+//         $valorKey = 'suma_nivel_'.($nivel+1);
+//         $valor = $item['valor'] ?? null;
+//         $suma = $item[$valorKey] ?? null;
 //         $valorFinal = ($es_calculable === "si") ? $valor : $suma;
 
-//         // Insertar en la tabla
+//         // Insertar
 //         $this->dbc->query("INSERT INTO balance_general_por_gestion 
-//             (idconfiguracion_reporte, valor, nivel, orden, nombre_cuenta_superior, es_calculable, idgestion, idempresa) 
-//             VALUES ('{$idconfiguracion}', '{$valorFinal}', '{$nivel}', '{$orden}', '{$nombre_cuenta_superior}', '{$es_calculable}', '{$idgestion}', '{$idempresa}')");
+//             (idplantilla_reporte, idconfiguracion_reporte, valor, nombre_actual, nivel, orden, nombre_cuenta_superior, grupo, es_calculable, idgestion, idempresa) 
+//             VALUES ('{$idplantilla_reporte}','{$idconfiguracion}', '{$valorFinal}', '{$nombre_actual}', '{$nivel}', '{$orden}', '{$nombre_cuenta_superior}', '{$grupo}', '{$es_calculable}', '{$idgestion}', '{$idempresa}')");
 
-//         // Recorrer niveles más profundos si existen
-//         for ($i = 2; $i <= 5; $i++) {
+//         // Recorrer niveles más profundos
+//         for ($i = $nivel+1; $i <= 5; $i++) {
 //             $nivelKey = 'nivel_'.$i;
 //             if (isset($item[$nivelKey]) && is_array($item[$nivelKey]) && count($item[$nivelKey]) > 0) {
-//                 $this->guardar_balance_general_por_gestion($item[$nivelKey], $i);
+//                 $this->guardar_balance_general_por_gestion($item[$nivelKey], $i, $data['empresa'], $idempresa, $idgestion);
 //             }
 //         }
 //     }
+                                                                                                                                                             
+//             $res = array("success", "Se Guardo correctamente","registroCaracteristicas");
+//             echo json_encode($res);
+   
 // }
+
+
 public function guardar_balance_general_por_gestion($data, $nivel = 1, $empresa = null, $idempresa = null, $idgestion = null) {
-    // En el primer nivel inicializamos empresa y gestión
+    $success = true; // bandera para saber si todo salió bien
+
     if ($nivel === 1) {
-        // Usamos directamente el dato que viene en $data
         $idempresa = $this->getidempresa($data['empresa']);
         $idgestion = $this->getidgestion($data['empresa']);
-        $items = $data['contenido']; // raíz
+        $items = $data['contenido']; 
     } else {
-        $items = $data; // en niveles internos ya es directamente el array
+        $items = $data; 
     }
 
     foreach ($items as $item) {
@@ -4194,20 +4215,23 @@ public function guardar_balance_general_por_gestion($data, $nivel = 1, $empresa 
         $es_calculable = $item['es_calculable'] ?? null;
         $orden = $item['orden'] ?? null;
 
-        // nombre dinámico según nivel
         $nombreKey = 'nombre_nivel_'.$nivel;
         $nombre_actual = $item[$nombreKey] ?? null;
         $nombre_cuenta_superior = $item['nombre_cuenta_superior'] ?? null;
-        // valor dinámico
+
         $valorKey = 'suma_nivel_'.($nivel+1);
         $valor = $item['valor'] ?? null;
         $suma = $item[$valorKey] ?? null;
         $valorFinal = ($es_calculable === "si") ? $valor : $suma;
 
-        // Insertar
-        $this->dbc->query("INSERT INTO balance_general_por_gestion 
+        // Ejecutar consulta
+        $query = "INSERT INTO balance_general_por_gestion 
             (idplantilla_reporte, idconfiguracion_reporte, valor, nombre_actual, nivel, orden, nombre_cuenta_superior, grupo, es_calculable, idgestion, idempresa) 
-            VALUES ('{$idplantilla_reporte}','{$idconfiguracion}', '{$valorFinal}', '{$nombre_actual}', '{$nivel}', '{$orden}', '{$nombre_cuenta_superior}', '{$grupo}', '{$es_calculable}', '{$idgestion}', '{$idempresa}')");
+            VALUES ('{$idplantilla_reporte}','{$idconfiguracion}', '{$valorFinal}', '{$nombre_actual}', '{$nivel}', '{$orden}', '{$nombre_cuenta_superior}', '{$grupo}', '{$es_calculable}', '{$idgestion}', '{$idempresa}')";
+
+        if (!$this->dbc->query($query)) {
+            $success = false; // si falla alguna inserción
+        }
 
         // Recorrer niveles más profundos
         for ($i = $nivel+1; $i <= 5; $i++) {
@@ -4217,9 +4241,19 @@ public function guardar_balance_general_por_gestion($data, $nivel = 1, $empresa 
             }
         }
     }
+
+    // Mensaje final
+    if ($nivel === 1) { 
+        if ($success) {                                                                                                                                                                
+                $res = array("success", "Registro exitoso","registroCaracteristicas");
+                echo json_encode($res);
+        } else {
+                $res = array("danger", "No se pudo registrar");
+                echo json_encode($res);
+        }
+    }
+
 }
-
-
 
 
     public function getidempresa($md5)
