@@ -5397,7 +5397,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
     }
 
-    // public function listar_monto_factura_cajas($idfactura,$cobro_pago) {
+    // public function listar_monto_factura_cajas($idfactura,$cobro_pago) { listar_usuarios
     //     $lista = [];
     //     // $idempresa = $this->getidempresa($empresa);
     

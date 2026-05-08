@@ -30,7 +30,7 @@ require_once "./configuracion/tipo_cliente_comercial.php";
 require_once "./configuracion/reporte_flujo_efectivo.php";
 require_once "./configuracion/usuario_gestion.php";
 
-$ver=explode("/",$_GET['ver']); //dividiendo los "/"  ver[0],ver[1],ver[x]  listafacturaapi_pagado eliminarasiento tipo 
+$ver=explode("/",$_GET['ver']); 
 if($ver[0]=="verificacion"){
 $ad=new Admin();
 $ad->verificacion();
@@ -781,9 +781,15 @@ elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
 }elseif($ver[0]=="listar_plantilla_flujo_efectivo"){//listar_recibo_por_caja_bancos
     $cont=new Reporte_flujo_efectivo();
     $cont->listar_plantilla_flujo_efectivo($ver[1],$ver[2]);
-}elseif($ver[0]=="listar_usuarios"){//listar_recibo_por_caja_bancos
+}elseif($ver[0]=="listar_solo_usuarios"){//listar_recibo_por_caja_bancos
     $cont=new Usuario_gestion();
-    $cont->listar_usuarios($ver[1]);
+    $cont->listar_solo_usuarios($ver[1]);
+}elseif($ver[0]=="listar_gestiones_por_usuarios"){//listar_recibo_por_caja_bancos
+    $cont=new Usuario_gestion();
+    $cont->listar_gestiones_por_usuarios($ver[1]);
+}elseif($ver[0]=="listar_usuarios_por_gestion"){//listar_recibo_por_caja_bancos
+    $cont=new Usuario_gestion();
+    $cont->listar_usuarios_por_gestion($ver[1]);
 }
 
 // reportedetalle  rp
@@ -793,7 +799,7 @@ elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
 // lista_cobrar_cobrado_factura listar_caja_bancos
 //   listar_recibo_otras_cuentas 
 // 
-// lista_pagar_pagado_factura
+// lista_pagar_pagado_factura listar_usuarios 
 // reportedetallefp lista_pagar_pagado_factura
 //  listadesconsolidar listar_anular_eliminar_factura 
 //

@@ -4,14 +4,16 @@ require_once "../../db/db.php";
 
 class Usuario_gestion extends DB{
     public function asignar_gestiones_a_usuario($data){
-
+    //  ini_set('display_errors', 1);
+    //     ini_set('display_startup_errors', 1);
+    //     error_reporting(E_ALL);
         $idempresa = $this->getidempresa($data['empresa']);
         // Decodificar el JSON a array asociativo 
-        $gestiones = json_decode($data['gestiones'], true);
+        // $gestiones = json_decode($data['gestiones'], true);
 
-        foreach($gestiones as $gestion){
+        foreach($data['gestiones'] as $gestion){
 
-            $vincu_gestion_usuario = $this->dbc->query("INSERT INTO gestion_por_usuario(idusuario,idgestion,idempresa,) VALUES ('$data[idusuario]','$gestion[idgestion]','$idempresa')");
+            $vincu_gestion_usuario = $this->dbc->query("INSERT INTO gestion_por_usuario(idusuario,idgestion,idempresa) VALUES ('$data[idusuario]','$gestion[idgestion]','$idempresa')");
 
         }
 
@@ -23,7 +25,7 @@ class Usuario_gestion extends DB{
         echo json_encode($res);
         
     }
-    public function listar_usuarios($empresa) {
+    public function listar_solo_usuarios($empresa) {
         $lista = [];
         $idempresa = $this->getidempresa($empresa);
     
@@ -41,7 +43,54 @@ class Usuario_gestion extends DB{
     
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
+
+    public function listar_gestiones_por_usuarios($idusuario) {
+        $lista = [];
+        // $idempresa = $this->getidempresa($empresa);
     
+        // Preparar la consulta
+        $get_gestiones = $this->dbc->query("SELECT * FROM gestion_por_usuario WHERE idusuario = '$idusuario'");
+    
+        while ($qwe = $this->dbc->fetch($get_gestiones)) {
+
+            $gesti = $this->dbc->query("SELECT * FROM gestion WHERE idgestion = '$qwe[idgestion]'");
+            $gst = $this->dbc->fetch($gesti);
+            $res = array(
+                "idusuario" => $qwe['idusuario'],
+                "idgestion" => $qwe['idgestion'],
+                "nombre" => $gst['nombre'],
+                "fecha_ini" => $gst['fechaini'],
+                "fecha_fin" => $gst['fechafin'],
+                "formato_transaccion" => $gst['formato_transaccion']
+            );
+            array_push($lista, $res);
+        }
+    
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
+    
+    public function listar_usuarios_por_gestion($idgestion) {
+        $lista = [];
+        // $idempresa = $this->getidempresa($empresa);
+    
+        // Preparar la consulta
+        $get_usuarios = $this->dbc->query("SELECT * FROM gestion_por_usuario WHERE idgestion = '$idgestion'");
+    
+        while ($qwe = $this->dbc->fetch($get_usuarios)) {
+
+            $usuario = $this->dbrh->query("SELECT * FROM usuarios WHERE idusuario = '$qwe[idusuario]'");
+            $usr = $this->dbc->fetch($usuario);
+            $res = array(
+                "idusuario" => $qwe['idusuario'],
+                "idgestion" => $qwe['idgestion'],
+                "nombre" => $usr['nombre']
+            );
+            array_push($lista, $res);
+        }
+    
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
+
     public function editar_divisa($id,$simbolo,$nombre,$empresa) {
         $idempresa = $this->getidempresa($empresa);
 

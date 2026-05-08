@@ -660,6 +660,7 @@ class Caja_bancos_recibos extends DB{
         // ini_set('display_startup_errors', 1);
         // error_reporting(E_ALL);
         $lista = [];
+        
         // $idempresa = $this->getidempresa($empresa);
 
         $array_cajaBancos = array_map('intval', explode(",", $cadena_cajaBancos));

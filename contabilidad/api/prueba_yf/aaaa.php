@@ -1892,6 +1892,23 @@ if ($pcuentas->num_rows > 0) {
 
         echo json_encode($lista); 
        }
+
+      // Nombre demasiado genérico
+      function procesar($dato) {
+          // ¿Procesar qué? No queda claro
+          return strtoupper($dato);
+      }
+
+      // Nombre arbitrario
+      function funcion1($valor) {
+          return $valor + 10;
+      }
+
+      // Nombre incomprensible
+      function xyz($input) {
+          return md5($input);
+      }
+
   //reportedetallefpt reporteactivodiaponibledos reportedetalletransaccion estado consolidar reporteactivoypasivo resultados reportecomprobantecontable                
 //re   firmas  reportebalancegeneral mayor reportecomprobantecontable mayorcuentacontable  reporteactivoypasivo
 
