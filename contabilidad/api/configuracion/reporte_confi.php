@@ -4277,6 +4277,6 @@ public function guardar_balance_general_por_gestion($data, $nivel = 1, $empresa 
         //$res=array("id"=>,"nombre"=>$qwe['nombre']); listapagarfactura
         return $qwe['idgestion'];
     }
-//activo--1    pasivo --2  patrimonio---3    ingresos---4   egresos_gastos --5  orden ---6  eliminar    editar  reporte_balance_general_consolidado
+//activo--1  getgestionactual  pasivo --2  patrimonio---3    ingresos---4   egresos_gastos --5  orden ---6  eliminar    editar  reporte_balance_general_consolidado
 }
 ?>

@@ -269,24 +269,6 @@ class PlantillaReporte extends DB{
 
     public function rp_editar_plantilla($idplantilla, $idplandecuenta, $nombre_personalizado, $tipo_operacion, $orden, $idplantilla_padre,$negrilla_cursiva, $empresa) {
         $idempresa = $this->get_id_empresa($empresa);
-
-        // $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM pr_plantilla WHERE idplantilla_padre = '$idplantilla'");
-        // $resultado = $consulta->fetch_assoc();
-        // $existe_plantilla = $resultado['total'];
-
-
-        // $consulta2 = $this->dbc->query("SELECT COUNT(*) AS total FROM agrupacion_plantilla WHERE idplantilla_padre = '$idplantilla'");
-        // $resultado2 = $consulta2->fetch_assoc();
-        // $existe_agrupacion = $resultado2['total'];
-
-        // if()//tipo operacion es diferente de lo q ya existe en la base de datos  entonces ir abajo
-        
-        
-        // if ($existe_plantilla > 0 || $existe_agrupacion > 0) { // EL REGISTRO TIENE DEPENDENCIAS
-        //     //NO SE PODRA EDITAR EL TIPO_OPERACION PERO SI EL ORDEN (EN DUDA)
-
-        //     $res = array("danger", "El registro no puede editarse","editarCaracteristicas");
-        // }else {
             // se editara
             $pregunta = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla = '$idplantilla'");
             $res_pregunta = $pregunta->fetch_assoc();
@@ -407,6 +389,16 @@ class PlantillaReporte extends DB{
     {
         $id_empresa = $this->get_id_empresa($idempresa);
 
+        $get_plantilla = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla = '$idplantilla'");
+        $get_plant = $get_plantilla->fetch_assoc();
+        if($get_plant['tipo_operacion'] == 'otra_operacion'){
+
+            //eliminar lo que tiene dentro tambien
+            $eliminar_hijs = $this->dbc->query("DELETE FROM agrupacion_plantilla WHERE idplantilla_padre = '$idplantilla'");
+            $eliminar_hijs2 = $this->dbc->query("DELETE FROM agrupacion_plantilla WHERE idplantilla_hijo = '$idplantilla'");
+        }else{
+
+        }
         // Eliminar el registro
         $stmt_delete = $this->dbc->prepare("DELETE FROM pr_plantilla WHERE idplantilla = ? AND idempresa = ?");
         $stmt_delete->bind_param("ii", $idplantilla, $id_empresa);
@@ -649,7 +641,7 @@ class PlantillaReporte extends DB{
         // return $arbol;
         echo json_encode($arbol, JSON_NUMERIC_CHECK);
     }
-    public function registrar_agrupacion_plantilla($idplantilla_padre, $idplantilla_hijo, $tipo_operacion,$monto,$idtipo_reportes,$empresa) {
+    public function registrar_agrupacion_plantilla($idplantilla_padre, $idplantilla_hijo, $tipo_operacion,$monto,$idtipo_reportes,$empresa,$obtiene_desde) {
         $idempresa = $this->get_id_empresa($empresa);
 
         if($tipo_operacion == 'porcentaje'){
@@ -657,7 +649,7 @@ class PlantillaReporte extends DB{
 
         }else{
             // Insertar el nuevo registro
-            $registro = $this->dbc->query("INSERT INTO agrupacion_plantilla(idplantilla_padre, idplantilla_hijo, tipo_operacion,monto,idtipo_reportes, idempresa) VALUES ('$idplantilla_padre', '$idplantilla_hijo', '$tipo_operacion','$monto','$idtipo_reportes', '$idempresa')");
+            $registro = $this->dbc->query("INSERT INTO agrupacion_plantilla(idplantilla_padre, idplantilla_hijo, tipo_operacion,monto,idtipo_reportes,obtiene_desde, idempresa) VALUES ('$idplantilla_padre', '$idplantilla_hijo', '$tipo_operacion','$monto','$idtipo_reportes','$obtiene_desde', '$idempresa')");
         }
        
         if ($registro === TRUE) {                                                                                                                                                                
@@ -678,29 +670,29 @@ class PlantillaReporte extends DB{
 
         if($suma_resta->num_rows > 0){
         
-        while ($row = $this->dbc->fetch($suma_resta)) { // ESTO ES DE SUMAS O RESTAS DE CUENTAS
+            while ($row = $this->dbc->fetch($suma_resta)) { // ESTO ES DE SUMAS O RESTAS DE CUENTAS
 
-            $consul = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla='$row[idplantilla_hijo]'");
-            $pr_plant = $consul->fetch_assoc();
-            if(empty($pr_plant['idplandecuenta'])){//plan de cuenta esta vacio
-                $nombre_hijo = $pr_plant['nombre_personalizado'];
-            }else{//plan de cuenta NO esta vacio
-                $plan_cuenta = $this->dbc->query("SELECT * FROM plandecuenta WHERE idplandecuenta='$pr_plant[idplandecuenta]'");
-                $pl_c = $plan_cuenta->fetch_assoc();
-                $nombre_hijo = $pl_c['nombreplan'];
+                $consul = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla='$row[idplantilla_hijo]'");
+                $pr_plant = $consul->fetch_assoc();
+                if(empty($pr_plant['idplandecuenta'])){//plan de cuenta esta vacio
+                    $nombre_hijo = $pr_plant['nombre_personalizado'];
+                }else{//plan de cuenta NO esta vacio
+                    $plan_cuenta = $this->dbc->query("SELECT * FROM plandecuenta WHERE idplandecuenta='$pr_plant[idplandecuenta]'");
+                    $pl_c = $plan_cuenta->fetch_assoc();
+                    $nombre_hijo = $pl_c['nombreplan'];
+                }
+
+                    $lista[] = [
+                        "idagrupacion_plantilla" => $row['idagrupacion_plantilla'],
+                        "idplantilla_padre"=>$row['idplantilla_padre'],
+                        "idplantilla_hijo" => $row['idplantilla_hijo'],
+                        "tipo_operacion" => $row['tipo_operacion'],
+                        "nombre" => $nombre_hijo,
+                        "monto" => $row['monto']
+                    ];
             }
-
-                $lista[] = [
-                    "idagrupacion_plantilla" => $row['idagrupacion_plantilla'],
-                    "idplantilla_padre"=>$row['idplantilla_padre'],
-                    "idplantilla_hijo" => $row['idplantilla_hijo'],
-                    "tipo_operacion" => $row['tipo_operacion'],
-                    "nombre" => $nombre_hijo,
-                    "monto" => $row['monto']
-                ];
-        }
-    }elseif($porcentaje->num_rows > 0){ // ESTO SON LOS PORCENTAJES DE ALGUNA CUENTA
-        while ($row = $this->dbc->fetch($porcentaje)) {
+        }elseif($porcentaje->num_rows > 0){ // ESTO SON LOS PORCENTAJES DE ALGUNA CUENTA
+            while ($row = $this->dbc->fetch($porcentaje)) {
 
             $consul = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla='$row[idplantilla_padre]'");
             $pr_plant = $consul->fetch_assoc();
@@ -2729,7 +2721,7 @@ class PlantillaReporte extends DB{
 
         $limpiar($array);
     echo json_encode($array, JSON_NUMERIC_CHECK);
-        // return $array;
+        // return $array; editar
     }
 
 }

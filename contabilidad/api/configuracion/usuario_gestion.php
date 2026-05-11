@@ -3,6 +3,36 @@ require_once "../../db/db.php";
 // require_once "../configuracion/empresa.php"; ini_set
 
 class Usuario_gestion extends DB{
+
+    // public function listar_gestiones_principal($empresa, $usuario)
+    // {
+    //     $lista = [];
+        
+    //     $usuario=$this->getidusuario($usuario);
+
+    //     $ide = $this->getidempresa($empresa);
+    //     $registro = $this->dbc->query("SELECT idgestion,nombre,fechaini,fechafin,estado,fecha,formato_transaccion,idempresa 
+    //     FROM gestion WHERE idempresa='$ide'");
+    //     while ($qwe = $this->dbc->fetch($registro)) {
+
+    //         $existe_trans = $this->dbc->query("SELECT * FROM transacciones WHERE idgestion='$qwe[0]' and organizacion_idorganizacion='$ide'");
+
+    //         if($existe_trans->num_rows > 0){      
+    //             $tiene_trans = "si";
+    //         }else{
+    //             $tiene_trans = "no";
+    //         }
+
+    //         $gestion_usuario = $this->dbc->query("SELECT * FROM gestion_por_usuario WHERE idgestion = ''");
+
+    //         if($qwe['idgestion']){}
+
+    //         $res = array("id" => $qwe[0], "nombre" => $qwe[1], "fechaini" => $qwe[2], "fechafin" => $qwe[3], "estado" => $qwe[4], "fecha" => $qwe[5],"formato_transaccion" => $qwe[6], "tiene_transaccion" => $tiene_trans);
+    //         array_push($lista, $res);
+    //     }
+    //     echo json_encode($lista);
+    // }
+
     public function asignar_gestiones_a_usuario($data){
     //  ini_set('display_errors', 1);
     //     ini_set('display_startup_errors', 1);
@@ -13,7 +43,7 @@ class Usuario_gestion extends DB{
 
         foreach($data['gestiones'] as $gestion){
 
-            $vincu_gestion_usuario = $this->dbc->query("INSERT INTO gestion_por_usuario(idusuario,idgestion,idempresa) VALUES ('$data[idusuario]','$gestion[idgestion]','$idempresa')");
+            $vincu_gestion_usuario = $this->dbc->query("INSERT INTO gestion_por_usuario(idusuario,idgestion,estado,idempresa) VALUES ('$data[idusuario]','$gestion[idgestion]','1','$idempresa')");
 
         }
 
@@ -44,6 +74,33 @@ class Usuario_gestion extends DB{
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
 
+    public function listar_gestion_activa($usuario) {
+        $lista = [];
+        // $idempresa = $this->getidempresa($empresa);
+        $idusuario=$this->getidusuario($usuario);
+
+        // Preparar la consulta
+        $get_gestion = $this->dbc->query("SELECT * FROM gestion_por_usuario WHERE idusuario = '$idusuario' AND estado = '2'");
+        $gst_x_usuario = $this->dbc->fetch($get_gestion);
+
+        $gestion = $this->dbc->query("SELECT * FROM gestion WHERE idgestion = '$gst_x_usuario[idgestion]'");
+        $gst = $this->dbc->fetch($gestion);
+
+        $res = array(
+            "idgestion" => $gst['idgestion'],
+            "nombre" => $gst['nombre'],
+            "fecha_ini" => $gst['fechaini'],
+            "fecha_fin" => $gst['fechafin'],
+            "estado" => $gst_x_usuario['estado'],
+            "formato_transaccion" => $gst['formato_transaccion']
+
+        );
+       
+        array_push($lista, $res);
+    
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
+
     public function listar_gestiones_por_usuarios($idusuario) {
         $lista = [];
         // $idempresa = $this->getidempresa($empresa);
@@ -58,6 +115,7 @@ class Usuario_gestion extends DB{
             $res = array(
                 "idusuario" => $qwe['idusuario'],
                 "idgestion" => $qwe['idgestion'],
+                "estado" => $qwe['estado'],
                 "nombre" => $gst['nombre'],
                 "fecha_ini" => $gst['fechaini'],
                 "fecha_fin" => $gst['fechafin'],
@@ -70,6 +128,9 @@ class Usuario_gestion extends DB{
     }
     
     public function listar_usuarios_por_gestion($idgestion) {
+        //  ini_set('display_errors', 1); 
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
         $lista = [];
         // $idempresa = $this->getidempresa($empresa);
     
@@ -78,8 +139,8 @@ class Usuario_gestion extends DB{
     
         while ($qwe = $this->dbc->fetch($get_usuarios)) {
 
-            $usuario = $this->dbrh->query("SELECT * FROM usuarios WHERE idusuario = '$qwe[idusuario]'");
-            $usr = $this->dbc->fetch($usuario);
+            $usuario = $this->dbrh->query("SELECT * FROM usuario WHERE idusuario = '$qwe[idusuario]'");
+            $usr = $this->dbrh->fetch($usuario);
             $res = array(
                 "idusuario" => $qwe['idusuario'],
                 "idgestion" => $qwe['idgestion'],
@@ -91,63 +152,68 @@ class Usuario_gestion extends DB{
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
 
-    public function editar_divisa($id,$simbolo,$nombre,$empresa) {
-        $idempresa = $this->getidempresa($empresa);
+    public function desvincular_gestiones_de_usuarios($idusuario,$idgestion){
 
-        $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM divisa WHERE nombre = '$nombre' AND idempresa = '$idempresa' AND iddivisa != '$id'");
-        $resultado = $consulta->fetch_assoc();
-        $totalRegistros = $resultado['total'];
-
-        if ($totalRegistros > 0) {
-            $res = array("danger", "El registro ya existe","editarCaracteristicas");
-        }else {
-            // Insertar el nuevo registro
-            $registroListaCompra = $this->dbc->query("UPDATE divisa
-                                    SET simbolo = '$simbolo',
-                                    nombre = '$nombre'
-                                    WHERE iddivisa = '$id';");
-            if ($registroListaCompra === TRUE) {                                                                                                                                                                
-                $res = array("success", "Edición exitosa","editarCaracteristicas");
-            } else {
-                $res = array("danger", "No se pudo editar",$id,$nombre,$empresa);
-            }
-        }
-        echo json_encode($res);
-    }
-    public function activar_divisa($iddivisa){
-        $consulta = $this->dbc->query("SELECT * FROM divisa WHERE iddivisa = '$iddivisa'");
-        $resultado = $consulta->fetch_assoc();
-        $estadoDivisa = $resultado['estado'];
-        $idempresa = $resultado['idempresa'];
-
-        if($estadoDivisa == 2){ // desactivado
-            // $edicionDivisa = $this->dbp->query("UPDATE divisas SET estado = '1' WHERE id_divisas = '$id_divisas'");
-            $edicionDivisa = $this->dbc->query("UPDATE divisa
-                                                SET estado = CASE
-                                                    WHEN iddivisa = '$iddivisa' THEN 1
-                                                    ELSE 2
-                                                END
-                                                WHERE idempresa = '$idempresa';
-        ");
-
-            $res = array("success", "la divisa se activo exitosamente","activar_divisa");
-        }        
-        echo json_encode($res);
-    }
-    public function eliminar_divisa($idcaracteristica,$idempresa){
-
-            if (0 > 0) {
-                $res = array("danger", "No se puede eliminar porque hay registros en proveedor_has_material","eliminar_proveedor");
-            } else {
                 // Insertar el nuevo registro
-                $registroProveedor = $this->dbp->query("DELETE FROM caracteristicas WHERE idcaracteristicas = '$idcaracteristica'");
-                if ($registroProveedor === TRUE) {                                                                                                                                                    
-                    $res = array("ok", "se elimino exitosamente","eliminarCaracteristica");
+                $eliminar_gest_usu = $this->dbc->query("DELETE FROM gestion_por_usuario WHERE idusuario = '$idusuario' AND  idgestion = '$idgestion'");
+                if ($eliminar_gest_usu === TRUE) {                                                                                                                                                    
+                    $res = array("success", "se elimino exitosamente","eliminarCaracteristica");
                 } else {
                     $res = array("danger", "No se pudo registrar");
                 }
-            }
+            
             echo json_encode($res);
+    }
+
+    public function activar_desactivar_gestiones($id, $estado, $usuario) // usuario como md5
+    {
+        // $ide = $this->getidempresa($empresa);
+        $idusuario=$this->getidusuario($usuario);
+        $res = "";
+        
+        // $get_gestiones = $this->dbc->query("SELECT * FROM gestion_por_usuario WHERE idusuario = '$idusuario'");
+    
+        // while ($qwe = $this->dbc->fetch($get_gestiones)) {
+            $desactivar = $this->dbc->query("UPDATE gestion_por_usuario SET estado='1' WHERE idusuario = '$idusuario'");
+
+        // }
+ 
+        
+        if ($desactivar === TRUE) {       
+            $cambiar_estado = $this->dbc->query("UPDATE gestion_por_usuario SET estado='$estado' WHERE idgestion_por_usuario='$id'");                                                                                                                                             
+            $res = array("success", "se actualizo exitosamente","activar_desactivar_gestiones");
+        } else {
+            $res = array("danger", "No se pudo registrar");
+        }
+        echo json_encode($res);
+    }
+
+    public function listar_gestiones_principal($usuario) {
+        $lista = [];
+        $idusuario=$this->getidusuario($usuario);
+    
+        // Preparar la consulta
+        $get_gestiones = $this->dbc->query("SELECT * FROM gestion_por_usuario WHERE idusuario = '$idusuario'");
+    
+        while ($qwe = $this->dbc->fetch($get_gestiones)) {
+
+            $gesti = $this->dbc->query("SELECT * FROM gestion WHERE idgestion = '$qwe[idgestion]'");
+            $gst = $this->dbc->fetch($gesti);
+            $res = array(
+                "idgestion_por_usuario" => $qwe['idgestion_por_usuario'],
+                "idusuario" => $qwe['idusuario'],
+                "idgestion" => $qwe['idgestion'],
+                "estado" => $qwe['estado'],
+                "nombre" => $gst['nombre'],
+                "fecha" => $gst['fecha'],
+                "fecha_ini" => $gst['fechaini'],
+                "fecha_fin" => $gst['fechafin'],
+                "formato_transaccion" => $gst['formato_transaccion']
+            );
+            array_push($lista, $res);
+        }
+    
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
     public function getidempresa($md5)
     {
@@ -155,5 +221,10 @@ class Usuario_gestion extends DB{
         $qwe = $this->dbe->fetch($registro);
         return $qwe['idorganizacion'];
     }
+    public function getidusuario($md5){
+        $registro=$this->dbrh->query("select * from usuario where md5(idusuario)='$md5'");
+        $qwe=$this->dbrh->fetch($registro);
+        return $qwe['idusuario'];
+    } 
 }
 ?>

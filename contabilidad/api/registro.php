@@ -597,12 +597,12 @@ if($data['ver'] == "asignar_asiento_A_factura") {
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idplantilla'],$_POST['idplandecuenta'],$_POST['nombre_personalizado'],$_POST['tipo_operacion'],$_POST['orden'],$_POST['idplantilla_padre'],$_POST['negrilla_cursiva'],$_POST['empresa']));
         }
     }elseif($ver=="registrar_agrupacion_plantilla"){
-        if(isset($_POST['idplantilla_padre'],$_POST['idplantilla_hijo'],$_POST['tipo_operacion'],$_POST['monto'],$_POST['idtipo_reportes'],$_POST['idempresa'])){
+        if(isset($_POST['idplantilla_padre'],$_POST['idplantilla_hijo'],$_POST['tipo_operacion'],$_POST['monto'],$_POST['idtipo_reportes'],$_POST['idempresa'],$_POST['obtiene_desde'])){
             $cont=new PlantillaReporte();
-            $cont->registrar_agrupacion_plantilla($_POST['idplantilla_padre'],$_POST['idplantilla_hijo'],$_POST['tipo_operacion'],$_POST['monto'],$_POST['idtipo_reportes'],$_POST['idempresa']);
+            $cont->registrar_agrupacion_plantilla($_POST['idplantilla_padre'],$_POST['idplantilla_hijo'],$_POST['tipo_operacion'],$_POST['monto'],$_POST['idtipo_reportes'],$_POST['idempresa'],$_POST['obtiene_desde']);
         }
         else{
-            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idplantilla_padre'],$_POST['idplantilla_hijo'],$_POST['tipo_operacion'],$_POST['monto'],$_POST['idtipo_reportes'],$_POST['idempresa']));
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idplantilla_padre'],$_POST['idplantilla_hijo'],$_POST['tipo_operacion'],$_POST['monto'],$_POST['idtipo_reportes'],$_POST['idempresa'],$_POST['obtiene_desde']));
         }  
     }
     elseif($ver=="registrar_recibo_cobro_cajaBancos_en_facturas"){
@@ -925,7 +925,7 @@ if($data['ver'] == "asignar_asiento_A_factura") {
 // asignar asiento registrar_recibo_cobro_cajaBancos_en_otras_cuentas editar_recibo_caja_bancos registrocobrarfactura registrar_anular_eliminar_activar_factura_tributario_transaccion
 // editar_caja_bancos_facturas registrar_factura_cobro_otras_cuentas registrocobrarfactura registrar_recibo_otras_cuentas  cambiarEstado_anular_eliminar_activar_transaccion
 
-// cobro_asignacion_factura_comercial registrar_estado_resultados_admin configuracion registrar_tipo_reportes registrar_factura_recibo_pago_cajaBancos
+// cobro_asignacion_factura_comercial registrar_estado_resultados_admin configuracion registrar_tipo_reportes registrar_factura_recibo_pago_cajaBancos registrar_factura_cobros_tributario
 
 } 
 // registrar_recibo_otras_cuentas registrocobrarfacturaGrupal cobro_asignacion_factura_comercial registrar_comprobantes

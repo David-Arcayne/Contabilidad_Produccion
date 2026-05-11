@@ -790,22 +790,43 @@ elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
 }elseif($ver[0]=="listar_usuarios_por_gestion"){//listar_recibo_por_caja_bancos
     $cont=new Usuario_gestion();
     $cont->listar_usuarios_por_gestion($ver[1]);
+}elseif($ver[0]=="desvincular_gestiones_de_usuarios"){//listar_recibo_por_caja_bancos
+    $cont=new Usuario_gestion();
+    $cont->desvincular_gestiones_de_usuarios($ver[1],$ver[2]);
+}elseif($ver[0]=="activar_desactivar_gestiones"){
+    $cont=new Usuario_gestion();
+    $cont->activar_desactivar_gestiones($ver[1],$ver[2],$ver[3]);
+}elseif($ver[0]=="listar_gestiones_principal"){
+    $cont=new Usuario_gestion();
+    $cont->listar_gestiones_principal($ver[1]);
+}elseif($ver[0]=="listar_gestion_activa"){
+    $cont=new Usuario_gestion();
+    $cont->listar_gestion_activa($ver[1]);
+}elseif($ver[0]=="eliminar_registro_flujo_efectivo"){
+    $cont=new Reporte_flujo_efectivo();
+    $cont->eliminar_registro_flujo_efectivo($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
+}elseif($ver[0]=="listar_agrupacion_plantilla_flujo_efectivo"){
+    $cont=new Reporte_flujo_efectivo();
+    $cont->listar_agrupacion_plantilla_flujo_efectivo($ver[1],$ver[2],$ver[3]);
+}elseif($ver[0]=="listar_flujo_efectivo_select_otras_operaciones"){
+    $cont=new Reporte_flujo_efectivo();
+    $cont->listar_flujo_efectivo_select_otras_operaciones($ver[1]);
 }
 
-// reportedetalle  rp
-// listar_factura listar_facturas_cobro_pago  
-// listar_recibo_otras_cuentas_pagar 
+// reportedetalle  rp listar_gestiones_por_usuarios  listar_agrupacion_plantilla
+// listar_factura listar_facturas_cobro_pago  rp_eliminar_plantilla
+// listar_recibo_otras_cuentas_pagar listadegestion
 
 // lista_cobrar_cobrado_factura listar_caja_bancos
-//   listar_recibo_otras_cuentas 
+//   listar_recibo_otras_cuentas listar_tipo_reportes listar_anular_eliminar_factura
 // 
-// lista_pagar_pagado_factura listar_usuarios 
+// lista_pagar_pagado_factura listar_usuarios  listar_agrupacion_plantilla
 // reportedetallefp lista_pagar_pagado_factura
 //  listadesconsolidar listar_anular_eliminar_factura 
 //
 
 // 
-//  listar_anular_eliminar_factura 
+//  listar_anular_eliminar_factura alerta
 //  estadogestion listar_factura_comercial
 // 
 // 

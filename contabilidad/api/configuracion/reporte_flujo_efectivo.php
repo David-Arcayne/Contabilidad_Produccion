@@ -20,10 +20,14 @@ public function listar_plantilla_flujo_efectivo($idplantilla_reporte,$empresa) {
         while ($qwe = $this->dbc->fetch($get_flujo_efectivo)) {
             $res = array(
                 // "reporte" => $qwe['reporte'],
+                "idconfi_reporte_flujo_efectivo" => $qwe['idconfi_reporte_flujo_efectivo'],
                 "nombre_registro" => $qwe['nombre_registro'],
                 "nivel_registro" => $qwe['nivel_registro'],
                 "tipo_operacion" => $qwe['tipo_operacion'],
                 "negrilla_cursiva" => $qwe['negrilla_cursiva'],
+                "orden" => $qwe['orden'],
+                "obtiene_desde" => $qwe['obtiene_desde'],
+                "id_plantilla_superior" => $qwe['id_plantilla_superior'],
                 "nivel_2" => [] //activo
                 // "nivel_3" => $qwe['nombre'],// 
                 // "estado" => $qwe['estado']
@@ -51,11 +55,15 @@ public function listar_plantilla_flujo_efectivo($idplantilla_reporte,$empresa) {
             }
             $res2 = array(
                 // "reporte" => $qwe['reporte'],
+                "idconfi_reporte_flujo_efectivo" => $qwe2['idconfi_reporte_flujo_efectivo'],
                 "nombre_registro" => $qwe2['nombre_registro'],
                 "nivel_registro" => $qwe2['nivel_registro'],
                 "tipo_operacion" => $qwe2['tipo_operacion'],
                 "negrilla_cursiva" => $qwe2['negrilla_cursiva'],
+                "orden" => $qwe2['orden'],
+                "obtiene_desde" => $qwe2['obtiene_desde'],
                 "nombre_confi_reporte" => $nombre_aux,
+                "id_plantilla_superior" => $qwe2['id_plantilla_superior'],
                 "nivel_3" => [] //activo
                 // "nivel_3" => $qwe['nombre'],// 
                 // "estado" => $qwe['estado']
@@ -66,18 +74,19 @@ public function listar_plantilla_flujo_efectivo($idplantilla_reporte,$empresa) {
         array_push($lista, $res);
         }
         echo json_encode($lista, JSON_NUMERIC_CHECK);
-}
-public function reporte_estado_origen_aplicacion($gestion_ant, $gestion_act){
-    // ini_set('display_errors', 1); 
-    //     ini_set('display_startup_errors', 1);
-    //     error_reporting(E_ALL);
+    }
+    public function reporte_estado_origen_aplicacion($gestion_ant, $gestion_act){
+        // ini_set('display_errors', 1); 
+        //     ini_set('display_startup_errors', 1);
+        //     error_reporting(E_ALL);
 
-$lista_report_flujo = $this->reporte_estado_ori_apli_privado($gestion_ant, $gestion_act);
+    $lista_report_flujo = $this->reporte_estado_ori_apli_privado($gestion_ant, $gestion_act);
 
-    echo json_encode($lista_report_flujo, JSON_NUMERIC_CHECK); 
-    // echo json_encode(array($gestion_ant, $gestion_act,"hola","como"));
-}
-private function reporte_estado_ori_apli_privado($gestion_ant, $gestion_act){
+        echo json_encode($lista_report_flujo, JSON_NUMERIC_CHECK); 
+        // echo json_encode(array($gestion_ant, $gestion_act,"hola","como"));
+    }
+
+    private function reporte_estado_ori_apli_privado($gestion_ant, $gestion_act){
     // ini_set('display_errors', 1); 
     //     ini_set('display_startup_errors', 1);
     //     error_reporting(E_ALL);
@@ -886,6 +895,251 @@ $aux_string ="";
         echo json_encode($res);
     }
 
+    // public function eliminar_registro_flujo_efectivo($id){
+
+    //         if (0 > 0) {
+    //             $res = array("danger", "No se puede eliminar porque hay registros en proveedor_has_material","eliminar_proveedor");
+    //         } else {
+    //             // Insertar el nuevo registro
+    //             $registroProveedor = $this->dbp->query("DELETE FROM confi_reporte_flujo_efectivo WHERE idconfi_reporte_flujo_efectivo = '$id'");
+    //             if ($registroProveedor === TRUE) {                                                                                                                                                    
+    //                 $res = array("ok", "se elimino exitosamente","eliminarCaracteristica");
+    //             } else {
+    //                 $res = array("danger", "No se pudo registrar");
+    //             }
+    //         }
+    //         echo json_encode($res);
+    // }
+    public function eliminar_registro_flujo_efectivo($idplantilla, $idplantilla_padre, $nivel, $idplantilla_reporte, $empresa)
+    {
+        $id_empresa = $this->getidempresa($empresa);
+        // $id_empresa = $this->get_id_empresa($idempresa);
+
+        $get_plantilla = $this->dbc->query("SELECT * FROM confi_reporte_flujo_efectivo WHERE idconfi_reporte_flujo_efectivo = '$idplantilla'");
+        $get_plant = $get_plantilla->fetch_assoc();
+        if($get_plant['tipo_operacion'] == 'otras_operaciones'){
+
+            //eliminar lo que tiene dentro tambien
+            $eliminar_hijs = $this->dbc->query("DELETE FROM agrupacion_plantilla WHERE idplantilla_padre = '$idplantilla'");
+            $eliminar_hijs2 = $this->dbc->query("DELETE FROM agrupacion_plantilla WHERE idplantilla_hijo = '$idplantilla'");
+        }else{
+
+        }
+        // Eliminar el registro
+        $stmt_delete = $this->dbc->query("DELETE FROM confi_reporte_flujo_efectivo WHERE idconfi_reporte_flujo_efectivo = '$idplantilla'");
+        // $stmt_delete->bind_param("ii", $idplantilla, $id_empresa);
+        // if (!$stmt_delete->execute()) {
+        //     echo json_encode(["danger", "Error al eliminar"]);
+        //     return;
+        // }
+        // $stmt_delete->close();
+
+        // Reordenar eliminando huecos
+        $this->dbc->query("SET @rownum := 0");
+        $filtro_padre = (int)$idplantilla_padre > 0 ? "id_plantilla_superior = $idplantilla_padre": "id_plantilla_superior IS NULL";
+        $stmt_reordenar = $this->dbc->query(
+            "UPDATE confi_reporte_flujo_efectivo p
+            JOIN (
+                SELECT idconfi_reporte_flujo_efectivo, (@rownum := @rownum + 1) AS nuevo_orden
+                FROM confi_reporte_flujo_efectivo
+                WHERE idplantilla_reporte = '$idplantilla_reporte'
+                AND $filtro_padre
+                AND nivel_registro = '$nivel'
+                AND idempresa = '$id_empresa'
+                ORDER BY ISNULL(orden), orden ASC, idconfi_reporte_flujo_efectivo DESC
+            ) AS ordenado
+            ON p.idconfi_reporte_flujo_efectivo = ordenado.idconfi_reporte_flujo_efectivo
+            SET p.orden = ordenado.nuevo_orden"
+        );
+        if ($stmt_reordenar === TRUE) {                                                                                                                                                    
+            $res = array("success", "se elimino exitosamente","eliminarCaracteristica");
+        } else {
+            $res = array("danger", "No se pudo registrar");
+        }
+        // $stmt_reordenar->bind_param("iii", $idplantilla_reporte, $nivel, $id_empresa);
+        // if (!$stmt_reordenar->execute()) {
+        //     echo json_encode(["warning", "Error al reordenar"]);
+        //     return;
+        // }
+
+        echo json_encode($res);
+    }
+
+    public function editar_registro_flujo_efectivo($idplantilla, $idplandecuenta, $nombre_personalizado, $tipo_operacion, $orden, $idplantilla_padre,$negrilla_cursiva, $empresa) {
+        $idempresa = $this->getidempresa($empresa);
+            // se editara
+            $pregunta = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla = '$idplantilla'");
+            $res_pregunta = $pregunta->fetch_assoc();
+            if($orden == $res_pregunta['orden']){ //NO QUIEREN CAMBIAR EL ORDEN
+                $editar = $this->dbc->query("UPDATE pr_plantilla
+                                    SET idplandecuenta = '$idplandecuenta',
+                                    nombre_personalizado = '$nombre_personalizado',
+                                    tipo_operacion = '$tipo_operacion',
+                                    negrilla_cursiva = '$negrilla_cursiva'
+                                    WHERE idplantilla = '$idplantilla';");
+
+            }elseif($orden > $res_pregunta['orden']){ // SI QUIEREN CAMBIAR EL ORDEN
+                //EL NUEVO ORDEN ES MAYOR QUE EL ORDEN Q YA ESTA REGISTRADO
+
+                if($idplantilla_padre == ""){ //ESTE REGISTRO ES DE NIVEL 1
+                $orden_inicio = $res_pregunta['orden'] + 1;
+
+                $consulta_nivel_1 = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla_reporte = '$res_pregunta[idplantilla_reporte]' 
+                AND idempresa = '$idempresa' AND nivel = '$res_pregunta[nivel]' AND orden BETWEEN '$orden_inicio' AND '$orden' ORDER BY orden ASC");
+
+                while ($rg = $this->dbc->fetch($consulta_nivel_1)) {
+                        $nuevo_orden = $rg['orden'] - 1;
+                        $editar_orden_demas = $this->dbc->query("UPDATE pr_plantilla
+                                    SET orden = '$nuevo_orden'
+                                    WHERE idplantilla = '$rg[idplantilla]';");
+                    }
+                    $editar = $this->dbc->query("UPDATE pr_plantilla
+                                    SET orden = '$orden',
+                                    idplandecuenta = '$idplandecuenta',
+                                    nombre_personalizado = '$nombre_personalizado',
+                                    tipo_operacion = '$tipo_operacion',
+                                    negrilla_cursiva = '$negrilla_cursiva'
+                                    WHERE idplantilla = '$idplantilla';");
+
+                }else{
+                    // $consulta_nivel_2 = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla_reporte = '$res_pregunta[idplantilla_reporte]' 
+                    // AND idempresa = '$idempresa' AND nivel = '$res_pregunta[nivel]' AND idplantilla_padre ='$res_pregunta[idplantilla_padre]' ORDER BY orden ASC");
+
+                    $orden_inicio = $res_pregunta['orden'] + 1;
+
+                    $recorrer_registro = $this->dbc->query("SELECT * FROM pr_plantilla where idplantilla_reporte = '$res_pregunta[idplantilla_reporte]' 
+                    AND idempresa = '$idempresa' AND nivel = '$res_pregunta[nivel]' AND idplantilla_padre ='$res_pregunta[idplantilla_padre]' AND orden BETWEEN '$orden_inicio' AND '$orden' ORDER BY orden ASC");
+
+                    while ($rg = $this->dbc->fetch($recorrer_registro)) {
+                        $nuevo_orden = $rg['orden'] - 1;
+                        $editar_orden_demas = $this->dbc->query("UPDATE pr_plantilla
+                                    SET orden = '$nuevo_orden'
+                                    WHERE idplantilla = '$rg[idplantilla]';");
+                    }
+                    $editar = $this->dbc->query("UPDATE pr_plantilla
+                                    SET orden = '$orden',
+                                    idplandecuenta = '$idplandecuenta',
+                                    nombre_personalizado = '$nombre_personalizado',
+                                    tipo_operacion = '$tipo_operacion',
+                                    negrilla_cursiva = '$negrilla_cursiva'
+                                    WHERE idplantilla = '$idplantilla';");
+
+                }
+            }elseif($orden < $res_pregunta['orden']){ //EL ORDEN INGRESADO ES MENOR QUE EL ORDEN DEL REGISTRO Q SE EDITARA
+
+                if($idplantilla_padre == ""){ //ESTE REGISTRO ES DE NIVEL 1
+                $orden_final = $res_pregunta['orden'] - 1; //4
+
+                $consulta_nivel_1 = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla_reporte = '$res_pregunta[idplantilla_reporte]' 
+                AND idempresa = '$idempresa' AND nivel = '$res_pregunta[nivel]' AND orden BETWEEN '$orden' AND '$orden_final' ORDER BY orden ASC");
+
+                while ($rg = $this->dbc->fetch($consulta_nivel_1)) {
+                        $nuevo_orden = $rg['orden'] + 1;
+                        $editar_orden_demas = $this->dbc->query("UPDATE pr_plantilla
+                                    SET orden = '$nuevo_orden'
+                                    WHERE idplantilla = '$rg[idplantilla]';");
+                    }
+                    $editar = $this->dbc->query("UPDATE pr_plantilla
+                                    SET orden = '$orden',
+                                    idplandecuenta = '$idplandecuenta',
+                                    nombre_personalizado = '$nombre_personalizado',
+                                    tipo_operacion = '$tipo_operacion',
+                                    negrilla_cursiva = '$negrilla_cursiva'
+                                    WHERE idplantilla = '$idplantilla';");
+
+                }else{
+                    // $consulta_nivel_2 = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla_reporte = '$res_pregunta[idplantilla_reporte]' 
+                    // AND idempresa = '$idempresa' AND nivel = '$res_pregunta[nivel]' AND idplantilla_padre ='$res_pregunta[idplantilla_padre]' ORDER BY orden ASC");
+
+                    $orden_final = $res_pregunta['orden'] - 1;
+
+                    $recorrer_registro = $this->dbc->query("SELECT * FROM pr_plantilla where idplantilla_reporte = '$res_pregunta[idplantilla_reporte]' 
+                    AND idempresa = '$idempresa' AND nivel = '$res_pregunta[nivel]' AND idplantilla_padre ='$res_pregunta[idplantilla_padre]' AND orden BETWEEN '$orden' AND '$orden_final' ORDER BY orden ASC");
+
+                    while ($rg = $this->dbc->fetch($recorrer_registro)) {
+                        $nuevo_orden = $rg['orden'] + 1;
+                        $editar_orden_demas = $this->dbc->query("UPDATE pr_plantilla
+                                    SET orden = '$nuevo_orden'
+                                    WHERE idplantilla = '$rg[idplantilla]';");
+                    }
+                    $editar = $this->dbc->query("UPDATE pr_plantilla
+                                    SET orden = '$orden',
+                                    idplandecuenta = '$idplandecuenta',
+                                    nombre_personalizado = '$nombre_personalizado',
+                                    tipo_operacion = '$tipo_operacion',
+                                    negrilla_cursiva = '$negrilla_cursiva'
+                                    WHERE idplantilla = '$idplantilla';");
+
+                }
+
+            }
+            // $es_diferente_orden = $res_pregunta['orden'];
+
+            if ($editar === TRUE) {                                                                                                                                                                
+                $res = array("success", "Edición exitosa","editarCaracteristicas",$idplantilla, $idplandecuenta, $nombre_personalizado, $tipo_operacion, $orden, $idplantilla_padre, $empresa);
+            } else {
+                $res = array("danger", "No se pudo editar");
+            }
+        // }
+        echo json_encode($res);
+    }
+
+    public function listar_agrupacion_plantilla_flujo_efectivo($id_plantilla_padre,$idplantilla_reporte,$tipo_operacion){
+        $lista = [];
+        // $registro = $this->dbc->query("SELECT * FROM agrupacion_plantilla WHERE idplantilla_padre='$id_plantilla_padre'");
+        $suma_resta = $this->dbc->query("SELECT * FROM agrupacion_plantilla WHERE idplantilla_padre='$id_plantilla_padre' 
+        AND (tipo_operacion = 'sumar' || tipo_operacion = 'restar') AND idtipo_reportes = '$idplantilla_reporte'");
+
+        if($suma_resta->num_rows > 0){
+        
+            while ($row = $this->dbc->fetch($suma_resta)) { // ESTO ES DE SUMAS O RESTAS DE CUENTAS
+
+                if($tipo_operacion == 'otras_opereaciones'){
+
+                    $consul = $this->dbc->query("SELECT * FROM confi_reporte_flujo_efectivo WHERE idconfi_reporte_flujo_efectivo='$row[idplantilla_hijo]'");
+                    $nom_hij = $consul->fetch_assoc();
+                    $nombre_hijo = $nom_hij['nombre_registro'];
+                }elseif($tipo_operacion == 'operaciones_vinculacion'){
+
+                    $consul = $this->dbc->query("SELECT distinct(*) FROM balance_general_por_gestion WHERE idconfiguracion_reporte = '$row[idplantilla_hijo]' 
+                    AND idplantilla_reporte ='$idplantilla_reporte'");
+                    $nom_hij = $consul->fetch_assoc();
+                    $nombre_hijo = $nom_hij['nombre_actual'];
+                }
+
+
+                    $lista[] = [
+                        "idagrupacion_plantilla" => $row['idagrupacion_plantilla'],
+                        "idplantilla_padre"=>$row['idplantilla_padre'],
+                        "idplantilla_hijo" => $row['idplantilla_hijo'],
+                        "tipo_operacion" => $row['tipo_operacion'],
+                        "nombre" => $nombre_hijo['nombre_registro'],
+                        "monto" => $row['monto']
+                    ];
+            }
+        }else{
+            //NADA 
+        }
+            echo json_encode($lista, JSON_PRETTY_PRINT);
+        }
+
+        public function listar_flujo_efectivo_select_otras_operaciones($idplantilla_reporte) {
+        $lista = [];
+        // $idempresa = $this->getidempresa($empresa);
+    
+        // Preparar la consulta
+        $get_confi_report = $this->dbc->query("SELECT * FROM confi_reporte_flujo_efectivo WHERE idplantilla_reporte = '$idplantilla_reporte'");
+    
+        while ($qwe = $this->dbc->fetch($get_confi_report)) {
+            $res = array(
+                "idconfi_reporte_flujo_efectivo" => $qwe['idconfi_reporte_flujo_efectivo'],
+                "nombre_registro" => $qwe['nombre_registro']
+            );
+            array_push($lista, $res);
+        }
+    
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
     public function getidempresa($md5)
     {
         $registro = $this->dbe->query("select * from organizacion where md5(idorganizacion)='$md5'");
@@ -907,6 +1161,6 @@ $aux_string ="";
     //     //$res=array("id"=>,"nombre"=>$qwe['nombre']); listapagarfactura
     //     return $qwe['idgestion'];
     // } editar_registros_padres_BG
-//activo--1    pasivo --2  patrimonio---3    ingresos---4   egresos_gastos --5  orden ---6  eliminar    editar  reporte_balance_general_consolidado
+//activo--1    pasivo --2  patrimonio---3    ingresos---4   egresos_gastos --5  orden ---6  eliminar    editar  reporte_balance_general_consolidado listar_plantilla_flujo_efectivo
 }
 ?>
