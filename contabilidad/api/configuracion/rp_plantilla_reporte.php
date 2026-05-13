@@ -394,8 +394,8 @@ class PlantillaReporte extends DB{
         if($get_plant['tipo_operacion'] == 'otra_operacion'){
 
             //eliminar lo que tiene dentro tambien
-            $eliminar_hijs = $this->dbc->query("DELETE FROM agrupacion_plantilla WHERE idplantilla_padre = '$idplantilla'");
-            $eliminar_hijs2 = $this->dbc->query("DELETE FROM agrupacion_plantilla WHERE idplantilla_hijo = '$idplantilla'");
+            $eliminar_hijs = $this->dbc->query("DELETE FROM agrupacion_plantilla WHERE idplantilla_padre = '$idplantilla' AND idtipo_reportes = '$idplantilla_reporte'");
+            $eliminar_hijs2 = $this->dbc->query("DELETE FROM agrupacion_plantilla WHERE idplantilla_hijo = '$idplantilla' AND idtipo_reportes = '$idplantilla_reporte'");
         }else{
 
         }

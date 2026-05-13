@@ -814,8 +814,8 @@ elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
 }
 
 // reportedetalle  rp listar_gestiones_por_usuarios  listar_agrupacion_plantilla
-// listar_factura listar_facturas_cobro_pago  rp_eliminar_plantilla
-// listar_recibo_otras_cuentas_pagar listadegestion
+// listar_factura listar_facturas_cobro_pago  rp_eliminar_plantilla listar_select_cuentas_balance_general
+// listar_recibo_otras_cuentas_pagar listadegestion eliminar_otras_operaciones
 
 // lista_cobrar_cobrado_factura listar_caja_bancos
 //   listar_recibo_otras_cuentas listar_tipo_reportes listar_anular_eliminar_factura

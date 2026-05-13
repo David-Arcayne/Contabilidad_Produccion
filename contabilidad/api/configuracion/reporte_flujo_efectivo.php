@@ -328,7 +328,7 @@ public function registrar_plantilla_flujo_efectivo(
         $nombre_aux = $nombre_registro;
     }elseif($tipo_operacion == 'operaciones_vinculacion'){ 
 
-        if($idconfiguracion_reporte == '0'){ // el nombre_Registro  es nombre personalizado
+        if($idconfiguracion_reporte == '0' || $idconfiguracion_reporte == ''){ // el nombre_Registro  es nombre personalizado
             $nombre_aux = $nombre_registro;
         }else{// obtenemos el nombre_registro del idconfiguracion_reporte
             $conf_report = $this->dbc->query("SELECT * from configuracion_reporte 
@@ -927,16 +927,14 @@ $aux_string ="";
         }
         // Eliminar el registro
         $stmt_delete = $this->dbc->query("DELETE FROM confi_reporte_flujo_efectivo WHERE idconfi_reporte_flujo_efectivo = '$idplantilla'");
-        // $stmt_delete->bind_param("ii", $idplantilla, $id_empresa);
-        // if (!$stmt_delete->execute()) {
-        //     echo json_encode(["danger", "Error al eliminar"]);
-        //     return;
-        // }
-        // $stmt_delete->close();
 
         // Reordenar eliminando huecos
         $this->dbc->query("SET @rownum := 0");
-        $filtro_padre = (int)$idplantilla_padre > 0 ? "id_plantilla_superior = $idplantilla_padre": "id_plantilla_superior IS NULL";
+        // $filtro_padre = (int)$idplantilla_padre > 0 ? "id_plantilla_superior = $idplantilla_padre": "id_plantilla_superior IS NULL";
+        $filtro_padre = (int)$idplantilla_padre > 0 
+        ? "id_plantilla_superior = $idplantilla_padre" 
+        : "id_plantilla_superior = 0";
+
         $stmt_reordenar = $this->dbc->query(
             "UPDATE confi_reporte_flujo_efectivo p
             JOIN (
@@ -956,11 +954,6 @@ $aux_string ="";
         } else {
             $res = array("danger", "No se pudo registrar");
         }
-        // $stmt_reordenar->bind_param("iii", $idplantilla_reporte, $nivel, $id_empresa);
-        // if (!$stmt_reordenar->execute()) {
-        //     echo json_encode(["warning", "Error al reordenar"]);
-        //     return;
-        // }
 
         echo json_encode($res);
     }
@@ -981,7 +974,7 @@ $aux_string ="";
             }elseif($orden > $res_pregunta['orden']){ // SI QUIEREN CAMBIAR EL ORDEN
                 //EL NUEVO ORDEN ES MAYOR QUE EL ORDEN Q YA ESTA REGISTRADO
 
-                if($idplantilla_padre == ""){ //ESTE REGISTRO ES DE NIVEL 1
+                if($idplantilla_padre == '0'){ //ESTE REGISTRO ES DE NIVEL 1
                 $orden_inicio = $res_pregunta['orden'] + 1;
 
                 $consulta_nivel_1 = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla_reporte = '$res_pregunta[idplantilla_reporte]' 
@@ -1027,7 +1020,7 @@ $aux_string ="";
                 }
             }elseif($orden < $res_pregunta['orden']){ //EL ORDEN INGRESADO ES MENOR QUE EL ORDEN DEL REGISTRO Q SE EDITARA
 
-                if($idplantilla_padre == ""){ //ESTE REGISTRO ES DE NIVEL 1
+                if($idplantilla_padre == '0'){ //ESTE REGISTRO ES DE NIVEL 1
                 $orden_final = $res_pregunta['orden'] - 1; //4
 
                 $consulta_nivel_1 = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla_reporte = '$res_pregunta[idplantilla_reporte]' 
@@ -1085,6 +1078,9 @@ $aux_string ="";
     }
 
     public function listar_agrupacion_plantilla_flujo_efectivo($id_plantilla_padre,$idplantilla_reporte,$tipo_operacion){
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
         $lista = [];
         // $registro = $this->dbc->query("SELECT * FROM agrupacion_plantilla WHERE idplantilla_padre='$id_plantilla_padre'");
         $suma_resta = $this->dbc->query("SELECT * FROM agrupacion_plantilla WHERE idplantilla_padre='$id_plantilla_padre' 
@@ -1094,14 +1090,14 @@ $aux_string ="";
         
             while ($row = $this->dbc->fetch($suma_resta)) { // ESTO ES DE SUMAS O RESTAS DE CUENTAS
 
-                if($tipo_operacion == 'otras_opereaciones'){
+                if($tipo_operacion == 'otras_operaciones'){
 
                     $consul = $this->dbc->query("SELECT * FROM confi_reporte_flujo_efectivo WHERE idconfi_reporte_flujo_efectivo='$row[idplantilla_hijo]'");
                     $nom_hij = $consul->fetch_assoc();
                     $nombre_hijo = $nom_hij['nombre_registro'];
                 }elseif($tipo_operacion == 'operaciones_vinculacion'){
 
-                    $consul = $this->dbc->query("SELECT distinct(*) FROM balance_general_por_gestion WHERE idconfiguracion_reporte = '$row[idplantilla_hijo]' 
+                    $consul = $this->dbc->query("SELECT DISTINCT(nombre_actual) FROM balance_general_por_gestion WHERE idconfiguracion_reporte = '$row[idplantilla_hijo]' 
                     AND idplantilla_reporte ='$idplantilla_reporte'");
                     $nom_hij = $consul->fetch_assoc();
                     $nombre_hijo = $nom_hij['nombre_actual'];
@@ -1113,7 +1109,7 @@ $aux_string ="";
                         "idplantilla_padre"=>$row['idplantilla_padre'],
                         "idplantilla_hijo" => $row['idplantilla_hijo'],
                         "tipo_operacion" => $row['tipo_operacion'],
-                        "nombre" => $nombre_hijo['nombre_registro'],
+                        "nombre" => $nombre_hijo,
                         "monto" => $row['monto']
                     ];
             }
