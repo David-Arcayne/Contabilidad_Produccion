@@ -25,12 +25,12 @@ class Factura_pagos extends DB{
         return $qwe['idsucursalcontable'];
     }
 
-    public function registrar_factura_pagos_tributario($por_concepto_de,$fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento,$tipo_factura,$clasefactura,$cobro, $pagar, $espesificacion,$trans, $cliente, $empresa, $sucursal,$asiento,$idcajas_bancos,$zn,$fecha_transaccion,$cuenta,$tipo_cuenta)
+    public function registrar_factura_pagos_tributario($por_concepto_de,$fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento,$tipo_factura,$clasefactura,$cobro, $pagar, $espesificacion,$trans, $cliente, $empresa, $sucursal,$asiento,$idcajas_bancos,$zn,$fecha_transaccion,$cuenta,$tipo_cuenta,$gestion)
         {
 
             $idempresa = $this->getidempresa($empresa);
             $idsucursal = $this->getidsucursal($sucursal); 
-            $gestion = $this->getgestionactualid($idempresa);
+            // $gestion = $this->getgestionactualid($idempresa);
         
             // Establecer la zona horaria recibida
             date_default_timezone_set($zn);

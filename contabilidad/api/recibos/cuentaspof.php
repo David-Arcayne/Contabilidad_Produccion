@@ -2,7 +2,7 @@
 require_once "../../db/db.php";
 class Cuentaspof extends DB{
 
-    public function registrocobrarfactura($idfactura,$lugar, $idtransaccion,$idcaja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$concepto,$archivo,$zn,$fecha_transaccion,$cuenta,$tipo_cuenta)
+    public function registrocobrarfactura($idfactura,$lugar, $idtransaccion,$idcaja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$concepto,$archivo,$zn,$fecha_transaccion,$cuenta,$tipo_cuenta,$idgestion)
     {
         // echo json_encode(array($idfactura,$lugar, $idtransaccion,$idcaja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$concepto,$archivo,$zn));
 
@@ -24,8 +24,8 @@ class Cuentaspof extends DB{
         $res = "";
         $sucursal = $this->getidsucursal($sucursal);
         $ide = $this->getidempresa($empresa);
-         $gestion = $this->getgestionactualC($empresa);
-        $idgestion = $gestion["id"];
+        //  $gestion = $this->getgestionactualC($empresa);
+        // $idgestion = $gestion["id"];
 
         $recibo_trans = $this->dbc->query("SELECT count(*) AS cant1 FROM cuentaspof cp 
         INNER JOIN transacciones t ON t.idtransacciones=cp.transaccion 

@@ -26,7 +26,7 @@ class Caja_bancos_contrataciones extends DB{
         return $qwe['idgestion'];
     }
 
-    public function cobrar_contratacion_con_factura_cajaBancos($idotras_cuentas,$por_concepto_de,$fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento,$clasefactura,$cobro, $pagar, $espesificacion,$trans, $cliente, $empresa, $cuenta,  $sucursal,$asiento,$idcaja_bancos,$archivo,$registro_desde)
+    public function cobrar_contratacion_con_factura_cajaBancos($idotras_cuentas,$por_concepto_de,$fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento,$clasefactura,$cobro, $pagar, $espesificacion,$trans, $cliente, $empresa, $cuenta,  $sucursal,$asiento,$idcaja_bancos,$archivo,$registro_desde,$gestion)
         {
 
         ini_set('display_errors', 1);
@@ -35,7 +35,7 @@ class Caja_bancos_contrataciones extends DB{
 
         $idsucursal = $this->getidsucursal($sucursal);
         $idempresa = $this->getidempresa($empresa);
-        $gestion = $this->getgestionactualid($idempresa);
+        // $gestion = $this->getgestionactualid($idempresa);
         $co = 0;
         $pa = 0;
         if ($cobro == 1 || $cobro == 2) {

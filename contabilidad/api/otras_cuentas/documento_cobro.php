@@ -9,7 +9,7 @@ class Documento_cobro extends DB{ //          idtransaccion, asiento,fecha, id_c
         // echo json_encode(array($fecha,$lugar,$cliente,$nro_tributario,$contacto,$nro_doc_identidad,$idtipo,$condiciones,$observaciones,$precio,$forma_pago,$empresa)); 
         $idsucursal = $this->getidsucursal($sucursal);
         $idempresa = $this->getidempresa($empresa);
-        $gestion = $this->getgestionactualid($idempresa);
+        // $gestion = $this->getgestionactualid($idempresa);
         
     
         // $idempresa = $this->getidempresa($empresa);
@@ -981,7 +981,7 @@ while ($qwe = $this->dbc->fetch($registro)) {
     
         $idempresa = $this->getidempresa($data['idempresa']);
         $idsucursal = $this->getidsucursal($data['idsucursal']); 
-        $gestion = $this->getgestionactualid($idempresa);
+        // $gestion = $this->getgestionactualid($idempresa);
     
         if($data['idasientotipo'] != ""){
                 
@@ -995,7 +995,7 @@ while ($qwe = $this->dbc->fetch($registro)) {
             $tipo_trans = $this->dbc->query("SELECT * FROM tipotransaccion WHERE idtipotransaccion='$at[tipo]'");
             $tt = $tipo_trans->fetch_assoc();
 
-            $gestion_sel = $this->dbc->query("SELECT * FROM gestion WHERE idgestion='$gestion'");
+            $gestion_sel = $this->dbc->query("SELECT * FROM gestion WHERE idgestion='$data[idgestion]'");
             $gc = $gestion_sel->fetch_assoc();
 
             if($gc['formato_transaccion'] == 'por_tipo_mes') {
@@ -1009,12 +1009,12 @@ while ($qwe = $this->dbc->fetch($registro)) {
                         FROM transacciones
                         WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]'
                         AND fechatransaccion BETWEEN '$fecha_inicio' AND '$fecha_fin'
-                        AND idgestion = '$gestion'
+                        AND idgestion = '$data[idgestion]'
                         AND organizacion_idorganizacion = '$idempresa'
                     )
                     AND t.tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]'
                     AND t.fechatransaccion BETWEEN '$fecha_inicio' AND '$fecha_fin'
-                    AND t.idgestion = '$gestion'
+                    AND t.idgestion = '$data[idgestion]'
                     AND t.organizacion_idorganizacion = '$idempresa';
                 ");
             } elseif($gc['formato_transaccion'] == 'por_tipo_gestion') {
@@ -1024,8 +1024,8 @@ while ($qwe = $this->dbc->fetch($registro)) {
                     WHERE t.codigotransaccion = ( 
                     SELECT MAX(codigotransaccion) 
                     FROM transacciones 
-                    WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]' AND idgestion = '$gestion' AND organizacion_idorganizacion = '$idempresa') 
-                    AND t.tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]' AND t.idgestion = '$gestion' AND t.organizacion_idorganizacion = '$idempresa';
+                    WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]' AND idgestion = '$data[idgestion]' AND organizacion_idorganizacion = '$idempresa') 
+                    AND t.tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]' AND t.idgestion = '$data[idgestion]' AND t.organizacion_idorganizacion = '$idempresa';
                 ");
             } else { // POR_GESTION
                 $nroTransa = $this->dbc->query("
@@ -1037,10 +1037,10 @@ while ($qwe = $this->dbc->fetch($registro)) {
                         SELECT MAX(codigotransaccion)
                         FROM transacciones
                         WHERE organizacion_idorganizacion = '$idempresa'
-                        AND idgestion = '$gestion'
+                        AND idgestion = '$data[idgestion]'
                     )
                     AND t.organizacion_idorganizacion = '$idempresa'
-                    AND t.idgestion = '$gestion';
+                    AND t.idgestion = '$data[idgestion]';
                 ");
             }
 
@@ -1050,7 +1050,7 @@ while ($qwe = $this->dbc->fetch($registro)) {
         if($data['fecha'] >= $resultado122['fechatransaccion']){
         // Insertar en transacciones
         $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion, fechatransaccion, tipodecambio, ndocumento, glosa, consolidar,estado, tipotransaccion_idtipotransaccion, organizacion_idorganizacion, sucursal, idgestion) 
-        VALUES ('$nroTransaccion', '{$data['fecha']}', '1', '0', '{$data['glosa']}', '1','1', '$tt[idtipotransaccion]', '$idempresa', '$idsucursal', '$gestion')");
+        VALUES ('$nroTransaccion', '{$data['fecha']}', '1', '0', '{$data['glosa']}', '1','1', '$tt[idtipotransaccion]', '$idempresa', '$idsucursal', '$data[idgestion]')");
     
         // Obtener el ID del registro recién insertado
         $idtransaccion = $this->dbc->insert_id;

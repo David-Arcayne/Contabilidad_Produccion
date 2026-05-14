@@ -1,6 +1,6 @@
 <?php
 session_start();
-//require_once "db.php";
+//require_once "db.php"; gestion
 require_once "../../db/db.php";
 class Filtrado_facturas extends DB{
     public function listar_facturas_cobros_sin_transaccion($cobrado,$cadena_cajaBancos,$empresa) {

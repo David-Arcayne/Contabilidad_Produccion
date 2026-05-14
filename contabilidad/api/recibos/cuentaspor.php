@@ -2,7 +2,7 @@
 require_once "../../db/db.php";
 class Cuentaspor extends DB{
 
-    public function registropagarfactura($idfactura,$lugar, $idtransaccion,$idcaja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$concepto,$archivo,$zn,$fecha_transaccion,$cuenta,$tipo_cuenta)
+    public function registropagarfactura($idfactura,$lugar, $idtransaccion,$idcaja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$concepto,$archivo,$zn,$fecha_transaccion,$cuenta,$tipo_cuenta,$idgestion)
     {
         // ini_set('display_errors', 1);
         // ini_set('display_startup_errors', 1);
@@ -23,8 +23,8 @@ class Cuentaspor extends DB{
         $sucursal = $this->getidsucursal($sucursal);
         $ide = $this->getidempresa($empresa);
 
-        $gestion = $this->getgestionactualC($empresa);
-        $idgestion = $gestion["id"];
+        // $gestion = $this->getgestionactualC($empresa);
+        // $idgestion = $gestion["id"];
 
         $recibo_trans = $this->dbc->query("SELECT count(*) AS cant1 FROM cuentaspor cp 
         INNER JOIN transacciones t ON t.idtransacciones=cp.transaccion 

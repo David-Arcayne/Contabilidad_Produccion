@@ -1,6 +1,6 @@
 <?php
 require_once "../../db/db.php";
-// require_once "../configuracion/empresa.php"; ini_set
+// require_once "../configuracion/empresa.php"; ini_set gestion
 
 class Tipo_cliente_comercial extends DB{
     public function registrar_tipo_cliente($tipo, $descripcion, $estado, $empresa)

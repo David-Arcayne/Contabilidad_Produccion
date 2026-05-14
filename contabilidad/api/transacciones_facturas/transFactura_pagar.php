@@ -37,7 +37,7 @@ class TransFactura_pagar extends DB{
     }
 
     // public function registrocobrarfactura($idfactura, $idtransaccion, $idcuenta, $fecha, $nrecibo, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa)
-    public function registropagarfacturaGrupal($fecha,$persona,$ci,$monto,$idasientotipo,$idtransaccion,$idcaja_bancos,$empresa,$sucursal,$archivo,$data,$zn,$glosa)
+    public function registropagarfacturaGrupal($fecha,$persona,$ci,$monto,$idasientotipo,$idtransaccion,$idcaja_bancos,$empresa,$sucursal,$archivo,$data,$zn,$glosa,$gestion)
     {
         // echo json_encode($data);
         // ini_set('display_errors', 1);
@@ -63,7 +63,7 @@ class TransFactura_pagar extends DB{
         // echo json_encode(array($fecha,$nrecibo,$persona,$ci,$monto,$idasientotipo,$empresa,$sucursal,$archivo,$facturas));
         $ide = $this->getidempresa($empresa);
         $idsucursal = $this->getidsucursal($sucursal); 
-        $gestion = $this->getgestionactualid($ide);
+        // $gestion = $this->getgestionactualid($ide);
 
         $recibo_trans = $this->dbc->query("SELECT count(*) AS cant1 FROM cuentaspor cp 
         INNER JOIN transacciones t ON t.idtransacciones=cp.transaccion 
@@ -526,14 +526,14 @@ public function listapagos_individuales($idfactura)
 
         echo json_encode($lista);
     }
-    public function registrar_transaccion_recibo_pago($idRecibo,$fecha,$monto,$glosa, $asiento,$idtransaccion,$empresa,$sucursal){
+    public function registrar_transaccion_recibo_pago($idRecibo,$fecha,$monto,$glosa, $asiento,$idtransaccion,$empresa,$sucursal,$gestion){
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
         
         $ide = $this->getidempresa($empresa);
         $sucursal = $this->getidsucursal($sucursal);
-        $gestion = $this->getgestionactualid($ide);
+        // $gestion = $this->getgestionactualid($ide);
 
         if ($asiento != "" && $idtransaccion == "") {
             // Construir rango dinámico (primer y último día del mes)

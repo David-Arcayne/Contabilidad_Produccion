@@ -4,11 +4,11 @@ session_start();
 require_once "../../db/db.php";
 class Anulacion_transaccion extends DB{
 
-    public function listar_anular_eliminar_transaccion($empresa,$todos) {
+    public function listar_anular_eliminar_transaccion($empresa,$todos,$idgestion) {
         $lista = [];
          $ide = $this->getidempresa($empresa);
-        $gestion = $this->getgestionactualC($empresa);
-        $idgestion = $gestion["id"];
+        // $gestion = $this->getgestionactualC($empresa);
+        // $idgestion = $gestion["id"];
         // Consulta SQL
         if($todos == '0'){ // solo de la gestion activa
             $sql =$this->dbc->query("SELECT * FROM solicitud_anular_eliminar s
@@ -63,7 +63,7 @@ class Anulacion_transaccion extends DB{
 }      
 // ----------------------------------------------------------------------
 
-public function registrar_anular_eliminar_activar_transaccion($idtransaccion,$motivo,$estado_opci,$estado_soli,$hora,$fecha,$usuario,$empresa)
+public function registrar_anular_eliminar_activar_transaccion($idtransaccion,$motivo,$estado_opci,$estado_soli,$hora,$fecha,$usuario,$empresa,$idgestion)
     {
         //estado_opci --> 1--> anular, 2--> eliminar, 3--> activar
         // estado_soli --> 1 = pendiente, 2= aceptado, 3=denegado
@@ -74,8 +74,8 @@ public function registrar_anular_eliminar_activar_transaccion($idtransaccion,$mo
         //CASO I --> vacio SI,  consolidado NO 
         $idusuario=$this->getidusuario($usuario);
         $idempresa=$this->getidempresa($empresa);
-        $gestion = $this->getgestionactualC($empresa);
-        $idgestion = $gestion["id"];
+        // $gestion = $this->getgestionactualC($empresa);
+        // $idgestion = $gestion["id"];
         $res = "";
         $registro=$this->dbc->query("INSERT INTO solicitud_anular_eliminar(transacciones_idtransacciones,motivo,estado_opcion,estado_solicitud,hora,fecha,idusuario,idempresa,idgestion)
         VALUES('$idtransaccion','$motivo','$estado_opci','$estado_soli','$hora','$fecha','$idusuario','$idempresa','$idgestion')");

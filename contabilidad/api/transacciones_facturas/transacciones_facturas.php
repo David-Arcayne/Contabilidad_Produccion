@@ -43,7 +43,7 @@ class Transacciones_facturas extends DB{
     
         $idempresa = $this->getidempresa($data['idempresa']);
         $idsucursal = $this->getidsucursal($data['idsucursal']); 
-        $gestion = $this->getgestionactualid($idempresa);
+        // $gestion = $this->getgestionactualid($idempresa);
     
         if($data['idasientotipo'] != ""){
             
@@ -57,7 +57,7 @@ class Transacciones_facturas extends DB{
             $tipo_trans = $this->dbc->query("SELECT * FROM tipotransaccion WHERE idtipotransaccion='$at[tipo]'");
             $tt = $tipo_trans->fetch_assoc();
 
-            $gestion_sel = $this->dbc->query("SELECT * FROM gestion WHERE idgestion='$gestion'");
+            $gestion_sel = $this->dbc->query("SELECT * FROM gestion WHERE idgestion='$data[idgestion]'");
             $gc = $gestion_sel->fetch_assoc();
 
             if($gc['formato_transaccion'] == 'por_tipo_mes') {
@@ -71,12 +71,12 @@ class Transacciones_facturas extends DB{
                         FROM transacciones
                         WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]'
                         AND fechatransaccion BETWEEN '$fecha_inicio' AND '$fecha_fin'
-                        AND idgestion = '$gestion'
+                        AND idgestion = '$data[idgestion]'
                         AND organizacion_idorganizacion = '$idempresa'
                     )
                     AND t.tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]'
                     AND t.fechatransaccion BETWEEN '$fecha_inicio' AND '$fecha_fin'
-                    AND t.idgestion = '$gestion'
+                    AND t.idgestion = '$data[idgestion]'
                     AND t.organizacion_idorganizacion = '$idempresa';
                 ");
             } elseif($gc['formato_transaccion'] == 'por_tipo_gestion') {
@@ -86,8 +86,8 @@ class Transacciones_facturas extends DB{
                     WHERE t.codigotransaccion = ( 
                     SELECT MAX(codigotransaccion) 
                     FROM transacciones 
-                    WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]' AND idgestion = '$gestion' AND organizacion_idorganizacion = '$idempresa') 
-                    AND t.tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]' AND t.idgestion = '$gestion' AND t.organizacion_idorganizacion = '$idempresa';
+                    WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]' AND idgestion = '$data[idgestion]' AND organizacion_idorganizacion = '$idempresa') 
+                    AND t.tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]' AND t.idgestion = '$data[idgestion]' AND t.organizacion_idorganizacion = '$idempresa';
                 ");
             } else { // POR_GESTION
                 $nroTransa = $this->dbc->query("
@@ -99,10 +99,10 @@ class Transacciones_facturas extends DB{
                         SELECT MAX(codigotransaccion)
                         FROM transacciones
                         WHERE organizacion_idorganizacion = '$idempresa'
-                        AND idgestion = '$gestion'
+                        AND idgestion = '$data[idgestion]'
                     )
                     AND t.organizacion_idorganizacion = '$idempresa'
-                    AND t.idgestion = '$gestion';
+                    AND t.idgestion = '$data[idgestion]';
                 ");
             }
 
@@ -113,7 +113,7 @@ class Transacciones_facturas extends DB{
         if($data['fecha'] >= $resultado122['fechatransaccion']){
             // Insertar en transacciones
         $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion, fechatransaccion, tipodecambio, ndocumento, glosa, consolidar,estado, tipotransaccion_idtipotransaccion, organizacion_idorganizacion, sucursal, idgestion) 
-        VALUES ('$nroTransaccion', '{$data['fecha']}', '1', '0', '{$data['glosa']}', '1','1', '$tt[idtipotransaccion]', '$idempresa', '$idsucursal', '$gestion')");
+        VALUES ('$nroTransaccion', '{$data['fecha']}', '1', '0', '{$data['glosa']}', '1','1', '$tt[idtipotransaccion]', '$idempresa', '$idsucursal', '$data[idgestion]')");
     
         // Obtener el ID del registro recién insertado
         $idtrans = $this->dbc->insert_id;
@@ -217,7 +217,7 @@ class Transacciones_facturas extends DB{
         echo json_encode($res);
     }
 
-    public function registrocobrarfacturaGrupal($fecha,$persona,$ci,$monto,$idtransaccion,$idcaja_bancos,$idasientotipo,$idempresa,$idsucursal,$archivo,$data,$zn,$glosa)
+    public function registrocobrarfacturaGrupal($fecha,$persona,$ci,$monto,$idtransaccion,$idcaja_bancos,$idasientotipo,$idempresa,$idsucursal,$archivo,$data,$zn,$glosa,$gestion)
     {
     if($idcaja_bancos == ""){
 // NO PASARA NADA
@@ -242,7 +242,7 @@ class Transacciones_facturas extends DB{
 
         $ide = $this->getidempresa($idempresa);
         $sucursal = $this->getidsucursal($idsucursal); 
-        $gestion = $this->getgestionactualid($ide);
+        // $gestion = $this->getgestionactualid($ide);
         
         $recibo_trans = $this->dbc->query("SELECT count(*) AS cant1 FROM cuentaspof cp 
         INNER JOIN transacciones t ON t.idtransacciones=cp.transaccion 
@@ -466,14 +466,14 @@ class Transacciones_facturas extends DB{
         }
         echo json_encode($res);
     }
-    public function registrar_transaccion_recibo($idRecibo,$fecha,$monto,$glosa, $asiento,$idtransaccion,$empresa,$sucursal){
+    public function registrar_transaccion_recibo($idRecibo,$fecha,$monto,$glosa, $asiento,$idtransaccion,$empresa,$sucursal,$gestion){
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
         
         $ide = $this->getidempresa($empresa);
         $sucursal = $this->getidsucursal($sucursal);
-        $gestion = $this->getgestionactualid($ide);
+        // $gestion = $this->getgestionactualid($ide);
 
         if ($asiento != "" && $idtransaccion == "") {
 

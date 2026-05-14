@@ -614,10 +614,10 @@ class PlantillaReporte extends DB{
         }
     }
 
-    public function obtener_datos_reporte($fecha_ini, $fecha_fin, $idplantilla_reporte, $idempresa)
+    public function obtener_datos_reporte($fecha_ini, $fecha_fin, $idplantilla_reporte, $idempresa,$id_gestion)
     {
         $id_empresa = $this->get_id_empresa($idempresa);
-        $id_gestion = $this->get_id_gestion($idempresa);
+        // $id_gestion = $this->get_id_gestion($idempresa);
         // Paso 1: obtener todos los registros de pr_plantilla en una sola consulta
         $stmt = $this->dbc->prepare(
             "SELECT * FROM pr_plantilla 
@@ -719,7 +719,7 @@ class PlantillaReporte extends DB{
         echo json_encode($lista, JSON_PRETTY_PRINT);
     }
 
-    private function reporte_estado_resultados_actualizado($idplantilla_reporte,$fecha_ini,$fecha_fin,$empresa) {
+    private function reporte_estado_resultados_actualizado($idplantilla_reporte,$fecha_ini,$fecha_fin,$empresa,$gestion) {
         //    ini_set('display_errors', 1); 
         // ini_set('display_startup_errors', 1);
         // error_reporting(E_ALL);
@@ -727,7 +727,7 @@ class PlantillaReporte extends DB{
         // $lista = [];
         $idempresa = $this->get_id_empresa($empresa);
         // $gestion = $this->getidgestion($empresa);
-    $gestion = $this->get_id_gestion($empresa);
+    // $gestion = $this->get_id_gestion($empresa);
         $lista_aux_buscador = [];
         $lista =[];
         // $tipo_report = $this->dbc->query("SELECT * FROM tipo_reportes WHERE idempresa = '$idempresa' AND tipo_reporte = 'estado_resultado'");
@@ -866,7 +866,8 @@ class PlantillaReporte extends DB{
                 $calc_otr_rep['idtipo_reporte_referencia'],   // REPORTE DE REFERENCIA
                 $fecha_ini,
                 $fecha_fin,
-                $empresa
+                $empresa,
+                $gestion
             );
 
                  if($total_otro_reporte < '0'){
@@ -1183,7 +1184,7 @@ class PlantillaReporte extends DB{
         return $valor_total;
     }
 
-    private function reporte_calculo_otro_reporte($idplantilla_reporte,$fecha_ini,$fecha_fin,$empresa) {
+    private function reporte_calculo_otro_reporte($idplantilla_reporte,$fecha_ini,$fecha_fin,$empresa,$gestion) {
         //    ini_set('display_errors', 1); 
         // ini_set('display_startup_errors', 1);
         // error_reporting(E_ALL);
@@ -1191,7 +1192,7 @@ class PlantillaReporte extends DB{
         // $lista = [];
         $idempresa = $this->get_id_empresa($empresa);
         // $gestion = $this->getidgestion($empresa);
-    $gestion = $this->get_id_gestion($empresa);
+    // $gestion = $this->get_id_gestion($empresa);
         $lista_aux_buscador = [];
         $lista =[];
         // $tipo_report = $this->dbc->query("SELECT * FROM tipo_reportes WHERE idempresa = '$idempresa' AND tipo_reporte = 'estado_resultado'");
@@ -1588,7 +1589,7 @@ class PlantillaReporte extends DB{
         // echo json_encode($valor_encontrado, JSON_NUMERIC_CHECK);
     }
 
-    private function reporte_calculo_otro_reporte_consolidado($idplantilla_reporte,$fecha_ini,$fecha_fin,$empresa) {
+    private function reporte_calculo_otro_reporte_consolidado($idplantilla_reporte,$fecha_ini,$fecha_fin,$empresa,$gestion) {
         //    ini_set('display_errors', 1); 
         // ini_set('display_startup_errors', 1);
         // error_reporting(E_ALL);
@@ -1596,7 +1597,7 @@ class PlantillaReporte extends DB{
         // $lista = [];
         $idempresa = $this->get_id_empresa($empresa);
         // $gestion = $this->getidgestion($empresa);
-    $gestion = $this->get_id_gestion($empresa);
+    // $gestion = $this->get_id_gestion($empresa);
         $lista_aux_buscador = [];
         $lista =[];
         // $tipo_report = $this->dbc->query("SELECT * FROM tipo_reportes WHERE idempresa = '$idempresa' AND tipo_reporte = 'estado_resultado'");
@@ -2100,7 +2101,7 @@ class PlantillaReporte extends DB{
         echo json_encode($lista);
     }
 
-    private function reporte_estado_resultados_actualizado_consolidado($idplantilla_reporte,$fecha_ini,$fecha_fin,$empresa) {
+    private function reporte_estado_resultados_actualizado_consolidado($idplantilla_reporte,$fecha_ini,$fecha_fin,$empresa,$gestion) {
         //    ini_set('display_errors', 1); 
         // ini_set('display_startup_errors', 1);
         // error_reporting(E_ALL);
@@ -2108,7 +2109,7 @@ class PlantillaReporte extends DB{
         // $lista = []; 
         $idempresa = $this->get_id_empresa($empresa);
         // $gestion = $this->getidgestion($empresa);
-    $gestion = $this->get_id_gestion($empresa);
+    // $gestion = $this->get_id_gestion($empresa);
         $lista_aux_buscador = [];
         $lista =[];
         // $tipo_report = $this->dbc->query("SELECT * FROM tipo_reportes WHERE idempresa = '$idempresa' AND tipo_reporte = 'estado_resultado'");
@@ -2209,7 +2210,8 @@ class PlantillaReporte extends DB{
                 $calc_otr_rep['idtipo_reporte_referencia'],   // REPORTE DE REFERENCIA
                 $fecha_ini,
                 $fecha_fin,
-                $empresa
+                $empresa,
+                $gestion
             );
 
                  if($total_otro_reporte < '0'){
@@ -2620,13 +2622,15 @@ class PlantillaReporte extends DB{
         $fecha_ini,
         $fecha_fin,
         $empresa,
-        $maxProfundidad
+        $maxProfundidad,
+        $gestion
     ) {
         $array = $this->reporte_estado_resultados_actualizado(
             $idplantilla_reporte,
             $fecha_ini,
             $fecha_fin,
-            $empresa
+            $empresa,
+            $gestion
         );
 
         $limpiar = function (&$items) use (&$limpiar, $maxProfundidad) {
@@ -2669,13 +2673,15 @@ class PlantillaReporte extends DB{
         $fecha_ini,
         $fecha_fin,
         $empresa,
-        $maxProfundidad
+        $maxProfundidad,
+        $gestion
     ) {
         $array = $this->reporte_estado_resultados_actualizado_consolidado(
             $idplantilla_reporte,
             $fecha_ini,
             $fecha_fin,
-            $empresa
+            $empresa,
+            $gestion
         );
 
     //     $array = array_filter( 

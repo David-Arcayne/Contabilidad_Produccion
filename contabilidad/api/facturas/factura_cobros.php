@@ -24,12 +24,12 @@ class Factura_cobros extends DB{
         $qwe = $this->dbe->fetch($registro);
         return $qwe['idsucursalcontable'];
     }
-    public function registrar_factura_cobros_tributario($por_concepto_de,$fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento,$tipo_factura,$clasefactura,$cobro, $pagar, $espesificacion,$trans, $cliente, $empresa, $sucursal,$asiento,$idcajas_bancos,$zn,$fecha_transaccion,$cuenta,$tipo_cuenta)
+    public function registrar_factura_cobros_tributario($por_concepto_de,$fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento,$tipo_factura,$clasefactura,$cobro, $pagar, $espesificacion,$trans, $cliente, $empresa, $sucursal,$asiento,$idcajas_bancos,$zn,$fecha_transaccion,$cuenta,$tipo_cuenta,$gestion)
     {
 
         $idempresa = $this->getidempresa($empresa);
         $idsucursal = $this->getidsucursal($sucursal); 
-        $gestion = $this->getgestionactualid($idempresa);
+        // $gestion = $this->getgestionactualid($idempresa);
     
         // Establecer la zona horaria recibida
         date_default_timezone_set($zn);
@@ -632,7 +632,7 @@ class Factura_cobros extends DB{
         echo json_encode($lista);
     }
 
-    public function registrar_anular_eliminar_activar_factura_caja_bancos($id_documento,$tipo_documento,$registro_desde,$motivo,$estado_opci,$estado_soli,$hora,$fecha,$usuario,$empresa)
+    public function registrar_anular_eliminar_activar_factura_caja_bancos($id_documento,$tipo_documento,$registro_desde,$motivo,$estado_opci,$estado_soli,$hora,$fecha,$usuario,$empresa,$idgestion)
     { // EN ESTA API LA FACTURA Y EL COMPROBANTE SE ANULAN, ELIMINAN Y ACTIVAN AL MISMO TIEMPO, PORQUE FUERON CREADO JUNTOS
 
         //estado_opci --> 1--> anular, 2--> eliminar, 3--> activar
@@ -644,8 +644,8 @@ class Factura_cobros extends DB{
         //CASO I --> vacio SI,  consolidado NO 
         $idusuario=$this->getidusuario($usuario);
         $idempresa=$this->getidempresa($empresa);
-        $gestion = $this->getgestionactualC($empresa);
-        $idgestion = $gestion["id"];
+        // $gestion = $this->getgestionactualC($empresa);
+        // $idgestion = $gestion["id"];
         $res = "";
 
         if($tipo_documento == 'factura'){ // ES FACTURA
@@ -1010,15 +1010,15 @@ class Factura_cobros extends DB{
         
         }
 
-public function listar_anular_eliminar_factura($empresa, $todos) {
+public function listar_anular_eliminar_factura($empresa, $todos,$idgestion) {
     // ini_set('display_errors', 1);
     // ini_set('display_startup_errors', 1);
     // error_reporting(E_ALL);
 
     $lista = [];
     $ide = $this->getidempresa($empresa);
-    $gestion = $this->getgestionactualC($empresa);
-    $idgestion = $gestion["id"];
+    // $gestion = $this->getgestionactualC($empresa);
+    // $idgestion = $gestion["id"];
 
     // Consulta SQL
     if ($todos == '0') { // solo de la gestion activa
@@ -1194,7 +1194,7 @@ public function listar_anular_eliminar_factura($empresa, $todos) {
     echo json_encode($lista);
 }
 
-public function registrar_anular_eliminar_activar_factura_tributario_transaccion($id_documento,$registro_desde,$motivo,$estado_opci,$estado_soli,$hora,$fecha,$usuario,$empresa)
+public function registrar_anular_eliminar_activar_factura_tributario_transaccion($id_documento,$registro_desde,$motivo,$estado_opci,$estado_soli,$hora,$fecha,$usuario,$empresa,$idgestion)
     { // EN ESTA API LA FACTURA Y EL COMPROBANTE SE ANULAN, ELIMINAN Y ACTIVAN AL MISMO TIEMPO, PORQUE FUERON CREADO JUNTOS
 
     // ini_set('display_errors', 1);
@@ -1209,8 +1209,8 @@ public function registrar_anular_eliminar_activar_factura_tributario_transaccion
         //CASO I --> vacio SI,  consolidado NO 
         $idusuario=$this->getidusuario($usuario);
         $idempresa=$this->getidempresa($empresa);
-        $gestion = $this->getgestionactualC($empresa);
-        $idgestion = $gestion["id"];
+        // $gestion = $this->getgestionactualC($empresa);
+        // $idgestion = $gestion["id"];
         $res = "";
 
         $factura_recibo_tipo = $this->dbc->query("SELECT * FROM factura WHERE idfactura = '$id_documento'");
@@ -1491,7 +1491,7 @@ public function registrar_anular_eliminar_activar_factura_tributario_transaccion
         
         }
 
-        public function registrar_anular_eliminar_activar_comprobante_tributario_transaccion($id_documento,$tipo_documento,$registro_desde,$motivo,$estado_opci,$estado_soli,$hora,$fecha,$usuario,$empresa)
+        public function registrar_anular_eliminar_activar_comprobante_tributario_transaccion($id_documento,$tipo_documento,$registro_desde,$motivo,$estado_opci,$estado_soli,$hora,$fecha,$usuario,$empresa,$idgestion)
     { // EN ESTA API LA FACTURA Y EL COMPROBANTE SE ANULAN, ELIMINAN Y ACTIVAN AL MISMO TIEMPO, PORQUE FUERON CREADO JUNTOS
 
     // ini_set('display_errors', 1);
@@ -1506,8 +1506,8 @@ public function registrar_anular_eliminar_activar_factura_tributario_transaccion
         //CASO I --> vacio SI,  consolidado NO 
         $idusuario=$this->getidusuario($usuario);
         $idempresa=$this->getidempresa($empresa);
-        $gestion = $this->getgestionactualC($empresa);
-        $idgestion = $gestion["id"];
+        // $gestion = $this->getgestionactualC($empresa);
+        // $idgestion = $gestion["id"];
         $res = "";
 
         $factura_recibo_tipo = $this->dbc->query("SELECT * FROM factura WHERE idfactura = '$id_documento'");
@@ -1729,75 +1729,4 @@ public function getusuario($id) {
     ];
 }
 
-    // public function anular_factura($idfactura,$tipo_factura) {
-    //     // $idempresa = $this->getidempresa($empresa);
-
-    //         // ANULAR LA FACTURA
-    //         $anular_factura = $this->dbc->query("UPDATE factura
-    //                                 SET estado = '2'
-    //                                 WHERE idfactura = '$idfactura';");
-
-    //         if ($anular_factura === TRUE) {     
-    //             $consulta1 = $this->dbc->query("SELECT * FROM cuentaspof WHERE idfactura = '$idfactura'");
-    //             $resultado1 = $consulta1->fetch_assoc();
-    //             $total_cobros = $resultado1['total'];
-
-    //             $consulta2 = $this->dbc->query("SELECT * FROM cuentaspor WHERE idfactura = '$idfactura'");
-    //             $resultado2 = $consulta2->fetch_assoc();
-    //             $total_pagos = $resultado2['total'];
-
-    //     if($total_cobros > 0){
-    //         $anular_comprobante = $this->dbc->query("UPDATE cuentaspof
-    //                                 SET estado = '2'
-    //                                 WHERE idfactura = '$idfactura';");
-    //     }elseif($total_pagos > 0){
-    //         $anular_comprobante = $this->dbc->query("UPDATE cuentaspor
-    //                                 SET estado = '2'
-    //                                 WHERE idfactura = '$idfactura';");
-    //     }else{
-    //         // SOLO SE ANULARA LAS FACTURA PORQUE NO TIENE COMPROBANTE ASIGNADO
-    //     }
-    //             $res = array("success", "Edición exitosa","editarCaracteristicas");
-    //         } else {
-    //             $res = array("danger", "No se pudo editar");
-    //         }
-
-    //     echo json_encode($res);
-    // }
-
-    // public function anular_recibo($idrecibo,$tipo_factura) {
-    //     // $idempresa = $this->getidempresa($empresa);
-
-    //         // ANULAR LA RECIBO
-    //         $anular_recibo = $this->dbc->query("UPDATE recibo
-    //                                 SET estado = '2'
-    //                                 WHERE idrecibo = '$idrecibo';");
-
-    //         if ($anular_recibo === TRUE) {     
-    //             $consulta1 = $this->dbc->query("SELECT * FROM cuentaspof WHERE idrecibo = '$idrecibo'");
-    //             $resultado1 = $consulta1->fetch_assoc();
-    //             $total_cobros = $resultado1['total'];
-
-    //             $consulta2 = $this->dbc->query("SELECT * FROM cuentaspor WHERE idrecibo = '$idrecibo'");
-    //             $resultado2 = $consulta2->fetch_assoc();
-    //             $total_pagos = $resultado2['total'];
-
-    //     if($total_cobros > 0){
-    //         $anular_comprobante = $this->dbc->query("UPDATE cuentaspof
-    //                                 SET estado = '2'
-    //                                 WHERE idrecibo = '$idrecibo';");
-    //     }elseif($total_pagos > 0){
-    //         $anular_comprobante = $this->dbc->query("UPDATE cuentaspor
-    //                                 SET estado = '2'
-    //                                 WHERE idrecibo = '$idrecibo';");
-    //     }else{
-    //         // SOLO SE ANULARA EL RECIBO PORQUE NO TIENE COMPROBANTE ASIGNADO
-    //     }
-    //             $res = array("success", "Edición exitosa","editarCaracteristicas");
-    //         } else {
-    //             $res = array("danger", "No se pudo editar");
-    //         }
-
-    //     echo json_encode($res);
-    // }
 }

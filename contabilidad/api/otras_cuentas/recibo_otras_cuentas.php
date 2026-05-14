@@ -1,7 +1,7 @@
 <?php
 require_once "../../db/db.php";
 class Recibo_otras_cuentas extends DB{
-public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtransaccion,$idcaja_bancos, $fecha, $persona, $ci, $monto, $asiento, $sucursal, $empresa,$archivo,$nro_recibo,$concepto,$client_prov,$zn,$fecha_transaccion,$tipo_cuenta,$cuenta)
+public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtransaccion,$idcaja_bancos, $fecha, $persona, $ci, $monto, $asiento, $sucursal, $empresa,$archivo,$nro_recibo,$concepto,$client_prov,$zn,$fecha_transaccion,$tipo_cuenta,$cuenta,$gestion)
     {
         // echo json_encode(array($idfactura, $idtransaccion,$caja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$archivo));
 
@@ -22,7 +22,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
         $res = "";
         $sucursal = $this->getidsucursal($sucursal);
         $ide = $this->getidempresa($empresa);
-        $gestion = $this->getgestionactualid($ide);
+        // $gestion = $this->getgestionactualid($ide);
 
         $recibo_trans = $this->dbc->query("SELECT count(*) AS cant1 FROM cuentaspof cp 
         INNER JOIN transacciones t ON t.idtransacciones=cp.transaccion 
@@ -473,7 +473,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
     //  }
 
 
-    public function registrar_recibo_otras_cuentas_pagar($idotras_cuentas, $lugar, $idtransaccion,$idcaja_bancos, $fecha, $persona, $ci, $monto, $asiento, $sucursal, $empresa,$archivo,$nro_recibo,$concepto,$client_prov,$zn,$fecha_transaccion,$tipo_cuenta,$cuenta)
+    public function registrar_recibo_otras_cuentas_pagar($idotras_cuentas, $lugar, $idtransaccion,$idcaja_bancos, $fecha, $persona, $ci, $monto, $asiento, $sucursal, $empresa,$archivo,$nro_recibo,$concepto,$client_prov,$zn,$fecha_transaccion,$tipo_cuenta,$cuenta,$gestion)
     {
         // echo json_encode(array($idfactura, $idtransaccion,$caja_bancos, $idcuenta, $fecha, $persona, $ci, $monto, $asiento, $idcliente, $sucursal, $empresa,$archivo));
 
@@ -495,7 +495,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
         $res = "";
         $sucursal = $this->getidsucursal($sucursal);
         $ide = $this->getidempresa($empresa);
-        $gestion = $this->getgestionactualid($ide);
+        // $gestion = $this->getgestionactualid($ide);
 
        $recibo_trans = $this->dbc->query("SELECT count(*) AS cant1 FROM cuentaspor cp 
         INNER JOIN transacciones t ON t.idtransacciones=cp.transaccion 
@@ -790,7 +790,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
         echo json_encode($res);
     }
 
-    public function registrar_factura_cobro_otras_cuentas($por_concepto_de,$fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento,$clasefactura,$cobro, $pagar,$idotras_cuentas, $espesificacion,$trans, $cliente, $empresa, $archivo, $sucursal,$asiento,$idcajas_bancos,$zn,$fecha_transaccion,$cuenta,$tipo_cuenta)
+    public function registrar_factura_cobro_otras_cuentas($por_concepto_de,$fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento,$clasefactura,$cobro, $pagar,$idotras_cuentas, $espesificacion,$trans, $cliente, $empresa, $archivo, $sucursal,$asiento,$idcajas_bancos,$zn,$fecha_transaccion,$cuenta,$tipo_cuenta,$gestion)
        {
 
         // Establecer la zona horaria recibida
@@ -804,7 +804,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
 
         $idempresa = $this->getidempresa($empresa);
         $idsucursal = $this->getidsucursal($sucursal); 
-        $gestion = $this->getgestionactualid($idempresa);
+        // $gestion = $this->getgestionactualid($idempresa);
     
         $res = "";
         if($idcajas_bancos == ""){
@@ -1091,7 +1091,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
         echo json_encode($res);
     }
 
-    public function registrar_factura_pago_otras_cuentas($por_concepto_de,$fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento,$clasefactura,$cobro, $pagar,$idotras_cuentas, $espesificacion,$trans, $cliente, $empresa, $archivo, $sucursal,$asiento,$idcajas_bancos,$zn,$fecha_transaccion,$cuenta,$tipo_cuenta)
+    public function registrar_factura_pago_otras_cuentas($por_concepto_de,$fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento,$clasefactura,$cobro, $pagar,$idotras_cuentas, $espesificacion,$trans, $cliente, $empresa, $archivo, $sucursal,$asiento,$idcajas_bancos,$zn,$fecha_transaccion,$cuenta,$tipo_cuenta,$gestion)
        {
 
         // Establecer la zona horaria recibida
@@ -1105,7 +1105,7 @@ public function registrar_recibo_otras_cuentas($idotras_cuentas, $lugar, $idtran
 
         $idempresa = $this->getidempresa($empresa);
         $idsucursal = $this->getidsucursal($sucursal); 
-        $gestion = $this->getgestionactualid($idempresa);
+        // $gestion = $this->getgestionactualid($idempresa);
     
         $res = "";
         if($idcajas_bancos == ""){

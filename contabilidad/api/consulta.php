@@ -63,7 +63,7 @@ $ad=new Admin();
 $ad->listatipodecambio($ver[1]);
 }elseif($ver[0]=="listatransacciones"){
 $cont=new Transacciones();
-$cont->listatransacciones($ver[1]);
+$cont->listatransacciones($ver[1],$ver[2]);
 }elseif($ver[0]=="tipotransaccion"){
 $cont=new Contabilidad();
 $cont->tipotransaccion();
@@ -76,13 +76,13 @@ $cont=new Transacciones();
 $cont->eliminardetalle($ver[1]);
 }elseif($ver[0]=="reportedetallefpt"){
 $rep=new Reportes();
-$rep->reportedetallefpt($ver[1],$ver[2],$ver[3],$ver[4],$ver[5],$ver[6],$ver[7]);
+$rep->reportedetallefpt($ver[1],$ver[2],$ver[3],$ver[4],$ver[5],$ver[6],$ver[7],$ver[8]);
 }elseif($ver[0]=="reportedetalletransaccion"){
 $rep=new Reportes();
-$rep->reportedetalletransaccion($ver[1],$ver[2],$ver[3],$ver[4],$ver[5],$ver[6]);
+$rep->reportedetalletransaccion($ver[1],$ver[2],$ver[3],$ver[4],$ver[5],$ver[6],$ver[7]);
 }elseif($ver[0]=="reporteactivodisponible"){
 $rep=new Reportes();
-$rep->reporteactivodisponible($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
+$rep->reporteactivodisponible($ver[1],$ver[2],$ver[3],$ver[4],$ver[5],$ver[6]);
 }elseif($ver[0]=="encabezado"){
 $rep=new Reportes();
 $rep->encabezado($ver[1]);
@@ -91,25 +91,25 @@ $rep=new Reportes();
 $rep->firmas($ver[1],$ver[2]);
 }elseif($ver[0]=="reportebalancedesumasysaldos"){
 $rep=new Reportes();
-$rep->reportebalancedesumasysaldos($ver[1],$ver[2],$ver[3]);
+$rep->reportebalancedesumasysaldos($ver[1],$ver[2],$ver[3],$ver[4]);
 }elseif($ver[0]=="reportebalancedesumasysaldoshasta"){
 $rep=new Reportes();
-$rep->reportebalancedesumasysaldoshasta($ver[1],$ver[2]);
+$rep->reportebalancedesumasysaldoshasta($ver[1],$ver[2],$ver[3]);
 }elseif($ver[0]=="reporteactivoypasivo"){
 $rep=new Reportes();
-$rep->reporteactivoypasivo($ver[1],$ver[2],$ver[3]);
+$rep->reporteactivoypasivo($ver[1],$ver[2],$ver[3],$ver[4]);
 }elseif($ver[0]=="reporteactivoypasivohasta"){
 $rep=new Reportes();
-$rep->reporteactivoypasivohasta($ver[1],$ver[2]);
+$rep->reporteactivoypasivohasta($ver[1],$ver[2],$ver[3]);
 }elseif($ver[0]=="reportecuentasderesultado"){
 $rep=new Reportes();
-$rep->reportecuentasderesultado($ver[1],$ver[2],$ver[3]);
+$rep->reportecuentasderesultado($ver[1],$ver[2],$ver[3],$ver[4]);
 }elseif($ver[0]=="reportecomprobantecontable"){
 $rep=new Reportes();
-$rep->reportecomprobantecontable($ver[1],$ver[2],$ver[3],$ver[4],$ver[5],$ver[6],$ver[7],$ver[8],$ver[9]);
+$rep->reportecomprobantecontable($ver[1],$ver[2],$ver[3],$ver[4],$ver[5],$ver[6],$ver[7],$ver[8],$ver[9],$ver[10]);
 }elseif($ver[0]=="reporteactivodiaponibledos"){
 $rep=new Reportes();
-$rep->reporteactivodiaponibledos($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
+$rep->reporteactivodiaponibledos($ver[1],$ver[2],$ver[3],$ver[4],$ver[5],$ver[6]);
 }elseif($ver[0]=="facturas"){
 $cont=new Contabilidad();
 $cont->facturas($ver[1]);
@@ -166,7 +166,7 @@ $cont=new Contabilidad();
 $cont->listapagoscobros($ver[1]);
 }elseif($ver[0]=="mayorcuentacontable"){
 $rep=new Reportes();
-$rep->mayorcuentacontable($ver[1],$ver[2],$ver[3],$ver[4],$ver[5],$ver[6]);
+$rep->mayorcuentacontable($ver[1],$ver[2],$ver[3],$ver[4],$ver[5],$ver[6],$ver[7]);
 }elseif($ver[0]=="eliminarcliente"){
 $cont=new Contabilidad();
 $cont->eliminarcliente($ver[1]);
@@ -262,7 +262,7 @@ $cont=new Contabilidad();
 $cont->consolidar($ver[1],$ver[2]);
 }elseif($ver[0]=="listadesconsolidar"){
 $cont=new Contabilidad();
-$cont->listadesconsolidar($ver[1],$ver[2]);
+$cont->listadesconsolidar($ver[1],$ver[2],$ver[3]);
 }elseif($ver[0]=="deleterelacionip"){
 $cont=new Contabilidad();
 $cont->deleterelacionip($ver[1]);
@@ -310,10 +310,10 @@ $cont->listaimpuestoentreplan($ver[1]);
     $cont->listafactura_cobro_trans($ver[1]);
 }elseif($ver[0]=="lista_transaccionEn_espera"){
     $cont=new Insertar_transaccion();
-    $cont->lista_transaccionEn_espera($ver[1],$ver[2]);
+    $cont->lista_transaccionEn_espera($ver[1],$ver[2],$ver[3]);
 }elseif($ver[0]=="listar_anular_eliminar_transaccion"){
     $cont=new Anulacion_transaccion();
-    $cont->listar_anular_eliminar_transaccion($ver[1],$ver[2]);
+    $cont->listar_anular_eliminar_transaccion($ver[1],$ver[2],$ver[3]);
 }elseif($ver[0]=="listar_caja_bancos"){
     $cont=new Plandecuentas();
     $cont->listar_caja_bancos($ver[1]);
@@ -387,16 +387,16 @@ elseif($ver[0]=="listar_asiento_por_modulo"){
     $cont->listar_recibo_por_caja_bancos($ver[1],$ver[2],$ver[3],$ver[4]);
 }elseif($ver[0]=="alerta_desconsolidacion"){
     $cont=new Alertas();
-    $cont->alerta_desconsolidacion($ver[1]);
+    $cont->alerta_desconsolidacion($ver[1],$ver[2]);
 }elseif($ver[0]=="alerta_transaccionEn_espera"){
     $cont=new Alertas();
-    $cont->alerta_transaccionEn_espera($ver[1]);
+    $cont->alerta_transaccionEn_espera($ver[1],$ver[2]);
 }elseif($ver[0]=="alerta_anular_eliminar_transaccion"){
     $cont=new Alertas();
-    $cont->alerta_anular_eliminar_transaccion($ver[1]);
+    $cont->alerta_anular_eliminar_transaccion($ver[1],$ver[2]);
 }elseif($ver[0]=="alerta_transacciones_comercial"){
     $cont=new Alertas();
-    $cont->alerta_transacciones_comercial($ver[1]);
+    $cont->alerta_transacciones_comercial($ver[1],$ver[2]);
 }elseif($ver[0]=="eliminar_gestion_contable"){
     $cont=new Contabilidad();
     $cont->eliminar_gestion_contable($ver[1]);
@@ -490,7 +490,7 @@ elseif($ver[0]=="eliminar_configuracion_reporte"){
     $cont->eliminar_configuracion_reporte($ver[1]);
 }elseif($ver[0]=="reporte_balance_general_hasta"){
     $cont=new Reporte_confi();
-    $cont->reporte_balance_general_hasta($ver[1],$ver[2]);
+    $cont->reporte_balance_general_hasta($ver[1],$ver[2],$ver[3]);
 }elseif($ver[0]=="listar_factura_comercial_comprobante"){
     $cont=new Factura_comercial();
     $cont->listar_factura_comercial_comprobante($ver[1]);
@@ -519,19 +519,10 @@ elseif($ver[0]=="rp_listar_plantilla"){
     $cont->eliminar_plantilla($ver[1], $ver[2], $ver[3], $ver[4], $ver[5]);
 }elseif($ver[0]=="rp_obtener_datos_reporte"){
     $cont=new PlantillaReporte();
-    $cont->obtener_datos_reporte($ver[1], $ver[2], $ver[3], $ver[4]);
-}elseif($ver[0]=="reporte_balance_general_prueba"){
-    $cont=new Reporte_confi();
-    $cont->reporte_balance_general_prueba($ver[1],$ver[2],$ver[3]);
+    $cont->obtener_datos_reporte($ver[1], $ver[2], $ver[3], $ver[4],$ver[5]);
 }elseif($ver[0]=="listar_agrupacion_plantilla"){
     $cont=new PlantillaReporte();
     $cont->listar_agrupacion_plantilla($ver[1],$ver[2]);
-}elseif($ver[0]=="reporte_estado_resultados"){
-    $cont=new PlantillaReporte();
-    $cont->reporte_estado_resultados($ver[1],$ver[2],$ver[3]);
-}elseif($ver[0]=="reporte_estado_resultados_actualizado"){
-    $cont=new PlantillaReporte();
-    $cont->reporte_estado_resultados_actualizado($ver[1],$ver[2],$ver[3],$ver[4]);
 }elseif($ver[0]=="eliminar_otras_operaciones"){
     $cont=new PlantillaReporte();
     $cont->eliminar_otras_operaciones($ver[1]);
@@ -616,16 +607,12 @@ elseif($ver[0]=="listar_datos_contrataciones_cajas"){
     $cont->lista_padres_plandecuentas($ver[1]);
 }
 // elseif($ver[0]=="reporte_balance_general_consolidado"){
-//     $cont=new Reporte_confi();
+//     $cont=new Reporte_confi(); 
 //     $cont->reporte_balance_general_consolidado($ver[1],$ver[2],$ver[3],$ver[4]);
 // }
 elseif($ver[0]=="reporte_balance_general_por_niveles_consolidados"){
     $cont=new Reporte_confi();
-    $cont->reporte_balance_general_por_niveles_consolidados($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
-}
-elseif($ver[0]=="reporte_estado_resultados_actualizado_consolidado"){
-    $cont=new PlantillaReporte();
-    $cont->reporte_estado_resultados_actualizado_consolidado($ver[1],$ver[2],$ver[3],$ver[4]);
+    $cont->reporte_balance_general_por_niveles_consolidados($ver[1],$ver[2],$ver[3],$ver[4],$ver[5],$ver[6]);
 }
 elseif($ver[0]=="reporte_balance_general_admin"){
     $cont=new Plantilla_admin();
@@ -695,7 +682,7 @@ elseif($ver[0]=="listar_reportes_referencia"){
     $cont->eliminar_otras_cuentas($ver[1]);
 }elseif($ver[0]=="reporte_balance_general_por_niveles"){
     $cont=new Reporte_confi();
-    $cont->reporte_balance_general_por_niveles($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
+    $cont->reporte_balance_general_por_niveles($ver[1],$ver[2],$ver[3],$ver[4],$ver[5],$ver[6]);
 }
 //-----------------------------------------------------------------------------------no esta subido a mistersoft lo de abajo
 elseif($ver[0]=="listar_recibos_asignado_cuentas"){
@@ -726,7 +713,7 @@ elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
     $cont->comprobantes_perteneciente_a_cuenta($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
 }elseif($ver[0]=="listar_anular_eliminar_factura"){
     $cont=new Factura_cobros();
-    $cont->listar_anular_eliminar_factura($ver[1],$ver[2]);
+    $cont->listar_anular_eliminar_factura($ver[1],$ver[2],$ver[3]);
 }elseif($ver[0]=="listar_comprobantes_de_recibo"){
     $cont=new Filtrado_facturas();
     $cont->listar_comprobantes_de_recibo($ver[1]);
@@ -741,10 +728,10 @@ elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
     $cont->listar_otras_cuentas_reporte($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
 }elseif($ver[0]=="reporte_estado_resultados_actualizado_por_niveles"){
     $cont=new PlantillaReporte();
-    $cont->reporte_estado_resultados_actualizado_por_niveles($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
+    $cont->reporte_estado_resultados_actualizado_por_niveles($ver[1],$ver[2],$ver[3],$ver[4],$ver[5],$ver[6]);
 }elseif($ver[0]=="reporte_estado_resultados_actualizado_consolidado_por_niveles"){
     $cont=new PlantillaReporte();
-    $cont->reporte_estado_resultados_actualizado_consolidado_por_niveles($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
+    $cont->reporte_estado_resultados_actualizado_consolidado_por_niveles($ver[1],$ver[2],$ver[3],$ver[4],$ver[5],$ver[6]);
 }elseif($ver[0]=="listar_tipo_cliente"){
     $cont=new Tipo_cliente_comercial();
     $cont->listar_tipo_cliente($ver[1]);
@@ -756,7 +743,7 @@ elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
     $cont->listar_recibo_por_caja_bancos_saldo($ver[1],$ver[2]);
 }elseif($ver[0]=="alerta_anular_eliminar_documentos"){//listar_recibo_por_caja_bancos
     $cont=new Alertas();
-    $cont->alerta_anular_eliminar_documentos($ver[1]);
+    $cont->alerta_anular_eliminar_documentos($ver[1],$ver[2]);
 }elseif($ver[0]=="listar_tipo_cliente_activos"){//listar_recibo_por_caja_bancos
     $cont=new Tipo_cliente_comercial();
     $cont->listar_tipo_cliente_activos($ver[1]);
@@ -774,7 +761,7 @@ elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
     $cont->reporte_flujo_efectivo($ver[1],$ver[2],$ver[3],$ver[4]);
 }elseif($ver[0]=="reporte_estado_origen_aplicacion"){//listar_recibo_por_caja_bancos
     $cont=new Reporte_flujo_efectivo();
-    $cont->reporte_estado_origen_aplicacion($ver[1],$ver[2]);
+    $cont->reporte_estado_origen_aplicacion($ver[1]);
 }elseif($ver[0]=="filtro_plantilla_flujo_por_nivel"){//listar_recibo_por_caja_bancos
     $cont=new Reporte_flujo_efectivo();
     $cont->filtro_plantilla_flujo_por_nivel($ver[1],$ver[2],$ver[3]);
@@ -811,29 +798,36 @@ elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
 }elseif($ver[0]=="listar_flujo_efectivo_select_otras_operaciones"){
     $cont=new Reporte_flujo_efectivo();
     $cont->listar_flujo_efectivo_select_otras_operaciones($ver[1]);
+}elseif($ver[0]=="listar_balance_general_guardados"){
+    $cont=new Reporte_flujo_efectivo();
+    $cont->listar_balance_general_guardados($ver[1]);
 }
+// elseif($ver[0]=="obtenerGestionAnterior"){
+//     $cont=new Reporte_flujo_efectivo();
+//     $cont->obtenerGestionAnterior($ver[1],$ver[2]);
+// }
 
-// reportedetalle  rp listar_gestiones_por_usuarios  listar_agrupacion_plantilla
+// reportedetalle  rp listar_gestiones_por_usuarios  listar_agrupacion_plantilla obtener_datos_reporte
 // listar_factura listar_facturas_cobro_pago  rp_eliminar_plantilla listar_select_cuentas_balance_general
-// listar_recibo_otras_cuentas_pagar listadegestion eliminar_otras_operaciones
+// listar_recibo_otras_cuentas_pagar listadegestion eliminar_otras_operaciones reporte_estado_origen_aplicacion
 
-// lista_cobrar_cobrado_factura listar_caja_bancos
-//   listar_recibo_otras_cuentas listar_tipo_reportes listar_anular_eliminar_factura
+// lista_cobrar_cobrado_factura listar_caja_bancos reporteactivoypasivo mayorcuentacontable
+//   listar_recibo_otras_cuentas listar_tipo_reportes listar_anular_eliminar_factura listatransacciones
 // 
-// lista_pagar_pagado_factura listar_usuarios  listar_agrupacion_plantilla
-// reportedetallefp lista_pagar_pagado_factura
-//  listadesconsolidar listar_anular_eliminar_factura 
+// lista_pagar_pagado_factura listar_usuarios  listar_agrupacion_plantilla reportecuentasderesultado
+// reportedetallefp lista_pagar_pagado_factura mayorcuentacontable_antiguo reporte_flujo_efectivo
+//  listadesconsolidar listar_anular_eliminar_factura  reporteactivodisponible reportedetalletransaccion
 //
 
 // 
-//  listar_anular_eliminar_factura alerta
-//  estadogestion listar_factura_comercial
+//  listar_anular_eliminar_factura alerta reportedetallefpt  reportebalancedesumasysaldos reportedeplanes
+//  estadogestion listar_factura_comercial listatransacciones reporte_balance_general_prueba
 // 
 // 
 //  
-//  lista_cobrar_cobrado_factura  reporte_estado_origen_aplicacion 
+//  lista_cobrar_cobrado_factura  reporte_estado_origen_aplicacion  reporte_balance_general_por_niveles_consolidados
 
-//   insertar_transaccion.php   
+//   insertar_transaccion.php    reporte_balance_general_hasta reportecomprobantecontable reporteactivodiaponibledos
 
 
 ?>

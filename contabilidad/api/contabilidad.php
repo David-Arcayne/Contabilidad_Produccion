@@ -1,6 +1,6 @@
 <?php
 session_start();
-//require_once "db.php"; lista_cobrar_cobrado_factura crearfacturas listadesconsolidar decode cuentaspof 
+//require_once "db.php"; lista_cobrar_cobrado_factura crearfacturas listadesconsolidar decode cuentaspof gestion
 require_once "../../db/db.php";
 class Contabilidad extends DB
 {//registroasiento eliminarasiento
@@ -25,12 +25,12 @@ class Contabilidad extends DB
 
     }
 
-    public function rangosolicituddesconsolidar($nTrainicio, $nTrafinal, $motivo, $estado, $hora, $fecha, $idusuario, $idempresa) {
+    public function rangosolicituddesconsolidar($nTrainicio, $nTrafinal, $motivo, $estado, $hora, $fecha, $idusuario, $idempresa,$idgestion) {
         $res = [];
         $usuario = $this->getidusuario($idusuario);
         $empresa = $this->getidempresa($idempresa);
-        $gestion = $this->getgestionactualC($idempresa);
-        $idgestion = $gestion["id"];
+        // $gestion = $this->getgestionactualC($idempresa);
+        // $idgestion = $gestion["id"];
         $codigo = date("Ymd") . rand(100, 1000);
         
         try {
@@ -109,10 +109,10 @@ class Contabilidad extends DB
      
     
 
-    public function listadesconsolidar($idempresa,$todos) {
+    public function listadesconsolidar($idempresa,$todos,$idgestion) {
         $lista = [];
-        $gestion = $this->getgestionactualC($idempresa);
-        $idgestion = $gestion["id"];
+        // $gestion = $this->getgestionactualC($idempresa);
+        // $idgestion = $gestion["id"];
         // Consulta SQL
         if($todos == '0'){
              $sql =$this->dbc->query("SELECT 
@@ -477,13 +477,13 @@ WHERE md5(p.organizacion_idorganizacion)='$ide'");
         return array("id" => $qwe['idgestion'], "nombre" => $qwe['nombre']);
     }
 
-    public function insertartransaccionen($codigo, $fecha, $tipocambio, $tipotransaccion, $glosa, $empresa, $sucursal)
+    public function insertartransaccionen($codigo, $fecha, $tipocambio, $tipotransaccion, $glosa, $empresa, $sucursal,$idgestion)
     {
         $ndocumento = "0";
         $ide = $this->getidempresa($empresa);
         $idsucursal = $this->getidsucursal($sucursal);
-        $gestion = $this->getgestionactualC($empresa);
-        $idgestion = $gestion["id"];
+        // $gestion = $this->getgestionactualC($empresa);
+        // $idgestion = $gestion["id"];
         $res = "";
         // aqui la condicional si hay una nueva gestion
         $trans = $this->dbc->query("select * from transacciones where codigotransaccion='$codigo' and organizacion_idorganizacion='$ide' and idgestion='$idgestion'");

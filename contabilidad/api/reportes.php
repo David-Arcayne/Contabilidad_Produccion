@@ -1,5 +1,5 @@
 <?php
-//require_once "db.php";reportecomprobantecontable
+//require_once "db.php";reportecomprobantecontable  gestion
 require_once "../../db/db.php";
 class Reportes extends DB {
 
@@ -50,7 +50,7 @@ public function getidgestion($md5){
         echo json_encode($lista);
     }
     
-    public function reporteactivodisponible($fechai,$fechaf,$reporte,$empresa,$consolidados){
+    public function reporteactivodisponible($fechai,$fechaf,$reporte,$empresa,$consolidados,$gestion){
         $lista=[];
 
         $debe=0;
@@ -58,7 +58,7 @@ public function getidgestion($md5){
         $deudor=0;
         $acreedor=0;
         $ide=$this->getidempresa($empresa);
-        $gestion=$this->getidgestion($empresa);
+        // $gestion=$this->getidgestion($empresa);
         if($consolidados == 'si'){
           $consoli_aux = "AND t.consolidar = '2'";
         }else{ // no
@@ -97,7 +97,7 @@ public function getidgestion($md5){
         echo json_encode($lista);
     }
 
-    public function reportedetalletransaccion($fechai,$fechaf,$mes_año,$cadena_tipo,$empresa,$consolidados){
+    public function reportedetalletransaccion($fechai,$fechaf,$mes_año,$cadena_tipo,$empresa,$consolidados,$gestion){
     //  echo json_encode(array($fechai,$fechaf,$mes_año,$cadena_tipo,$empresa));
       ini_set('display_errors', 1);
       ini_set('display_startup_errors', 1);
@@ -105,7 +105,7 @@ public function getidgestion($md5){
         $lista=[];
         $total=[];
         $ide=$this->getidempresa($empresa);
-        $gestion=$this->getidgestion($empresa);
+        // $gestion=$this->getidgestion($empresa);
 
         $gestion_sel = $this->dbc->query("SELECT * FROM gestion WHERE idgestion='$gestion'");
         $gc = $gestion_sel->fetch_assoc();
@@ -268,14 +268,14 @@ public function getidgestion($md5){
         echo json_encode($total);
     }
 
-    public function reportedetallefpt($fechai,$fechaf,$mes_año,$cadena_tipo,$clase_factura,$empresa,$consolidados){
+    public function reportedetallefpt($fechai,$fechaf,$mes_año,$cadena_tipo,$clase_factura,$empresa,$consolidados,$gestion){
       // ini_set('display_errors', 1);
       // ini_set('display_startup_errors', 1);
       // error_reporting(E_ALL);
         $lista=[];
         //$total=[];
         $ide=$this->getidempresa($empresa);
-        $gestion=$this->getidgestion($empresa);
+        // $gestion=$this->getidgestion($empresa);
 
         $gestion_sel = $this->dbc->query("SELECT * FROM gestion WHERE idgestion='$gestion'");
         $gc = $gestion_sel->fetch_assoc();
@@ -508,10 +508,10 @@ public function getidgestion($md5){
         echo json_encode($lista);
     }
 
-    public function reportebalancedesumasysaldosB($fechai,$fechaf,$empresa){
+    public function reportebalancedesumasysaldosB($fechai,$fechaf,$empresa,$gestion){
         $lista=[];
         $ide=$this->getidempresa($empresa);
-        $gestion=$this->getidgestion($empresa);
+        // $gestion=$this->getidgestion($empresa);
         $reporte=$this->dbc->query("SELECT p.numero,p.nombreplan,SUM(d.debe) AS debe,SUM(d.haber) AS haber,SUM(debe)-SUM(haber) AS deudor,SUM(haber)-SUM(debe) AS acreedor FROM plandecuenta AS p
         INNER JOIN transacciones AS t ON t.organizacion_idorganizacion='$ide'
         INNER JOIN detalletransaccion AS d ON d.idplandecuenta=p.idplandecuenta AND t.idtransacciones=d.transacciones_idtransacciones
@@ -534,10 +534,10 @@ public function getidgestion($md5){
         echo json_encode($lista);
     }
 
-    public function reportebalancedesumasysaldos($fechai, $fechaf, $empresa) {
+    public function reportebalancedesumasysaldos($fechai, $fechaf, $empresa,$gestion) {
       $lista = [];
       $ide = $this->getidempresa($empresa);
-      $gestion = $this->getidgestion($empresa);
+      // $gestion = $this->getidgestion($empresa);
       $reporte = $this->dbc->query("SELECT p.numero, p.nombreplan, SUM(d.debe) AS debe, SUM(d.haber) AS haber, SUM(debe) - SUM(haber) AS deudor, SUM(haber) - SUM(debe) AS acreedor FROM plandecuenta AS p
       INNER JOIN transacciones AS t ON t.organizacion_idorganizacion='$ide' AND t.estado NOT IN (4, 5, 6)
       INNER JOIN detalletransaccion AS d ON d.idplandecuenta=p.idplandecuenta AND t.idtransacciones=d.transacciones_idtransacciones
@@ -575,12 +575,12 @@ public function getidgestion($md5){
   }
   
 
-  public function reportebalancedesumasysaldoshasta($fechaf, $empresa) {
+  public function reportebalancedesumasysaldoshasta($fechaf, $empresa,$gestion) {
 
 
     $lista = [];
     $ide = $this->getidempresa($empresa);
-    $gestion = $this->getidgestion($empresa);
+    // $gestion = $this->getidgestion($empresa);
     $reporte = $this->dbc->query("SELECT p.numero, p.nombreplan, SUM(d.debe) AS debe, SUM(d.haber) AS haber, SUM(debe) - SUM(haber) AS deudor, SUM(haber) - SUM(debe) AS acreedor FROM plandecuenta AS p
     INNER JOIN transacciones AS t ON t.organizacion_idorganizacion='$ide' AND t.estado NOT IN (4, 5, 6)
     INNER JOIN detalletransaccion AS d ON d.idplandecuenta=p.idplandecuenta AND t.idtransacciones=d.transacciones_idtransacciones
@@ -683,10 +683,10 @@ public function getidgestion($md5){
     // echo json_encode($lista);
 }
 
-    public function reporteactivoypasivo($fechai,$fechaf,$empresa){
+    public function reporteactivoypasivo($fechai,$fechaf,$empresa,$gestion){
         $lista=[];
         $ide=$this->getidempresa($empresa);
-        $gestion=$this->getidgestion($empresa);
+        // $gestion=$this->getidgestion($empresa);
         $reporte=$this->dbc->query("SELECT p.numero,p.nombreplan,SUM(d.debe) AS debe,SUM(d.haber) AS haber,SUM(debe)-SUM(haber) AS deudor,SUM(haber)-SUM(debe) AS acreedor FROM plandecuenta AS p
         INNER JOIN transacciones AS t ON t.organizacion_idorganizacion='$ide'
         INNER JOIN detalletransaccion AS d ON d.idplandecuenta=p.idplandecuenta AND t.idtransacciones=d.transacciones_idtransacciones
@@ -721,10 +721,10 @@ $totalHaber = 0;
       }*/
     }
 
-    public function reporteactivoypasivohasta($fechaf,$empresa){
+    public function reporteactivoypasivohasta($fechaf,$empresa,$gestion){
         $lista=[];
         $ide=$this->getidempresa($empresa);
-        $gestion=$this->getidgestion($empresa);
+        // $gestion=$this->getidgestion($empresa);
         $reporte=$this->dbc->query("SELECT p.numero,p.nombreplan,SUM(d.debe) AS debe,SUM(d.haber) as haber,SUM(debe)-SUM(haber) as deudor,SUM(haber)-SUM(debe) as acreedor from plandecuenta as p
         INNER JOIN transacciones AS t ON t.organizacion_idorganizacion='$ide'
         INNER JOIN detalletransaccion AS d ON d.idplandecuenta=p.idplandecuenta AND t.idtransacciones=d.transacciones_idtransacciones
@@ -757,10 +757,10 @@ $totalHaber = 0;
       }
           */
     }
-    public function reportecuentasderesultado($fechai,$fechaf,$empresa){
+    public function reportecuentasderesultado($fechai,$fechaf,$empresa,$gestion){
         $lista=[];
         $ide=$this->getidempresa($empresa);
-        $gestion=$this->getidgestion($empresa);
+        // $gestion=$this->getidgestion($empresa);
         $reporte=$this->dbc->query("SELECT p.numero,p.nombreplan,SUM(d.debe) as debe,SUM(d.haber) as haber,SUM(debe)-SUM(haber) as deudor,SUM(haber)-SUM(debe) as acreedor from plandecuenta as p
         INNER JOIN transacciones as t ON t.organizacion_idorganizacion='$ide'
         INNER JOIN detalletransaccion as d ON d.idplandecuenta=p.idplandecuenta and t.idtransacciones=d.transacciones_idtransacciones
@@ -794,7 +794,7 @@ $totalHaber = 0;
           */
     }
 
-  public function reportecomprobantecontable($numeroIni,$numeroFin,$fechaIni,$fechaFin,$mes_año,$cadena_tipo,$empresa,$factura,$consolidados){
+  public function reportecomprobantecontable($numeroIni,$numeroFin,$fechaIni,$fechaFin,$mes_año,$cadena_tipo,$empresa,$factura,$consolidados,$gestion){
     //reporteactivodiaponible    La fecha, persona, ci, Nro comprobante y el monto
     // echo json_encode(array($fechaIni,$fechaFin,$numeroIni,$numeroFin,$empresa,$factura));
     // ini_set('display_errors', 1);
@@ -803,7 +803,7 @@ $totalHaber = 0;
 
     $lista=[];
     $ide=$this->getidempresa($empresa);
-    $gestion=$this->getidgestion($empresa);
+    // $gestion=$this->getidgestion($empresa);
 
     $gestion_sel = $this->dbc->query("SELECT * FROM gestion WHERE idgestion='$gestion'");
         $gc = $gestion_sel->fetch_assoc();
@@ -1152,7 +1152,7 @@ $totalHaber = 0;
     echo json_encode($lista); 
    }
 
-    public function reporteactivodiaponibledos($numeroIni,$numeroFin,$fechaIni,$fechaFin,$empresa){
+    public function reporteactivodiaponibledos($numeroIni,$numeroFin,$fechaIni,$fechaFin,$empresa,$gestion){
         $lista=[];
 
         $debe=0;
@@ -1160,7 +1160,7 @@ $totalHaber = 0;
         $deudor=0;
         $acreedor=0;
         $ide=$this->getidempresa($empresa);
-        $gestion=$this->getidgestion($empresa);
+        // $gestion=$this->getidgestion($empresa);
         if($numeroIni == 0 && $numeroFin == 0){
           $reporteA=$this->dbc->query("SELECT
           pc.numero AS codigo,
@@ -1290,13 +1290,13 @@ $totalHaber = 0;
         echo json_encode($lista);   
     }
 
-   public function mayorcuentacontable($fechai, $fechaf, $numero_ini, $numero_fin, $empresa, $consolidados)
+   public function mayorcuentacontable($fechai, $fechaf, $numero_ini, $numero_fin, $empresa, $consolidados,$gestion)
 {
     ini_set('display_errors', 1);
     error_reporting(E_ALL);
 
     $ide = $this->getidempresa($empresa);
-    $gestion = $this->getidgestion($empresa);
+    // $gestion = $this->getidgestion($empresa);
 
     if ($consolidados == 'si') {
         $consoli_aux = "AND t.consolidar = '2'";
@@ -1679,10 +1679,10 @@ ORDER BY p.numero ASC, t.fechatransaccion ASC
 
 
 
-  public function reportedeplanes($empresa, $numero, $fechai, $fechaf)
+  public function reportedeplanes($empresa, $numero, $fechai, $fechaf,$gestion)
   {
     $ide = $this->getidempresa($empresa);
-    $gestion = $this->getidgestion($empresa);
+    // $gestion = $this->getidgestion($empresa);
     
     // Inicializar array vacío y valores de debe y haber
     $result = [

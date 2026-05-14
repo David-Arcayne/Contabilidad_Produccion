@@ -4,13 +4,13 @@ session_start();
 require_once "../../db/db.php";
 class Transacciones extends DB{
     
-    public function registrotransaccion($fecha, $tipocambio, $tipotransaccion, $glosa, $empresa, $sucursal,$ufv,$dolar)
+    public function registrotransaccion($fecha, $tipocambio, $tipotransaccion, $glosa, $empresa, $sucursal,$ufv,$dolar,$idgestion)
     {
         $ndocumento = "0";
         $ide = $this->getidempresa($empresa);
         $idsucursal = $this->getidsucursal($sucursal);
-        $gestion = $this->getgestionactualC($empresa);
-        $idgestion = $gestion["id"];
+        // $gestion = $this->getgestionactualC($empresa);
+        // $idgestion = $gestion["id"];
         $res = "";
 
         // Construir rango dinámico (primer y último día del mes)
@@ -115,13 +115,13 @@ $nroTransaccion = $resultado122['codigotransaccion'] + 1;
 
     }
 
-    public function listatransacciones($empresa)
+    public function listatransacciones($empresa,$gestion)
     {
         $lista = [];
         // row
         $ide = $this->getidempresa($empresa);
-        $getG = $this->getgestionactualC($empresa);
-        $gestion = $getG['id'];
+        // $getG = $this->getgestionactualC($empresa);
+        // $gestion = $getG['id'];
 
         $gestion_sel = $this->dbc->query("SELECT * FROM gestion WHERE idgestion='$gestion'");
         $gc = $gestion_sel->fetch_assoc();
@@ -618,7 +618,7 @@ if($filtrado->num_rows > 0){
             return $resultado12['total'] > 0;
 
     }
-    public function registro_transaccion_comercial($fecha, $idasignacion_asiento,$monto, $empresa, $sucursal)
+    public function registro_transaccion_comercial($fecha, $idasignacion_asiento,$monto, $empresa, $sucursal,$gestion)
     {
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
@@ -626,7 +626,7 @@ if($filtrado->num_rows > 0){
 
         $ide = $this->getidempresa($empresa);
         $idsucursal = $this->getidsucursal($sucursal);
-        $gestion = $this->getgestionactualid($ide);
+        // $gestion = $this->getgestionactualid($ide);
         // echo json_encode(array($ide,$idsucursal,$gestion,$fecha, $idasignacion_asiento, $empresa, $sucursal));
         $res = "";
         // aqui la condicional si hay una nueva gestion
@@ -1545,14 +1545,14 @@ public function asignar_facturas_A_cuentas($data) {
     
         echo json_encode($res);
     }
-    public function registrotransaccion_por_asiento($fecha,$idasiento,$monto,$glosa,$empresa,$sucursal)
+    public function registrotransaccion_por_asiento($fecha,$idasiento,$monto,$glosa,$empresa,$sucursal,$idgestion)
     {
         // echo json_encode(array("hola",$fecha,$idasiento,$monto,$empresa,$sucursal));
         $ndocumento = "0";
         $ide = $this->getidempresa($empresa);
         $idsucursal = $this->getidsucursal($sucursal);
-        $gestion = $this->getgestionactualC($empresa);
-        $idgestion = $gestion["id"];
+        // $gestion = $this->getgestionactualC($empresa);
+        // $idgestion = $gestion["id"];
         $res = "";
         // aqui la condicional si hay una nueva gestion
 

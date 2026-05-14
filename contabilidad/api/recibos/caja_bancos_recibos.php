@@ -25,7 +25,7 @@ class Caja_bancos_recibos extends DB{
         //$res=array("id"=>,"nombre"=>$qwe['nombre']); registrar_factura_recibo_pago_cajaBancos
         return $qwe['idgestion'];
     }
-    public function registrar_factura_recibo_cobro_cajaBancos($idotras_cuentas,$por_concepto_de,$fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento,$clasefactura,$cobro, $pagar, $espesificacion,$trans, $cliente, $empresa, $sucursal,$asiento,$idcaja_bancos,$archivo,$registro_desde,$zn,$fecha_transaccion,$cuenta,$tipo_cuenta)
+    public function registrar_factura_recibo_cobro_cajaBancos($idotras_cuentas,$por_concepto_de,$fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento,$clasefactura,$cobro, $pagar, $espesificacion,$trans, $cliente, $empresa, $sucursal,$asiento,$idcaja_bancos,$archivo,$registro_desde,$zn,$fecha_transaccion,$cuenta,$tipo_cuenta,$gestion)
     {
 
         //  ini_set('display_errors', 1);
@@ -43,7 +43,7 @@ class Caja_bancos_recibos extends DB{
 
         $idsucursal = $this->getidsucursal($sucursal);
         $idempresa = $this->getidempresa($empresa);
-        $gestion = $this->getgestionactualid($idempresa);
+        // $gestion = $this->getgestionactualid($idempresa);
         $co = 0;
         $pa = 0;
         if ($cobro == 1 || $cobro == 2) {
@@ -338,7 +338,7 @@ class Caja_bancos_recibos extends DB{
 
     }
 
-    public function registrar_factura_recibo_pago_cajaBancos($idotras_cuentas,$por_concepto_de,$fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento,$clasefactura,$cobro, $pagar, $espesificacion,$trans, $cliente, $empresa, $sucursal,$asiento,$idcaja_bancos,$archivo,$registro_desde,$zn,$fecha_transaccion,$cuenta,$tipo_cuenta)
+    public function registrar_factura_recibo_pago_cajaBancos($idotras_cuentas,$por_concepto_de,$fecha, $nfactura, $nautorizacion, $codigocontrol, $monto, $tasacero, $export, $npoliza, $ice, $descuento,$clasefactura,$cobro, $pagar, $espesificacion,$trans, $cliente, $empresa, $sucursal,$asiento,$idcaja_bancos,$archivo,$registro_desde,$zn,$fecha_transaccion,$cuenta,$tipo_cuenta,$gestion)
     {
 
         // ini_set('display_errors', 1);
@@ -356,7 +356,7 @@ class Caja_bancos_recibos extends DB{
         
         $idsucursal = $this->getidsucursal($sucursal);
         $idempresa = $this->getidempresa($empresa);
-        $gestion = $this->getgestionactualid($idempresa);
+        // $gestion = $this->getgestionactualid($idempresa);
         $co = 0;
         $pa = 0;
         if ($cobro == 1 || $cobro == 2) {
@@ -4372,7 +4372,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         // echo json_encode(array);
     }  
 
-    public function registrar_recibo_cobro_cajaBancos_en_facturas($idfact,$fecha,$lugar,$persona, $ci,$monto, $asiento,$trans,$idcaja_bancos,$concepto,$archivo,$registro_desde,$sucursal,$empresa,$zn,$fecha_transaccion,$cuenta,$tipo_cuenta)
+    public function registrar_recibo_cobro_cajaBancos_en_facturas($idfact,$fecha,$lugar,$persona, $ci,$monto, $asiento,$trans,$idcaja_bancos,$concepto,$archivo,$registro_desde,$sucursal,$empresa,$zn,$fecha_transaccion,$cuenta,$tipo_cuenta,$gestion)
     { // nueva apiiiiiiiiiii
 
         // ini_set('display_errors', 1);
@@ -4390,7 +4390,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
         $idsucursal = $this->getidsucursal($sucursal);
         $idempresa = $this->getidempresa($empresa);
-        $gestion = $this->getgestionactualid($idempresa);
+        // $gestion = $this->getgestionactualid($idempresa);
     
         $res = ""; 
 
@@ -4643,7 +4643,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
     //esta api esta en la opcion caja_bancos donde podemos crear recibos asignando directamente a una factura existente
 
-    public function registrar_recibo_pago_cajaBancos_en_facturas($idfact,$fecha,$lugar,$persona, $ci,$monto, $asiento,$trans,$idcaja_bancos,$concepto,$archivo,$registro_desde,$sucursal,$empresa,$zn,$fecha_transaccion,$cuenta,$tipo_cuenta)
+    public function registrar_recibo_pago_cajaBancos_en_facturas($idfact,$fecha,$lugar,$persona, $ci,$monto, $asiento,$trans,$idcaja_bancos,$concepto,$archivo,$registro_desde,$sucursal,$empresa,$zn,$fecha_transaccion,$cuenta,$tipo_cuenta,$gestion)
     { // nueva apiiiiiiiiiii
 
         // ini_set('display_errors', 1);
@@ -4661,7 +4661,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
         $idsucursal = $this->getidsucursal($sucursal);
         $idempresa = $this->getidempresa($empresa);
-        $gestion = $this->getgestionactualid($idempresa);
+        // $gestion = $this->getgestionactualid($idempresa);
     
         $res = ""; //array($fecha,$nfactura,$nautorizacion,$codigocontrol,$monto,$tasacero,$export,$npoliza,$ice,$descuento,$espesificacion,$cliente,$co,$pa,$trans,$clasefactura,$cuenta,$idempresa,$idsucursal);
         
@@ -4913,7 +4913,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
     }
 
-    public function registrar_recibo_cobro_cajaBancos_en_otras_cuentas($nro_recibo,$idotras_cuentas,$fecha,$lugar,$persona, $ci,$precio, $asiento,$trans,$idcaja_bancos,$archivo,$registro_desde,$client_prov,$concepto,$sucursal,$empresa,$zn,$fecha_transaccion,$tipo_cuenta, $cuenta)
+    public function registrar_recibo_cobro_cajaBancos_en_otras_cuentas($nro_recibo,$idotras_cuentas,$fecha,$lugar,$persona, $ci,$precio, $asiento,$trans,$idcaja_bancos,$archivo,$registro_desde,$client_prov,$concepto,$sucursal,$empresa,$zn,$fecha_transaccion,$tipo_cuenta, $cuenta,$gestion)
     {                                             
         //idtransaccion, asiento,fecha, id_cliente_proveedor, concepto, precio, idtipo
         // echo json_encode(array($fecha,$coc,$cobro, $pagar,$trans, $cliente,$asiento,$concepto,$precio,$idtipo,$empresa,$sucursal,$idcaja_bancos));
@@ -4932,7 +4932,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
         $idsucursal = $this->getidsucursal($sucursal);
         $idempresa = $this->getidempresa($empresa);
-        $gestion = $this->getgestionactualid($idempresa);
+        // $gestion = $this->getgestionactualid($idempresa);
   
         $res = ""; //array($fecha,$nfactura,$nautorizacion,$codigocontrol,$monto,$tasacero,$export,$npoliza,$ice,$descuento,$espesificacion,$cliente,$co,$pa,$trans,$clasefactura,$cuenta,$idempresa,$idsucursal);
         
@@ -5211,7 +5211,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
     }
 
-     public function registrar_recibo_pago_cajaBancos_en_otras_cuentas($nro_recibo,$idotras_cuentas,$fecha,$lugar,$persona, $ci,$precio, $asiento,$trans,$idcaja_bancos,$archivo,$registro_desde,$client_prov,$concepto,$sucursal,$empresa,$zn,$fecha_transaccion,$tipo_cuenta,$cuenta)
+     public function registrar_recibo_pago_cajaBancos_en_otras_cuentas($nro_recibo,$idotras_cuentas,$fecha,$lugar,$persona, $ci,$precio, $asiento,$trans,$idcaja_bancos,$archivo,$registro_desde,$client_prov,$concepto,$sucursal,$empresa,$zn,$fecha_transaccion,$tipo_cuenta,$cuenta,$gestion)
     {                                             
         //idtransaccion, asiento,fecha, id_cliente_proveedor, concepto, precio, idtipo
         // echo json_encode(array($fecha,$coc,$cobro, $pagar,$trans, $cliente,$asiento,$concepto,$precio,$idtipo,$empresa,$sucursal,$idcaja_bancos));
@@ -5230,7 +5230,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
         $idsucursal = $this->getidsucursal($sucursal);
         $idempresa = $this->getidempresa($empresa);
-        $gestion = $this->getgestionactualid($idempresa);
+        // $gestion = $this->getgestionactualid($idempresa);
   
         $res = ""; //array($fecha,$nfactura,$nautorizacion,$codigocontrol,$monto,$tasacero,$export,$npoliza,$ice,$descuento,$espesificacion,$cliente,$co,$pa,$trans,$clasefactura,$cuenta,$idempresa,$idsucursal);
         

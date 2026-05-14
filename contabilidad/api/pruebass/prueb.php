@@ -115,13 +115,13 @@ $nroTransaccion = $resultado122['codigotransaccion'] + 1;
 
     }
 
-    public function listatransacciones($empresa)
+    public function listatransacciones($empresa,$gestion)
     {
         $lista = [];
         // row
         $ide = $this->getidempresa($empresa);
-        $getG = $this->getgestionactualC($empresa);
-        $gestion = $getG['id'];
+        // $getG = $this->getgestionactualC($empresa);
+        // $gestion = $getG['id'];
 
         $gestion_sel = $this->dbc->query("SELECT * FROM gestion WHERE idgestion='$gestion'");
         $gc = $gestion_sel->fetch_assoc();
