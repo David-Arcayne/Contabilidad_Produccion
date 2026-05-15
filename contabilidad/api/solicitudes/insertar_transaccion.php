@@ -1,6 +1,6 @@
 <?php
 session_start();
-//require_once "db.php";
+//require_once "db.php"; 
 require_once "../../db/db.php";
 class Insertar_transaccion extends DB{
     // $codigo, $fecha, $tipocambio, $tipotransaccion, $glosa, $empresa, $sucursal

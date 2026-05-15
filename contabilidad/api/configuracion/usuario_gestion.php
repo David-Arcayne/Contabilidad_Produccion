@@ -34,9 +34,10 @@ class Usuario_gestion extends DB{
     // }
 
     public function asignar_gestiones_a_usuario($data){
-    //  ini_set('display_errors', 1);
-    //     ini_set('display_startup_errors', 1);
-    //     error_reporting(E_ALL);
+     ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+    $success = false;
         $idempresa = $this->getidempresa($data['empresa']);
         // Decodificar el JSON a array asociativo 
         // $gestiones = json_decode($data['gestiones'], true);
@@ -44,10 +45,10 @@ class Usuario_gestion extends DB{
         foreach($data['gestiones'] as $gestion){
 
             $vincu_gestion_usuario = $this->dbc->query("INSERT INTO gestion_por_usuario(idusuario,idgestion,estado,idempresa) VALUES ('$data[idusuario]','$gestion[idgestion]','1','$idempresa')");
-
+            $success = true;
         }
 
-        if ($vincu_gestion_usuario === TRUE) {                                                                                                                                                                
+        if ($success === TRUE) {                                                                                                                                                                
             $res = array("success", "Registro exitoso","registroCaracteristicas");
         }else {
             $res = array("danger", "No se pudo registrar");
@@ -63,9 +64,20 @@ class Usuario_gestion extends DB{
         $get_usuario = $this->dbrh->query("SELECT * FROM usuario WHERE idempresa = '$idempresa'");
     
         while ($qwe = $this->dbc->fetch($get_usuario)) {
+            $get_trabajador = $this->dbrh->query("SELECT * FROM trabajador WHERE idtrabajador = '$qwe[trabajador_idtrabajador]'");
+
+            $trab = $get_trabajador->fetch_assoc();
+
+            $get_cargo = $this->dbrh->query("SELECT * FROM cargos WHERE idcargos = '$trab[cargos_idcargos]'");
+
+            $carg = $get_cargo->fetch_assoc();
+
             $res = array(
                 "idusuario" => $qwe['idusuario'],
-                "nombre" => $qwe['nombre'],
+                "nombre_usuario" => $qwe['nombre'],
+                "nombre_trabajador" => $trab['nombre'],
+                "apellido_trabajador" => $trab['apellido'],
+                "cargo" => $carg['cargo'],
                 "idempresa" => $qwe['idempresa']
             );
             array_push($lista, $res);
@@ -141,10 +153,22 @@ class Usuario_gestion extends DB{
 
             $usuario = $this->dbrh->query("SELECT * FROM usuario WHERE idusuario = '$qwe[idusuario]'");
             $usr = $this->dbrh->fetch($usuario);
+
+            $get_trabajador = $this->dbrh->query("SELECT * FROM trabajador WHERE idtrabajador = '$usr[trabajador_idtrabajador]'");
+
+            $trab = $get_trabajador->fetch_assoc();
+
+            $get_cargo = $this->dbrh->query("SELECT * FROM cargos WHERE idcargos = '$trab[cargos_idcargos]'");
+
+            $carg = $get_cargo->fetch_assoc();
+
             $res = array(
                 "idusuario" => $qwe['idusuario'],
                 "idgestion" => $qwe['idgestion'],
-                "nombre" => $usr['nombre']
+                "nombre_usuario" => $usr['nombre'],
+                "nombre_trabajador" => $trab['nombre'],
+                "apellido_trabajador" => $trab['apellido'],
+                "cargo" => $carg['cargo']
             );
             array_push($lista, $res);
         }
@@ -214,6 +238,48 @@ class Usuario_gestion extends DB{
         }
     
         echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
+    public function listar_gestiones_filtrado($empresa, $idusuario)
+    {
+        $lista = [];
+        
+        // $idusuario=$this->getidusuario($usuario);
+
+        $ide = $this->getidempresa($empresa);
+
+        $get_gestiones = $this->dbc->query("SELECT * FROM gestion_por_usuario WHERE idusuario ='$idusuario' AND idempresa ='$ide'");
+
+        $gestiones = []; // aquí guardamos los IDs
+
+        if($get_gestiones->num_rows > 0){
+            while ($gst = $this->dbc->fetch($get_gestiones)) {
+                $gestiones[] = $gst['idgestion']; 
+            }
+
+            // Convertimos el array en una lista separada por comas
+            $listaGestiones = implode(",", $gestiones);
+            $aux_complemento = " AND idgestion NOT IN(".$listaGestiones.")";
+        }else{
+            $aux_complemento = "";
+        }
+
+        
+        $gestiones_listar = $this->dbc->query("SELECT idgestion,nombre,fechaini,fechafin,estado,fecha,formato_transaccion,idempresa 
+        FROM gestion WHERE idempresa ='$ide' $aux_complemento");
+        while ($qwe = $this->dbc->fetch($gestiones_listar)) {
+
+            // $existe_trans = $this->dbc->query("SELECT * FROM transacciones WHERE idgestion='$qwe[0]' and organizacion_idorganizacion='$ide'");
+
+            // if($existe_trans->num_rows > 0){      
+            //     $tiene_trans = "si";
+            // }else{
+            //     $tiene_trans = "no";
+            // }
+
+            $res = array("id" => $qwe[0], "nombre" => $qwe[1], "fechaini" => $qwe[2], "fechafin" => $qwe[3], "estado" => $qwe[4], "fecha" => $qwe[5],"formato_transaccion" => $qwe[6], "tiene_transaccion" => $tiene_trans);
+            array_push($lista, $res);
+        }
+        echo json_encode($lista);
     }
     public function getidempresa($md5)
     {

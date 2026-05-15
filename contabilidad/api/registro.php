@@ -145,7 +145,7 @@ else{
     $cont->registropagarfacturaf5($_POST['idrecibo'],$_POST['lugar'],$_POST['fecha'],$_POST['persona'],$_POST['ci'],$_POST['idtransaccion'],$_POST['archivo']);
 }elseif($ver=="registrogestion"){
 $cont=new Contabilidad();
-$cont->registrogestion($_POST['nombre'],$_POST['fechaini'],$_POST['fechafin'],$_POST['formato_transaccion'],$_POST['empresa']);
+$cont->registrogestion($_POST['nombre'],$_POST['fechaini'],$_POST['fechafin'],$_POST['formato_transaccion'],$_POST['empresa'],$_POST['usuario']);
 }elseif($ver=="registrogestionf5"){
 $cont=new Contabilidad();
 $cont->registrogestionf5($_POST['nombre'],$_POST['idgestion'],$_POST['empresa'],$_POST['fechaini'],$_POST['fechafin'],$_POST['formato_transaccion']);
@@ -925,7 +925,7 @@ if($data['ver'] == "asignar_asiento_A_factura") {
 // asignar asiento registrar_recibo_cobro_cajaBancos_en_otras_cuentas editar_recibo_caja_bancos registrocobrarfactura registrar_anular_eliminar_activar_factura_tributario_transaccion
 //   registrar_balance_general_admin registrar_vinculacion_depreciacion
 
-// registrar_recibo_cobro_cajaBancos_en_otras_cuentas guardar_balance_general_por_gestion
+// registrar_recibo_cobro_cajaBancos_en_otras_cuentas guardar_balance_general_por_gestion registrogestion
 
 } 
 // registrar_recibo_otras_cuentas registrotransaccion registrar_recibo_cobro_cajaBancos_en_facturas registrar_recibo_pago_cajaBancos_en_otras_cuentas

@@ -801,10 +801,13 @@ elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
 }elseif($ver[0]=="listar_balance_general_guardados"){
     $cont=new Reporte_flujo_efectivo();
     $cont->listar_balance_general_guardados($ver[1]);
+}elseif($ver[0]=="listar_gestiones_filtrado"){
+    $cont=new Usuario_gestion();
+    $cont->listar_gestiones_filtrado($ver[1],$ver[2]);
 }
 // elseif($ver[0]=="obtenerGestionAnterior"){
-//     $cont=new Reporte_flujo_efectivo();
-//     $cont->obtenerGestionAnterior($ver[1],$ver[2]);
+//     $cont=new Reporte_flujo_efectivo(); listadegestion    listar_solo_usuarios 
+//     $cont->obtenerGestionAnterior($ver[1],$ver[2]); eliminar_gestion_contable   
 // }
 
 // reportedetalle  rp listar_gestiones_por_usuarios  listar_agrupacion_plantilla obtener_datos_reporte
@@ -815,12 +818,12 @@ elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
 //   listar_recibo_otras_cuentas listar_tipo_reportes listar_anular_eliminar_factura listatransacciones
 // 
 // lista_pagar_pagado_factura listar_usuarios  listar_agrupacion_plantilla reportecuentasderesultado
-// reportedetallefp lista_pagar_pagado_factura mayorcuentacontable_antiguo reporte_flujo_efectivo
+// reportedetallefp lista_pagar_pagado_factura mayorcuentacontable_antiguo listar_solo_usuarios 
 //  listadesconsolidar listar_anular_eliminar_factura  reporteactivodisponible reportedetalletransaccion
 //
 
 // 
-//  listar_anular_eliminar_factura alerta reportedetallefpt  reportebalancedesumasysaldos reportedeplanes
+//  listar_anular_ reportedetallefpt  reportebalancedesumasysaldos reportedeplanes activar_desactivar_gestiones
 //  estadogestion listar_factura_comercial listatransacciones reporte_balance_general_prueba
 // 
 // 

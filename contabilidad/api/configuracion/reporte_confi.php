@@ -3110,7 +3110,7 @@ public function guardar_balance_general_por_gestion($data, $nivel = 1, $empresa 
                 $res = array("success", "Registro exitoso","registroCaracteristicas");
                 echo json_encode($res);
         } else {
-                $res = array("danger", "No se pudo registrar");
+                $res = array("danger", "Ya existe balance general en la gestion");
                 echo json_encode($res);
         }
     }

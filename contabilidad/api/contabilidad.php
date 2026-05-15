@@ -1776,13 +1776,21 @@ WHERE
         return $qwe['idgestion'];
     }
 
-     public function  registrogestion($nombre, $fechaini, $fechafin, $formato_trans, $empresa)
+     public function  registrogestion($nombre, $fechaini, $fechafin, $formato_trans, $empresa,$usuario)
     {
+        $idusuario=$this->getidusuario($usuario);
         $res = "";
         $ide = $this->getidempresa($empresa);
         $fecha = date("Y-m-d");
-        $registro = $this->dbc->query("insert into gestion(idgestion,nombre,fechaini,fechafin,fecha,formato_transaccion,idempresa)value(NULL,'$nombre','$fechaini','$fechafin','$fecha','$formato_trans','$ide')");
+        $registro = $this->dbc->query("INSERT INTO gestion(idgestion,nombre,fechaini,fechafin,fecha,formato_transaccion,idempresa)
+        VALUES(NULL,'$nombre','$fechaini','$fechafin','$fecha','$formato_trans','$ide')");
+
         if ($registro === TRUE) {
+            $idgestion = $this->dbc->insert_id;
+            
+            $registro = $this->dbc->query("INSERT INTO gestion_por_usuario(idusuario,idgestion,estado,idempresa)
+            VALUES('$idusuario','$idgestion','1','$ide')");
+
             $res = array("success", "registro Correcto", "registrogestion");
         } else {
             $res = array("danger", "No se pudo realizar el registro");
@@ -2094,6 +2102,9 @@ WHERE
             $query = "DELETE FROM gestion WHERE idgestion='$id'";
             $this->dbc->query($query);
             
+            $query2 = "DELETE FROM gestion_por_usuario WHERE idgestion='$id'";
+            $this->dbc->query($query2);
+
             $this->dbc->commit();
             $res = array("success", "Se eliminó correctamente", "eliminarcliente");
     
