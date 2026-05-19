@@ -920,12 +920,20 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     }elseif($data['ver'] == "asignar_gestiones_a_usuario") {
         $cont=new Usuario_gestion();
         $cont->asignar_gestiones_a_usuario($data);
+    }elseif($ver == "editar_flujo_efectivo"){
+        if(isset($_POST['idplantilla'],$_POST['idconfi_reporte'],$_POST['obtiene_desde'],$_POST['nombre_registro'],$_POST['tipo_operacion'],$_POST['orden'],$_POST['idplantilla_padre'],$_POST['negrilla_cursiva'],$_POST['empresa'])){
+            // decode echo json_encode(array("danger", "Faltan parámetros en la solicitud", $_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$facturas));
+            $cont=new Reporte_flujo_efectivo();
+            $cont->editar_flujo_efectivo($_POST['idplantilla'],$_POST['idconfi_reporte'],$_POST['obtiene_desde'],$_POST['nombre_registro'],$_POST['tipo_operacion'],$_POST['orden'],$_POST['idplantilla_padre'],$_POST['negrilla_cursiva'],$_POST['empresa']);
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idplantilla'],$_POST['idconfi_reporte'],$_POST['obtiene_desde'],$_POST['nombre_registro'],$_POST['tipo_operacion'],$_POST['orden'],$_POST['idplantilla_padre'],$_POST['negrilla_cursiva'],$_POST['empresa']));
+        }
     }
-   
 // asignar asiento registrar_recibo_cobro_cajaBancos_en_otras_cuentas editar_recibo_caja_bancos registrocobrarfactura registrar_anular_eliminar_activar_factura_tributario_transaccion
-//   registrar_balance_general_admin registrar_vinculacion_depreciacion
+//   registrar_balance_general_admin registrar_vinculacion_depreciacion editar_registro_flujo_efectivo
 
-// registrar_recibo_cobro_cajaBancos_en_otras_cuentas guardar_balance_general_por_gestion registrogestion
+// registrar_recibo_cobro_cajaBancos_en_otras_cuentas guardar_balance_general_por_gestion registrogestion registrar_agrupacion_plantilla
 
 } 
 // registrar_recibo_otras_cuentas registrotransaccion registrar_recibo_cobro_cajaBancos_en_facturas registrar_recibo_pago_cajaBancos_en_otras_cuentas
