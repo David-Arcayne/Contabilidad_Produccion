@@ -804,6 +804,9 @@ elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
 }elseif($ver[0]=="listar_gestiones_filtrado"){
     $cont=new Usuario_gestion();
     $cont->listar_gestiones_filtrado($ver[1],$ver[2]);
+}elseif($ver[0]=="listar_balance_general_completo_icono"){
+    $cont=new Reporte_confi();
+    $cont->listar_balance_general_completo_icono($ver[1]);
 }
 // elseif($ver[0]=="obtenerGestionAnterior"){ 
 //     $cont=new Reporte_flujo_efectivo(); listadegestion    listar_solo_usuarios 
@@ -811,11 +814,11 @@ elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
 // }
 
 // reportedetalle  rp listar_gestiones_por_usuarios  listar_agrupacion_plantilla obtener_datos_reporte listar_agrupacion_plantilla_flujo_efectivo
-// listar_factura listar_facturas_cobro_pago  rp_eliminar_plantilla reporte_balance_general_por_niveles
+// listar_factura listar_facturas_cobro_pago  rp_eliminar_plantilla reporte_balance_general_por_niveles listar_balance_general_guardados
 // listar_recibo_otras_cuentas_pagar listadegestion eliminar_otras_operaciones reporte_estado_origen_aplicacion
 
 // lista_cobrar_cobrado_factura listar_caja_bancos reporteactivoypasivo mayorcuentacontable
-// listatransacciones listar_balance_general_guardados
+// listatransacciones listar_balance_general_guardados listar_plantilla_flujo_efectivo
 // 
 // lista_pagar_pagado_factura listar_usuarios  listar_agrupacion_plantilla reportecuentasderesultado
 // reportedetallefp lista_pagar_pagado_factura mayorcuentacontable_antiguo listar_solo_usuarios 

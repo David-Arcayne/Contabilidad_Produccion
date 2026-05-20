@@ -35,13 +35,18 @@ public function listar_plantilla_flujo_efectivo($idplantilla_reporte,$empresa) {
 
             }
 
-            if($qwe['idconfiguracion_reporte'] != 0 || $qwe['idconfiguracion_reporte'] != null){
-                // $nombre_perso = "";
-                $nombre_perso = $qwe['nombre_registro'];
-            }else{
-                // $nombre_perso = $qwe['nombre_registro'];
+            if($qwe['tipo_operacion'] == 'operaciones_vinculacion' && $nombre_aux2 != ''){
                 $nombre_perso = "";
+            }else{
+                if($qwe['idconfiguracion_reporte'] != 0 || $qwe['idconfiguracion_reporte'] != null){
+                // $nombre_perso = "";
+                    $nombre_perso = $qwe['nombre_registro'];
+                }else{
+                    // $nombre_perso = $qwe['nombre_registro'];
+                    $nombre_perso = "";
+                }
             }
+            
             $res = array(
                 // "reporte" => $qwe['reporte'],
                 "idconfi_reporte_flujo_efectivo" => $qwe['idconfi_reporte_flujo_efectivo'],
@@ -1083,6 +1088,7 @@ $aux_string ="";
 
             $res = array(
                 // "idconfi_reporte_flujo_efectivo" => $qwe['idconfi_reporte_flujo_efectivo'],
+                "idgestion" => $gst['idgestion'],
                 "nombre_gestion" => $gst['nombre'],
                 "fecha_ini" => $gst['fechaini'],
                 "fecha_fin" => $gst['fechafin'],

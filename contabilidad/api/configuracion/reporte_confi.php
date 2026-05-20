@@ -3117,155 +3117,112 @@ public function guardar_balance_general_por_gestion($data, $nivel = 1, $empresa 
 
 }
 
-public function listar_balance_general_completo_icono($idplantilla_reporte,$empresa) {
+public function listar_balance_general_completo_icono($idgestion) {
         //    ini_set('display_errors', 1); 
         // ini_set('display_startup_errors', 1);
         // error_reporting(E_ALL);
         $lista = [];
-        $idempresa = $this->getidempresa($empresa);
+        // $idempresa = $this->getidempresa($empresa);
     
         // Preparar la consulta
         // $getPedido = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE nivel_registrado = '1' AND idempresa = '$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
-        $getPedido = $this->dbc->query("SELECT DISTINCT(reporte) FROM configuracion_reporte WHERE idempresa='$idempresa' AND reporte = 'balance_general' AND idplantilla_reporte ='$idplantilla_reporte'");// ACTIVO, PASIVO, PATRIMONIO
+        // $getPedido = $this->dbc->query("SELECT DISTINCT(reporte) FROM configuracion_reporte WHERE idempresa='$idempresa' AND reporte = 'balance_general' AND idplantilla_reporte ='$idplantilla_reporte'");// ACTIVO, PASIVO, PATRIMONIO
 
-        while ($qwe = $this->dbc->fetch($getPedido)) {
-            $res = array(
-                "reporte" => $qwe['reporte'],
-                "nivel_1" => [] //activo
-                // "nivel_3" => $qwe['nombre'],// 
-                // "estado" => $qwe['estado']
-            );
+        // while ($qwe = $this->dbc->fetch($getPedido)) {
+            // $res = array(
+            //     "reporte" => $qwe['reporte'],
+            //     "nivel_1" => [] //activo
+            //     // "nivel_3" => $qwe['nombre'],// 
+            //     // "estado" => $qwe['estado']
+            // );
         
         // $get_nivel_2 = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE nivel_registrado = '2' AND idempresa = '$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
 
-        $get_nivel_2 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '' AND reporte = '$qwe[reporte]' AND idempresa='$idempresa' 
-        AND idplantilla_reporte ='$idplantilla_reporte' ORDER BY orden ASC");// ACTIVO, PASIVO, PATRIMONIO
-        while ($qwe2 = $this->dbc->fetch($get_nivel_2)) {
-        $cuenta = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe2[idplandecuenta]'");// ACTIVO, PASIVO, PATRIMONIO
-        $nombre_cuenta = $cuenta->fetch_assoc();
+        $get_nivel_2 = $this->dbc->query("SELECT * FROM balance_general_por_gestion WHERE idgestion = '$idgestion' AND nivel ='1'");// ACTIVO, PASIVO, PATRIMONIO
         
-        $depre_consulta = $this->dbc->query("SELECT * from vinculacion_cuenta_depreciacion where idcuenta_depreciacion = '$qwe2[idplandecuenta]'");// ACTIVO, PASIVO, PATRIMONIO
-
-        if($depre_consulta->num_rows > 0){
-            $es_depreciacion = 'si';
-        }else{
-            $es_depreciacion = 'no';
-        }
+        while ($qwe2 = $this->dbc->fetch($get_nivel_2)) {
+        
             $res2 = array(
                 "idconfiguracion_reporte" => $qwe2['idconfiguracion_reporte'],
-                "idplandecuenta" => $nombre_cuenta['idplandecuenta'],
-                "codigo" => $nombre_cuenta['numero'],
-                "nombre_nivel_1" => $nombre_cuenta['nombreplan'],
-                "es_activo_fijo" => $qwe2['es_activo_fijo'],
-                "es_calculable" => $qwe2['es_calculable'],
+                // "es_activo_fijo" => $qwe3['es_activo_fijo'],
+                // "es_calculable" => $qwe3['es_calculable'],
+                "nombre" => $qwe2['nombre_actual'],
+                "nivel" => $qwe2['nivel'],
                 "orden" => $qwe2['orden'],
-                "es_depreciacion" => $es_depreciacion,
-                "negrilla_cursiva" => $qwe2['negrilla_cursiva'],
+                // "es_depreciacion" => $es_depreciacion,
+                "valor" => $qwe2['valor'],
                 "nivel_2" => [] //activo
                 // "nivel_3" => $qwe['nombre'],// 
                 // "estado" => $qwe['estado']
                 
             );
-            $get_nivel_3 = $this->dbc->query("SELECT * from configuracion_reporte WHERE grupo = '$qwe2[grupo]' AND nombre_cuenta_superior = '$nombre_cuenta[nombreplan]' AND reporte = '$qwe[reporte]' AND idempresa='$idempresa' 
-            AND idplantilla_reporte ='$idplantilla_reporte' ORDER BY orden ASC");// ACTIVO, PASIVO, PATRIMONIO
+            $get_nivel_3 = $this->dbc->query("SELECT * FROM balance_general_por_gestion WHERE idgestion = '$idgestion' 
+  AND nombre_cuenta_superior ='$qwe2[nombre_actual]' AND grupo ='$qwe2[grupo]'");// ACTIVO, PASIVO, PATRIMONIO
             while ($qwe3 = $this->dbc->fetch($get_nivel_3)) {
-                $cuenta2 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe3[idplandecuenta]'");// ACTIVO, PASIVO, PATRIMONIO
-                $nombre_cuenta2 = $cuenta2->fetch_assoc();
-
-                $depre_consulta = $this->dbc->query("SELECT * from vinculacion_cuenta_depreciacion where idcuenta_depreciacion = '$qwe3[idplandecuenta]'
-                AND idtipo_reportes ='$idplantilla_reporte'");// ACTIVO, PASIVO, PATRIMONIO
-
-                if($depre_consulta->num_rows > 0){
-                    $es_depreciacion = 'si';
-                }else{
-                    $es_depreciacion = 'no';
-                }
 
                 $res3 = array(
                 "idconfiguracion_reporte" => $qwe3['idconfiguracion_reporte'],
-                "idplandecuenta" => $nombre_cuenta2['idplandecuenta'],
-                "codigo" => $nombre_cuenta2['numero'],
-                "nombre_nivel_2" => $nombre_cuenta2['nombreplan'],
-                "es_activo_fijo" => $qwe3['es_activo_fijo'],
-                "es_calculable" => $qwe3['es_calculable'],
+                // "es_activo_fijo" => $qwe3['es_activo_fijo'],
+                // "es_calculable" => $qwe3['es_calculable'],
+                "nombre" => $qwe3['nombre_actual'],
+                "nivel" => $qwe3['nivel'],
                 "orden" => $qwe3['orden'],
-                "es_depreciacion" => $es_depreciacion,
-                "negrilla_cursiva" => $qwe3['negrilla_cursiva'],
+                // "es_depreciacion" => $es_depreciacion,
+                "valor" => $qwe3['valor'],
                 "nivel_3" => [] //activo
                 // "nivel_3" => $qwe['nombre'],// 
                 // "estado" => $qwe['estado']
                 );
-                 $get_nivel_4 = $this->dbc->query("SELECT * from configuracion_reporte where grupo = '$qwe3[grupo]' AND nombre_cuenta_superior = '$nombre_cuenta2[nombreplan]' AND reporte = '$qwe[reporte]' AND idempresa='$idempresa' 
-                 AND idplantilla_reporte ='$idplantilla_reporte' ORDER BY orden ASC");// ACTIVO, PASIVO, PATRIMONIO
+                 $get_nivel_4 = $this->dbc->query("SELECT * FROM balance_general_por_gestion WHERE idgestion = '$idgestion' 
+  -- AND nivel ='4' 
+    AND nombre_cuenta_superior ='$qwe3[nombre_actual]' AND grupo ='$qwe3[grupo]'
+    ORDER BY orden ASC");// ACTIVO, PASIVO, PATRIMONIO
                 while ($qwe4 = $this->dbc->fetch($get_nivel_4)) {
-                    $cuenta3 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe4[idplandecuenta]'");// ACTIVO, PASIVO, PATRIMONIO
-                    $nombre_cuenta3 = $cuenta3->fetch_assoc();
-
-                    $depre_consulta = $this->dbc->query("SELECT * from vinculacion_cuenta_depreciacion where idcuenta_depreciacion = '$qwe4[idplandecuenta]'
-                    AND idtipo_reportes ='$idplantilla_reporte'");// ACTIVO, PASIVO, PATRIMONIO
-
-                    if($depre_consulta->num_rows > 0){
-                        $es_depreciacion = 'si';
-                    }else{
-                        $es_depreciacion = 'no';
-                    }
 
                     $res4 = array(
                     "idconfiguracion_reporte" => $qwe4['idconfiguracion_reporte'],
-                    "idplandecuenta" => $nombre_cuenta3['idplandecuenta'],   
-                    "codigo" => $nombre_cuenta3['numero'],
-                    "nombre_nivel_3" => $nombre_cuenta3['nombreplan'],
-                    "es_activo_fijo" => $qwe4['es_activo_fijo'],
-                    "es_calculable" => $qwe4['es_calculable'],
-                    "orden" => $qwe4['orden'],
-                    "es_depreciacion" => $es_depreciacion,
-                    "negrilla_cursiva" => $qwe4['negrilla_cursiva'],
+                // "es_activo_fijo" => $qwe3['es_activo_fijo'],
+                // "es_calculable" => $qwe3['es_calculable'],
+                "nombre" => $qwe4['nombre_actual'],
+                "nivel" => $qwe4['nivel'],
+                "orden" => $qwe4['orden'],
+                // "es_depreciacion" => $es_depreciacion,
+                "valor" => $qwe4['valor'],
                     "nivel_4" => [] //activo
                     );
-                    $get_nivel_5 = $this->dbc->query("SELECT * from configuracion_reporte where grupo = '$qwe4[grupo]' AND nombre_cuenta_superior = '$nombre_cuenta3[nombreplan]' AND reporte = '$qwe[reporte]' AND idempresa='$idempresa'
-                    AND idplantilla_reporte ='$idplantilla_reporte' ORDER BY orden ASC");// ACTIVO, PASIVO, PATRIMONIO
+                    $get_nivel_5 = $this->dbc->query("SELECT * FROM balance_general_por_gestion WHERE idgestion = '$idgestion' 
+  -- AND nivel ='4' 
+    AND nombre_cuenta_superior ='$qwe4[nombre_actual]' AND grupo ='$qwe4[grupo]'
+    ORDER BY orden ASC");// ACTIVO, PASIVO, PATRIMONIO
                     while ($qwe5 = $this->dbc->fetch($get_nivel_5)) {
-                        $cuenta4 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe5[idplandecuenta]'");// ACTIVO, PASIVO, PATRIMONIO
-                        $nombre_cuenta4 = $cuenta4->fetch_assoc();
-
-                        $depre_consulta = $this->dbc->query("SELECT * from vinculacion_cuenta_depreciacion where idcuenta_depreciacion = '$qwe5[idplandecuenta]'
-                        AND idtipo_reportes ='$idplantilla_reporte'");// ACTIVO, PASIVO, PATRIMONIO
-
-                        if($depre_consulta->num_rows > 0){
-                            $es_depreciacion = 'si';
-                        }else{
-                            $es_depreciacion = 'no';
-                        }
 
                         $res5 = array(
                         "idconfiguracion_reporte" => $qwe5['idconfiguracion_reporte'],
-                        "idplandecuenta" => $nombre_cuenta4['idplandecuenta'],    
-                        "codigo" => $nombre_cuenta4['numero'],
-                        "nombre_nivel_4" => $nombre_cuenta4['nombreplan'],
-                        "es_activo_fijo" => $qwe5['es_activo_fijo'],
-                        "es_calculable" => $qwe5['es_calculable'],
-                        "orden" => $qwe5['orden'],
-                        "es_depreciacion" => $es_depreciacion,
-                        "negrilla_cursiva" => $qwe5['negrilla_cursiva'],
+                // "es_activo_fijo" => $qwe3['es_activo_fijo'],
+                // "es_calculable" => $qwe3['es_calculable'],
+                "nombre" => $qwe5['nombre_actual'],
+                "nivel" => $qwe5['nivel'],
+                "orden" => $qwe5['orden'],
+                // "es_depreciacion" => $es_depreciacion,
+                "valor" => $qwe5['valor'],
                         "nivel_5" => [] //activo
                         );
                 //----------------------------------------------------------------------------
-                    $get_nivel_6 = $this->dbc->query("SELECT * from configuracion_reporte where grupo = '$qwe5[grupo]' AND nombre_cuenta_superior = '$nombre_cuenta4[nombreplan]' AND reporte = '$qwe[reporte]' AND idempresa='$idempresa' 
-                    AND idplantilla_reporte ='$idplantilla_reporte' ORDER BY orden ASC");// ACTIVO, PASIVO, PATRIMONIO
+                    $get_nivel_6 = $this->dbc->query("SELECT * FROM balance_general_por_gestion WHERE idgestion = '$idgestion' 
+  -- AND nivel ='4' 
+    AND nombre_cuenta_superior ='$qwe5[nombre_actual]' AND grupo ='$qwe5[grupo]'
+    ORDER BY orden ASC");// ACTIVO, PASIVO, PATRIMONIO
                     while ($qwe6 = $this->dbc->fetch($get_nivel_6)) {
-                        $cuenta5 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe6[idplandecuenta]'");// ACTIVO, PASIVO, PATRIMONIO
-                        $nombre_cuenta5 = $cuenta5->fetch_assoc();
 
                         $res6 = array(
                         "idconfiguracion_reporte" => $qwe6['idconfiguracion_reporte'],
-                        "idplandecuenta" => $nombre_cuenta5['idplandecuenta'], 
-                        "codigo" => $nombre_cuenta5['numero'],   
-                        "nombre_nivel_5" => $nombre_cuenta5['nombreplan'],
-                        "es_activo_fijo" => $qwe6['es_activo_fijo'],
-                        "es_calculable" => $qwe6['es_calculable'],
-                        "orden" => $qwe6['orden'],
-                        "es_depreciacion" => $es_depreciacion,
-                        "negrilla_cursiva" => $qwe6['negrilla_cursiva'],
+                    // "es_activo_fijo" => $qwe3['es_activo_fijo'],
+                    // "es_calculable" => $qwe3['es_calculable'],
+                    "nombre" => $qwe6['nombre_actual'],
+                    "nivel" => $qwe6['nivel'],
+                    "orden" => $qwe6['orden'],
+                    // "es_depreciacion" => $es_depreciacion,
+                    "valor" => $qwe6['valor'],
                         "nivel_5" => [] //activo
                         );
                         
@@ -3278,10 +3235,11 @@ public function listar_balance_general_completo_icono($idplantilla_reporte,$empr
                 }
                array_push($res2['nivel_2'], $res3); 
             }
-            array_push($res['nivel_1'], $res2);
+            // array_push($res['nivel_1'], $res2);
+            array_push($lista, $res2);
         }
-            array_push($lista, $res);
-        }
+            // array_push($lista, $res);
+        // }
     
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
