@@ -2254,7 +2254,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
     }else{// TIPO = 3 --> TODOS 
 
-        $getPedido = $this->dbc->query("SELECT 
+        $get_contabilidad = $this->dbc->query("SELECT 
             cp.idcuentaspor AS id_cuenta,
             cp.idrecibo,
             cp.nrecibo,
@@ -2308,22 +2308,22 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
         ORDER BY fecha ASC;");
     
     // Convertir resultado en arreglo
-    $array_1 = [];
-    while ($row = $getPedido->fetch_assoc()) {
-        $array_1[] = $row;
+    $array_contabilidad = [];
+    while ($row = $get_contabilidad->fetch_assoc()) {
+        $array_contabilidad[] = $row;
     }
 
     $comprobante_comercial = $this->dbc->query("SELECT cc.*, 'COMERCIAL' AS modulo FROM comprobantes_comercial_caja_bancos cc
     WHERE cc.idcaja_bancos IN($caja_bancos) AND cc.fecha BETWEEN '$fecha_ini' AND '$fecha_fin' ORDER BY cc.fecha ASC;");
 
     // Convertir resultado en arreglo
-    $array_2 = [];
+    $array_comercial = [];
     while ($cc = $comprobante_comercial->fetch_assoc()) {
-        $array_2[] = $cc;
+        $array_comercial[] = $cc;
     }
 
     // 1. Unir ambos listados
-    $combinado = array_merge($array_1, $array_2);
+    $combinado = array_merge($array_contabilidad, $array_comercial);
 
     // 2. Ordenar por fecha ascendente
     usort($combinado, function($a, $b) {
@@ -2341,13 +2341,17 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                      
                 //     $cp['transaccion']
     
-                if($qwe['modulo'] == 'CONTABILIDAD'){
+//{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+                
+            ////ESTE APARTADO ES PARA DEFINIR QUue DOCUMENTOS ESTAN ACTIVOS O ANULADOS O PENDIENTES
+            // Y PARA SABER NOMBRE DE LOS CLIENTES Y PROVEEDORES
+
+                if($qwe['modulo'] == 'CONTABILIDAD'){ // LOS REGISTROS DE CONTABILIDAD TENDRAN DIFERENTES CAMPOS QUE COMERCIAL
 
                     if($qwe['ingreso_egreso'] == 'ingreso'){
 
                     if($qwe['idfactura'] != 0){
-                        //es cliente y se puede obtener del campo cliente directamente 
-                        // $proveedor = $this->dbcm->query("select * from proveedor where id_proveedor='" . $qwe[18] . "'");
+                        
                         $factura = $this->dbc->query("SELECT * 
                         FROM factura 
                         WHERE idfactura = '$qwe[idfactura]'");
@@ -2420,7 +2424,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         $cl = $cliente->fetch_assoc();
                     }
 
-                }else{// PAGAR
+                }else{// PAGAR --> egreso  --> contabilidad
                     
                     if($qwe['idfactura'] != 0){
                         //es cliente y se puede obtener del campo cliente directamente 
@@ -2503,6 +2507,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                 }elseif($qwe['modulo'] == 'COMERCIAL'){
 
                 }
+//{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
                 
                 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
                 if($aux_contador == 0){ //ESTAMOS EN PRIMERA FILA, SUMAR LAS ANTERIORES FILAS A LA FECHA
@@ -2594,7 +2599,10 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                 // $saldo = $saldo + $qwe['monto'];
      
             }
-                //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+//ESTE APARTADO ES PARA MOSTRAR EN LA LISTA EL "res" //¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿'''''''''''''000000000000000000000000000000000000000000000000000000
+
                 if($qwe['modulo'] == 'CONTABILIDAD'){
 
                     if($qwe['ingreso_egreso'] == 'ingreso'){
@@ -2606,22 +2614,15 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                     }
 
                     if($qwe['idrecibo'] != 0){
-                        //Según documento N° 11 de 24/04/2025
-                        $fecha_nueva = date("d/m/Y", strtotime($reci['fecha']));
-                        // $aux_descripcion = "s/g doc N° $reci[nro_recibo] de: $fecha_nueva";
-                        $otras_cuentas = $this->dbc->query("SELECT * 
-                        FROM otras_cuentas
-                        WHERE idotras_cuentas = '$reci[idotras_cuentas]'");
+                        
+                        // $fecha_nueva = date("d/m/Y", strtotime($reci['fecha']));
+                        
+                        // $otras_cuentas = $this->dbc->query("SELECT * 
+                        // FROM otras_cuentas
+                        // WHERE idotras_cuentas = '$reci[idotras_cuentas]'");
 
-                        $oc = $otras_cuentas->fetch_assoc();
+                        // $oc = $otras_cuentas->fetch_assoc();
 
-                        // if($oc['cobrado'] == '-1' && $oc['pagado'] == '-1'){ //CONTRATO GENERAL
-                        //     $aux_descripcion = $reci['concepto'];
-                        // }else{
-                        //     $aux_descripcion = $reci['concepto']."("."s/g Contrato: ". $oc['concepto'].", N° ".$oc['nro_otras_cuentas'].", ".$oc['fecha'].")"; // NO ES CONTRATO GENERAL
-                        // }
-
-                  
                         $res = array(
                             "fecha" => $qwe['fecha'],
                             "tipo_documento" => 3,
@@ -2651,25 +2652,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "pertenece_contratacion" => "si"
                         );
                     }else{
-                        $fecha_nueva = date("d/m/Y", strtotime($fact['fecha']));
-
-                        // if($fact['idotras_cuentas'] == '0' || $fact['idotras_cuentas'] == null){ //ESTA FACTURA NOO PERTENECE A CONTRATO, NO TENDRA "s/g Contrato"
-                        //     $aux_descripcion = $fact['por_concepto_de'];
-                        //     $pertenece_contrato = "no";
-                        // }else{
-                        //     //ESTA FACTURA SII PERTENECE A CONTRATO
-                   
-                        //     $otras_cuentas = $this->dbc->query("SELECT * FROM otras_cuentas WHERE idotras_cuentas = '$fact[idotras_cuentas]'");
-                        //     $oc = $otras_cuentas->fetch_assoc();
-
-                        //     if($oc['cobrado'] == '-1' && $oc['pagado'] == '-1'){ //CONTRATO GENERAL
-                        //         $aux_descripcion = $fact['por_concepto_de'];
-                        //     }else{
-                        //         $aux_descripcion = $fact['por_concepto_de']."("."s/g Contrato: ". $oc['concepto'].", N° ".$oc['nro_otras_cuentas'].", ".$oc['fecha'].")"; // NO ES CONTRATO GENERAL
-                        //     }
-
-                        //     $pertenece_contrato = "si";
-                        // }
+                        // $fecha_nueva = date("d/m/Y", strtotime($fact['fecha']));
         
                         if($fact['tipo_factura'] == 'contado'){ //factura al contado
                             $aux_descripcion = $fact['por_concepto_de'];
@@ -2709,7 +2692,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "pertenece_contratacion" => 'si'
                         );
                     }
-                }else{ // PAGAR
+                }else{ // PAGAR --> egreso --> contabilidad
 
 
                     if($estado_documento == 'anulado'){
@@ -2718,13 +2701,13 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             $saldo = $saldo - $qwe['monto'];
                     }
                     if($qwe['idrecibo'] != 0){
-                        $fecha_nueva = date("d/m/Y", strtotime($reci['fecha']));
+                        // $fecha_nueva = date("d/m/Y", strtotime($reci['fecha']));
                         // $aux_descripcion = "s/g doc N° $reci[nro_recibo] de: $fecha_nueva";
-                        $otras_cuentas = $this->dbc->query("SELECT * 
-                        FROM otras_cuentas
-                        WHERE idotras_cuentas = '$reci[idotras_cuentas]'");
+                        // $otras_cuentas = $this->dbc->query("SELECT * 
+                        // FROM otras_cuentas
+                        // WHERE idotras_cuentas = '$reci[idotras_cuentas]'");
 
-                        $oc = $otras_cuentas->fetch_assoc();
+                        // $oc = $otras_cuentas->fetch_assoc();
 
                         // if($oc['cobrado'] == '-1' && $oc['pagado'] == '-1'){ //CONTRATO GENERAL
                         //     $aux_descripcion = $reci['concepto'];
@@ -2761,7 +2744,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "pertenece_contratacion" => "si"
                         );
                     }else{
-                        $fecha_nueva = date("d/m/Y", strtotime($fact['fecha']));
+                        // $fecha_nueva = date("d/m/Y", strtotime($fact['fecha']));
 
                         // if($fact['idotras_cuentas'] == '0' || $fact['idotras_cuentas'] == null){ //ESTA FACTURA NO PERTENECE A CONTRATO, NO TENDRA "s/g Contrato"
                         //     $aux_descripcion = $fact['por_concepto_de'];
@@ -2825,7 +2808,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
                     if($qwe['ingreso_egreso'] == 'ingreso'){
 
-                        if($qwe['estado'] == 'no autorizado'){
+                        if($qwe['estado'] == 'no_autorizado'){
                             // no sumara nada porque el documento esta anulado
                         }else{
                                 $saldo = $saldo + $qwe['monto'];

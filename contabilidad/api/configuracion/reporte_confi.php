@@ -4,20 +4,35 @@ require_once "../../db/db.php";
 
 class Reporte_confi extends DB{
 
-    public function activar_desactivar_tipo_reportes($idtipo_reportes, $estado){
-         ini_set('display_errors', 1);
+    public function activar_desactivar_tipo_reportes($idtipo_reportes, $estado,$tipo_reporte,$idempresa){
+        ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
         // $idempresa = $this->getidempresa($empresa);
 
+        $get_tipoReport = $this->dbc->query("SELECT * FROM tipo_reportes WHERE tipo_reporte ='$tipo_reporte'
+        AND estado ='$estado' AND idempresa ='$idempresa'");
+
+        if($get_tipoReport->num_rows > 0){
+            //MOSTRAR ALGUN MENSAJE DE ERROR O ADVERTENCIA DE QUE YA EXISTE UNA PLANILLA CON EL MISMO ESTADO
+            // while ($qwe = $this->dbc->fetch($get_tipoReport)) {
+            //     $desactivar_estados = $this->dbc->query("UPDATE tipo_reportes SET estado = '0' WHERE idtipo_reportes = '$qwe[idtipo_reportes]'");
+
+            // }
+            // $cambiar_estado = $this->dbc->query("UPDATE tipo_reportes SET estado = '$estado' WHERE idtipo_reportes = '$idtipo_reportes'");
+
+            $cambiar_estado = FALSE;
+        }else{
             $cambiar_estado = $this->dbc->query("UPDATE tipo_reportes SET estado = '$estado' WHERE idtipo_reportes = '$idtipo_reportes'");
+        }
+    
            
                 if ($cambiar_estado === TRUE){   
                     // $desactivado = $this->dbc->query("UPDATE tipo_reportes SET estado = '0' WHERE tipo_reporte = '$tipo_reporte' AND idtipo_reportes != '$idtipo_reportes' AND idempresa = '$idempresa'");
                                                                                                                                                                     
                     $res = array("success", "Se cambio de estado correctamente","rp_registrar_reporte");
                 }else {
-                    $res = array("danger", "No se pudo registrar");
+                    $res = array("danger", "Ya existe una planilla con ese estado");
                 }
         echo json_encode($res);
     }
@@ -38,7 +53,7 @@ class Reporte_confi extends DB{
         echo json_encode($res);
     }
 
- public function listar_tipo_reportes($empresa) {
+    public function listar_tipo_reportes($empresa) {
     $idempresa = $this->getidempresa($empresa);
         $lista = [];
         $registro = $this->dbc->query("SELECT * FROM tipo_reportes WHERE idempresa='$idempresa'");

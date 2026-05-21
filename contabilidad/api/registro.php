@@ -706,11 +706,11 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         }
     }
     elseif($ver=="activar_desactivar_tipo_reportes"){
-        if(isset($_POST['idtipo_reportes'],$_POST['estado'])){
+        if(isset($_POST['idtipo_reportes'],$_POST['estado'],$_POST['tipo_reporte'],$_POST['idempresa'])){
             $cont=new Reporte_confi();
-            $cont->activar_desactivar_tipo_reportes($_POST['idtipo_reportes'],$_POST['estado']);
+            $cont->activar_desactivar_tipo_reportes($_POST['idtipo_reportes'],$_POST['estado'],$_POST['tipo_reporte'],$_POST['idempresa']);
         }else{
-            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idtipo_reportes'],$_POST['estado']));
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idtipo_reportes'],$_POST['estado'],$_POST['tipo_reporte'],$_POST['idempresa']));
         }
     }
     elseif($ver=="registrar_estado_resultados_admin"){
@@ -933,10 +933,10 @@ if($data['ver'] == "asignar_asiento_A_factura") {
 // asignar asiento registrar_recibo_cobro_cajaBancos_en_otras_cuentas editar_recibo_caja_bancos registrocobrarfactura registrar_anular_eliminar_activar_factura_tributario_transaccion
 //   registrar_balance_general_admin registrar_vinculacion_depreciacion editar_registro_flujo_efectivo
 
-// registrar_recibo_cobro_cajaBancos_en_otras_cuentas guardar_balance_general_por_gestion registrogestion registrar_agrupacion_plantilla
+// registrar_recibo_cobro_cajaBancos_en_otras_cuentas guardar_balance_general_por_gestion registrogestion desvincular
 
 } 
-// registrar_recibo_otras_cuentas registrotransaccion registrar_recibo_cobro_cajaBancos_en_facturas registrar_recibo_pago_cajaBancos_en_otras_cuentas
+// registrar_recibo_otras_cuentas registrotransaccion registrar_recibo_cobro_cajaBancos_en_facturas registrar_recibo_pago_cajaBancos_en_otras_cuentas activar_desactivar_tipo_reportes
 // registrar_agrupacion_plantilla registro_transaccion_comercial registrar_factura_recibo_pago_cajaBancos registrar_recibo_pago_cajaBancos_en_facturas
 // crearsolofacturasapif5  registrar_recibo_cobro_cajaBancos_en_facturas registrar_factura_recibo_cobro_cajaBancos cobrar_contratacion_con_factura_cajaBancos
 ?> 

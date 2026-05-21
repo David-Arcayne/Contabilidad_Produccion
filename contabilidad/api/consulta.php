@@ -813,15 +813,15 @@ elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
 //     $cont->obtenerGestionAnterior($ver[1],$ver[2]); eliminar_gestion_contable   
 // }
 
-// reportedetalle  rp listar_gestiones_por_usuarios  listar_agrupacion_plantilla obtener_datos_reporte listar_agrupacion_plantilla_flujo_efectivo
-// listar_factura listar_facturas_cobro_pago  rp_eliminar_plantilla reporte_balance_general_por_niveles listar_balance_general_guardados
-// listar_recibo_otras_cuentas_pagar listadegestion eliminar_otras_operaciones reporte_estado_origen_aplicacion
+// reportedetalle  rp listar_gestiones_por_usuarios desvincular
+// listar_factura listar_facturas_cobro_pago listar_recibo_por_caja_bancos
+// listar_recibo_otras_cuentas_pagar listadegestion eliminar_otras_operaciones reporte_estado_origen_aplicacion listar_factura_comercial_con_transaccion
 
 // lista_cobrar_cobrado_factura listar_caja_bancos reporteactivoypasivo mayorcuentacontable
 // listatransacciones listar_balance_general_guardados listar_plantilla_flujo_efectivo
 // 
 // lista_pagar_pagado_factura listar_usuarios  listar_agrupacion_plantilla reportecuentasderesultado
-// reportedetallefp lista_pagar_pagado_factura mayorcuentacontable_antiguo listar_solo_usuarios 
+// reportedetallefp lista_pagar_pagado_factura mayorcuentacontable_antiguo listar_solo_usuarios  reporte_estado_resultados_actualizado_consolidado_por_niveles
 //  listadesconsolidar listar_anular_eliminar_factura  reporteactivodisponible reportedetalletransaccion
 //
 
