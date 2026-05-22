@@ -2314,7 +2314,9 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
     }
 
     $comprobante_comercial = $this->dbc->query("SELECT cc.*, 'COMERCIAL' AS modulo FROM comprobantes_comercial_caja_bancos cc
-    WHERE cc.idcaja_bancos IN($caja_bancos) AND cc.fecha BETWEEN '$fecha_ini' AND '$fecha_fin' ORDER BY cc.fecha ASC;");
+    WHERE cc.idcaja_bancos IN($caja_bancos) 
+    AND cc.estado ='autorizado'
+    AND cc.fecha BETWEEN '$fecha_ini' AND '$fecha_fin' ORDER BY cc.fecha ASC;");
 
     // Convertir resultado en arreglo
     $array_comercial = [];
@@ -2561,7 +2563,9 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
             }
 
             $fuera_rango_comprobante_comercial = $this->dbc->query("SELECT ccc.* FROM comprobantes_comercial_caja_bancos ccc
-            WHERE ccc.idcaja_bancos IN($caja_bancos) AND ccc.fecha < '$fecha_ini' ORDER BY ccc.fecha ASC;");
+            WHERE ccc.idcaja_bancos IN($caja_bancos)
+            AND ccc.estado ='autorizado'
+            AND ccc.fecha < '$fecha_ini' ORDER BY ccc.fecha ASC;");
 
             // Convertir resultado en arreglo
             $array_2_fuera_rango = [];
@@ -2818,18 +2822,6 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         $cl = $cliente->fetch_assoc();
                         $id_client_prov = $cl['id_cliente'];
 
-                    }else{
-                        if($qwe['estado'] == 'no_autorizado'){
-                            // no sumara nada porque el documento esta anulado
-                        }else{
-                                $saldo = $saldo - $qwe['monto'];
-                        }
-                        $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor= '$qwe[cliente_proveedor]'");
-                        $cl = $proveedor->fetch_assoc();
-                        $id_client_prov = $cl['id_proveedor'];
-                    }
-
-                    if($qwe['estado'] == 'autorizado'){
                         $res = array(
                             "fecha" => $qwe['fecha'],
                             // "tipo_documento" => 2,
@@ -2857,9 +2849,46 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "registro_desde" => $qwe['registro_desde'],
                             // "pertenece_contratacion" => 'si'
                         );
+
                     }else{
-                        // no esta autoizado no mostrara nada
+                        if($qwe['estado'] == 'no_autorizado'){
+                            // no sumara nada porque el documento esta anulado
+                        }else{
+                                $saldo = $saldo - $qwe['monto'];
+                        }
+                        $proveedor = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor= '$qwe[cliente_proveedor]'");
+                        $cl = $proveedor->fetch_assoc();
+                        $id_client_prov = $cl['id_proveedor'];
+
+                        $res = array(
+                            "fecha" => $qwe['fecha'],
+                            // "tipo_documento" => 2,
+                            // "idcomprobante" => $qwe['id_cuenta'],
+                            "nrecibo" => $qwe['nro_comprobante'],
+                            // "lugar" => $qwe['lugar'],
+                            // "persona" => $qwe['persona'],
+                            // "ci" => $qwe['ci'],
+                            "factura_recibo" => $qwe['registro_desde'],
+                            // "idfactura" => $fact['idfactura'],
+                            "nro_documento" => $qwe['nro_documento'],
+                            "por_concepto_de" => $qwe['concepto'],
+                            // "idotras_cuentas" => "$fact[idotras_cuentas]",
+                            "estado_documento" => "activo",
+                            "codigotransaccion" => $tr['codigotransaccion'],
+                            "id_cliente" => $id_client_prov,
+                            "nombre_cliente" => $cl['nombre'],
+                            //descripcion saldra de la factura o otras cuentas 
+                            "descripcion" => $qwe['concepto'],
+                            // "archivo" => $qwe['archivo'],
+                            "egreso" => $qwe['monto'],
+                            "monto" => $qwe['monto'],
+                            "saldo_inicial" => $saldo_inicial,
+                            "saldo" => $saldo,
+                            "registro_desde" => $qwe['registro_desde'],
+                            // "pertenece_contratacion" => 'si'
+                        );
                     }
+                  
                     
                 }//}}}}}}}}}
               
