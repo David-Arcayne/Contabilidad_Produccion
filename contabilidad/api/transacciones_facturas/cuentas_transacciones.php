@@ -227,6 +227,19 @@ class Cuentas_transacciones extends DB{
             }
         }
 
+        if(){
+            //COBROS DE FACTURAS
+            $cobros = $this->dbc->query("SELECT c.*,f.idorganizacion FROM cuentaspof c INNER JOIN factura f ON f.idfactura = c.idfactura
+            WHERE c.cuenta ='0' AND c.idfactura != '0' AND f.idorganizacion ='$idempresa' AND c.transaccion IN($array_buscar) ORDER BY c.fecha DESC");
+            while ($qwe = $this->dbc->fetch($cobros)) {
+               
+                $res = array("idcomprobante" => $qwe['idcuentaspof'], "fecha" => $qwe['fecha'], "nrecibo" => $qwe['nrecibo'], "monto" => $qwe['monto'],"persona" => $qwe['persona'],"tipo" => "venta");   
+
+                array_push($lista, $res);
+            }
+        }else{
+
+        }
         echo json_encode($lista);
     }
 

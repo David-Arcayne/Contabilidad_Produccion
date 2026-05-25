@@ -807,30 +807,37 @@ elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
 }elseif($ver[0]=="listar_balance_general_completo_icono"){
     $cont=new Reporte_confi();
     $cont->listar_balance_general_completo_icono($ver[1]);
+}elseif($ver[0]=="listar_factura_comercial_con_caja_bancos"){
+    $cont=new Factura_comercial();
+    $cont->listar_factura_comercial_con_caja_bancos($ver[1]);
+}elseif($ver[0]=="listar_factura_comercial_sin_cajaBancos"){
+    $cont=new Factura_comercial();
+    $cont->listar_factura_comercial_sin_cajaBancos($ver[1],$ver[2]);
 }
+
 // elseif($ver[0]=="obtenerGestionAnterior"){ 
 //     $cont=new Reporte_flujo_efectivo(); listadegestion    listar_solo_usuarios 
 //     $cont->obtenerGestionAnterior($ver[1],$ver[2]); eliminar_gestion_contable   
 // }
 
-// reportedetalle  rp listar_gestiones_por_usuarios desvincular
+// reportedetalle  rp listar_gestiones_por_usuarios desvincular listar_tipo_reportes
 // listar_factura listar_facturas_cobro_pago listar_recibo_por_caja_bancos
 // listar_recibo_otras_cuentas_pagar listadegestion eliminar_otras_operaciones reporte_estado_origen_aplicacion listar_factura_comercial_con_transaccion
 
 // lista_cobrar_cobrado_factura listar_caja_bancos reporteactivoypasivo mayorcuentacontable
-// listatransacciones listar_balance_general_guardados listar_plantilla_flujo_efectivo
+// listatransacciones listar_balance_general_guardados listar_plantilla_flujo_efectivo listar_cobros_comercial
 // 
 // lista_pagar_pagado_factura listar_usuarios  listar_agrupacion_plantilla reportecuentasderesultado
 // reportedetallefp lista_pagar_pagado_factura mayorcuentacontable_antiguo listar_solo_usuarios  reporte_estado_resultados_actualizado_consolidado_por_niveles
-//  listadesconsolidar listar_anular_eliminar_factura  reporteactivodisponible reportedetalletransaccion
+//  listadesconsolidar listar_anular_eliminar_factura  reporteactivodisponible listar_factura_comercial_con_caja_bancos
 //
 
 // 
-//  listar_anular_ reportedetallefpt  reportebalancedesumasysaldos reportedeplanes activar_desactivar_gestiones
-//  estadogestion listar_factura_comercial listatransacciones reporte_balance_general_prueba listar_select_cuentas_balance_general
+//  listar_anular_ reportedetallefpt  reportebalancedesumasysaldos reportedeplanes activar_desactivar_gestiones listar_comprobantes_cobro_pago
+//  estadogestion listar_factura_comercial listatransacciones reporte_balance_general_prueba listar_select_cuentas_balance_general listar_cobros_comercial
 // 
 // 
-//  eliminar_otras_operaciones
+//  eliminar_otras_operaciones asignar_comprobantes_A_comprobantes listar_facturas_comercial_cobro
 //  lista_cobrar_cobrado_factura  reporte_estado_origen_aplicacion  reporte_balance_general_por_niveles_consolidados listar_plantilla_flujo_efectivo 
 
 //   insertar_transaccion.php    reporte_balance_general_hasta reportecomprobantecontable reporteactivodiaponibledos eliminar_registro_flujo_efectivo eliminar_configuracion_reporte

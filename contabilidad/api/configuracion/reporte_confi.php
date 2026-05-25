@@ -8,20 +8,20 @@ class Reporte_confi extends DB{
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
-        // $idempresa = $this->getidempresa($empresa);
+        $ide = $this->getidempresa($idempresa);
 
         $get_tipoReport = $this->dbc->query("SELECT * FROM tipo_reportes WHERE tipo_reporte ='$tipo_reporte'
-        AND estado ='$estado' AND idempresa ='$idempresa'");
+        AND estado ='$estado' AND idempresa ='$ide'");
 
         if($get_tipoReport->num_rows > 0){
             //MOSTRAR ALGUN MENSAJE DE ERROR O ADVERTENCIA DE QUE YA EXISTE UNA PLANILLA CON EL MISMO ESTADO
-            // while ($qwe = $this->dbc->fetch($get_tipoReport)) {
-            //     $desactivar_estados = $this->dbc->query("UPDATE tipo_reportes SET estado = '0' WHERE idtipo_reportes = '$qwe[idtipo_reportes]'");
+            while ($qwe = $this->dbc->fetch($get_tipoReport)) {
+                $desactivar_estados = $this->dbc->query("UPDATE tipo_reportes SET estado = '0' WHERE idtipo_reportes = '$qwe[idtipo_reportes]'");
 
-            // }
-            // $cambiar_estado = $this->dbc->query("UPDATE tipo_reportes SET estado = '$estado' WHERE idtipo_reportes = '$idtipo_reportes'");
+            }
+            $cambiar_estado = $this->dbc->query("UPDATE tipo_reportes SET estado = '$estado' WHERE idtipo_reportes = '$idtipo_reportes'");
 
-            $cambiar_estado = FALSE;
+            // $cambiar_estado = FALSE;
         }else{
             $cambiar_estado = $this->dbc->query("UPDATE tipo_reportes SET estado = '$estado' WHERE idtipo_reportes = '$idtipo_reportes'");
         }
@@ -59,12 +59,16 @@ class Reporte_confi extends DB{
         $registro = $this->dbc->query("SELECT * FROM tipo_reportes WHERE idempresa='$idempresa'");
     
         while ($row = $this->dbc->fetch($registro)) {
+
+            $get_tipo_report = $this->dbc->query("SELECT * FROM tipo_reportes WHERE idtipo_reportes='$row[id_plantilla_reporte]'");
+            $tr = $get_tipo_report->fetch_assoc();
             $lista[] = [
                 "idtipo_reportes" => $row['idtipo_reportes'],
                 "nombre"=>$row['nombre'],
                 "descripcion" => $row['descripcion'],
                 "tipo_reporte" => $row['tipo_reporte'],
                 "id_plantilla_reporte" => $row['id_plantilla_reporte'],
+                "nombre_tipo_reporte_referencia" => $tr['nombre'],
                 "estado" => $row['estado']
             ];
         }

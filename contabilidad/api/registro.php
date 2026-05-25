@@ -929,11 +929,22 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         else{
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idplantilla'],$_POST['idconfi_reporte'],$_POST['obtiene_desde'],$_POST['nombre_registro'],$_POST['tipo_operacion'],$_POST['orden'],$_POST['idplantilla_padre'],$_POST['negrilla_cursiva'],$_POST['empresa']));
         }
+    }elseif($data['ver'] == "cambiar_cajaBanco_de_facturas_comercial_desde_conta") {
+        $cont=new Factura_comercial();
+        $cont->cambiar_cajaBanco_de_facturas_comercial_desde_conta($data);
+    }elseif($data['ver'] == "anular_caja_bancos_comercial") {
+        $cont=new Factura_comercial();
+        $cont->anular_caja_bancos_comercial($data);
+    }elseif($data['ver'] == "vincular_cajaBanco_de_facturas_comercial_desde_conta") {
+        $cont=new Factura_comercial();
+        $cont->vincular_cajaBanco_de_facturas_comercial_desde_conta($data);
     }
+    
+    
 // asignar asiento registrar_recibo_cobro_cajaBancos_en_otras_cuentas editar_recibo_caja_bancos registrocobrarfactura registrar_anular_eliminar_activar_factura_tributario_transaccion
-//   registrar_balance_general_admin registrar_vinculacion_depreciacion editar_registro_flujo_efectivo
+//   registrar_balance_general_admin registrar_vinculacion_depreciacion editar_registro_flujo_efectivo activar_desactivar_tipo_reportes
 
-// registrar_recibo_cobro_cajaBancos_en_otras_cuentas guardar_balance_general_por_gestion registrogestion desvincular
+// asignar_comprobantes_A_comprobantes guardar_balance_general_por_gestion registrogestion desvincular vincular_cajaBanco_de_facturas_comercial_desde_conta
 
 } 
 // registrar_recibo_otras_cuentas registrotransaccion registrar_recibo_cobro_cajaBancos_en_facturas registrar_recibo_pago_cajaBancos_en_otras_cuentas activar_desactivar_tipo_reportes
