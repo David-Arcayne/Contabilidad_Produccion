@@ -938,6 +938,9 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     }elseif($data['ver'] == "vincular_cajaBanco_de_facturas_comercial_desde_conta") {
         $cont=new Factura_comercial();
         $cont->vincular_cajaBanco_de_facturas_comercial_desde_conta($data);
+    }elseif($data['ver'] == "asignar_cobros_comercial_A_cuentas") {
+        $cont=new Factura_comercial();
+        $cont->asignar_cobros_comercial_A_cuentas($data);
     }
     
     
@@ -947,7 +950,7 @@ if($data['ver'] == "asignar_asiento_A_factura") {
 // asignar_comprobantes_A_comprobantes guardar_balance_general_por_gestion registrogestion desvincular vincular_cajaBanco_de_facturas_comercial_desde_conta
 
 } 
-// registrar_recibo_otras_cuentas registrotransaccion registrar_recibo_cobro_cajaBancos_en_facturas registrar_recibo_pago_cajaBancos_en_otras_cuentas activar_desactivar_tipo_reportes
+// registrar_recibo_otras_cuentas registrotransaccion registrar_agrupacion_plantilla registrar_recibo_pago_cajaBancos_en_otras_cuentas activar_desactivar_tipo_reportes
 // registrar_agrupacion_plantilla registro_transaccion_comercial registrar_factura_recibo_pago_cajaBancos registrar_recibo_pago_cajaBancos_en_facturas
 // crearsolofacturasapif5  registrar_recibo_cobro_cajaBancos_en_facturas registrar_factura_recibo_cobro_cajaBancos cobrar_contratacion_con_factura_cajaBancos
 ?> 

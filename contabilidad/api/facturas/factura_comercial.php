@@ -1144,54 +1144,128 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
         
     }
 
-//     public function listar_cobros_comercial_sin_cuenta($viv_mister_soft,$idcuenta,$empresa)
-//     {
-//         $idempresa = $this->getidempresa($empresa); 
-//         // $ide = $this->getidempresa($empresa);
-//         $lista = [];
-//         // $registro = $this->dbc->query("SELECT * FROM factura WHERE cuenta = '$idcuenta' LIMIT 1");
-//         $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion ='$idcuenta'");
-//         $dt = $this->dbc->fetch($detalle_trans);
+    public function listar_cobros_comercial_sin_cuenta($viv_mister_soft,$idcuenta,$empresa)
+    {
+        $idempresa = $this->getidempresa($empresa); 
+        // $ide = $this->getidempresa($empresa);
+        $lista = [];
+        // $registro = $this->dbc->query("SELECT * FROM factura WHERE cuenta = '$idcuenta' LIMIT 1");
+        $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion ='$idcuenta'");
+        $dt = $this->dbc->fetch($detalle_trans);
 
-//         $factu_clase = $this->dbc->query("SELECT * FROM transaccion_documentos_comercial 
-//         WHERE idempresa ='$idempresa' AND cuenta ='0' AND idtransaccion IN(0,$dt[transacciones_idtransacciones])");
+        $factu_clase = $this->dbc->query("SELECT * FROM transaccion_documentos_comercial 
+        WHERE idempresa ='$idempresa' AND cuenta ='0' AND idtransaccion IN(0,$dt[transacciones_idtransacciones])");
 
-//         // INCLUIRA ESE COBRO EN EL LISTADO PORQUE ESE COBRO PERTENECE A LA TRANSACCION PERO NO PERTENECE A NINGUNA CUENTA
-//         while ($qwe = $this->dbc->fetch($factu_clase)) {
+        // INCLUIRA ESE COBRO EN EL LISTADO PORQUE ESE COBRO PERTENECE A LA TRANSACCION PERO NO PERTENECE A NINGUNA CUENTA
+        while ($qwe = $this->dbc->fetch($factu_clase)) {
     
-//                 $cobro = $this->dbcm->query("SELECT * FROM detalle_cobro WHERE iddetalle_cobro='" . $qwe['id_documento'] . "'");
-//                 $asd = $this->dbcm->fetch($cobro);
-//                 $res = array("iddetalle_cobro" => $asd['iddetalle_cobro'], "fecha_actual" => $asd['fecha_actual'], "num_documento" => $asd['num_documento'], "monto" => $asd['monto']);
+                $cobro = $this->dbcm->query("SELECT * FROM detalle_cobro WHERE iddetalle_cobro='" . $qwe['id_documento'] . "'");
+                $asd = $this->dbcm->fetch($cobro);
+                $res = array("iddetalle_cobro" => $asd['iddetalle_cobro'], "fecha_actual" => $asd['fecha_actual'], "num_documento" => $asd['num_documento'], "monto" => $asd['monto']);
      
-//                 array_push($lista, $res);
-//         }
-// //´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´
+                array_push($lista, $res);
+        }
+//´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´
 
-//     if($viv_mister_soft == "vivasoft"){
-//         $url = "https://vivasoft.link/app/cmv1/api/listaCobrosContabilidad/".$empresa;
-//     }else{ // mistersofts
-//         $url = "https://mistersofts.com/app/cmv1/api/listaCobrosContabilidad/".$empresa;
-//     }
+    if($viv_mister_soft == "vivasoft"){
+        $url = "https://vivasoft.link/app/cmv1/api/listaCobrosContabilidad/".$empresa;
+    }else{ // mistersofts
+        $url = "https://mistersofts.com/app/cmv1/api/listaCobrosContabilidad/".$empresa;
+    }
         
 
-//         // $url = "https://mistersofts.com/app/cmv1/api/listaVentas/".$empresa;
-//         $data = json_decode(file_get_contents($url), true);
-//         $lista_cobro_venta = [];
+        // $url = "https://mistersofts.com/app/cmv1/api/listaVentas/".$empresa;
+        $data = json_decode(file_get_contents($url), true);
+        $lista_cobro_venta = [];
 
-//         foreach($data as $plantilla){
-//             $trans_fact = $this->dbc->query("SELECT id_documento 
-//                                             FROM transaccion_documentos_comercial 
-//                                             WHERE id_documento = '{$plantilla['idDetalleCobro']}' AND registro_desde ='cobro_venta_comercial'");
-//             if($trans_fact->num_rows > 0){
-//                 // Ya existe, no lo agregamos
-//             } else {
-//                 // Guardamos todo el registro, no solo el id
-//                 $lista_cobro_venta[] = $plantilla;
-//             }
-//         }
+        foreach($data as $plantilla){
+            $trans_fact = $this->dbc->query("SELECT id_documento 
+                                            FROM transaccion_documentos_comercial 
+                                            WHERE id_documento = '{$plantilla['idDetalleCobro']}' AND registro_desde ='cobro_venta_comercial'");
+            if($trans_fact->num_rows > 0){
+                // Ya existe, no lo agregamos
+            } else {
+                // Guardamos todo el registro, no solo el id
+                $lista_cobro_venta[] = $plantilla;
+            }
+        }
 
-//         $lista_final = array_merge($lista, $lista_cobro_venta);
+        $lista_final = array_merge($lista, $lista_cobro_venta);
         
-//         echo json_encode($lista_final);
-//     }
+        echo json_encode($lista_final);
+    }
+
+     public function asignar_cobros_comercial_A_cuentas($data) {
+    
+        $idempresa = $this->getidempresa($data['empresa']);
+        // Decodificar el JSON a array asociativo 
+        $cobros = json_decode($data['cobros_comercial'], true);
+        // $gestion = $this->getgestionactualid($idempresa);
+        $montoCobros = 0;
+
+        $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$data[cuenta]'");
+        $dt = $detalle_trans->fetch_assoc();
+        $array_ids = [];
+        
+        foreach ($cobros as $cobro) {
+                $montoCobros += $cobro['monto'];
+            }
+                    
+        if($data['sumar_reemplazar'] == 'suma'){ // SUMAR
+            if($dt['debe'] > 0){
+                $nuevo_monto_dt = $dt['debe'] + $montoCobros;
+                $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
+            }else{
+                $nuevo_monto_dt = $dt['haber'] + $montoCobros;
+                $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
+            }
+        }elseif($data['sumar_reemplazar'] == 'reemplazo'){ // REEMPLAZAR
+
+        // desvincular todos los documentos de esta cuenta
+            $desv_recibo = $this->dbc->query("UPDATE recibo SET cuenta = '0',transaccion = '0' WHERE cuenta = '$data[cuenta]'");
+            $desv_factura = $this->dbc->query("UPDATE factura SET cuenta = '0',transacciones_idtransacciones = '0' WHERE cuenta = '$data[cuenta]'");
+            $desv_comprob_cobr = $this->dbc->query("UPDATE cuentaspof SET cuenta = '0',transaccion = '0' WHERE cuenta = '$data[cuenta]'");
+            $desv_comprob_pag = $this->dbc->query("UPDATE cuentaspor SET cuenta = '0',transaccion = '0' WHERE cuenta = '$data[cuenta]'");
+            $desv_comer = $this->dbc->query("DELETE FROM transaccion_documentos_comercial WHERE cuenta = '$data[cuenta]'");
+
+        // Convertimos el array en una lista separada por comas 
+
+            if($dt['debe'] > 0){
+                $nuevo_monto_dt = $montoCobros;
+                $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
+            }else{
+                $nuevo_monto_dt = $montoCobros;
+                $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
+            }
+        }else{ // SOLO VINCULARA NADA MAS
+            $editar_dt = TRUE;
+        }
+   
+        foreach ($cobros as $cobro) {
+
+                // $montoFacturas += $factura['monto'];
+                $existe_fact_comercial = $this->dbc->query("SELECT * FROM transaccion_documentos_comercial WHERE id_documento = '$cobro[id_documento]'");
+                if($existe_fact_comercial->num_rows > 0){
+                    $updatetranscodigo = $this->dbc->query("UPDATE transaccion_documentos_comercial SET cuenta = '$data[cuenta]',idtransaccion = '$dt[transacciones_idtransacciones]'  
+                    WHERE id_documento = '{$cobro['id_documento']}'");
+
+                }else{ // NO EXISTE EN LA TABLA ESA FACTURA
+                    $registrar_fact_trans = $this->dbc->query("INSERT INTO transaccion_documentos_comercial(id_documento,idtransaccion,cuenta,registro_desde,idempresa)
+                    VALUES('$cobro[id_documento]','$dt[transacciones_idtransacciones]','$data[cuenta]','cobro_venta_comercial','$idempresa')");
+
+                }   
+                // Guardamos el idfactura_comercial en el array 
+                // $array_ids[] = $factura['idfactura_comercial'];
+                
+        }
+
+        // Respuesta
+        if ($editar_dt === TRUE) {
+            $res = array("success", "Se Registro Correctamente", "asignar_facturas_A_cuentas",$data['cuenta'],$dt['transacciones_idtransacciones'],$nuevo_monto_dt,$montoCobros,$idempresa,$data['idempresa'],gethostname());
+        } else {
+            $res = array("danger", "Lo sient00o hubo un problema, por favor vuelva a intentar más tarde",$data['facturas_comercial'],$data['cuenta'],$nuevo_monto_dt);
+        }
+    
+        echo json_encode($res);
+    }
 }

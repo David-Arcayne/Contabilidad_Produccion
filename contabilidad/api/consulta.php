@@ -814,10 +814,10 @@ elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
     $cont=new Factura_comercial();
     $cont->listar_factura_comercial_sin_cajaBancos($ver[1],$ver[2]);
 }
-// elseif($ver[0]=="listar_cobros_comercial_sin_cuenta"){
-//     $cont=new Factura_comercial();
-//     $cont->listar_cobros_comercial_sin_cuenta($ver[1],$ver[2],$ver[3]);
-// }
+elseif($ver[0]=="listar_cobros_comercial_sin_cuenta"){
+    $cont=new Factura_comercial();
+    $cont->listar_cobros_comercial_sin_cuenta($ver[1],$ver[2],$ver[3]);
+}
 
 // elseif($ver[0]=="obtenerGestionAnterior"){ 
 //     $cont=new Reporte_flujo_efectivo(); listadegestion    listar_solo_usuarios 
