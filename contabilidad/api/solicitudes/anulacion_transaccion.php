@@ -189,7 +189,7 @@ public function registrar_anular_eliminar_activar_transaccion($idtransaccion,$mo
                 $update_recibo=$this->dbc->query("UPDATE cuentaspor SET transaccion = '0' 
                         WHERE transaccion = '$idtransaccion'");  
                 
-                $delete_trans_fact=$this->dbc->query("DELETE FROM transaccion_factura_comercial
+                $delete_trans_fact=$this->dbc->query("DELETE FROM transaccion_documentos_comercial
                 WHERE idtransaccion = '$idtransaccion'");  
 
                 $eliminado=$this->dbc->query("SELECT codigotransaccion,fechatransaccion,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,idgestion FROM transacciones 

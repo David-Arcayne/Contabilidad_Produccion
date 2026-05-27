@@ -59,9 +59,9 @@ class Factura_comercial extends DB{
             }            
 
             //PREGUNTAMOS SI ESA FACTURA TIENE TRANSACCION
-            $trans_fact = $this->dbc->query("SELECT idfactura_comercial 
-                                            FROM transaccion_factura_comercial 
-                                            WHERE idfactura_comercial = '{$plantilla['id']}'");
+            $trans_fact = $this->dbc->query("SELECT id_documento 
+                                            FROM transaccion_documentos_comercial 
+                                            WHERE id_documento = '{$plantilla['id']}' AND registro_desde ='contado_venta_comercial'");
             if($trans_fact->num_rows > 0){
                 // Ya existe, no lo agregamos
             }else {
@@ -91,8 +91,8 @@ class Factura_comercial extends DB{
 
         //PREGUNTAMOS SI ESA FACTURA TIENE TRANSACCION
             $trans_fact = $this->dbc->query("SELECT idtransaccion 
-                                            FROM transaccion_factura_comercial 
-                                            WHERE idfactura_comercial = '{$plantilla['id']}'");
+                                            FROM transaccion_documentos_comercial 
+                                            WHERE id_documento = '{$plantilla['id']}' AND registro_desde ='contado_venta_comercial'");
             if($trans_fact->num_rows > 0){
                 // AGREGAMOS EL CODIGO DE LA TRANSACCION
                 $trans_codig = $trans_fact->fetch_assoc();
@@ -160,10 +160,10 @@ class Factura_comercial extends DB{
         $lista = [];
 
         $listaFactura = [];
-        $trans_fact = $this->dbc->query("SELECT idfactura_comercial FROM transaccion_factura_comercial WHERE idempresa = '$idempresa'");
+        $trans_fact = $this->dbc->query("SELECT id_documento FROM transaccion_documentos_comercial WHERE idempresa = '$idempresa' AND registro_desde ='contado_venta_comercial'");
         while ($zxc = $this->dbc->fetch($trans_fact)) {
             // $listaFactura = $zxc['idfactura_comercial'];
-            array_push($listaFactura,$zxc['idfactura_comercial']);
+            array_push($listaFactura,$zxc['id_documento']);
         }
 
         $facturas = implode(", ", $listaFactura);
@@ -201,10 +201,10 @@ class Factura_comercial extends DB{
         $lista = [];
 
         $listaFactura = [];
-        $trans_fact = $this->dbc->query("SELECT idfactura_comercial FROM transaccion_factura_comercial WHERE idempresa = '$idempresa'");
+        $trans_fact = $this->dbc->query("SELECT id_documento FROM transaccion_documentos_comercial WHERE idempresa = '$idempresa' AND registro_desde ='contado_venta_comercial'");
         while ($zxc = $this->dbc->fetch($trans_fact)) {
             // $listaFactura = $zxc['idfactura_comercial'];
-            array_push($listaFactura,$zxc['idfactura_comercial']);
+            array_push($listaFactura,$zxc['id_documento']);
         }
 
         $facturas = implode(", ", $listaFactura);
@@ -372,11 +372,11 @@ class Factura_comercial extends DB{
             foreach($facturas as $factura){
 
                 if($id_cuenta == ""){
-                $registrar_fact_trans = $this->dbc->query("INSERT INTO transaccion_factura_comercial(idfactura_comercial,idtransaccion,cuenta,idempresa)VALUES('$factura[idfactura]','$idtrans','0','$ide')");
+                $registrar_fact_trans = $this->dbc->query("INSERT INTO transaccion_documentos_comercial(id_documento,idtransaccion,cuenta,registro_desde,idempresa)VALUES('$factura[idfactura]','$idtrans','0','contado_venta_comercial','$ide')");
 
                 }else{ // SE ASIGNARA CUENTA MAS
 
-                $registrar_fact_trans = $this->dbc->query("INSERT INTO transaccion_factura_comercial(idfactura_comercial,idtransaccion,cuenta,idempresa)VALUES('$factura[idfactura]','$idtrans','$id_cuenta','$ide')");
+                $registrar_fact_trans = $this->dbc->query("INSERT INTO transaccion_documentos_comercial(id_documento,idtransaccion,cuenta,registro_desde,idempresa)VALUES('$factura[idfactura]','$idtrans','$id_cuenta','contado_venta_comercial','$ide')");
                 
                 $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$id_cuenta'");
                         $dt = $detalle_trans->fetch_assoc(); 
@@ -477,10 +477,10 @@ class Factura_comercial extends DB{
         $lista = [];
 
         $listaFactura = [];
-        $trans_fact = $this->dbc->query("SELECT idfactura_comercial FROM transaccion_factura_comercial WHERE idempresa = '$idempresa'");
+        $trans_fact = $this->dbc->query("SELECT id_documento FROM transaccion_documentos_comercial WHERE idempresa = '$idempresa' AND registro_desde ='contado_venta_comercial'");
         while ($zxc = $this->dbc->fetch($trans_fact)) {
             // $listaFactura = $zxc['idfactura_comercial'];
-            array_push($listaFactura,$zxc['idfactura_comercial']);
+            array_push($listaFactura,$zxc['id_documento']);
         }
 
         $facturas = implode(", ", $listaFactura);
@@ -564,7 +564,7 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
  $i = 0;
         while ($qwe = $this->dbcm->fetch($clien)) {
  
-            $trans_fact_aux = $this->dbc->query("SELECT * FROM transaccion_factura_comercial WHERE idfactura_comercial = '$qwe[0]'");
+            $trans_fact_aux = $this->dbc->query("SELECT * FROM transaccion_documentos_comercial WHERE id_documento = '$qwe[0]' AND registro_desde ='contado_venta_comercial'");
 
             $trans_id = $trans_fact_aux->fetch_assoc();
 
@@ -693,7 +693,7 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
         $i = 0;
         while ($qwe = $this->dbcm->fetch($clien)) {
                 
-            $trans_fact_aux = $this->dbc->query("SELECT * FROM transaccion_factura_comercial WHERE idfactura_comercial = '$qwe[0]'");
+            $trans_fact_aux = $this->dbc->query("SELECT * FROM transaccion_documentos_comercial WHERE id_documento = '$qwe[0]' AND registro_desde ='contado_venta_comercial'");
 
             $get_caja_bancos_comprobante = $this->dbc->query("SELECT * FROM comprobantes_comercial_caja_bancos WHERE id_documento = '$qwe[0]' AND registro_desde ='contado_venta_comercial'");
             $cb_comprob = $get_caja_bancos_comprobante->fetch_assoc();
@@ -730,7 +730,7 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
         $listaFactura = [];
         // lista pagados y pagar clientes proveedor
         $facture = $this->dbc->query("SELECT *
-        FROM transaccion_factura_comercial WHERE idtransaccion='$idtransaccion'");
+        FROM transaccion_documentos_comercial WHERE idtransaccion='$idtransaccion' AND registro_desde ='contado_venta_comercial'");
         // while ($qwe = $this->dbc->fetch($facture)) {
             // if ($qwe['clasefactura'] == 2) {
             //     $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $qwe[18] . "'");
@@ -744,7 +744,7 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
             if($facture->num_rows > 0){
                 while ($zxc = $this->dbc->fetch($facture)) {
             // $listaFactura = $zxc['idfactura_comercial'];
-            array_push($listaFactura,$zxc['idfactura_comercial']);
+            array_push($listaFactura,$zxc['id_documento']);
         }
 
         $facturas = implode(", ", $listaFactura);
@@ -790,7 +790,7 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
         while ($qwe = $this->dbcm->fetch($clien)) {
                     
             
-            $trans_fact_aux = $this->dbc->query("SELECT * FROM transaccion_factura_comercial WHERE idfactura_comercial = '$qwe[0]'");
+            $trans_fact_aux = $this->dbc->query("SELECT * FROM transaccion_documentos_comercial WHERE id_documento = '$qwe[0]' AND registro_desde ='contado_venta_comercial'");
 
             $trans_id = $trans_fact_aux->fetch_assoc();
 
@@ -811,7 +811,7 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
     }
     public function asignar_facturas_comercial_A_cuentas($data) {
     
-        $idempresa = $this->getidempresa($data['idempresa']);
+        $idempresa = $this->getidempresa($data['empresa']);
         // Decodificar el JSON a array asociativo 
         $facturas = json_decode($data['facturas_comercial'], true);
         // $gestion = $this->getgestionactualid($idempresa);
@@ -842,7 +842,7 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
             $desv_factura = $this->dbc->query("UPDATE factura SET cuenta = '0',transacciones_idtransacciones = '0' WHERE cuenta = '$data[cuenta]'");
             $desv_comprob_cobr = $this->dbc->query("UPDATE cuentaspof SET cuenta = '0',transaccion = '0' WHERE cuenta = '$data[cuenta]'");
             $desv_comprob_pag = $this->dbc->query("UPDATE cuentaspor SET cuenta = '0',transaccion = '0' WHERE cuenta = '$data[cuenta]'");
-            $desv_comer = $this->dbc->query("DELETE FROM transaccion_factura_comercial WHERE cuenta = '$data[cuenta]'");
+            $desv_comer = $this->dbc->query("DELETE FROM transaccion_documentos_comercial WHERE cuenta = '$data[cuenta]'");
 
         // Convertimos el array en una lista separada por comas 
 
@@ -860,14 +860,14 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
         foreach ($facturas as $factura) {
 
                 // $montoFacturas += $factura['monto'];
-                $existe_fact_comercial = $this->dbc->query("SELECT * FROM transaccion_factura_comercial WHERE idfactura_comercial = '$factura[idfactura_comercial]'");
+                $existe_fact_comercial = $this->dbc->query("SELECT * FROM transaccion_documentos_comercial WHERE id_documento = '$factura[idfactura_comercial]' AND registro_desde ='contado_venta_comercial'");
                 if($existe_fact_comercial->num_rows > 0){
-                    $updatetranscodigo = $this->dbc->query("UPDATE transaccion_factura_comercial SET cuenta = '$data[cuenta]',idtransaccion = '$dt[transacciones_idtransacciones]'  
-                    WHERE idfactura_comercial = '{$factura['idfactura_comercial']}'");
+                    $updatetranscodigo = $this->dbc->query("UPDATE transaccion_documentos_comercial SET cuenta = '$data[cuenta]',idtransaccion = '$dt[transacciones_idtransacciones]'  
+                    WHERE id_documento = '{$factura['idfactura_comercial']}' AND registro_desde ='contado_venta_comercial'");
 
                 }else{ // NO EXISTE EN LA TABLA ESA FACTURA
-                    $registrar_fact_trans = $this->dbc->query("INSERT INTO transaccion_factura_comercial(idfactura_comercial,idtransaccion,cuenta,idempresa)
-                    VALUES('$factura[idfactura_comercial]','$dt[transacciones_idtransacciones]','$data[cuenta]','$idempresa')");
+                    $registrar_fact_trans = $this->dbc->query("INSERT INTO transaccion_documentos_comercial(id_documento,idtransaccion,cuenta,registro_desde,idempresa)
+                    VALUES('$factura[idfactura_comercial]','$dt[transacciones_idtransacciones]','$data[cuenta]','contado_venta_comercial','$idempresa')");
 
                 }   
                 // Guardamos el idfactura_comercial en el array 

@@ -1096,6 +1096,23 @@ class Filtrado_facturas extends DB{
             $plandecuenta = $this->dbc->query("SELECT * FROM plandecuenta WHERE idplandecuenta = '$dt_aux[idplandecuenta]'");
             $pl_cuenta = $this->dbc->fetch($plandecuenta);
 
+            if($qwe['tipo_factura'] == 'contado' && $qwe['clasefactura'] == '1'){
+                $fact_cajas = $this->dbc->query("SELECT * FROM detalle_caja_bancos_pagar WHERE idfactura = '$qwe[idfactura]'");
+                $fcb = $this->dbc->fetch($fact_cajas);
+
+                $nom_cj = $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '$fcb[idcaja_bancos]'");
+                $nombre_cb = $this->dbc->fetch($nom_cj);
+                $nombre_caja_banco = $nombre_cb['tipo_cuenta'];
+            }elseif($qwe['tipo_factura'] == 'contado' && $qwe['clasefactura'] == '2'){
+                $fact_cajas = $this->dbc->query("SELECT * FROM detalle_caja_bancos_cobrar WHERE idfactura = '$qwe[idfactura]'");
+                $fcb = $this->dbc->fetch($fact_cajas);
+
+                $nom_cj = $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '$fcb[idcaja_bancos]'");
+                $nombre_cb = $this->dbc->fetch($nom_cj);
+                $nombre_caja_banco = $nombre_cb['tipo_cuenta'];
+            }else{
+                $nombre_caja_banco = "";
+            }
             $res = array(
                 "idfactura" => $qwe['idfactura'],
                 "fecha" => $qwe['fecha'],
@@ -1106,6 +1123,7 @@ class Filtrado_facturas extends DB{
                 "tipo_factura" => $tipo_factura,
                 "estado_saldo" => $estado_de_cobro_pago,
                 "nro_transaccion" => $nro_trans['codigotransaccion'],
+                "nombre_caja_banco" => $nombre_caja_banco,
                 "nombre_cuenta" => $pl_cuenta['nombreplan']
             );
             array_push($lista, $res);
@@ -1115,9 +1133,9 @@ class Filtrado_facturas extends DB{
     }
 
     public function recibos_perteneciente_a_cuenta($idtransaccion,$idcuenta,$fecha_ini,$fecha_fin,$empresa){
-    //  ini_set('display_errors', 1);
-    //     ini_set('display_startup_errors', 1);
-    //     error_reporting(E_ALL);
+     ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
     $idempresa = $this->getidempresa($empresa);    
     $lista = [];
     
@@ -1159,15 +1177,55 @@ class Filtrado_facturas extends DB{
             if($qwe['cobrado'] == 1){
                 $tipo_recibo = "venta";
                 $estado_de_cobro_pago = "cobrado";
+
+                $comprob_cobr = $this->dbc->query("SELECT * FROM cuentaspof WHERE idrecibo = '$qwe[idrecibo]'");
+                $cc = $this->dbc->fetch($comprob_cobr);
+
+                $rec_cajas = $this->dbc->query("SELECT * FROM detalle_caja_bancos_cobrar WHERE idcuentaspof = '$cc[idcuentaspof]'");
+                $rcb = $this->dbc->fetch($rec_cajas);
+
+                $nom_cj = $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '$rcb[idcaja_bancos]'");
+                $nombre_cb = $this->dbc->fetch($nom_cj);
+                $nombre_caja_banco = $nombre_cb['tipo_cuenta'];
+
             }elseif($qwe['cobrado'] == 2){
                 $tipo_recibo = "venta";
                 $estado_de_cobro_pago = "cobrado";
+
+                $comprob_cobr = $this->dbc->query("SELECT * FROM cuentaspof WHERE idrecibo = '$qwe[idrecibo]'");
+                $cc = $this->dbc->fetch($comprob_cobr);
+
+                $rec_cajas = $this->dbc->query("SELECT * FROM detalle_caja_bancos_cobrar WHERE idcuentaspof = '$cc[idcuentaspof]'");
+                $rcb = $this->dbc->fetch($rec_cajas);
+
+                $nom_cj = $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '$rcb[idcaja_bancos]'");
+                $nombre_cb = $this->dbc->fetch($nom_cj);
+                $nombre_caja_banco = $nombre_cb['tipo_cuenta'];
+
             }elseif($qwe['pagado'] == 1){
                 $tipo_recibo = "compra";
                 $estado_de_cobro_pago = "pagado";
+
+                $comprob_pag = $this->dbc->query("SELECT * FROM cuentaspor WHERE idrecibo = '$qwe[idrecibo]'");
+                $cc = $this->dbc->fetch($comprob_pag);
+
+                $rec_cajas = $this->dbc->query("SELECT * FROM detalle_caja_bancos_pagar WHERE idcuentaspor = '$cc[idcuentaspor]'");
+                $rcb = $this->dbc->fetch($rec_cajas);
+
+                $nom_cj = $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '$rcb[idcaja_bancos]'");
+                $nombre_cb = $this->dbc->fetch($nom_cj);
+                $nombre_caja_banco = $nombre_cb['tipo_cuenta'];
+
             }elseif($qwe['pagado'] == 2){
                 $tipo_recibo = "compra";
                 $estado_de_cobro_pago = "pagado";
+
+                $rec_cajas = $this->dbc->query("SELECT * FROM detalle_caja_bancos_pagar WHERE idrecibo = '$qwe[idrecibo]'");
+                $rcb = $this->dbc->fetch($rec_cajas);
+
+                $nom_cj = $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '$rcb[idcaja_bancos]'");
+                $nombre_cb = $this->dbc->fetch($nom_cj);
+                $nombre_caja_banco = $nombre_cb['tipo_cuenta'];
             }
 
             $trans = $this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones = '$qwe[transaccion]'");
@@ -1179,6 +1237,7 @@ class Filtrado_facturas extends DB{
             $plandecuenta = $this->dbc->query("SELECT * FROM plandecuenta WHERE idplandecuenta = '$dt_aux[idplandecuenta]'");
             $pl_cuenta = $this->dbc->fetch($plandecuenta);
 
+
             $res = array(
                 "idrecibo" => $qwe['idrecibo'],
                 "fecha" => $qwe['fecha'],
@@ -1188,6 +1247,7 @@ class Filtrado_facturas extends DB{
                 "estado_recibo" => "contado",
                 "tipo_recibo" => $tipo_recibo,
                 "estado_saldo" => $estado_de_cobro_pago,
+                "nombre_caja_banco" => $nombre_caja_banco,
                 "nombre_cuenta" => $pl_cuenta['nombreplan']
             );
             array_push($lista, $res);

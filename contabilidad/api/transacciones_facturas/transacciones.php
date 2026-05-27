@@ -1395,7 +1395,7 @@ public function asignar_facturas_A_cuentas($data) {
             $desv_factura = $this->dbc->query("UPDATE factura SET cuenta = '0',transacciones_idtransacciones = '0' WHERE cuenta = '$data[cuenta]'");
             $desv_comprob_cobr = $this->dbc->query("UPDATE cuentaspof SET cuenta = '0',transaccion = '0' WHERE cuenta = '$data[cuenta]'");
             $desv_comprob_pag = $this->dbc->query("UPDATE cuentaspor SET cuenta = '0',transaccion = '0' WHERE cuenta = '$data[cuenta]'");
-            $desv_comer = $this->dbc->query("DELETE FROM transaccion_factura_comercial WHERE cuenta = '$data[cuenta]'");
+            $desv_comer = $this->dbc->query("DELETE FROM transaccion_documentos_comercial WHERE cuenta = '$data[cuenta]'");
 
         // Actualizar detalletransaccion según debe/haber
         $nuevo_monto_dt = $montoFacturas;
@@ -1492,7 +1492,7 @@ public function asignar_facturas_A_cuentas($data) {
             $desv_factura = $this->dbc->query("UPDATE factura SET cuenta = '0',transacciones_idtransacciones = '0' WHERE cuenta = '$data[cuenta]'");
             $desv_comprob_cobr = $this->dbc->query("UPDATE cuentaspof SET cuenta = '0',transaccion = '0' WHERE cuenta = '$data[cuenta]'");
             $desv_comprob_pag = $this->dbc->query("UPDATE cuentaspor SET cuenta = '0',transaccion = '0' WHERE cuenta = '$data[cuenta]'");
-            $desv_comer = $this->dbc->query("DELETE FROM transaccion_factura_comercial WHERE cuenta = '$data[cuenta]'");
+            $desv_comer = $this->dbc->query("DELETE FROM transaccion_documentos_comercial WHERE cuenta = '$data[cuenta]'");
 
             if ($dt['debe'] > 0) {
                 $nuevo_monto_dt = $montoRecibos;
@@ -1657,7 +1657,7 @@ public function asignar_facturas_A_cuentas($data) {
             $desv_factura = $this->dbc->query("UPDATE factura SET cuenta = '0',transacciones_idtransacciones = '0' WHERE cuenta = '$data[cuenta]'");
             $desv_comprob_cobr = $this->dbc->query("UPDATE cuentaspof SET cuenta = '0',transaccion = '0' WHERE cuenta = '$data[cuenta]'");
             $desv_comprob_pag = $this->dbc->query("UPDATE cuentaspor SET cuenta = '0',transaccion = '0' WHERE cuenta = '$data[cuenta]'");
-            $desv_comer = $this->dbc->query("DELETE FROM transaccion_factura_comercial WHERE cuenta = '$data[cuenta]'");
+            $desv_comer = $this->dbc->query("DELETE FROM transaccion_documentos_comercial WHERE cuenta = '$data[cuenta]'");
             
             if($dt['debe'] > 0){
                 $nuevo_monto_dt = $montoComprobantes;
@@ -1727,7 +1727,7 @@ public function asignar_facturas_A_cuentas($data) {
             foreach ($data['facturas_comercial'] as $factura) {
 
                 // $montoFacturas += $factura['monto'];
-                $updatetranscodigo = $this->dbc->query("DELETE FROM transaccion_factura_comercial WHERE idfactura_comercial = '{$factura['idfactura_comercial']}'");
+                $updatetranscodigo = $this->dbc->query("DELETE FROM transaccion_documentos_comercial WHERE id_documento = '{$factura['idfactura_comercial']}' AND registro_desde ='contado_venta_comercial'");
 
             }
    
@@ -1772,7 +1772,7 @@ public function asignar_facturas_A_cuentas($data) {
 
 
                     $monto_documento += $docu['monto'];
-                    $updatetranscodigo = $this->dbc->query("UPDATE transaccion_factura_comercial SET cuenta = '0' WHERE idfactura_comercial = '{$docu['id']}'");
+                    $updatetranscodigo = $this->dbc->query("UPDATE transaccion_documentos_comercial SET cuenta = '0' WHERE id_documento = '{$docu['id']}' AND registro_desde ='contado_venta_comercial'");
                 }elseif($docu['tipo'] == 'comprobante de cobro'){
 
                     $monto_documento += $docu['monto'];

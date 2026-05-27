@@ -25,6 +25,7 @@ require_once "./configuracion/plantilla_admin.php";
 require_once "./configuracion/tipo_cliente_comercial.php";
 require_once "./configuracion/reporte_flujo_efectivo.php";
 require_once "./configuracion/usuario_gestion.php";
+require_once "./configuracion/vinculacion_empresas.php";
 // require_once "./recibos/caja_bancos_contrataciones.php";
 
 $ver=$_POST['ver'];
@@ -941,16 +942,28 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     }elseif($data['ver'] == "asignar_cobros_comercial_A_cuentas") {
         $cont=new Factura_comercial();
         $cont->asignar_cobros_comercial_A_cuentas($data);
+    }elseif($ver == "editar_otras_operaciones"){
+        if(isset($_POST['idagrupacion_plantilla'],$_POST['idplantilla_hijo'],$_POST['tipo_operacion'],$_POST['monto'])){
+            // decode echo json_encode(array("danger", "Faltan parámetros en la solicitud", $_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$facturas));
+            $cont=new PlantillaReporte();
+            $cont->editar_otras_operaciones($_POST['idagrupacion_plantilla'],$_POST['idplantilla_hijo'],$_POST['tipo_operacion'],$_POST['monto']);
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idagrupacion_plantilla'],$_POST['idplantilla_hijo'],$_POST['tipo_operacion'],$_POST['monto']));
+        }
+    }elseif($ver == "vincular_empresas"){
+        $cont=new Vinculacion_empresas();
+        $cont->vincular_empresas($_POST['idempresa_actual'],$_POST['idempresa_vinculada'],$_POST['idgestion_vinculada']);
     }
     
     
 // asignar asiento registrar_recibo_cobro_cajaBancos_en_otras_cuentas editar_recibo_caja_bancos registrocobrarfactura registrar_anular_eliminar_activar_factura_tributario_transaccion
-//   registrar_balance_general_admin registrar_vinculacion_depreciacion editar_registro_flujo_efectivo activar_desactivar_tipo_reportes
+//   registrar_balance_general_admin registrar_vinculacion_depreciacion editar_registro_flujo_efectivo activar_desactivar_tipo_reportes creartipoasiento
 
-// asignar_comprobantes_A_comprobantes guardar_balance_general_por_gestion registrogestion desvincular vincular_cajaBanco_de_facturas_comercial_desde_conta
+// asignar_comprobantes_A_comprobantes guardar_balance_general_por_gestion registrogestion ss desvincular_facturas_comercial_de_transaccion
 
 } 
-// registrar_recibo_otras_cuentas registrotransaccion registrar_agrupacion_plantilla registrar_recibo_pago_cajaBancos_en_otras_cuentas activar_desactivar_tipo_reportes
-// registrar_agrupacion_plantilla registro_transaccion_comercial registrar_factura_recibo_pago_cajaBancos registrar_recibo_pago_cajaBancos_en_facturas
+// registrar_recibo_otras_cuentas registrotransaccion registrar_agrupacion_plantilla registrar_recibo_pago_cajaBancos_en_otras_cuentas asignar_facturas_comercial_A_cuentas
+// registrar_agrupacion_plantilla registro_transaccion_comercial registrar_factura_recibo_pago_cajaBancos registrar_recibo_pago_cajaBancos_en_facturas editar_otras_operaciones
 // crearsolofacturasapif5  registrar_recibo_cobro_cajaBancos_en_facturas registrar_factura_recibo_cobro_cajaBancos cobrar_contratacion_con_factura_cajaBancos
 ?> 

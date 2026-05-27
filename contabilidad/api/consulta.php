@@ -29,6 +29,7 @@ require_once "./transacciones_facturas/cuentas_transacciones.php";
 require_once "./configuracion/tipo_cliente_comercial.php";
 require_once "./configuracion/reporte_flujo_efectivo.php";
 require_once "./configuracion/usuario_gestion.php";
+require_once "./configuracion/vinculacion_empresas.php";
 
 $ver=explode("/",$_GET['ver']); 
 if($ver[0]=="verificacion"){
@@ -701,10 +702,7 @@ elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
     $cont->facturas_perteneciente_a_cuenta($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
 }elseif($ver[0]=="listar_facturas_comercial_cobro"){
     $cont=new Cuentas_transacciones();
-    $cont->listar_facturas_comercial_cobro($ver[1],$ver[2]);
-}elseif($ver[0]=="listar_facturas_comercial_asignado_cuentas"){
-    $cont=new Cuentas_transacciones();
-    $cont->listar_facturas_comercial_asignado_cuentas($ver[1]);
+    $cont->listar_facturas_comercial_cobro($ver[1],$ver[2],$ver[3]);
 }elseif($ver[0]=="recibos_perteneciente_a_cuenta"){
     $cont=new Filtrado_facturas();
     $cont->recibos_perteneciente_a_cuenta($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
@@ -817,6 +815,12 @@ elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
 elseif($ver[0]=="listar_cobros_comercial_sin_cuenta"){
     $cont=new Factura_comercial();
     $cont->listar_cobros_comercial_sin_cuenta($ver[1],$ver[2],$ver[3]);
+}elseif($ver[0]=="listar_gestiones_por_idempresa"){
+    $cont=new Vinculacion_empresas();
+    $cont->listar_gestiones_por_idempresa($ver[1]);
+}elseif($ver[0]=="listar_vinculacion_empresas"){
+    $cont=new Vinculacion_empresas();
+    $cont->listar_vinculacion_empresas($ver[1]);
 }
 
 // elseif($ver[0]=="obtenerGestionAnterior"){ 
@@ -831,18 +835,18 @@ elseif($ver[0]=="listar_cobros_comercial_sin_cuenta"){
 // lista_cobrar_cobrado_factura listar_caja_bancos listar_facturas_comercial_cobro mayorcuentacontable
 // listatransacciones listar_balance_general_guardados listar_plantilla_flujo_efectivo listar_cobros_comercial
 // 
-// lista_pagar_pagado_factura listar_usuarios  listar_agrupacion_plantilla reportecuentasderesultado
+// lista_pagar_pagado_factura listar_usuarios  listar_agrupacion_plantilla reportecuentasderesultado reportedetallefpt
 // reportedetallefp lista_pagar_pagado_factura mayorcuentacontable_antiguo listar_solo_usuarios  reporte_estado_resultados_actualizado_consolidado_por_niveles
 //  listadesconsolidar listar_anular_eliminar_factura  reporteactivodisponible listar_factura_comercial_con_caja_bancos
 //
 
 // 
 //  listar_anular_ reportedetallefpt  reportebalancedesumasysaldos reportedeplanes activar_desactivar_gestiones listar_comprobantes_cobro_pago
-//  estadogestion listar_factura_comercial listatransacciones reporte_balance_general_prueba listar_select_cuentas_balance_general listar_cobros_comercial
+//  estadogestion listar_factura_comercial listatransacciones reporte_balance_general_prueba listar_agrupacion_plantilla facturas_perteneciente_a_cuenta
 // 
 // 
 //  eliminar_otras_operaciones asignar_comprobantes_A_comprobantes listar_facturas_comercial_cobro
-//  lista_cobrar_cobrado_factura  reporte_estado_origen_aplicacion  reporte_balance_general_por_niveles_consolidados listar_plantilla_flujo_efectivo 
+//  lista_cobrar_cobrado_factura  reporte_estado_origen_aplicacion  reporte_balance_general_por_niveles_consolidados listar_facturas_comercial_asignado_cuentas  
 
 //   insertar_transaccion.php    reporte_balance_general_hasta reportecomprobantecontable reporteactivodiaponibledos eliminar_registro_flujo_efectivo eliminar_configuracion_reporte
 

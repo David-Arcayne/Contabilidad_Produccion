@@ -665,7 +665,7 @@ class PlantillaReporte extends DB{
         $suma_resta = $this->dbc->query("SELECT * FROM agrupacion_plantilla WHERE idplantilla_padre='$id_plantilla_padre' 
         AND (tipo_operacion = 'sumar' || tipo_operacion = 'restar') AND idtipo_reportes = '$idplantilla_reporte'");
 
-        $porcentaje = $this->dbc->query("SELECT * FROM agrupacion_plantilla WHERE idplantilla_hijo='$id_plantilla_padre' 
+        $porcentaje = $this->dbc->query("SELECT * FROM agrupacion_plantilla WHERE idplantilla_padre='$id_plantilla_padre' 
         AND tipo_operacion = 'porcentaje' AND idtipo_reportes = '$idplantilla_reporte'");
 
         if($suma_resta->num_rows > 0){
@@ -1996,7 +1996,7 @@ class PlantillaReporte extends DB{
 
     public function editar_otras_operaciones($idagrupacion_plantilla, $idplantilla_hijo, $operacion, $monto)
     {
-        // $id_empresa = $this->get_id_empresa($idempresa);
+        // $id_empresa = $this->get_id_empresa($idempresa); listar_agrupacion_plantilla
 
         // $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM agrupacion_plantilla WHERE idplantilla_hijo = '$idplantilla_hijo' AND idempresa = '$idempresa' AND iddivisa != '$id'");
         // $resultado = $consulta->fetch_assoc();
@@ -2727,7 +2727,7 @@ class PlantillaReporte extends DB{
 
         $limpiar($array);
     echo json_encode($array, JSON_NUMERIC_CHECK);
-        // return $array; editar registrar_agrupacion_plantilla
+        // return $array; editar registrar_agrupacion_plantilla editar_otras_operaciones
     }
 
 }

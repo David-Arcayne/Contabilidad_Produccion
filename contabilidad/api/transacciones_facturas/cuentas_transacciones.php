@@ -275,7 +275,7 @@ class Cuentas_transacciones extends DB{
         echo json_encode($lista);
     }
 
-    public function listar_facturas_comercial_cobro($idcuenta,$empresa)
+    public function listar_facturas_comercial_cobro($idcuenta,$empresa,$viv_mister_soft)
     {
         $idempresa = $this->getidempresa($empresa); 
         // $ide = $this->getidempresa($empresa);
@@ -284,32 +284,32 @@ class Cuentas_transacciones extends DB{
         $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion ='$idcuenta'");
         $dt = $this->dbc->fetch($detalle_trans);
 
-        $factu_clase = $this->dbc->query("SELECT * FROM transaccion_factura_comercial WHERE idempresa ='$idempresa' AND cuenta ='0' AND idtransaccion IN(0,$dt[transacciones_idtransacciones])");
+        $factu_clase = $this->dbc->query("SELECT * FROM transaccion_documentos_comercial WHERE idempresa ='$idempresa' AND cuenta ='0' AND idtransaccion IN(0,$dt[transacciones_idtransacciones]) AND registro_desde ='contado_venta_comercial'");
 
         while ($qwe = $this->dbc->fetch($factu_clase)) {
     
-                $venta = $this->dbcm->query("SELECT * FROM venta WHERE id_venta='" . $qwe['idfactura_comercial'] . "'");
+                $venta = $this->dbcm->query("SELECT * FROM venta WHERE id_venta='" . $qwe['id_documento'] . "'");
                 $asd = $this->dbcm->fetch($venta);
                 $res = array("id_venta" => $asd['id_venta'], "fecha" => $asd['fecha_venta'], "nfactura" => $asd['nfactura'], "montofactura" => $asd['monto_total']);
      
                 array_push($lista, $res);
         }
 //´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´
-        $url = "https://vivasoft.link/app/cmv1/api/listaVentas/".$empresa;
-        // if($viv_mister_soft == "vivasoft"){
-        //     $url = "https://vivasoft.link/app/cmv1/api/listaVentas/".$empresa;
-        // }else{ // mistersofts
-        //     $url = "https://mistersofts.com/app/cmv1/api/listaVentas/".$empresa;
-        // }
+        // $url = "https://vivasoft.link/app/cmv1/api/listaVentas/".$empresa;
+        if($viv_mister_soft == "vivasoft"){
+            $url = "https://vivasoft.link/app/cmv1/api/listaVentas/".$empresa;
+        }else{ // mistersofts
+            $url = "https://mistersofts.com/app/cmv1/api/listaVentas/".$empresa;
+        }
 
         // $url = "https://mistersofts.com/app/cmv1/api/listaVentas/".$empresa;
         $data = json_decode(file_get_contents($url), true);
         $lista_factura_venta = [];
 
         foreach($data as $plantilla){
-            $trans_fact = $this->dbc->query("SELECT idfactura_comercial 
-                                            FROM transaccion_factura_comercial 
-                                            WHERE idfactura_comercial = '{$plantilla['id']}'");
+            $trans_fact = $this->dbc->query("SELECT id_documento
+                                            FROM transaccion_documentos_comercial 
+                                            WHERE id_documento = '{$plantilla['id']}'");
             if($trans_fact->num_rows > 0){
                 // Ya existe, no lo agregamos
             } else {
@@ -322,33 +322,15 @@ class Cuentas_transacciones extends DB{
         
         echo json_encode($lista_final);
     }
-    public function listar_facturas_comercial_asignado_cuentas($idcuenta)
-    {
-        // $ide = $this->getidempresa($empresa);
-        $lista = [];
-        $registro = $this->dbc->query("SELECT * FROM transaccion_factura_comercial WHERE cuenta = '$idcuenta'");
-        while ($qwe = $this->dbc->fetch($registro)) {
-
-                $venta = $this->dbcm->query("SELECT * FROM venta WHERE id_venta= '$qwe[idfactura_comercial]'");
-                $asd = $this->dbcm->fetch($venta);
-
-                $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente= '$asd[cliente_id_cliente1]'");
-                $cl = $this->dbcm->fetch($cliente);
-
-                $res = array("id" => $asd['id_venta'], "fecha" => $asd['fecha_venta'], "nfactura" => $asd['nfactura'], "montofactura" => $asd['monto_total'],"cliente" =>$cl['nombre']);
-           
-                    array_push($lista, $res);
-        }
-        echo json_encode($lista);
-    }
+    
     public function listar_todos_documentos_asignado_cuenta($idcuenta)
 {
     $lista = [];
 
     // FACTURAS COMERCIALES
-    $registro = $this->dbc->query("SELECT * FROM transaccion_factura_comercial WHERE cuenta = '$idcuenta'");
+    $registro = $this->dbc->query("SELECT * FROM transaccion_documentos_comercial WHERE cuenta = '$idcuenta' AND registro_desde ='contado_venta_comercial'");
     while ($qwe = $this->dbc->fetch($registro)) {
-        $venta = $this->dbcm->query("SELECT * FROM venta WHERE id_venta= '$qwe[idfactura_comercial]'");
+        $venta = $this->dbcm->query("SELECT * FROM venta WHERE id_venta= '$qwe[id_documento]'");
         $asd = $this->dbcm->fetch($venta);
 
         $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente= '$asd[cliente_id_cliente1]'");

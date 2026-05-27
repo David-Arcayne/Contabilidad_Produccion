@@ -280,6 +280,11 @@ public function getidgestion($md5){
         $gestion_sel = $this->dbc->query("SELECT * FROM gestion WHERE idgestion='$gestion'");
         $gc = $gestion_sel->fetch_assoc();
       
+        // if($cadena_tipo == '0'){
+
+        // }else{
+
+        // }
         $array_tipos = array_map('intval', explode(",", $cadena_tipo));
         $tipos = implode(",", $array_tipos);
 
@@ -394,7 +399,7 @@ public function getidgestion($md5){
             ");
 
         }else{ //POR GESTION
-          $transacciones=$this->dbc->query("SELECT
+          $transacciones=$this->dbc->query("SELECT DISTINCT
           t.codigotransaccion,
           t.fechatransaccion,
           t.glosa,
@@ -422,85 +427,104 @@ public function getidgestion($md5){
             $factu=$this->dbc->query("SELECT * FROM factura WHERE transacciones_idtransacciones='$qwe[3]' 
             AND clasefactura = '1'
             ORDER by fecha asc");
-            while($asd=$this->dbc->fetch($factu)){
-                $nit=0;$cliente="";
-    
-                $proveedor=$this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='".$asd['proveedorcliente_idproveedorcliente']."'");
-                $zxc=$this->dbcm->fetch($proveedor);
-                $nit=$zxc['nit'];
-                $cliente=$zxc['nombre'];
-                
+            if($factu->num_rows > 0){ // EXISTEN FACTURAS MOSTRAR
+              while($asd=$this->dbc->fetch($factu)){
+                  $nit=0;$cliente="";
+      
+                  $proveedor=$this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='".$asd['proveedorcliente_idproveedorcliente']."'");
+                  $zxc=$this->dbcm->fetch($proveedor);
+                  $nit=$zxc['nit'];
+                  $cliente=$zxc['nombre'];
+                  
 
-                $fac=array("fecha"=>$asd['fecha'],"nfactura"=>$asd['nfactura'],"monto"=>$asd['montofactura'],"clasefactura"=>$asd['clasefactura'],"nit"=>$nit,"proveedor"=>$cliente
-                );
-                array_push($facturas,$fac);
+                  $fac=array("fecha"=>$asd['fecha'],"nfactura"=>$asd['nfactura'],"monto"=>$asd['montofactura'],"clasefactura"=>$asd['clasefactura'],"nit"=>$nit,"proveedor"=>$cliente
+                  );
+                  array_push($facturas,$fac);
+              }
+              
+            
+              $res=array(
+                  "transaccion"=>$qwe[0],
+                  "fechat"=>$qwe[1],
+                  "estado"=>$qwe[4],
+                  "facturas"=>$facturas
+              );
+              array_push($lista,$res);
+            }else{
+
+              // NO MOSTRARA LA TRANSACCION PORQUE NO EXISTEN FACTURAS
             }
             
-          
-            $res=array(
-                "transaccion"=>$qwe[0],
-                "fechat"=>$qwe[1],
-                "estado"=>$qwe[4],
-                "facturas"=>$facturas
-            );
-            array_push($lista,$res);
           }elseif($clase_factura == '2'){ //COBROSSSSS
             $factu=$this->dbc->query("SELECT * FROM factura WHERE transacciones_idtransacciones='$qwe[3]' 
             AND clasefactura = '2'
             ORDER by fecha asc");
-            while($asd=$this->dbc->fetch($factu)){
-                $nit=0;$cliente="";
-    
-                $proveedor=$this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='".$asd['proveedorcliente_idproveedorcliente']."'");
-                $zxc=$this->dbcm->fetch($proveedor);
-                $nit=$zxc['nit'];
-                $cliente=$zxc['nombre'];
-                
 
-                $fac=array("fecha"=>$asd['fecha'],"nfactura"=>$asd['nfactura'],"monto"=>$asd['montofactura'],"clasefactura"=>$asd['clasefactura'],"nit"=>$nit,"proveedor"=>$cliente
+            if($factu->num_rows > 0){ // EXISTEN FACTURAS MOSTRAR
+                while($asd=$this->dbc->fetch($factu)){
+                  $nit=0;$cliente="";
+      
+                  $proveedor=$this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='".$asd['proveedorcliente_idproveedorcliente']."'");
+                  $zxc=$this->dbcm->fetch($proveedor);
+                  $nit=$zxc['nit'];
+                  $cliente=$zxc['nombre'];
+                  
+
+                  $fac=array("fecha"=>$asd['fecha'],"nfactura"=>$asd['nfactura'],"monto"=>$asd['montofactura'],"clasefactura"=>$asd['clasefactura'],"nit"=>$nit,"proveedor"=>$cliente
+                  );
+                  array_push($facturas,$fac);
+                }
+                
+              
+                $res=array(
+                    "transaccion"=>$qwe[0],
+                    "fechat"=>$qwe[1],
+                    "estado"=>$qwe[4],
+                    "facturas"=>$facturas
                 );
-                array_push($facturas,$fac);
+                array_push($lista,$res);
+            }else{
+              
+              // NO MOSTRARA LA TRANSACCION PORQUE NO EXISTEN FACTURAS
             }
             
-          
-            $res=array(
-                "transaccion"=>$qwe[0],
-                "fechat"=>$qwe[1],
-                "estado"=>$qwe[4],
-                "facturas"=>$facturas
-            );
-            array_push($lista,$res);
           }else{// CLASE FACTURA = 3 --> TODOS
               
             $factu=$this->dbc->query("SELECT * FROM factura WHERE transacciones_idtransacciones='".$qwe[3]."' ORDER by fecha asc");
-            while($asd=$this->dbc->fetch($factu)){
-                $nit=0;$cliente="";
-                if($asd['clasefactura']==1){ // clasefactura 1 proveedor  y 2 cliente 
-                  
-                $proveedor=$this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='".$asd['proveedorcliente_idproveedorcliente']."'");
-                $zxc=$this->dbcm->fetch($proveedor);
-                $nit=$zxc['nit'];
-                $cliente=$zxc['nombre'];
-                }else{
-                  $ccliente=$this->dbcm->query("select * from cliente where id_cliente='".$asd['proveedorcliente_idproveedorcliente']."'");
-                $zxc=$this->dbcm->fetch($ccliente);
-                $nit=$zxc['nit'];
-                $cliente=$zxc['nombre'];
-                }
-
-                $fac=array("fecha"=>$asd['fecha'],"nfactura"=>$asd['nfactura'],"monto"=>$asd['montofactura'],"clasefactura"=>$asd['clasefactura'],"nit"=>$nit,"proveedor"=>$cliente
-                );
-                array_push($facturas,$fac);
-            }
             
-          
-            $res=array(
-                "transaccion"=>$qwe[0],
-                "fechat"=>$qwe[1],
-                "estado"=>$qwe[4],
-                "facturas"=>$facturas
-            );
-            array_push($lista,$res);
+            if($factu->num_rows > 0){ // EXISTEN FACTURAS MOSTRAR
+                while($asd=$this->dbc->fetch($factu)){
+                    $nit=0;$cliente="";
+                    if($asd['clasefactura']==1){ // clasefactura 1 proveedor  y 2 cliente 
+                      
+                    $proveedor=$this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor='".$asd['proveedorcliente_idproveedorcliente']."'");
+                    $zxc=$this->dbcm->fetch($proveedor);
+                    $nit=$zxc['nit'];
+                    $cliente=$zxc['nombre'];
+                    }else{
+                      $ccliente=$this->dbcm->query("select * from cliente where id_cliente='".$asd['proveedorcliente_idproveedorcliente']."'");
+                    $zxc=$this->dbcm->fetch($ccliente);
+                    $nit=$zxc['nit'];
+                    $cliente=$zxc['nombre'];
+                    }
+
+                    $fac=array("fecha"=>$asd['fecha'],"nfactura"=>$asd['nfactura'],"monto"=>$asd['montofactura'],"clasefactura"=>$asd['clasefactura'],"nit"=>$nit,"proveedor"=>$cliente
+                    );
+                    array_push($facturas,$fac);
+                }
+                
+              
+                $res=array(
+                    "transaccion"=>$qwe[0],
+                    "fechat"=>$qwe[1],
+                    "estado"=>$qwe[4],
+                    "facturas"=>$facturas
+                );
+                array_push($lista,$res);
+            }else{
+              
+              // NO MOSTRARA LA TRANSACCION PORQUE NO EXISTEN FACTURAS
+            }
           }
           
         }    
@@ -1031,11 +1055,11 @@ $totalHaber = 0;
        }
        }
 
-        $factura_comercial=$this->dbc->query("SELECT * FROM transaccion_factura_comercial WHERE idtransaccion ='$qwe[5]'");
+        $factura_comercial=$this->dbc->query("SELECT * FROM transaccion_documentos_comercial WHERE idtransaccion ='$qwe[5]' AND registro_desde ='contado_venta_comercial'");
         if($factura_comercial->num_rows > 0){
             while($qq=$this->dbc->fetch($factura_comercial)){
                       
-              $factu_com=$this->dbcm->query("SELECT * FROM venta WHERE id_venta ='$qq[idfactura_comercial]'");
+              $factu_com=$this->dbcm->query("SELECT * FROM venta WHERE id_venta ='$qq[id_documento]'");
               $resuu = $factu_com->fetch_assoc();
 
 

@@ -13,6 +13,9 @@ class Admin extends DB
         // Preparar la respuesta por defecto
         $res = array("ok" => "danger", "mensaje" => "Registro No es Correcto");
 
+        //SI EL ID DE LA EMPRESA EXISTE EN LA TABLA vinculacion_empresa EN EL CAMPO idempresa_actual
+        // SIGNIFICA QUE EL REGISTRO QUE HAGAMOS SE DUPLICARA EN LA EMPRESA VINCULADA
+        
         // Verificar si se obtuvo un id válido de la empresa
         if (!$ide) {
             $res['mensaje'] = 'ID de empresa no válido';
