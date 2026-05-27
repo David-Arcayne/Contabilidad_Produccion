@@ -814,17 +814,21 @@ elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
     $cont=new Factura_comercial();
     $cont->listar_factura_comercial_sin_cajaBancos($ver[1],$ver[2]);
 }
+// elseif($ver[0]=="listar_cobros_comercial_sin_cuenta"){
+//     $cont=new Factura_comercial();
+//     $cont->listar_cobros_comercial_sin_cuenta($ver[1],$ver[2],$ver[3]);
+// }
 
 // elseif($ver[0]=="obtenerGestionAnterior"){ 
 //     $cont=new Reporte_flujo_efectivo(); listadegestion    listar_solo_usuarios 
 //     $cont->obtenerGestionAnterior($ver[1],$ver[2]); eliminar_gestion_contable   
 // }
 
-// reportedetalle  rp listar_gestiones_por_usuarios desvincular listar_tipo_reportes
-// listar_factura listar_facturas_cobro_pago listar_recibo_por_caja_bancos
-// listar_recibo_otras_cuentas_pagar listadegestion eliminar_otras_operaciones reporte_estado_origen_aplicacion listar_factura_comercial_con_transaccion
+// reportedetalle  rp listar_gestiones_por_usuarios listar_facturas_comercial_cobro listar_tipo_reportes
+// listar_factura listar_facturas_cobro_pago listar_recibo_por_caja_bancos listar_facturas_comercial_cobro
+// listar_recibo_otras_cuentas_pagar listadegestion eliminar_otras_operaciones listar_facturas_comercial_cobro listar_factura_comercial_con_transaccion
 
-// lista_cobrar_cobrado_factura listar_caja_bancos reporteactivoypasivo mayorcuentacontable
+// lista_cobrar_cobrado_factura listar_caja_bancos listar_facturas_comercial_cobro mayorcuentacontable
 // listatransacciones listar_balance_general_guardados listar_plantilla_flujo_efectivo listar_cobros_comercial
 // 
 // lista_pagar_pagado_factura listar_usuarios  listar_agrupacion_plantilla reportecuentasderesultado

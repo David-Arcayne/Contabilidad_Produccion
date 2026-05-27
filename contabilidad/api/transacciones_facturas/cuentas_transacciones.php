@@ -295,8 +295,14 @@ class Cuentas_transacciones extends DB{
                 array_push($lista, $res);
         }
 //´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´
-        // $url = "https://vivasoft.link/app/cmv1/api/listaVentas/".$empresa;
-        $url = "https://mistersofts.com/app/cmv1/api/listaVentas/".$empresa;
+        $url = "https://vivasoft.link/app/cmv1/api/listaVentas/".$empresa;
+        // if($viv_mister_soft == "vivasoft"){
+        //     $url = "https://vivasoft.link/app/cmv1/api/listaVentas/".$empresa;
+        // }else{ // mistersofts
+        //     $url = "https://mistersofts.com/app/cmv1/api/listaVentas/".$empresa;
+        // }
+
+        // $url = "https://mistersofts.com/app/cmv1/api/listaVentas/".$empresa;
         $data = json_decode(file_get_contents($url), true);
         $lista_factura_venta = [];
 
