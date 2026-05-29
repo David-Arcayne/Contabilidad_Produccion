@@ -351,6 +351,36 @@ class Cuentas_transacciones extends DB{
         $lista[] = $res;
     }
 
+    // COBROS DE FACTURAS COMERCIAL
+    $registro = $this->dbc->query("SELECT * FROM transaccion_documentos_comercial WHERE cuenta = '$idcuenta' AND registro_desde ='cobro_venta_comercial'");
+    while ($qwe = $this->dbc->fetch($registro)) {
+        $cobro = $this->dbcm->query("SELECT * FROM detalle_cobro WHERE iddetalle_cobro= '$qwe[id_documento]'");
+        $cb = $this->dbcm->fetch($cobro);
+
+        $est_cobro = $this->dbcm->query("SELECT * FROM estado_cobro WHERE id_estado_cobro= '$cb[estado_cobro_id_estado_cobro]'");
+        $ec = $this->dbcm->fetch($est_cobro);
+
+        $venta2 = $this->dbcm->query("SELECT * FROM venta WHERE id_venta= '$ec[venta_id_venta]'");
+        $asd2 = $this->dbcm->fetch($venta2);
+
+        $cliente2 = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente= '$asd2[cliente_id_cliente1]'");
+        $cl2 = $this->dbcm->fetch($cliente2);
+
+        $res = array(
+            "tipo" => "cobro_venta_comercial",
+            "id" => $cb['iddetalle_cobro'],
+            "fecha" => $cb['fecha_actual'],
+            "nro_documento" => $cb['num_documento'],
+            "monto" => $cb['monto'],
+            "cobrado" => "cobro",
+            "pagado" => "",
+            "concepto" => "",
+            "cobro_pago" => "cobro",
+            "cliente_proveedor" => $cl2['nombre']
+        );
+        $lista[] = $res;
+    }
+
     // FACTURAS
     $registro = $this->dbc->query("SELECT * FROM factura WHERE cuenta = '$idcuenta'");
     while ($qwe = $this->dbc->fetch($registro)) {

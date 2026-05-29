@@ -957,7 +957,7 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     }
     
     
-// asignar asiento registrar_recibo_cobro_cajaBancos_en_otras_cuentas editar_recibo_caja_bancos registrocobrarfactura registrar_anular_eliminar_activar_factura_tributario_transaccion
+// asignar asiento desvincular_documentos_de_cuenta editar_recibo_caja_bancos registrocobrarfactura registrar_anular_eliminar_activar_factura_tributario_transaccion
 //   registrar_balance_general_admin registrar_vinculacion_depreciacion editar_registro_flujo_efectivo activar_desactivar_tipo_reportes creartipoasiento
 
 // asignar_comprobantes_A_comprobantes guardar_balance_general_por_gestion registrogestion ss desvincular_facturas_comercial_de_transaccion

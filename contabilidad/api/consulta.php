@@ -736,46 +736,46 @@ elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
 }elseif($ver[0]=="eliminar_tipo_cliente"){
     $cont=new Tipo_cliente_comercial();
     $cont->eliminar_tipo_cliente($ver[1]);
-}elseif($ver[0]=="listar_recibo_por_caja_bancos_saldo"){//listar_recibo_por_caja_bancos
+}elseif($ver[0]=="listar_recibo_por_caja_bancos_saldo"){
     $cont=new Caja_bancos_recibos();
     $cont->listar_recibo_por_caja_bancos_saldo($ver[1],$ver[2]);
-}elseif($ver[0]=="alerta_anular_eliminar_documentos"){//listar_recibo_por_caja_bancos
+}elseif($ver[0]=="alerta_anular_eliminar_documentos"){
     $cont=new Alertas();
     $cont->alerta_anular_eliminar_documentos($ver[1],$ver[2]);
-}elseif($ver[0]=="listar_tipo_cliente_activos"){//listar_recibo_por_caja_bancos
+}elseif($ver[0]=="listar_tipo_cliente_activos"){
     $cont=new Tipo_cliente_comercial();
     $cont->listar_tipo_cliente_activos($ver[1]);
-}elseif($ver[0]=="listar_datos_de_usuario"){//listar_recibo_por_caja_bancos
+}elseif($ver[0]=="listar_datos_de_usuario"){
     $cont=new Contabilidad();
     $cont->listar_datos_de_usuario($ver[1]);
-}elseif($ver[0]=="listar_cobros_comercial"){//listar_recibo_por_caja_bancos
+}elseif($ver[0]=="listar_cobros_comercial"){
     $cont=new Factura_comercial();
     $cont->listar_cobros_comercial($ver[1],$ver[2]);
-}elseif($ver[0]=="listar_select_cuentas_balance_general"){//listar_recibo_por_caja_bancos
+}elseif($ver[0]=="listar_select_cuentas_balance_general"){
     $cont=new Reporte_flujo_efectivo();
     $cont->listar_select_cuentas_balance_general($ver[1]);
-}elseif($ver[0]=="reporte_flujo_efectivo"){//listar_recibo_por_caja_bancos
+}elseif($ver[0]=="reporte_flujo_efectivo"){
     $cont=new Reporte_flujo_efectivo();
     $cont->reporte_flujo_efectivo($ver[1],$ver[2],$ver[3],$ver[4]);
-}elseif($ver[0]=="reporte_estado_origen_aplicacion"){//listar_recibo_por_caja_bancos
+}elseif($ver[0]=="reporte_estado_origen_aplicacion"){
     $cont=new Reporte_flujo_efectivo();
     $cont->reporte_estado_origen_aplicacion($ver[1]);
-}elseif($ver[0]=="filtro_plantilla_flujo_por_nivel"){//listar_recibo_por_caja_bancos
+}elseif($ver[0]=="filtro_plantilla_flujo_por_nivel"){
     $cont=new Reporte_flujo_efectivo();
     $cont->filtro_plantilla_flujo_por_nivel($ver[1],$ver[2],$ver[3]);
-}elseif($ver[0]=="listar_plantilla_flujo_efectivo"){//listar_recibo_por_caja_bancos
+}elseif($ver[0]=="listar_plantilla_flujo_efectivo"){
     $cont=new Reporte_flujo_efectivo();
     $cont->listar_plantilla_flujo_efectivo($ver[1],$ver[2]);
-}elseif($ver[0]=="listar_solo_usuarios"){//listar_recibo_por_caja_bancos
+}elseif($ver[0]=="listar_solo_usuarios"){
     $cont=new Usuario_gestion();
     $cont->listar_solo_usuarios($ver[1]);
-}elseif($ver[0]=="listar_gestiones_por_usuarios"){//listar_recibo_por_caja_bancos
+}elseif($ver[0]=="listar_gestiones_por_usuarios"){
     $cont=new Usuario_gestion();
     $cont->listar_gestiones_por_usuarios($ver[1]);
-}elseif($ver[0]=="listar_usuarios_por_gestion"){//listar_recibo_por_caja_bancos
+}elseif($ver[0]=="listar_usuarios_por_gestion"){
     $cont=new Usuario_gestion();
     $cont->listar_usuarios_por_gestion($ver[1]);
-}elseif($ver[0]=="desvincular_gestiones_de_usuarios"){//listar_recibo_por_caja_bancos
+}elseif($ver[0]=="desvincular_gestiones_de_usuarios"){
     $cont=new Usuario_gestion();
     $cont->desvincular_gestiones_de_usuarios($ver[1],$ver[2]);
 }elseif($ver[0]=="activar_desactivar_gestiones"){
@@ -828,16 +828,16 @@ elseif($ver[0]=="listar_cobros_comercial_sin_cuenta"){
 //     $cont->obtenerGestionAnterior($ver[1],$ver[2]); eliminar_gestion_contable   
 // }
 
-// reportedetalle  rp listar_gestiones_por_usuarios listar_facturas_comercial_cobro listar_tipo_reportes
+// reportedetalle  rp listar_gestiones_por_usuarios listar_select_cuentas_balance_general listar_tipo_reportes
 // listar_factura listar_facturas_cobro_pago listar_recibo_por_caja_bancos listar_facturas_comercial_cobro
 // listar_recibo_otras_cuentas_pagar listadegestion eliminar_otras_operaciones listar_facturas_comercial_cobro listar_factura_comercial_con_transaccion
 
-// lista_cobrar_cobrado_factura listar_caja_bancos listar_facturas_comercial_cobro mayorcuentacontable
+// lista_cobrar_cobrado_factura listar_caja_bancos listar_facturas_comercial_cobro mayorcuentacontable listar_anular_eliminar_factura
 // listatransacciones listar_balance_general_guardados listar_plantilla_flujo_efectivo listar_cobros_comercial
 // 
 // lista_pagar_pagado_factura listar_usuarios  listar_agrupacion_plantilla reportecuentasderesultado reportedetallefpt
 // reportedetallefp lista_pagar_pagado_factura mayorcuentacontable_antiguo listar_solo_usuarios  reporte_estado_resultados_actualizado_consolidado_por_niveles
-//  listadesconsolidar listar_anular_eliminar_factura  reporteactivodisponible listar_factura_comercial_con_caja_bancos
+//  listadesconsolidar listar_todos_documentos_asignado_cuenta  reporteactivodisponible listar_factura_comercial_con_caja_bancos
 //
 
 // 

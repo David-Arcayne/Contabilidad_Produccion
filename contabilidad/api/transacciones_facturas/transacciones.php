@@ -1773,6 +1773,11 @@ public function asignar_facturas_A_cuentas($data) {
 
                     $monto_documento += $docu['monto'];
                     $updatetranscodigo = $this->dbc->query("UPDATE transaccion_documentos_comercial SET cuenta = '0' WHERE id_documento = '{$docu['id']}' AND registro_desde ='contado_venta_comercial'");
+                }elseif($docu['tipo'] == 'cobro_venta_comercial'){
+
+
+                    $monto_documento += $docu['monto'];
+                    $updatetranscodigo = $this->dbc->query("UPDATE transaccion_documentos_comercial SET cuenta = '0' WHERE id_documento = '{$docu['id']}' AND registro_desde ='cobro_venta_comercial'");
                 }elseif($docu['tipo'] == 'comprobante de cobro'){
 
                     $monto_documento += $docu['monto'];

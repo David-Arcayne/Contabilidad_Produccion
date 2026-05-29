@@ -1053,6 +1053,7 @@ public function listar_anular_eliminar_factura($empresa, $todos,$idgestion) {
             $recibo = $this->dbc->query("SELECT * FROM recibo WHERE idrecibo = '{$qwe['id_documento']}'");
             if ($rec = $recibo->fetch_assoc()) {
                 $nro_doc = $rec['nro_recibo'];
+                $fecha_doc = $rec['fecha'];
                 $monto = $rec['monto'];
                 if ($rec['cobrado'] != '0') {
                     $comprobant = $this->dbc->query("SELECT * FROM cuentaspof WHERE idrecibo = '{$qwe['id_documento']}'");
@@ -1083,6 +1084,7 @@ public function listar_anular_eliminar_factura($empresa, $todos,$idgestion) {
             $factura = $this->dbc->query("SELECT * FROM factura WHERE idfactura = '{$qwe['id_documento']}'");
             if ($fac = $factura->fetch_assoc()) {
                 $nro_doc = $fac['nfactura'];
+                $fecha_doc = $fac['fecha'];
                 $monto = $fac['montofactura'];
                 if ($fac['clasefactura'] == '2') {
                     $comprobant = $this->dbc->query("SELECT * FROM cuentaspof WHERE idfactura = '{$qwe['id_documento']}'");
@@ -1117,6 +1119,7 @@ public function listar_anular_eliminar_factura($empresa, $todos,$idgestion) {
                     $caja_banco = $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '{$dt_cm['idcaja_bancos']}'");
                     $cb = $caja_banco->fetch_assoc();
                 $nro_doc = $cp['nrecibo'];
+                $fecha_doc = $cp['fecha'];
                 $monto = $cp['monto'];
                 if ($cp['idfactura'] != '0') {
                     $fac = $this->dbc->query("SELECT * FROM factura WHERE idfactura = '{$cp['idfactura']}'")->fetch_assoc();
@@ -1143,6 +1146,7 @@ public function listar_anular_eliminar_factura($empresa, $todos,$idgestion) {
                     $caja_banco = $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '{$dt_cm['idcaja_bancos']}'");
                     $cb = $caja_banco->fetch_assoc();
                 $nro_doc = $cp['nrecibo'];
+                $fecha_doc = $cp['fecha'];
                 $monto = $cp['monto'];
                 if ($cp['idfactura'] != '0') {
                     $fac = $this->dbc->query("SELECT * FROM factura WHERE idfactura = '{$cp['idfactura']}'")->fetch_assoc();
@@ -1170,6 +1174,7 @@ public function listar_anular_eliminar_factura($empresa, $todos,$idgestion) {
             "idsolicitud_anular_eliminar_documento" => $qwe['idsolicitud_anular_eliminar_documento'],
             "id_documento" => $qwe['id_documento'],
             "nro_documento" => $nro_doc,
+            "fecha_documento" => $fecha_doc,
             "registro_desde" => $qwe['registro_desde'],
             "tipo_documento" => $qwe['tipo_documento'],
             "hora" => $qwe['hora'],
