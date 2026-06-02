@@ -1552,34 +1552,34 @@ class PlantillaReporte extends DB{
             $lista_aux_buscador = [];        
         }
     
-        // Buscar el primer elemento con disponible_para_otro_reporte = "si"
-        function buscarDisponible($lista) {
-            foreach ($lista as $item) {
-                if (isset($item['disponible_para_otro_reporte']) && strtolower($item['disponible_para_otro_reporte']) == 'si') {
-                    // Si tiene suma_nivel_2, devolverlo
-                    if (isset($item['suma_nivel_2'])) {
-                        return $item['suma_nivel_2'];
-                    }
-                    // Si tiene valor (por ejemplo, niveles inferiores) calculo_otro_reporte
-                    if (isset($item['valor'])) {
-                        return $item['valor'];
-                    }
-                }
+        // // Buscar el primer elemento con disponible_para_otro_reporte = "si"
+        // function buscarDisponible($lista) {
+        //     foreach ($lista as $item) {
+        //         if (isset($item['disponible_para_otro_reporte']) && strtolower($item['disponible_para_otro_reporte']) == 'si') {
+        //             // Si tiene suma_nivel_2, devolverlo
+        //             if (isset($item['suma_nivel_2'])) {
+        //                 return $item['suma_nivel_2'];
+        //             }
+        //             // Si tiene valor (por ejemplo, niveles inferiores) calculo_otro_reporte
+        //             if (isset($item['valor'])) {
+        //                 return $item['valor'];
+        //             }
+        //         }
 
-                // Buscar recursivamente en niveles inferiores
-                foreach ($item as $clave => $subnivel) {
-                    if (is_array($subnivel)) {
-                        $resultado = buscarDisponible($subnivel);
-                        if ($resultado !== null) {
-                            return $resultado;
-                        }
-                    }
-                }
-            }
-            return null;
-        }
+        //         // Buscar recursivamente en niveles inferiores
+        //         foreach ($item as $clave => $subnivel) {
+        //             if (is_array($subnivel)) {
+        //                 $resultado = buscarDisponible($subnivel);
+        //                 if ($resultado !== null) {
+        //                     return $resultado;
+        //                 }
+        //             }
+        //         }
+        //     }
+        //     return null;
+        // }
 
-        $valor_encontrado = buscarDisponible($lista);
+        $valor_encontrado = $this->buscarDisponible($lista);
 
         // Si no encuentra nada, devuelve 0 o null
         if ($valor_encontrado === null) {
@@ -1589,7 +1589,7 @@ class PlantillaReporte extends DB{
         // echo json_encode($valor_encontrado, JSON_NUMERIC_CHECK);
     }
 
-    private function reporte_calculo_otro_reporte_consolidado($idplantilla_reporte,$fecha_ini,$fecha_fin,$empresa,$gestion) {
+    public function reporte_calculo_otro_reporte_consolidado($idplantilla_reporte,$fecha_ini,$fecha_fin,$empresa,$gestion) {
         //    ini_set('display_errors', 1); 
         // ini_set('display_startup_errors', 1);
         // error_reporting(E_ALL);
@@ -1714,8 +1714,8 @@ class PlantillaReporte extends DB{
                 // }
                 $res['suma_nivel_2'] = $resu;
             }
-            // elseif($pl_otro_reporte->num_rows > 0){ // ES UNA PLANTILLA QUE OBTIENE RESULTADO DE OTRO REPORTE
-            //     //  $pl_list['tipo_operacion'] == 'calculo_otro_reporte'
+            elseif($pl_otro_reporte->num_rows > 0){ // ES UNA PLANTILLA QUE OBTIENE RESULTADO DE OTRO REPORTE
+                //  $pl_list['tipo_operacion'] == 'calculo_otro_reporte'
 
             //     $calculo_otro_reporte = $pl_otro_reporte->fetch_assoc(); 
 
@@ -1726,8 +1726,28 @@ class PlantillaReporte extends DB{
             //     $fecha_fin,
             //     $empresa
             // );
-            //     // $res['suma_nivel_2'] = $sum_rest;
-            // }
+                
+
+             //  $pl_list['tipo_operacion'] == 'calculo_otro_reporte'
+                $total_otro_reporte = 0;
+                $calc_otr_rep = $pl_otro_reporte->fetch_assoc(); 
+
+                // IR AL OTRO REPORTE PARA OBTENER LO QUE QUIERO
+
+                $total_otro_reporte =$this->reporte_calculo_otro_reporte_consolidado(    // TENDRIA QUE USAR OTRO REPORTE QUE ME RETORNE DIRECTAMENTE EL RESULTADO DE LA PLANTILLA 
+                $calc_otr_rep['idtipo_reporte_referencia'],   // REPORTE DE REFERENCIA
+                $fecha_ini,
+                $fecha_fin,
+                $empresa,
+                $gestion
+            );
+
+                 if($total_otro_reporte < '0'){
+                    $res['suma_nivel_2'] = 0;
+                }else{
+                    $res['suma_nivel_2'] = $total_otro_reporte;
+                }
+            }
             elseif($pl_padre_calcu->num_rows > 0){ //ES UNA PLANTILLA CON HIJOS CALCULABLES  (VENTAS)
 
             // NIVEL 2 2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222
@@ -1957,8 +1977,45 @@ class PlantillaReporte extends DB{
             $lista_aux_buscador = [];        
         }
     
-        // Buscar el primer elemento con disponible_para_otro_reporte = "si"
-        function buscarDisponible($lista) {
+        // // Buscar el primer elemento con disponible_para_otro_reporte = "si"
+        // function buscarDisponible($lista) {
+        //     foreach ($lista as $item) {
+        //         if (isset($item['disponible_para_otro_reporte']) && strtolower($item['disponible_para_otro_reporte']) == 'si') {
+        //             // Si tiene suma_nivel_2, devolverlo
+        //             if (isset($item['suma_nivel_2'])) {
+        //                 return $item['suma_nivel_2'];
+        //             }
+        //             // Si tiene valor (por ejemplo, niveles inferiores) calculo_otro_reporte
+        //             if (isset($item['valor'])) {
+        //                 return $item['valor'];
+        //             }
+        //         }
+
+        //         // Buscar recursivamente en niveles inferiores
+        //         foreach ($item as $clave => $subnivel) {
+        //             if (is_array($subnivel)) {
+        //                 $resultado = buscarDisponible($subnivel);
+        //                 if ($resultado !== null) {
+        //                     return $resultado;
+        //                 }
+        //             }
+        //         }
+        //     }
+        //     return null;
+        // }
+
+        $valor_encontrado = $this->buscarDisponible($lista);
+
+        // Si no encuentra nada, devuelve 0 o null
+        // if ($valor_encontrado === null) {
+        //     $valor_encontrado = 0;
+        // }
+        return $valor_encontrado;
+        // echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
+
+    // Buscar el primer elemento con disponible_para_otro_reporte = "si"
+       public function buscarDisponible($lista) {
             foreach ($lista as $item) {
                 if (isset($item['disponible_para_otro_reporte']) && strtolower($item['disponible_para_otro_reporte']) == 'si') {
                     // Si tiene suma_nivel_2, devolverlo
@@ -1974,7 +2031,7 @@ class PlantillaReporte extends DB{
                 // Buscar recursivamente en niveles inferiores
                 foreach ($item as $clave => $subnivel) {
                     if (is_array($subnivel)) {
-                        $resultado = buscarDisponible($subnivel);
+                        $resultado = $this->buscarDisponible($subnivel);
                         if ($resultado !== null) {
                             return $resultado;
                         }
@@ -1983,17 +2040,6 @@ class PlantillaReporte extends DB{
             }
             return null;
         }
-
-        $valor_encontrado = buscarDisponible($lista);
-
-        // Si no encuentra nada, devuelve 0 o null
-        if ($valor_encontrado === null) {
-            $valor_encontrado = 0;
-        }
-        return $valor_encontrado;
-        // echo json_encode($valor_encontrado, JSON_NUMERIC_CHECK);
-    }
-
     public function editar_otras_operaciones($idagrupacion_plantilla, $idplantilla_hijo, $operacion, $monto)
     {
         // $id_empresa = $this->get_id_empresa($idempresa); listar_agrupacion_plantilla
@@ -2540,9 +2586,6 @@ class PlantillaReporte extends DB{
     public function registrar_reportes_referencia($idtipo_reporte,$idplantilla,$idtipo_reporte_referencia,$idplantilla_referencia,$empresa){
         // $idempresa = Empresa::getidempresa($empresa);
         $idempresa = $this->get_id_empresa($empresa);
-        // $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM divisa WHERE nombre = '$nombre' AND idempresa = '$idempresa'");
-        // $resultado = $consulta->fetch_assoc();
-        // $totalRegistros = $resultado['total'];
 
         if (0 > 0) {
             $res = array("danger", "El registro ya existe","Error");
@@ -2727,7 +2770,7 @@ class PlantillaReporte extends DB{
 
         $limpiar($array);
     echo json_encode($array, JSON_NUMERIC_CHECK);
-        // return $array; editar registrar_agrupacion_plantilla editar_otras_operaciones
+        // return $array; editar registrar_agrupacion_plantilla editar_otras_operaciones calculo reporte_estado_resultados_actualizado_consolidado_por_niveles
     }
 
 }

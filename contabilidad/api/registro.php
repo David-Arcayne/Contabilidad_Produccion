@@ -539,12 +539,12 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         }
     }
     elseif($ver=="registrar_configuracion_reporte"){
-        if(isset($_POST['idplandecuenta'],$_POST['idplantilla_reporte'],$_POST['reporte'],$_POST['nombre_cuenta_superior'],$_POST['nivel_registrado'],$_POST['grupo'],$_POST['es_calculable'],$_POST['es_activo_fijo'],$_POST['negrilla_cursiva'],$_POST['empresa'])){
+        if(isset($_POST['idplandecuenta'],$_POST['idplantilla_reporte'],$_POST['reporte'],$_POST['nombre_cuenta_superior'],$_POST['nivel_registrado'],$_POST['grupo'],$_POST['es_calculable'],$_POST['es_activo_fijo'],$_POST['negrilla_cursiva'],$_POST['tipo_operacion'],$_POST['empresa'])){
             $cont=new Reporte_confi();
-            $cont->registrar_configuracion_reporte($_POST['idplandecuenta'],$_POST['idplantilla_reporte'],$_POST['reporte'],$_POST['nombre_cuenta_superior'],$_POST['nivel_registrado'],$_POST['grupo'],$_POST['es_calculable'],$_POST['es_activo_fijo'],$_POST['negrilla_cursiva'],$_POST['empresa']);
+            $cont->registrar_configuracion_reporte($_POST['idplandecuenta'],$_POST['idplantilla_reporte'],$_POST['reporte'],$_POST['nombre_cuenta_superior'],$_POST['nivel_registrado'],$_POST['grupo'],$_POST['es_calculable'],$_POST['es_activo_fijo'],$_POST['negrilla_cursiva'],$_POST['tipo_operacion'],$_POST['empresa']);
         }
         else{
-            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idplandecuenta'],$_POST['idplantilla_reporte'],$_POST['reporte'],$_POST['nombre_cuenta_superior'],$_POST['nivel_registrado'],$_POST['grupo'],$_POST['es_calculable'],$_POST['es_activo_fijo'],$_POST['negrilla_cursiva'],$_POST['empresa']));
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idplandecuenta'],$_POST['idplantilla_reporte'],$_POST['reporte'],$_POST['nombre_cuenta_superior'],$_POST['nivel_registrado'],$_POST['grupo'],$_POST['es_calculable'],$_POST['es_activo_fijo'],$_POST['negrilla_cursiva'],$_POST['tipo_operacion'],$_POST['empresa']));
         }
     }
     elseif($ver=="registrar_vinculacion_depreciacion"){
@@ -964,6 +964,6 @@ if($data['ver'] == "asignar_asiento_A_factura") {
 
 } 
 // registrar_recibo_otras_cuentas registrotransaccion registrar_agrupacion_plantilla registrar_recibo_pago_cajaBancos_en_otras_cuentas asignar_facturas_comercial_A_cuentas
-// registrar_agrupacion_plantilla registro_transaccion_comercial registrar_factura_recibo_pago_cajaBancos registrar_recibo_pago_cajaBancos_en_facturas editar_otras_operaciones
+// registrar_agrupacion_plantilla registrar_configuracion_reporte registrar_factura_recibo_pago_cajaBancos registrar_recibo_pago_cajaBancos_en_facturas editar_otras_operaciones
 // crearsolofacturasapif5  registrar_recibo_cobro_cajaBancos_en_facturas registrar_factura_recibo_cobro_cajaBancos cobrar_contratacion_con_factura_cajaBancos
 ?> 

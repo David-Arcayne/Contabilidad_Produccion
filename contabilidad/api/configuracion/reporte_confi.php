@@ -1,6 +1,6 @@
 <?php
 require_once "../../db/db.php";
-// require_once "../configuracion/empresa.php"; editar
+// require_once "../configuracion/rp_plantilla_reporte.php"; 
 
 class Reporte_confi extends DB{
 
@@ -174,7 +174,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
     }
 
     //-----------------------------------------------------------------------------
-    public function registrar_configuracion_reporte($idplandecuenta,$idplantilla_reporte,$reporte,$nombre_cuenta_superior,$nivel,$grupo,$es_calculable,$es_activo_fijo,$negrilla_cursiva,$empresa){
+    public function registrar_configuracion_reporte($idplandecuenta,$idplantilla_reporte,$reporte,$nombre_cuenta_superior,$nivel,$grupo,$es_calculable,$es_activo_fijo,$negrilla_cursiva,$tipo_operacion,$empresa){
       
         // $idempresa = Empresa::getidempresa($empresa);
         $idempresa = $this->getidempresa($empresa);
@@ -189,8 +189,8 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
             $orden_ulti = $resultado['total'] + 1;
 
                 // Insertar el nuevo registro
-                $registroProveedor = $this->dbc->query("INSERT INTO configuracion_reporte(idplandecuenta,idplantilla_reporte,reporte,nombre_cuenta_superior,nivel_registrado,orden,grupo,es_calculable,es_activo_fijo,negrilla_cursiva,idempresa) 
-                VALUES ('$idplandecuenta','$idplantilla_reporte','$reporte','$nombre_cuenta_superior','$nivel','$orden_ulti','$grupo','$es_calculable','$es_activo_fijo','$negrilla_cursiva','$idempresa')");
+                $registroProveedor = $this->dbc->query("INSERT INTO configuracion_reporte(idplandecuenta,idplantilla_reporte,reporte,nombre_cuenta_superior,nivel_registrado,orden,grupo,es_calculable,es_activo_fijo,negrilla_cursiva,tipo_operacion,idempresa) 
+                VALUES ('$idplandecuenta','$idplantilla_reporte','$reporte','$nombre_cuenta_superior','$nivel','$orden_ulti','$grupo','$es_calculable','$es_activo_fijo','$negrilla_cursiva','$tipo_operacion','$idempresa')");
                 if ($registroProveedor === TRUE) {                                                                                                                                                                
                     $res = array("success", "Registro exitoso","registroCaracteristicas");
                 } else {
@@ -309,6 +309,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                 "orden" => $qwe2['orden'],
                 "es_depreciacion" => $es_depreciacion,
                 "negrilla_cursiva" => $qwe2['negrilla_cursiva'],
+                "tipo_operacion" => $qwe2['tipo_operacion'],
                 "nivel_2" => [] //activo
                 // "nivel_3" => $qwe['nombre'],// 
                 // "estado" => $qwe['estado']
@@ -339,6 +340,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                 "orden" => $qwe3['orden'],
                 "es_depreciacion" => $es_depreciacion,
                 "negrilla_cursiva" => $qwe3['negrilla_cursiva'],
+                "tipo_operacion" => $qwe3['tipo_operacion'],
                 "nivel_3" => [] //activo
                 // "nivel_3" => $qwe['nombre'],// 
                 // "estado" => $qwe['estado']
@@ -368,6 +370,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                     "orden" => $qwe4['orden'],
                     "es_depreciacion" => $es_depreciacion,
                     "negrilla_cursiva" => $qwe4['negrilla_cursiva'],
+                    "tipo_operacion" => $qwe4['tipo_operacion'],
                     "nivel_4" => [] //activo
                     );
                     $get_nivel_5 = $this->dbc->query("SELECT * from configuracion_reporte where grupo = '$qwe4[grupo]' AND nombre_cuenta_superior = '$nombre_cuenta3[nombreplan]' AND reporte = '$qwe[reporte]' AND idempresa='$idempresa'
@@ -395,6 +398,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                         "orden" => $qwe5['orden'],
                         "es_depreciacion" => $es_depreciacion,
                         "negrilla_cursiva" => $qwe5['negrilla_cursiva'],
+                        "tipo_operacion" => $qwe5['tipo_operacion'],
                         "nivel_5" => [] //activo
                         );
                 //----------------------------------------------------------------------------
@@ -414,6 +418,7 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                         "orden" => $qwe6['orden'],
                         "es_depreciacion" => $es_depreciacion,
                         "negrilla_cursiva" => $qwe6['negrilla_cursiva'],
+                        "tipo_operacion" => $qwe6['tipo_operacion'],
                         "nivel_5" => [] //activo
                         );
                         
@@ -1372,9 +1377,9 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
         return $lista;
     }
     private function reporte_balance_general_consolidado($idplantilla_reporte,$fecha_ini,$fecha_fin,$empresa,$gestion) {
-        ini_set('display_errors', 1); 
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+        // ini_set('display_errors', 1); 
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
         
         $lista = [];
         $idempresa = $this->getidempresa($empresa);
@@ -2116,6 +2121,41 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                     );
                                     array_push($res2['nivel_2'], $res3); 
                                 }
+                    }elseif($qwe3['tipo_operacion'] == "calculo_otro_reporte"){
+
+                        $total_otro_reporte = 0;
+                        
+                        $pl_otro_reporte = $this->dbc->query("SELECT * FROM calculo_otro_reporte WHERE idplantilla = '$qwe3[idconfiguracion_reporte]'");
+                        $calc_otr_rep = $pl_otro_reporte->fetch_assoc();
+
+                        // IR AL OTRO REPORTE PARA OBTENER LO QUE QUIERO
+                        $miObjeto = new PlantillaReporte();
+                        $total_otro_reporte = $miObjeto->reporte_calculo_otro_reporte_consolidado(
+                        $calc_otr_rep['idtipo_reporte_referencia'],   // REPORTE DE REFERENCIA
+                        $fecha_ini,
+                        $fecha_fin,
+                        $empresa,
+                        $gestion
+                        );
+
+                        $suma_nivel_2 = $suma_nivel_2 + $total_otro_reporte;
+                        $res3 = array(
+                                    "idconfiguracion_reporte" => $qwe3['idconfiguracion_reporte'],
+                                    "idplantilla_reporte" => $qwe3['idplantilla_reporte'],
+                                    "grupo" => $qwe3['grupo'],
+                                    "negrilla_cursiva" => $qwe3['negrilla_cursiva'],
+                                    "es_calculable" => $qwe3['es_calculable'],
+                                    "idplandecuenta" => $nombre_cuenta2['idplandecuenta'], 
+                                    "codigo" => $nombre_cuenta2['numero'],   
+                                    "nombre_nivel_2" => $nombre_cuenta2['nombreplan'],
+                                    "valor" => $total_otro_reporte,
+                                    "profundidad" => '2',
+                                    "orden" => $qwe3['orden'],
+                                    "nombre_cuenta_superior" => $qwe3['nombre_cuenta_superior'],
+                                    "nivel_3" => [] //activo   
+                                    );
+                                    array_push($res2['nivel_2'], $res3); 
+
                     }else{
                         //NO ES CALCULABLE
                         $res3 = array(
@@ -2173,7 +2213,42 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                     array_push($res3['nivel_3'], $res4); 
                                 }
 
-                         }else{ //NO ES CALCULABLE
+                         }elseif($qwe4['tipo_operacion'] == "calculo_otro_reporte"){
+
+                        $total_otro_reporte = 0;
+                        $pl_otro_reporte = $this->dbc->query("SELECT * FROM calculo_otro_reporte WHERE idplantilla = '$qwe4[idconfiguracion_reporte]'");
+                        $calc_otr_rep = $pl_otro_reporte->fetch_assoc();
+
+                        // IR AL OTRO REPORTE PARA OBTENER LO QUE QUIERO
+                        $miObjeto = new PlantillaReporte();
+                        $total_otro_reporte = $miObjeto->reporte_calculo_otro_reporte_consolidado(
+                        $calc_otr_rep['idtipo_reporte_referencia'],   // REPORTE DE REFERENCIA
+                        $fecha_ini,
+                        $fecha_fin,
+                        $empresa,
+                        $gestion
+                        );
+
+                        $suma_nivel_3 = $suma_nivel_3 + $total_otro_reporte;
+
+                        $res4 = array(
+                                    "idconfiguracion_reporte" => $qwe4['idconfiguracion_reporte'],
+                                    "idplantilla_reporte" => $qwe4['idplantilla_reporte'],
+                                    "grupo" => $qwe4['grupo'],
+                                    "negrilla_cursiva" => $qwe4['negrilla_cursiva'],
+                                    "es_calculable" => $qwe4['es_calculable'],
+                                    "idplandecuenta" => $nombre_cuenta2['idplandecuenta'], 
+                                    "codigo" => $nombre_cuenta2['numero'],   
+                                    "nombre_nivel_3" => $nombre_cuenta2['nombreplan'],
+                                    "valor" => $total_otro_reporte,
+                                    "profundidad" => '2',
+                                    "orden" => $qwe4['orden'],
+                                    "nombre_cuenta_superior" => $qwe4['nombre_cuenta_superior'],
+                                    "nivel_4" => [] //activo   
+                                    );
+                                    array_push($res3['nivel_3'], $res4); 
+
+                    }else{ //NO ES CALCULABLE
                             //ESTO ES NIVEL 3
                              $res4 = array(
                         "idconfiguracion_reporte" => $qwe4['idconfiguracion_reporte'],
@@ -2235,7 +2310,41 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                                     array_push($res4['nivel_4'], $res5); 
                                 }
 
-                            }else{ // NO ES CALCULABLE
+                            }elseif($qwe5['tipo_operacion'] == "calculo_otro_reporte"){
+
+                        $total_otro_reporte = 0;
+                        $pl_otro_reporte = $this->dbc->query("SELECT * FROM calculo_otro_reporte WHERE idplantilla = '$qwe5[idconfiguracion_reporte]'");
+                        $calc_otr_rep = $pl_otro_reporte->fetch_assoc();
+
+                        // IR AL OTRO REPORTE PARA OBTENER LO QUE QUIERO
+                        $miObjeto = new PlantillaReporte();
+                        $total_otro_reporte = $miObjeto->reporte_calculo_otro_reporte_consolidado(
+                        $calc_otr_rep['idtipo_reporte_referencia'],   // REPORTE DE REFERENCIA
+                        $fecha_ini,
+                        $fecha_fin,
+                        $empresa,
+                        $gestion
+                        );
+
+                        $suma_nivel_4 = $suma_nivel_4 + $total_otro_reporte;
+                        $res5 = array(
+                                    "idconfiguracion_reporte" => $qwe5['idconfiguracion_reporte'],
+                                    "idplantilla_reporte" => $qwe5['idplantilla_reporte'],
+                                    "grupo" => $qwe5['grupo'],
+                                    "negrilla_cursiva" => $qwe5['negrilla_cursiva'],
+                                    "es_calculable" => $qwe5['es_calculable'],
+                                    "idplandecuenta" => $nombre_cuenta2['idplandecuenta'], 
+                                    "codigo" => $nombre_cuenta2['numero'],   
+                                    "nombre_nivel_4" => $nombre_cuenta2['nombreplan'],
+                                    "valor" => $total_otro_reporte,
+                                    "profundidad" => '2',
+                                    "orden" => $qwe5['orden'],
+                                    "nombre_cuenta_superior" => $qwe5['nombre_cuenta_superior'],
+                                    "nivel_5" => [] //activo   
+                                    );
+                                    array_push($res4['nivel_4'], $res5); 
+
+                    }else{ // NO ES CALCULABLE
                          $res5 = array(
                         "idconfiguracion_reporte" => $qwe5['idconfiguracion_reporte'],
                         "idplantilla_reporte" => $qwe5['idplantilla_reporte'],
@@ -3017,6 +3126,9 @@ public function reporte_balance_general_por_niveles_consolidados(
     $maxProfundidad,
     $gestion
 ) {
+    // ini_set('display_errors', 1);
+    //   ini_set('display_startup_errors', 1);
+    //   error_reporting(E_ALL);
     $array = $this->reporte_balance_general_consolidado(
         $idplantilla_reporte,
         $fecha_ini,
@@ -3262,6 +3374,7 @@ public function listar_balance_general_completo_icono($idgestion) {
     
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
+
     public function getidempresa($md5)
     {
         $registro = $this->dbe->query("select * from organizacion where md5(idorganizacion)='$md5'");

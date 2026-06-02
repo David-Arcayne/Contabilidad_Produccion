@@ -1698,7 +1698,7 @@ WHERE
                 $tiene_trans = "no";
             }
 
-            $res = array("id" => $qwe[0], "nombre" => $qwe[1], "fechaini" => $qwe[2], "fechafin" => $qwe[3], "estado" => $qwe[4], "fecha" => $qwe[5],"formato_transaccion" => $qwe[6], "tiene_transaccion" => $tiene_trans);
+            $res = array("id" => $qwe[0], "nombre" => $qwe[1], "fechaini" => $qwe[2], "fechafin" => $qwe[3], "estado" => $qwe[4], "fecha" => $qwe[5],"formato_transaccion" => $qwe[6], "tiene_transaccion" => $tiene_trans,"idempresa" => $ide);
             array_push($lista, $res);
         }
         echo json_encode($lista);
