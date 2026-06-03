@@ -665,7 +665,7 @@ class PlantillaReporte extends DB{
         $suma_resta = $this->dbc->query("SELECT * FROM agrupacion_plantilla WHERE idplantilla_padre='$id_plantilla_padre' 
         AND (tipo_operacion = 'sumar' || tipo_operacion = 'restar') AND idtipo_reportes = '$idplantilla_reporte'");
 
-        $porcentaje = $this->dbc->query("SELECT * FROM agrupacion_plantilla WHERE idplantilla_padre='$id_plantilla_padre' 
+        $porcentaje = $this->dbc->query("SELECT * FROM agrupacion_plantilla WHERE idplantilla_hijo='$id_plantilla_padre' 
         AND tipo_operacion = 'porcentaje' AND idtipo_reportes = '$idplantilla_reporte'");
 
         if($suma_resta->num_rows > 0){
@@ -1184,7 +1184,7 @@ class PlantillaReporte extends DB{
         return $valor_total;
     }
 
-    private function reporte_calculo_otro_reporte($idplantilla_reporte,$fecha_ini,$fecha_fin,$empresa,$gestion) {
+    public function reporte_calculo_otro_reporte($idplantilla_reporte,$fecha_ini,$fecha_fin,$empresa,$gestion) {
         //    ini_set('display_errors', 1); 
         // ini_set('display_startup_errors', 1);
         // error_reporting(E_ALL);
@@ -1309,20 +1309,27 @@ class PlantillaReporte extends DB{
                 // }
                 $res['suma_nivel_2'] = $resu;
             }
-            // elseif($pl_otro_reporte->num_rows > 0){ // ES UNA PLANTILLA QUE OBTIENE RESULTADO DE OTRO REPORTE
-            //     //  $pl_list['tipo_operacion'] == 'calculo_otro_reporte'
+            elseif($pl_otro_reporte->num_rows > 0){ // ES UNA PLANTILLA QUE OBTIENE RESULTADO DE OTRO REPORTE
+    
+                $total_otro_reporte = 0;
+                $calc_otr_rep = $pl_otro_reporte->fetch_assoc(); 
 
-            //     $calculo_otro_reporte = $pl_otro_reporte->fetch_assoc(); 
+                // IR AL OTRO REPORTE PARA OBTENER LO QUE QUIERO
 
-            //     // IR AL OTRO REPORTE PARA OBTENER LO QUE QUIERO
-            //     $this->reporte_estado_resultados_actualizado(    // TENDRIA QUE USAR OTRO REPORTE QUE ME RETORNE DIRECTAMENTE EL RESULTADO DE LA PLANTILLA 
-            //     $calculo_otro_reporte['idtipo_reporte_referencia'],   // REPORTE DE REFERENCIA
-            //     $fecha_ini,
-            //     $fecha_fin,
-            //     $empresa
-            // );
-            //     // $res['suma_nivel_2'] = $sum_rest;
-            // }
+                $total_otro_reporte =$this->reporte_calculo_otro_reporte(    // TENDRIA QUE USAR OTRO REPORTE QUE ME RETORNE DIRECTAMENTE EL RESULTADO DE LA PLANTILLA 
+                $calc_otr_rep['idtipo_reporte_referencia'],   // REPORTE DE REFERENCIA
+                $fecha_ini,
+                $fecha_fin,
+                $empresa,
+                $gestion
+            );
+
+                 if($total_otro_reporte < '0'){
+                    $res['suma_nivel_2'] = 0;
+                }else{
+                    $res['suma_nivel_2'] = $total_otro_reporte;
+                }
+            }
             elseif($pl_padre_calcu->num_rows > 0){ //ES UNA PLANTILLA CON HIJOS CALCULABLES  (VENTAS)
 
             // NIVEL 2 2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222
@@ -1551,33 +1558,6 @@ class PlantillaReporte extends DB{
             // array_push($lista, $res);  
             $lista_aux_buscador = [];        
         }
-    
-        // // Buscar el primer elemento con disponible_para_otro_reporte = "si"
-        // function buscarDisponible($lista) {
-        //     foreach ($lista as $item) {
-        //         if (isset($item['disponible_para_otro_reporte']) && strtolower($item['disponible_para_otro_reporte']) == 'si') {
-        //             // Si tiene suma_nivel_2, devolverlo
-        //             if (isset($item['suma_nivel_2'])) {
-        //                 return $item['suma_nivel_2'];
-        //             }
-        //             // Si tiene valor (por ejemplo, niveles inferiores) calculo_otro_reporte
-        //             if (isset($item['valor'])) {
-        //                 return $item['valor'];
-        //             }
-        //         }
-
-        //         // Buscar recursivamente en niveles inferiores
-        //         foreach ($item as $clave => $subnivel) {
-        //             if (is_array($subnivel)) {
-        //                 $resultado = buscarDisponible($subnivel);
-        //                 if ($resultado !== null) {
-        //                     return $resultado;
-        //                 }
-        //             }
-        //         }
-        //     }
-        //     return null;
-        // }
 
         $valor_encontrado = $this->buscarDisponible($lista);
 
@@ -1715,20 +1695,7 @@ class PlantillaReporte extends DB{
                 $res['suma_nivel_2'] = $resu;
             }
             elseif($pl_otro_reporte->num_rows > 0){ // ES UNA PLANTILLA QUE OBTIENE RESULTADO DE OTRO REPORTE
-                //  $pl_list['tipo_operacion'] == 'calculo_otro_reporte'
-
-            //     $calculo_otro_reporte = $pl_otro_reporte->fetch_assoc(); 
-
-            //     // IR AL OTRO REPORTE PARA OBTENER LO QUE QUIERO
-            //     $this->reporte_estado_resultados_actualizado(    // TENDRIA QUE USAR OTRO REPORTE QUE ME RETORNE DIRECTAMENTE EL RESULTADO DE LA PLANTILLA 
-            //     $calculo_otro_reporte['idtipo_reporte_referencia'],   // REPORTE DE REFERENCIA
-            //     $fecha_ini,
-            //     $fecha_fin,
-            //     $empresa
-            // );
-                
-
-             //  $pl_list['tipo_operacion'] == 'calculo_otro_reporte'
+              
                 $total_otro_reporte = 0;
                 $calc_otr_rep = $pl_otro_reporte->fetch_assoc(); 
 
@@ -2770,7 +2737,7 @@ class PlantillaReporte extends DB{
 
         $limpiar($array);
     echo json_encode($array, JSON_NUMERIC_CHECK);
-        // return $array; editar registrar_agrupacion_plantilla editar_otras_operaciones calculo reporte_estado_resultados_actualizado_consolidado_por_niveles
+        // return $array; editar registrar_agrupacion_plantilla editar_otras_operaciones calculo buscar
     }
 
 }

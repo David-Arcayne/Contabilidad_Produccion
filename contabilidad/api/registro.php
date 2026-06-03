@@ -965,5 +965,5 @@ if($data['ver'] == "asignar_asiento_A_factura") {
 } 
 // registrar_recibo_otras_cuentas registrotransaccion registrar_agrupacion_plantilla registrar_recibo_pago_cajaBancos_en_otras_cuentas asignar_facturas_comercial_A_cuentas
 // registrar_agrupacion_plantilla registrar_configuracion_reporte registrar_factura_recibo_pago_cajaBancos registrar_recibo_pago_cajaBancos_en_facturas editar_otras_operaciones
-// crearsolofacturasapif5  registrar_recibo_cobro_cajaBancos_en_facturas registrar_factura_recibo_cobro_cajaBancos cobrar_contratacion_con_factura_cajaBancos
+// cobrar_contratacion_con_factura_cajaBancos registrar_agrupacion_plantilla
 ?> 
