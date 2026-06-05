@@ -474,28 +474,28 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         }
     }
     elseif($ver=="registrar_cuenta_pre_cierre"){
-        if(isset($_POST['fecha'],$_POST['empresa'],$_POST['sucursal'])){
+        if(isset($_POST['fecha'],$_POST['empresa'],$_POST['sucursal'],$_POST['idgestion'])){
             $cont=new Transacciones();
-            $cont->registrar_cuenta_pre_cierre($_POST['fecha'],$_POST['empresa'],$_POST['sucursal']);
+            $cont->registrar_cuenta_pre_cierre($_POST['fecha'],$_POST['empresa'],$_POST['sucursal'],$_POST['idgestion']);
         }
         else{
-            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['fecha'],$_POST['empresa'],$_POST['sucursal']));
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['fecha'],$_POST['empresa'],$_POST['sucursal'],$_POST['idgestion']));
         }
     }elseif($ver=="registrar_cuenta_cierre"){
-        if(isset($_POST['fecha'],$_POST['empresa'],$_POST['sucursal'])){
+        if(isset($_POST['fecha'],$_POST['empresa'],$_POST['sucursal'],$_POST['idgestion'])){
             $cont=new Transacciones();
-            $cont->registrar_cuenta_cierre($_POST['fecha'],$_POST['empresa'],$_POST['sucursal']);
+            $cont->registrar_cuenta_cierre($_POST['fecha'],$_POST['empresa'],$_POST['sucursal'],$_POST['idgestion']);
         }
         else{
-            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['fecha'],$_POST['empresa'],$_POST['sucursal']));
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['fecha'],$_POST['empresa'],$_POST['sucursal'],$_POST['idgestion']));
         }
     }elseif($ver=="registrar_cuenta_apertura"){
-        if(isset($_POST['fecha'],$_POST['idgestion_anterior'],$_POST['empresa'],$_POST['sucursal'])){
+        if(isset($_POST['fecha'],$_POST['idgestion_anterior'],$_POST['empresa'],$_POST['sucursal'],$_POST['idgestion'])){
             $cont=new Transacciones();
-            $cont->registrar_cuenta_apertura($_POST['fecha'],$_POST['idgestion_anterior'],$_POST['empresa'],$_POST['sucursal']);
+            $cont->registrar_cuenta_apertura($_POST['fecha'],$_POST['idgestion_anterior'],$_POST['empresa'],$_POST['sucursal'],$_POST['idgestion']);
         }
         else{
-            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['fecha'],$_POST['idgestion_anterior'],$_POST['empresa'],$_POST['sucursal']));
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['fecha'],$_POST['idgestion_anterior'],$_POST['empresa'],$_POST['sucursal'],$_POST['idgestion']));
         }
     }elseif($ver=="editar_caja_bancos_usuarios"){
         if(isset($_POST['idcaja_banco_usuario'],$_POST['idcaja_bancos'],$_POST['idtrabajador'],$_POST['funcion'],$_POST['permiso_registrar'],$_POST['empresa'])){

@@ -3,7 +3,7 @@ require_once "../../db/db.php";
 // require_once "../configuracion/empresa.php"; ini_set
 
 class Vinculacion_empresas extends DB{
-    public function vincular_empresas($empresa_act,$idempresa_vincula,$idgestion_vincula){
+    public function vincular_empresas_reemplazando_plandecuentas($empresa_act,$idempresa_vincula,$idgestion_vincula){
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
@@ -24,7 +24,7 @@ class Vinculacion_empresas extends DB{
         echo json_encode($res);
         
     }
-    public function vincular_empresas_reemplazando_plandecuentas($empresa_act,$idempresa_vincula,$idgestion_vincula){
+    public function vincular_empresas($empresa_act,$idempresa_vincula,$idgestion_vincula){
        
         $resp_a_usuario = FALSE;
         // $idempresa = Empresa::getidempresa($empresa);
@@ -57,7 +57,7 @@ class Vinculacion_empresas extends DB{
 
                         while($rubr = $this->dbc->fetch($get_rubro_pl)){
                             $registro_rubro = $this->dbc->query("INSERT INTO agrupacion_rubro_plandecuenta(tipo_plandecuenta,numero,idempresa)
-                            VALUES ('$rubr[tipo_plandecuenta]','$rubr[numero]','$rubr[idempresa]')");
+                            VALUES ('$rubr[tipo_plandecuenta]','$rubr[numero]','$idempresa_vincula')");
                         }
                         while($qwe = $this->dbc->fetch($get_plandecuenta_empresa_act)){
                             $registro_pl = $this->dbc->query("INSERT INTO plandecuenta(numero,nombreplan,descripcion,saldonormal,consolidar,idp,organizacion_idorganizacion)

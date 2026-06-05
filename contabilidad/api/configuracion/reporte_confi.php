@@ -439,6 +439,238 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
 
+    public function listar_configuracion_reporte_version2($idplantilla_reporte,$empresa) {
+        //    ini_set('display_errors', 1); 
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
+        $lista = [];
+        $idempresa = $this->getidempresa($empresa);
+    
+        // Preparar la consulta
+        // $getPedido = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE nivel_registrado = '1' AND idempresa = '$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
+        $getPedido = $this->dbc->query("SELECT DISTINCT(reporte) FROM configuracion_reporte WHERE idempresa='$idempresa' AND reporte = 'balance_general' AND idplantilla_reporte ='$idplantilla_reporte'");// ACTIVO, PASIVO, PATRIMONIO
+
+        while ($qwe = $this->dbc->fetch($getPedido)) {
+            $res = array(
+                "reporte" => $qwe['reporte'],
+                "nivel_1" => [] //activo
+                // "nivel_3" => $qwe['nombre'],// 
+                // "estado" => $qwe['estado']
+            );
+        
+        // $get_nivel_2 = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE nivel_registrado = '2' AND idempresa = '$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
+
+        $get_nivel_2 = $this->dbc->query("SELECT * from configuracion_reporte where nombre_cuenta_superior = '' AND reporte = '$qwe[reporte]' AND idempresa='$idempresa' 
+        AND idplantilla_reporte ='$idplantilla_reporte' ORDER BY orden ASC");// ACTIVO, PASIVO, PATRIMONIO
+        while ($qwe2 = $this->dbc->fetch($get_nivel_2)) {
+        
+        if($qwe2['idplandecuenta'] == 0){ // ES NOMBRE PERSONALIZADO
+            $nombre = $qwe2['nombre_personalizado'];
+            $idpl_cuenta ="";
+            $codigo = "";
+        }else{
+            $cuenta = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe2[idplandecuenta]'");// ACTIVO, PASIVO, PATRIMONIO
+            $nombre_cuenta = $cuenta->fetch_assoc();
+            $nombre = $nombre_cuenta['nombreplan'];
+            $idpl_cuenta = $nombre_cuenta['idplandecuenta'];
+            $codigo = $nombre_cuenta['numero'];
+        }
+        
+        
+        $depre_consulta = $this->dbc->query("SELECT * from vinculacion_cuenta_depreciacion where idcuenta_depreciacion = '$qwe2[idplandecuenta]'");// ACTIVO, PASIVO, PATRIMONIO
+
+        if($depre_consulta->num_rows > 0){
+            $es_depreciacion = 'si';
+        }else{
+            $es_depreciacion = 'no';
+        }
+            $res2 = array(
+                "idconfiguracion_reporte" => $qwe2['idconfiguracion_reporte'],
+                "idplandecuenta" => $idpl_cuenta,
+                "codigo" => $codigo,
+                "nombre_nivel_1" => $nombre,
+                "es_activo_fijo" => $qwe2['es_activo_fijo'],
+                "es_calculable" => $qwe2['es_calculable'],
+                "orden" => $qwe2['orden'],
+                "es_depreciacion" => $es_depreciacion,
+                "negrilla_cursiva" => $qwe2['negrilla_cursiva'],
+                "tipo_operacion" => $qwe2['tipo_operacion'],
+                "nivel_2" => [] //activo
+                // "nivel_3" => $qwe['nombre'],// 
+                // "estado" => $qwe['estado']
+                
+            );
+            $get_nivel_3 = $this->dbc->query("SELECT * from configuracion_reporte WHERE grupo = '$qwe2[grupo]' AND nombre_cuenta_superior = '$nombre' AND reporte = '$qwe[reporte]' AND idempresa='$idempresa' 
+            AND idplantilla_reporte ='$idplantilla_reporte' ORDER BY orden ASC");// ACTIVO, PASIVO, PATRIMONIO
+            while ($qwe3 = $this->dbc->fetch($get_nivel_3)) {
+                if($qwe3['idplandecuenta'] == 0){ // ES NOMBRE PERSONALIZADO
+                    $nombre2 = $qwe3['nombre_personalizado'];
+                    $idpl_cuenta2 ="";
+                    $codigo2 = "";
+                }else{
+                    $cuenta2 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe3[idplandecuenta]'");// ACTIVO, PASIVO, PATRIMONIO
+                    $nombre_cuenta2 = $cuenta2->fetch_assoc();
+                    $nombre2 = $nombre_cuenta2['nombreplan'];
+                    $idpl_cuenta2 = $nombre_cuenta2['idplandecuenta'];
+                    $codigo2 = $nombre_cuenta2['numero'];
+                }
+                // $cuenta2 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe3[idplandecuenta]'");// ACTIVO, PASIVO, PATRIMONIO
+                // $nombre_cuenta2 = $cuenta2->fetch_assoc();
+
+                $depre_consulta = $this->dbc->query("SELECT * from vinculacion_cuenta_depreciacion where idcuenta_depreciacion = '$qwe3[idplandecuenta]'
+                AND idtipo_reportes ='$idplantilla_reporte'");// ACTIVO, PASIVO, PATRIMONIO
+
+                if($depre_consulta->num_rows > 0){
+                    $es_depreciacion = 'si';
+                }else{
+                    $es_depreciacion = 'no';
+                }
+
+                $res3 = array(
+                "idconfiguracion_reporte" => $qwe3['idconfiguracion_reporte'],
+                "idplandecuenta" => $idpl_cuenta2,
+                "codigo" => $codigo2,
+                "nombre_nivel_2" => $nombre2,
+                "es_activo_fijo" => $qwe3['es_activo_fijo'],
+                "es_calculable" => $qwe3['es_calculable'],
+                "orden" => $qwe3['orden'],
+                "es_depreciacion" => $es_depreciacion,
+                "negrilla_cursiva" => $qwe3['negrilla_cursiva'],
+                "tipo_operacion" => $qwe3['tipo_operacion'],
+                "nivel_3" => [] //activo
+                // "nivel_3" => $qwe['nombre'],// 
+                // "estado" => $qwe['estado']
+                );
+                 $get_nivel_4 = $this->dbc->query("SELECT * from configuracion_reporte where grupo = '$qwe3[grupo]' AND nombre_cuenta_superior = '$nombre2' AND reporte = '$qwe[reporte]' AND idempresa='$idempresa' 
+                 AND idplantilla_reporte ='$idplantilla_reporte' ORDER BY orden ASC");// ACTIVO, PASIVO, PATRIMONIO
+                while ($qwe4 = $this->dbc->fetch($get_nivel_4)) {
+                    if($qwe4['idplandecuenta'] == 0){ // ES NOMBRE PERSONALIZADO
+                        $nombre3 = $qwe4['nombre_personalizado'];
+                        $idpl_cuenta3 ="";
+                        $codigo3 = "";
+                    }else{
+                        $cuenta3 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe4[idplandecuenta]'");// ACTIVO, PASIVO, PATRIMONIO
+                        $nombre_cuenta3 = $cuenta3->fetch_assoc();
+                        $nombre3 = $nombre_cuenta3['nombreplan'];
+                        $idpl_cuenta3 = $nombre_cuenta3['idplandecuenta'];
+                        $codigo3 = $nombre_cuenta3['numero'];
+                    }
+                    // $cuenta3 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe4[idplandecuenta]'");// ACTIVO, PASIVO, PATRIMONIO
+                    // $nombre_cuenta3 = $cuenta3->fetch_assoc();
+
+                    $depre_consulta = $this->dbc->query("SELECT * from vinculacion_cuenta_depreciacion where idcuenta_depreciacion = '$qwe4[idplandecuenta]'
+                    AND idtipo_reportes ='$idplantilla_reporte'");// ACTIVO, PASIVO, PATRIMONIO
+
+                    if($depre_consulta->num_rows > 0){
+                        $es_depreciacion = 'si';
+                    }else{
+                        $es_depreciacion = 'no';
+                    }
+
+                    $res4 = array(
+                    "idconfiguracion_reporte" => $qwe4['idconfiguracion_reporte'],
+                    "idplandecuenta" => $idpl_cuenta3,   
+                    "codigo" => $codigo3,
+                    "nombre_nivel_3" => $nombre3,
+                    "es_activo_fijo" => $qwe4['es_activo_fijo'],
+                    "es_calculable" => $qwe4['es_calculable'],
+                    "orden" => $qwe4['orden'],
+                    "es_depreciacion" => $es_depreciacion,
+                    "negrilla_cursiva" => $qwe4['negrilla_cursiva'],
+                    "tipo_operacion" => $qwe4['tipo_operacion'],
+                    "nivel_4" => [] //activo
+                    );
+                    $get_nivel_5 = $this->dbc->query("SELECT * from configuracion_reporte where grupo = '$qwe4[grupo]' AND nombre_cuenta_superior = '$nombre3' AND reporte = '$qwe[reporte]' AND idempresa='$idempresa'
+                    AND idplantilla_reporte ='$idplantilla_reporte' ORDER BY orden ASC");// ACTIVO, PASIVO, PATRIMONIO
+                    while ($qwe5 = $this->dbc->fetch($get_nivel_5)) {
+
+                        if($qwe5['idplandecuenta'] == 0){ // ES NOMBRE PERSONALIZADO
+                            $nombre4 = $qwe5['nombre_personalizado'];
+                            $idpl_cuenta4 ="";
+                            $codigo4 = "";
+                        }else{
+                            $cuenta4 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe5[idplandecuenta]'");// ACTIVO, PASIVO, PATRIMONIO
+                            $nombre_cuenta4 = $cuenta4->fetch_assoc();
+                            $nombre4 = $nombre_cuenta4['nombreplan'];
+                            $idpl_cuenta4 = $nombre_cuenta4['idplandecuenta'];
+                            $codigo4 = $nombre_cuenta4['numero'];
+                        }
+                        // $cuenta4 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe5[idplandecuenta]'");// ACTIVO, PASIVO, PATRIMONIO
+                        // $nombre_cuenta4 = $cuenta4->fetch_assoc();
+
+                        $depre_consulta = $this->dbc->query("SELECT * from vinculacion_cuenta_depreciacion where idcuenta_depreciacion = '$qwe5[idplandecuenta]'
+                        AND idtipo_reportes ='$idplantilla_reporte'");// ACTIVO, PASIVO, PATRIMONIO
+
+                        if($depre_consulta->num_rows > 0){
+                            $es_depreciacion = 'si';
+                        }else{
+                            $es_depreciacion = 'no';
+                        }
+
+                        $res5 = array(
+                        "idconfiguracion_reporte" => $qwe5['idconfiguracion_reporte'],
+                        "idplandecuenta" => $idpl_cuenta4,    
+                        "codigo" => $codigo4,
+                        "nombre_nivel_4" => $nombre4,
+                        "es_activo_fijo" => $qwe5['es_activo_fijo'],
+                        "es_calculable" => $qwe5['es_calculable'],
+                        "orden" => $qwe5['orden'],
+                        "es_depreciacion" => $es_depreciacion,
+                        "negrilla_cursiva" => $qwe5['negrilla_cursiva'],
+                        "tipo_operacion" => $qwe5['tipo_operacion'],
+                        "nivel_5" => [] //activo
+                        );
+                //----------------------------------------------------------------------------
+                    $get_nivel_6 = $this->dbc->query("SELECT * from configuracion_reporte where grupo = '$qwe5[grupo]' AND nombre_cuenta_superior = '$nombre4' AND reporte = '$qwe[reporte]' AND idempresa='$idempresa' 
+                    AND idplantilla_reporte ='$idplantilla_reporte' ORDER BY orden ASC");// ACTIVO, PASIVO, PATRIMONIO
+                    while ($qwe6 = $this->dbc->fetch($get_nivel_6)) {
+                        if($qwe6['idplandecuenta'] == 0){ // ES NOMBRE PERSONALIZADO
+                            $nombre5 = $qwe6['nombre_personalizado'];
+                            $idpl_cuenta5 ="";
+                            $codigo5 = "";
+                        }else{
+                            $cuenta5 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe6[idplandecuenta]'");// ACTIVO, PASIVO, PATRIMONIO
+                            $nombre_cuenta5 = $cuenta5->fetch_assoc();
+                            $nombre5 = $nombre_cuenta5['nombreplan'];
+                            $idpl_cuenta5 = $nombre_cuenta5['idplandecuenta'];
+                            $codigo5 = $nombre_cuenta5['numero'];
+                        }
+
+                        // $cuenta5 = $this->dbc->query("SELECT * from plandecuenta where idplandecuenta = '$qwe6[idplandecuenta]'");// ACTIVO, PASIVO, PATRIMONIO
+                        // $nombre_cuenta5 = $cuenta5->fetch_assoc();
+
+                        $res6 = array(
+                        "idconfiguracion_reporte" => $qwe6['idconfiguracion_reporte'],
+                        "idplandecuenta" => $idpl_cuenta5, 
+                        "codigo" => $codigo5,   
+                        "nombre_nivel_5" => $nombre5,
+                        "es_activo_fijo" => $qwe6['es_activo_fijo'],
+                        "es_calculable" => $qwe6['es_calculable'],
+                        "orden" => $qwe6['orden'],
+                        "es_depreciacion" => $es_depreciacion,
+                        "negrilla_cursiva" => $qwe6['negrilla_cursiva'],
+                        "tipo_operacion" => $qwe6['tipo_operacion'],
+                        "nivel_5" => [] //activo
+                        );
+                        
+                        array_push($res5['nivel_5'], $res6); 
+                    }
+                //-------------------------------------------------------------------------------------
+                        array_push($res4['nivel_4'], $res5); 
+                    }
+                    array_push($res3['nivel_3'], $res4); 
+                }
+               array_push($res2['nivel_2'], $res3); 
+            }
+            array_push($res['nivel_1'], $res2);
+        }
+            array_push($lista, $res);
+        }
+    
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
+
+
  private function reporte_balance_general($idplantilla_reporte,$fecha_ini,$fecha_fin,$empresa,$gestion) {
         // ini_set('display_errors', 1); 
         // ini_set('display_startup_errors', 1);
@@ -3291,69 +3523,233 @@ public function reporte_balance_general_por_niveles_consolidados(
         // return $array;
     }
 
-public function guardar_balance_general_por_gestion($data, $nivel = 1, $empresa = null, $idempresa = null, $idgestion = null) {
-    $success = true; // bandera para saber si todo salió bien
+// public function guardar_balance_general_por_gestion($data, $nivel = 1, $empresa = null, $idempresa = null, $idgestion = null) {
+//     // $data['contenido'] = json_decode(file_get_contents('ruta/del/archivo.txt'), true);  decodificar valorFinal 
 
+//     $success = true; // bandera para saber si todo salió bien
+
+//     if ($nivel === 1) {
+//         $idempresa = $this->getidempresa($data['empresa']);
+//         $idgestion = $data['idgestion'];
+//         $items = $data['contenido']; 
+//     } else {
+//         $items = $data; 
+//     }
+
+//     $existe_balance = $this->dbc->query("SELECT * FROM balance_general_por_gestion WHERE idgestion ='$idgestion'");
+
+//     if($existe_balance->num_rows > 0){
+//         // NO VOLVERA A GUARDAR BALANCE GENERAL PORQUE YA EXISTE UNO EN ESTA GESTION
+        
+//         $success = false;
+//     }else{
+//         foreach ($items as $item) {
+//             $idconfiguracion = $item['idconfiguracion_reporte'] ?? null;
+//             $idplantilla_reporte = $item['idplantilla_reporte'] ?? null;
+//             $grupo = $item['grupo'] ?? null;
+//             $es_calculable = $item['es_calculable'] ?? null;
+//             $orden = $item['orden'] ?? null;
+
+//             $nombreKey = 'nombre_nivel_'.$nivel;
+//             $nombre_actual = $item[$nombreKey] ?? null;
+//             $nombre_cuenta_superior = $item['nombre_cuenta_superior'] ?? null;
+
+//             $valorKey = 'suma_nivel_'.($nivel+1);
+//             $valor = $item['valor'] ?? null;
+//             $suma = $item[$valorKey] ?? null;
+//             $valorFinal = ($es_calculable === "si") ? $valor : $suma;
+
+//             // Ejecutar consulta
+//             $query = "INSERT INTO balance_general_por_gestion 
+//                 (idplantilla_reporte, idconfiguracion_reporte, valor, nombre_actual, nivel, orden, nombre_cuenta_superior, grupo, es_calculable, idgestion, idempresa) 
+//                 VALUES ('{$idplantilla_reporte}','{$idconfiguracion}', '{$valorFinal}', '{$nombre_actual}', '{$nivel}', '{$orden}', '{$nombre_cuenta_superior}', '{$grupo}', '{$es_calculable}', '{$idgestion}', '{$idempresa}')";
+
+//             if (!$this->dbc->query($query)) {
+//                 $success = false; // si falla alguna inserción
+//             }
+
+//             // Recorrer niveles más profundos
+//             for ($i = $nivel+1; $i <= 5; $i++) {
+//                 $nivelKey = 'nivel_'.$i;
+//                 if (isset($item[$nivelKey]) && is_array($item[$nivelKey]) && count($item[$nivelKey]) > 0) {
+//                     $this->guardar_balance_general_por_gestion($item[$nivelKey], $i, $data['empresa'], $idempresa, $idgestion);
+//                 }
+//             }
+//         }
+//     }
+
+//     // Mensaje final
+//     if ($nivel === 1) { 
+//         if ($success) {                                                                                                                                                                
+//                 $res = array("success", "Registro exitoso","registroCaracteristicas",);
+//                 echo json_encode($res);
+//         } else {
+//                 $res = array("danger", "Ya existe balance general en la gestion");
+//                 echo json_encode($res);
+//         }
+//     }
+
+// }
+
+    public function guardar_balance_general_por_gestion($data, $nivel = 1, $empresa = null, $idempresa = null, $idgestion = null)
+{
+    $success = true;
+
+    // Primera llamada
     if ($nivel === 1) {
+
         $idempresa = $this->getidempresa($data['empresa']);
         $idgestion = $data['idgestion'];
-        $items = $data['contenido']; 
+        $empresa = $data['empresa'];
+
+        $items = $data['contenido'];
+
+        // Verificar una sola vez
+        $existe_balance = $this->dbc->query("
+            SELECT *
+            FROM balance_general_por_gestion
+            WHERE idgestion = '$idgestion'
+        ");
+
+        if ($existe_balance->num_rows > 0) {
+
+            $res = array(
+                "danger",
+                "Ya existe balance general en la gestión"
+            );
+
+            echo json_encode($res);
+            return;
+        }
+
     } else {
-        $items = $data; 
+
+        $items = $data;
+
     }
 
-    $existe_balance = $this->dbc->query("SELECT * FROM balance_general_por_gestion WHERE idgestion ='$idgestion'");
+    foreach ($items as $item) {
 
-    if($existe_balance->num_rows > 0){
-        // NO VOLVERA A GUARDAR BALANCE GENERAL PORQUE YA EXISTE UNO EN ESTA GESTION
-        $success = false;
-    }else{
-        foreach ($items as $item) {
-            $idconfiguracion = $item['idconfiguracion_reporte'] ?? null;
-            $idplantilla_reporte = $item['idplantilla_reporte'] ?? null;
-            $grupo = $item['grupo'] ?? null;
-            $es_calculable = $item['es_calculable'] ?? null;
-            $orden = $item['orden'] ?? null;
+        $idconfiguracion = $item['idconfiguracion_reporte'] ?? null;
+        $idplantilla_reporte = $item['idplantilla_reporte'] ?? null;
+        $grupo = $item['grupo'] ?? null;
+        $es_calculable = $item['es_calculable'] ?? null;
+        $orden = $item['orden'] ?? null;
 
-            $nombreKey = 'nombre_nivel_'.$nivel;
-            $nombre_actual = $item[$nombreKey] ?? null;
-            $nombre_cuenta_superior = $item['nombre_cuenta_superior'] ?? null;
+        // Nombre del nivel actual
+        $nombreKey = 'nombre_nivel_' . $nivel;
+        $nombre_actual = $item[$nombreKey] ?? null;
 
-            $valorKey = 'suma_nivel_'.($nivel+1);
-            $valor = $item['valor'] ?? null;
-            $suma = $item[$valorKey] ?? null;
-            $valorFinal = ($es_calculable === "si") ? $valor : $suma;
+        $nombre_cuenta_superior = $item['nombre_cuenta_superior'] ?? null;
 
-            // Ejecutar consulta
-            $query = "INSERT INTO balance_general_por_gestion 
-                (idplantilla_reporte, idconfiguracion_reporte, valor, nombre_actual, nivel, orden, nombre_cuenta_superior, grupo, es_calculable, idgestion, idempresa) 
-                VALUES ('{$idplantilla_reporte}','{$idconfiguracion}', '{$valorFinal}', '{$nombre_actual}', '{$nivel}', '{$orden}', '{$nombre_cuenta_superior}', '{$grupo}', '{$es_calculable}', '{$idgestion}', '{$idempresa}')";
+        // Valor a guardar
+        $valorKey = 'suma_nivel_' . ($nivel + 1);
 
-            if (!$this->dbc->query($query)) {
-                $success = false; // si falla alguna inserción
-            }
+        $valor = $item['valor'] ?? null;
+        $suma = $item[$valorKey] ?? null;
 
-            // Recorrer niveles más profundos
-            for ($i = $nivel+1; $i <= 5; $i++) {
-                $nivelKey = 'nivel_'.$i;
-                if (isset($item[$nivelKey]) && is_array($item[$nivelKey]) && count($item[$nivelKey]) > 0) {
-                    $this->guardar_balance_general_por_gestion($item[$nivelKey], $i, $data['empresa'], $idempresa, $idgestion);
-                }
-            }
-        }
-    }
+        // $valorFinal = ($es_calculable === "si")
+        //     ? $valor
+        //     : $suma;
 
-    // Mensaje final
-    if ($nivel === 1) { 
-        if ($success) {                                                                                                                                                                
-                $res = array("success", "Registro exitoso","registroCaracteristicas");
-                echo json_encode($res);
+        if ($valor !== null) {
+            $valorFinal = $valor;
         } else {
-                $res = array("danger", "Ya existe balance general en la gestion");
-                echo json_encode($res);
+            $valorFinal = $suma;
+        }
+
+        // Debug temporal
+        /*
+        echo "<pre>";
+        echo "Nivel: $nivel | Nombre: $nombre_actual | Valor: $valorFinal";
+        echo "</pre>";
+        */
+
+        $query = "
+            INSERT INTO balance_general_por_gestion
+            (
+                idplantilla_reporte,
+                idconfiguracion_reporte,
+                valor,
+                nombre_actual,
+                nivel,
+                orden,
+                nombre_cuenta_superior,
+                grupo,
+                es_calculable,
+                idgestion,
+                idempresa
+            )
+            VALUES
+            (
+                '$idplantilla_reporte',
+                '$idconfiguracion',
+                '$valorFinal',
+                '$nombre_actual',
+                '$nivel',
+                '$orden',
+                '$nombre_cuenta_superior',
+                '$grupo',
+                '$es_calculable',
+                '$idgestion',
+                '$idempresa'
+            )
+        ";
+
+        if (!$this->dbc->query($query)) {
+
+            $success = false;
+
+            // Debug temporal
+            // echo $this->dbc->error;
+        }
+
+        // ==========================================
+        // Recursión (solo al siguiente nivel)
+        // ==========================================
+
+        $siguienteNivel = $nivel + 1;
+        $nivelKey = 'nivel_' . $siguienteNivel;
+
+        if (
+            isset($item[$nivelKey]) &&
+            is_array($item[$nivelKey]) &&
+            count($item[$nivelKey]) > 0
+        ) {
+
+            $this->guardar_balance_general_por_gestion(
+                $item[$nivelKey],
+                $siguienteNivel,
+                $empresa,
+                $idempresa,
+                $idgestion
+            );
+
         }
     }
 
+    // Respuesta final únicamente desde la llamada principal
+    if ($nivel === 1) {
+
+        if ($success) {
+
+            $res = array(
+                "success",
+                "Registro exitoso",
+                "registroCaracteristicas"
+            );
+
+        } else {
+
+            $res = array(
+                "danger",
+                "Ocurrió un error al guardar algunos registros"
+            );
+
+        }
+
+        echo json_encode($res);
+    }
 }
 
 public function listar_balance_general_completo_icono($idgestion) {

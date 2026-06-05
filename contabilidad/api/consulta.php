@@ -450,10 +450,10 @@ elseif($ver[0]=="listar_facturas_cobros_sin_transaccion"){
     $cont->usuario_con_permiso_registrar_transaccion($ver[1],$ver[2]);
 }elseif($ver[0]=="existe_apertura_pre_cierre"){
     $cont=new Transacciones();
-    $cont->existe_apertura_pre_cierre($ver[1],$ver[2]);
+    $cont->existe_apertura_pre_cierre($ver[1],$ver[2],$ver[3]);
 }elseif($ver[0]=="existe_cierre_de_gestion_anterior"){
     $cont=new Transacciones();
-    $cont->existe_cierre_de_gestion_anterior($ver[1]);
+    $cont->existe_cierre_de_gestion_anterior($ver[1],$ver[2]);
 }elseif($ver[0]=="listar_factura_comercial"){
     $cont=new Factura_comercial();
     $cont->listar_factura_comercial($ver[1],$ver[2]);
@@ -832,11 +832,11 @@ elseif($ver[0]=="listar_cobros_comercial_sin_cuenta"){
 //     $cont->obtenerGestionAnterior($ver[1],$ver[2]); eliminar_gestion_contable   
 // }
 
-// listar_agrupacion_plantilla  rp listadegestion listar_select_cuentas_balance_general reporte_calculo_otro_reporte_consolidado
-// reporte_balance_general_por_niveles listar_facturas_cobro_pago listar_recibo_por_caja_bancos listar_facturas_comercial_cobro
+// listar_balance_general_completo_icono  rp listadegestion listar_select_cuentas_balance_general reporte_calculo_otro_reporte_consolidado
+// existe_apertura_pre_cierre listar_facturas_cobro_pago listar_recibo_por_caja_bancos listar_facturas_comercial_cobro
 // lista_pagar_pagado_factura listar_reportes_referencia_select eliminar_otras_operaciones listadegestion listar_factura_comercial_con_transaccion
 
-// listar_reportes_referencia listar_caja_bancos listar_facturas_comercial_cobro mayorcuentacontable listar_anular_eliminar_factura
+// listar_balance_general_completo_icono listar_caja_bancos listar_facturas_comercial_cobro mayorcuentacontable listar_anular_eliminar_factura
 // listatransacciones listar_balance_general_guardados listar_plantilla_flujo_efectivo listar_cobros_comercial
 // 
 // reporte_balance_general_consolidado listar_usuarios  listar_agrupacion_plantilla reportecuentasderesultado reportedetallefpt
