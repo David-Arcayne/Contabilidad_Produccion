@@ -61,7 +61,7 @@ class Vinculacion_empresas extends DB{
                         }
                         while($qwe = $this->dbc->fetch($get_plandecuenta_empresa_act)){
                             $registro_pl = $this->dbc->query("INSERT INTO plandecuenta(numero,nombreplan,descripcion,saldonormal,consolidar,idp,organizacion_idorganizacion)
-                            VALUES ('$qwe[numero]','$qwe[nombreplan]','$qwe[descripcion]','$qwe[saldonormal]','$qwe[consolidar]','$qwe[idp]','$qwe[organizacion_idorganizacion]')");
+                            VALUES ('$qwe[numero]','$qwe[nombreplan]','$qwe[descripcion]','$qwe[saldonormal]','$qwe[consolidar]','$qwe[idp]','$idempresa_vincula')");
                         }
 
                         $resp_a_usuario = TRUE;
@@ -71,11 +71,11 @@ class Vinculacion_empresas extends DB{
                     // DUPLICAR AGRUPACION_RUBRO Y PLANES DE CUENTAS
                     while($rubr = $this->dbc->fetch($get_rubro_pl)){
                         $registro_rubro = $this->dbc->query("INSERT INTO agrupacion_rubro_plandecuenta(tipo_plandecuenta,numero,idempresa)
-                        VALUES ('$rubr[tipo_plandecuenta]','$rubr[numero]','$rubr[idempresa]')");
+                        VALUES ('$rubr[tipo_plandecuenta]','$rubr[numero]','$idempresa_vincula')");
                     }
                     while($qwe = $this->dbc->fetch($get_plandecuenta_empresa_act)){
                         $registro_pl = $this->dbc->query("INSERT INTO plandecuenta(numero,nombreplan,descripcion,saldonormal,consolidar,idp,organizacion_idorganizacion)
-                        VALUES ('$qwe[numero]','$qwe[nombreplan]','$qwe[descripcion]','$qwe[saldonormal]','$qwe[consolidar]','$qwe[idp]','$qwe[organizacion_idorganizacion]')");
+                        VALUES ('$qwe[numero]','$qwe[nombreplan]','$qwe[descripcion]','$qwe[saldonormal]','$qwe[consolidar]','$qwe[idp]','$idempresa_vincula')");
                     }
 
                     $resp_a_usuario = TRUE;
