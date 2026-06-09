@@ -954,6 +954,9 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     }elseif($ver == "vincular_empresas"){
         $cont=new Vinculacion_empresas();
         $cont->vincular_empresas($_POST['idempresa_actual'],$_POST['idempresa_vinculada'],$_POST['idgestion_vinculada']);
+    }elseif($data == "duplicar_transaccion_otra_empresa"){
+        $cont=new Vinculacion_empresas();
+        $cont->duplicar_transaccion_otra_empresa($data);
     }
     
     
@@ -965,5 +968,5 @@ if($data['ver'] == "asignar_asiento_A_factura") {
 } 
 // registrar_recibo_otras_cuentas registrotransaccion registrar_agrupacion_plantilla registrar_recibo_pago_cajaBancos_en_otras_cuentas asignar_facturas_comercial_A_cuentas
 // registrar_agrupacion_plantilla registrar_configuracion_reporte registrar_factura_recibo_pago_cajaBancos registrar_recibo_pago_cajaBancos_en_facturas editar_otras_operaciones
-// cobrar_contratacion_con_factura_cajaBancos registrar_agrupacion_plantilla
+// cobrar_contratacion_con_factura_cajaBancos vincular_rubro_plandecuentas
 ?> 

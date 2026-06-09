@@ -24,7 +24,7 @@ class Vinculacion_empresas extends DB{
         echo json_encode($res);
         
     }
-    public function vincular_empresas($empresa_act,$idempresa_vincula,$idgestion_vincula){
+    public function vincular_empresas_version_2($empresa_act,$idempresa_vincula,$idgestion_vincula){
        
         $resp_a_usuario = FALSE;
         // $idempresa = Empresa::getidempresa($empresa);
@@ -99,6 +99,91 @@ class Vinculacion_empresas extends DB{
         echo json_encode($res);
         
     }
+
+    public function vincular_empresas($empresa_act,$idempresa_vincula,$idgestion_vincula){
+       
+        $resp_a_usuario = FALSE;
+        // $idempresa = Empresa::getidempresa($empresa);
+        $idempresa_act = $this->getidempresa($empresa_act);
+        $get_plandecuenta_empresa_act = $this->dbc->query("SELECT * FROM plandecuenta WHERE organizacion_idorganizacion = '$idempresa_act'");
+
+        $get_rubro_pl = $this->dbc->query("SELECT * FROM agrupacion_rubro_plandecuenta WHERE idempresa = '$idempresa_act'");
+
+        $get_tipo_trans_act = $this->dbc->query("SELECT * FROM tipotransaccion WHERE idempresa = '$idempresa_act'");
+
+        $get_tipo_cambio_act = $this->dbc->query("SELECT * FROM tipodecambio WHERE idorganizacion = '$idempresa_act'");
+
+        //DEBE EXISTIR PLAN D CUENTAS,RUBRO AGRUPACION, TIPO ASIENTO Y TIPO D CAMBIO
+        if($get_plandecuenta_empresa_act->num_rows > 0 && $get_rubro_pl->num_rows > 0 && $get_tipo_trans_act->num_rows > 0 && $get_tipo_cambio_act->num_rows > 0){ //SI EXISTE PLAN DE CUENTAS y RUBRO AGRUPACION EN LA EMPRESA ACTUAL QUE ESTAMOS
+            
+            $get_plandecuenta_empresa_vincu = $this->dbc->query("SELECT * FROM plandecuenta WHERE organizacion_idorganizacion = '$idempresa_vincula'");
+
+            $get_rubro_pl_vincu = $this->dbc->query("SELECT * FROM agrupacion_rubro_plandecuenta WHERE idempresa = '$idempresa_vincula'");
+
+            $get_tipo_trans_vincu = $this->dbc->query("SELECT * FROM tipotransaccion WHERE idempresa = '$idempresa_vincula'");
+
+            $get_tipo_cambio_vincu = $this->dbc->query("SELECT * FROM tipodecambio WHERE idorganizacion = '$idempresa_vincula'");
+
+            // if($get_rubro_pl->num_rows > 0){ // SI EXISTE RUBRO PLAN DE CUENTAS EN LA EMPRESA ACTUAL QUE ESTAMOS 
+                if($get_plandecuenta_empresa_vincu->num_rows == 0 && $get_rubro_pl_vincu->num_rows == 0 && $get_tipo_trans_vincu->num_rows == 0 && $get_tipo_cambio_vincu->num_rows == 0){ // SI EXISTE PLANES DE CUENTAS EN LA EMPRESA QUE VAMOS A VINCULAR
+
+                    // DUPLICAR AGRUPACION_RUBRO Y PLANES DE CUENTAS
+
+                        while($rubr = $this->dbc->fetch($get_rubro_pl)){
+                            $registro_rubro = $this->dbc->query("INSERT INTO agrupacion_rubro_plandecuenta(tipo_plandecuenta,numero,idempresa)
+                            VALUES ('$rubr[tipo_plandecuenta]','$rubr[numero]','$idempresa_vincula')");
+                        }
+
+                        while($pl = $this->dbc->fetch($get_plandecuenta_empresa_act)){
+                            $registro_pl = $this->dbc->query("INSERT INTO plandecuenta(numero,nombreplan,descripcion,saldonormal,consolidar,idp,organizacion_idorganizacion)
+                            VALUES ('$pl[numero]','$pl[nombreplan]','$pl[descripcion]','$pl[saldonormal]','$pl[consolidar]','$pl[idp]','$idempresa_vincula')");
+                        }
+
+                        while($tip_trans = $this->dbc->fetch($get_tipo_trans_act)){
+                            $registro_tipo = $this->dbc->query("INSERT INTO tipotransaccion(nombre,detalle,idempresa)
+                            VALUES ('$tip_trans[nombre]','$tip_trans[detalle]','$idempresa_vincula')");
+                        }
+                        while($tc = $this->dbc->fetch($get_tipo_cambio_act)){
+                            $registro_tcambio = $this->dbc->query("INSERT INTO tipodecambio(dolar,ufv,fecha,idorganizacion)
+                            VALUES ('$tc[dolar]','$tc[ufv]','$tc[fecha]','$idempresa_vincula')");
+                        }
+
+                        $get_agru = $this->dbc->query("SELECT * FROM agrupacion_rubro_plandecuenta WHERE idempresa ='$idempresa_vincula' ORDER BY numero ASC");
+
+                        while($agr = $this->dbc->fetch($get_agru)){
+                            $aux_num = $agr['numero'] + 1;
+                            // $get_agru = $this->dbc->query("SELECT * FROM plandecuenta WHERE organizacion_idorganizacion ='$idempresa_vincula' 
+                            // AND numero BETWEEN '$agr[numero]' AND '$aux_num'");
+                            $update_agru = $this->dbc->query("UPDATE plandecuenta SET idagrupacion_rubro_plandecuenta = '$agr[idagrupacion_rubro_plandecuenta]' 
+                            WHERE organizacion_idorganizacion ='$idempresa_vincula' 
+                            AND numero BETWEEN '$agr[numero]' AND '$aux_num'");
+                        }
+
+                        $resp_a_usuario = TRUE;
+
+                }else{ // NO EXISTEN PLANES DE CUENTAS EN LA EMPRESA QUE VAMOS A VINCULAR
+
+                    $resp_a_usuario = FALSE;
+                }
+
+
+        }else{ 
+            // NO EXISTE PLAN DE CUENTAS EN LA EMPRESA ACTUAL DONDE NOS ENCONTRAMOS MOSTRAR MENSAJE DE ERROR
+            $resp_a_usuario = FALSE;
+        }
+    
+            if ($resp_a_usuario === TRUE) {        
+                
+                $registrar_vinculacion = $this->dbc->query("INSERT INTO vinculacion_empresas(idempresa_actual,idempresa_vinculada,idgestion_vinculada) VALUES ('$idempresa_act','$idempresa_vincula','$idgestion_vincula')");
+                                                                                                                                                        
+                $res = array("success", "Registro exitoso","registroCaracteristicas");
+            } else {
+                $res = array("danger", "No se pudo registrar");
+            }
+        
+        echo json_encode($res);
+        
+    }
     public function listar_gestiones_por_idempresa($idempresa) {
         $lista = [];
         // $idempresa = $this->getidempresa($empresa);
@@ -152,28 +237,91 @@ class Vinculacion_empresas extends DB{
         echo json_encode($lista, JSON_NUMERIC_CHECK);
         // echo json_encode(array($idempresa));
     }
-    public function editar_divisa($id,$simbolo,$nombre,$empresa) {
-        $idempresa = $this->getidempresa($empresa);
+    public function duplicar_transaccion_otra_empresa($data) {
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+    
+        $idempresa = $this->getidempresa($data['empresa']);
+        $idsucursal = $this->getidsucursal($data['sucursal']); 
+        // $gestion = $this->getgestionactualid($idempresa);
+        $montoRecibos = 0;
 
-        $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM divisa WHERE nombre = '$nombre' AND idempresa = '$idempresa' AND iddivisa != '$id'");
-        $resultado = $consulta->fetch_assoc();
-        $totalRegistros = $resultado['total'];
+        // Construir rango dinámico (primer y último día del mes)
+        $fecha_inicio = date("Y-m-01", strtotime($data['fecha'])); // "2025-03-01"
+        $fecha_fin    = date("Y-m-t", strtotime($data['fecha']));  // "2025-03-31"
 
-        if ($totalRegistros > 0) {
-            $res = array("danger", "El registro ya existe","editarCaracteristicas");
-        }else {
-            // Insertar el nuevo registro
-            $registroListaCompra = $this->dbc->query("UPDATE divisa
-                                    SET simbolo = '$simbolo',
-                                    nombre = '$nombre'
-                                    WHERE iddivisa = '$id';");
-            if ($registroListaCompra === TRUE) {                                                                                                                                                                
-                $res = array("success", "Edición exitosa","editarCaracteristicas");
-            } else {
-                $res = array("danger", "No se pudo editar",$id,$nombre,$empresa);
-            }
+        $existe_vincu_empresa = $this->dbc->query("SELECT * FROM vinculacion_empresas WHERE idempresa_actual = '$idempresa'");
+        $ev = $existe_vincu_empresa->fetch_assoc();
+
+        $gestion_sel = $this->dbc->query("SELECT * FROM gestion WHERE idgestion='$ev[idgestion_vinculada]'");
+        $gc = $gestion_sel->fetch_assoc();
+
+        $tipocambio = $this->dbc->query("SELECT * FROM tipodecambio WHERE fecha = '$data[fecha]' AND idorganizacion ='$ev[idempresa_vinculada]'");
+        $tc = $tipocambio->fetch_assoc();
+
+        $tipotransaccion = $this->dbc->query("SELECT * FROM tipotransaccion WHERE nombre = '$data[ttransaccion]' AND idempresa ='$ev[idempresa_vinculada]'");
+        $tt = $tipotransaccion->fetch_assoc();
+
+        if($gc['formato_transaccion'] == 'por_tipo_mes') {
+            $nroTransa = $this->dbc->query("SELECT *
+            --  COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+            FROM transacciones
+            WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]'
+            AND fechatransaccion BETWEEN '$fecha_inicio' AND '$fecha_fin'
+            AND idgestion = '$ev[idgestion_vinculada]'
+            AND organizacion_idorganizacion = '$ev[idempresa_vinculada]'
+            ORDER BY codigotransaccion DESC
+                LIMIT 1
+            ");
+        } elseif($gc['formato_transaccion'] == 'por_tipo_gestion') {
+            $nroTransa = $this->dbc->query("SELECT *
+            -- COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                FROM transacciones 
+                WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]'
+                AND idgestion = '$ev[idgestion_vinculada]'
+                AND organizacion_idorganiizacion = '$ev[idempresa_vinculada]'
+                ORDER BY codigotransaccion DESC
+                LIMIT 1
+            ");
+        } else { // POR_GESTION
+        
+            $nroTransa = $this->dbc->query("SELECT *
+                FROM transacciones 
+                WHERE organizacion_idorganizacion = '$ev[idempresa_vinculada]'
+                AND idgestion = '$ev[idgestion_vinculada]'
+                ORDER BY codigotransaccion DESC
+                LIMIT 1
+            ");
         }
+
+        $resultado122 = $nroTransa->fetch_assoc();
+        $nroTransaccion = $resultado122['codigotransaccion'] + 1;
+
+
+        $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
+        VALUE('$nroTransaccion','$data[fecha]','$tc[idtipodecambio]','0','$data[glosa]','1','1','$tt[idtipotransaccion]','$ev[idempresa_vinculada]','$idsucursal','$ev[idgestion_vinculada]')");
+
+        $idtransaccion = $this->dbc->insert_id;
+
+        foreach ($data['detalle'] as $dt_trans) {
+
+            $plandecuenta = $this->dbc->query("SELECT * FROM plandecuenta WHERE numero = '$dt_trans[numero]' AND organizacion_idorganizacion ='$ev[idempresa_vinculada]'");
+            $pl = $plandecuenta->fetch_assoc();
+
+            $crearDet_trans = $this->dbc->query("INSERT INTO detalletransaccion(debe,haber,nota,transacciones_idtransacciones,idplandecuenta,idcuentapresupuestaria,estado,cobrar,pagar,idorganizacion,idsucursal,orden)
+            VALUES ('$dt_trans[debe]','$dt_trans[haber]','$dt_trans[nota]','$idtransaccion','$pl[idplandecuenta]','0','$dt_trans[estado]','$dt_trans[cobrar]','$dt_trans[pagar]','$ev[idempresa_vinculada]','$idsucursal','$dt_trans[orden]')");
+        }
+
+        // Respuesta
+        if ($writetrans === TRUE) {
+            $res = array("success", "Se Registro Correctamente", "asignar_facturas_A_cuentas",$data['detalle'],$idtransaccion,$ev['idempresa_vinculada']);
+        } else {
+            $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde",$data['detalle'],$idtransaccion,$ev['idempresa_vinculada']);
+        }
+    
         echo json_encode($res);
+        // echo json_encode(array());
     }
     public function activar_divisa($iddivisa){
         $consulta = $this->dbc->query("SELECT * FROM divisa WHERE iddivisa = '$iddivisa'");
@@ -215,6 +363,12 @@ class Vinculacion_empresas extends DB{
         $registro = $this->dbe->query("select * from organizacion where md5(idorganizacion)='$md5'");
         $qwe = $this->dbe->fetch($registro);
         return $qwe['idorganizacion'];
+    }
+    public function getidsucursal($md5)
+    {
+        $registro = $this->dbe->query("select * from sucursalcontable where md5(idsucursalcontable)='$md5'");
+        $qwe = $this->dbe->fetch($registro);
+        return $qwe['idsucursalcontable'];
     }
 }
 ?>

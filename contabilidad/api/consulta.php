@@ -849,7 +849,7 @@ elseif($ver[0]=="listar_cobros_comercial_sin_cuenta"){
 //  reporte_balance_general_por_niveles_consolidados listar_factura_comercial listatransacciones reporte_balance_general_prueba listar_agrupacion_plantilla facturas_perteneciente_a_cuenta
 // 
 // 
-//  eliminar_otras_operaciones asignar_comprobantes_A_comprobantes listar_facturas_comercial_cobro
+//  reporte_estado_origen_aplicacion listatransacciones listar_facturas_comercial_cobro
 //  lista_cobrar_cobrado_factura  reporte_estado_origen_aplicacion  listar_solo_usuarios listar_usuarios_por_gestion  
 
 //   insertar_transaccion.php    reporte_balance_general_hasta reportecomprobantecontable reporteactivodiaponibledos eliminar_registro_flujo_efectivo eliminar_configuracion_reporte

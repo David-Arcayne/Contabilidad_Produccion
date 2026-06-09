@@ -150,7 +150,8 @@ $nroTransaccion = $resultado122['codigotransaccion'] + 1;
             MONTH(t.fechatransaccion) ASC,
             t.tipotransaccion_idtipotransaccion ASC,
             t.codigotransaccion DESC
-    ) AS fecha_siguiente
+    ) AS fecha_siguiente,
+    t.vinculado_otra_empresa
 FROM transacciones AS t
 WHERE t.idgestion = '$gestion'
   AND t.organizacion_idorganizacion = '$ide'
@@ -178,7 +179,8 @@ ORDER BY
                 t.codigotransaccion DESC) AS fecha_anterior,
                 LEAD(t.fechatransaccion) OVER 
                 (ORDER BY t.idgestion ASC,t.tipotransaccion_idtipotransaccion ASC, 
-                t.codigotransaccion DESC) AS fecha_siguiente
+                t.codigotransaccion DESC) AS fecha_siguiente,
+                t.vinculado_otra_empresa
 
             FROM transacciones t
             LEFT JOIN gestion g ON g.idgestion = t.idgestion
@@ -206,7 +208,8 @@ ORDER BY
         t.estado,
         t.tipodecambio,
         LAG(t.fechatransaccion) OVER (ORDER BY t.codigotransaccion DESC) AS fecha_anterior,
-        LEAD(t.fechatransaccion) OVER (ORDER BY t.codigotransaccion DESC) AS fecha_siguiente
+        LEAD(t.fechatransaccion) OVER (ORDER BY t.codigotransaccion DESC) AS fecha_siguiente,
+        t.vinculado_otra_empresa
       FROM
         transacciones AS t
       WHERE
@@ -225,13 +228,13 @@ ORDER BY
             $asd = $this->dbc->fetch($tt);
             $detalle = [];
 
-            $transdeta = $this->dbc->query("select d.iddetalletransaccion,p.nombreplan,d.debe,d.haber,d.nota,d.estado,d.idorganizacion,d.idplandecuenta from detalletransaccion as d,plandecuenta as p where p.idplandecuenta=d.idplandecuenta and d.transacciones_idtransacciones='$qwe[0]'");
+            $transdeta = $this->dbc->query("SELECT d.iddetalletransaccion,p.nombreplan,d.debe,d.haber,d.nota,d.estado,d.idorganizacion,d.idplandecuenta,d.cobrar,d.pagar,d.orden,p.numero FROM detalletransaccion as d,plandecuenta as p where p.idplandecuenta=d.idplandecuenta and d.transacciones_idtransacciones='$qwe[0]'");
             while ($qq = $this->dbc->fetch($transdeta)) {
-                $ress = array("id" => $qq[0], "plan" => $qq[1], "debe" => $qq[2], "haber" => $qq[3], "nota" => $qq[4], "estado" => $qq[5], "idempresa" => $qq[6], "idplan" => $qq[7]);
+                $ress = array("id" => $qq[0], "plan" => $qq[1], "debe" => $qq[2], "haber" => $qq[3], "nota" => $qq[4], "estado" => $qq[5], "idempresa" => $qq[6], "idplan" => $qq[7],"cobrar" => $qq[8],"pagar" => $qq[9],"orden" => $qq[10],"numero" => $qq[11]);
                 array_push($detalle, $ress);
             }
 
-            $res = array("id" => $qwe[0], "ntransaccion" => $qwe[1], "fecha" => $qwe[2],"fecha_anterior" => $qwe['fecha_anterior'],"fecha_siguiente" => $qwe['fecha_siguiente'], "glosa" => $qwe[3], "consolidar" => $qwe[4], "ttransaccion" => $asd['nombre'],"idtipotransaccion"=>$qwe[5], "gestion" => $qwe[6],"estado" => $qwe[7], "detalle" => $detalle, "tipocambio" => $qwe[8],"existe" => 1,"formato_transaccion" => $gc['formato_transaccion']);
+            $res = array("id" => $qwe[0], "ntransaccion" => $qwe[1], "fecha" => $qwe[2],"fecha_anterior" => $qwe['fecha_anterior'],"fecha_siguiente" => $qwe['fecha_siguiente'], "glosa" => $qwe[3], "consolidar" => $qwe[4], "ttransaccion" => $asd['nombre'],"idtipotransaccion"=>$qwe[5], "gestion" => $qwe[6],"estado" => $qwe[7], "detalle" => $detalle, "tipocambio" => $qwe[8],"existe" => 1,"formato_transaccion" => $gc['formato_transaccion'],"vinculado_otra_empresa" => $qwe['vinculado_otra_empresa']);
             array_push($lista, $res);
         }
         }else{
@@ -240,13 +243,13 @@ ORDER BY
             $asd = $this->dbc->fetch($tt);
             $detalle = [];
 
-            $transdeta = $this->dbc->query("select d.iddetalletransaccion,p.nombreplan,d.debe,d.haber,d.nota,d.estado,d.idorganizacion,d.idplandecuenta from detalletransaccion as d,plandecuenta as p where p.idplandecuenta=d.idplandecuenta and d.transacciones_idtransacciones='$qwe[0]'");
+            $transdeta = $this->dbc->query("SELECT d.iddetalletransaccion,p.nombreplan,d.debe,d.haber,d.nota,d.estado,d.idorganizacion,d.idplandecuenta,d.cobrar,d.pagar,d.orden,p.numero from detalletransaccion as d,plandecuenta as p where p.idplandecuenta=d.idplandecuenta and d.transacciones_idtransacciones='$qwe[0]'");
             while ($qq = $this->dbc->fetch($transdeta)) {
-                $ress = array("id" => $qq[0], "plan" => $qq[1], "debe" => $qq[2], "haber" => $qq[3], "nota" => $qq[4], "estado" => $qq[5], "idempresa" => $qq[6], "idplan" => $qq[7]);
+                $ress = array("id" => $qq[0], "plan" => $qq[1], "debe" => $qq[2], "haber" => $qq[3], "nota" => $qq[4], "estado" => $qq[5], "idempresa" => $qq[6], "idplan" => $qq[7],"cobrar" => $qq[8],"pagar" => $qq[9],"orden" => $qq[10],"numero" => $qq[11]);
                 array_push($detalle, $ress);
             }
 
-            $res = array("id" => $qwe[0], "ntransaccion" => $qwe[1], "fecha" => $qwe[2],"fecha_anterior" => $qwe['fecha_anterior'],"fecha_siguiente" => $qwe['fecha_siguiente'], "glosa" => $qwe[3], "consolidar" => $qwe[4], "ttransaccion" => $asd['nombre'],"idtipotransaccion"=>$qwe[5], "gestion" => $qwe[6],"estado" => $qwe[7], "detalle" => $detalle, "tipocambio" => $qwe[8],"existe" => 0,"formato_transaccion" => $gc['formato_transaccion']);
+            $res = array("id" => $qwe[0], "ntransaccion" => $qwe[1], "fecha" => $qwe[2],"fecha_anterior" => $qwe['fecha_anterior'],"fecha_siguiente" => $qwe['fecha_siguiente'], "glosa" => $qwe[3], "consolidar" => $qwe[4], "ttransaccion" => $asd['nombre'],"idtipotransaccion"=>$qwe[5], "gestion" => $qwe[6],"estado" => $qwe[7], "detalle" => $detalle, "tipocambio" => $qwe[8],"existe" => 0,"formato_transaccion" => $gc['formato_transaccion'],"vinculado_otra_empresa" => $qwe['vinculado_otra_empresa']);
             array_push($lista, $res);
         }
         }
@@ -1486,30 +1489,6 @@ public function asignar_facturas_A_cuentas($data) {
                 ");
             } else {
                 $nuevo_monto_dt = $dt['haber'] + $montoRecibos;
-                $editar_dt = $this->dbc->query("
-                    UPDATE detalletransaccion 
-                    SET haber = '$nuevo_monto_dt' 
-                    WHERE iddetalletransaccion = '$data[cuenta]'
-                ");
-            }
-        } elseif ($data['sumar_reemplazar'] == 'reemplazo') {
-
-            // desvincular todos los documentos de esta cuenta
-            $desv_recibo = $this->dbc->query("UPDATE recibo SET cuenta = '0',transaccion = '0' WHERE cuenta = '$data[cuenta]'");
-            $desv_factura = $this->dbc->query("UPDATE factura SET cuenta = '0',transacciones_idtransacciones = '0' WHERE cuenta = '$data[cuenta]'");
-            $desv_comprob_cobr = $this->dbc->query("UPDATE cuentaspof SET cuenta = '0',transaccion = '0' WHERE cuenta = '$data[cuenta]'");
-            $desv_comprob_pag = $this->dbc->query("UPDATE cuentaspor SET cuenta = '0',transaccion = '0' WHERE cuenta = '$data[cuenta]'");
-            $desv_comer = $this->dbc->query("DELETE FROM transaccion_documentos_comercial WHERE cuenta = '$data[cuenta]'");
-
-            if ($dt['debe'] > 0) {
-                $nuevo_monto_dt = $montoRecibos;
-                $editar_dt = $this->dbc->query("
-                    UPDATE detalletransaccion 
-                    SET debe = '$nuevo_monto_dt' 
-                    WHERE iddetalletransaccion = '$data[cuenta]'
-                ");
-            } else {
-                $nuevo_monto_dt = $montoRecibos;
                 $editar_dt = $this->dbc->query("
                     UPDATE detalletransaccion 
                     SET haber = '$nuevo_monto_dt' 

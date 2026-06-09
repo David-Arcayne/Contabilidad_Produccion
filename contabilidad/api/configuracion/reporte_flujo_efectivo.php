@@ -184,39 +184,49 @@ public function listar_plantilla_flujo_efectivo($idplantilla_reporte,$empresa) {
     $suma_pasi_patri_aplicacion = 0;
 
     foreach ($agrupados as $item) {
-        $valor_ant = $item["valor_anterior"] ?? 0;
-        $valor_act = $item["valor_actual"] ?? 0;
+    $valor_ant = $item["valor_anterior"] ?? 0;
+    $valor_act = $item["valor_actual"] ?? 0;
 
+    if ($item['grupo'] == '1') {
+        // Invertir la lógica para grupo 1
+        $resultado = $valor_ant - $valor_act;
+        $origen = $resultado > 0 ? $resultado : 0;
+        // Aplicación siempre positivo
+        $aplicacion = $resultado < 0 ? abs($resultado) : 0;
+
+        $suma_activo_anterior += $valor_ant;
+        $suma_activo_actual += $valor_act;
+        $suma_activo_origen += $origen;
+        $suma_activo_aplicacion += $aplicacion;
+    } else {
+        // Mantener la lógica original para grupo 2 y 3
         $resultado = $valor_act - $valor_ant;
         $origen = $resultado > 0 ? $resultado : 0;
-        $aplicacion = $resultado < 0 ? $resultado : 0;
+        $aplicacion = $resultado < 0 ? abs($resultado) : 0; // también positivo
 
-        if ($item['grupo'] == '1') {
-            $suma_activo_anterior += $valor_ant;
-            $suma_activo_actual += $valor_act;
-            $suma_activo_origen += $origen;
-            $suma_activo_aplicacion += $aplicacion;
-        } else {
-            $suma_pasi_patri_anterior += $valor_ant;
-            $suma_pasi_patri_actual += $valor_act;
-            $suma_pasi_patri_origen += $origen;
-            $suma_pasi_patri_aplicacion += $aplicacion;
-        }
-        $confi = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE idconfiguracion_reporte='$item[idconfiguracion_reporte]'");
-        $cr = $this->dbc->fetch($confi);
-
-        $lista[] = [
-            "idconfiguracion_reporte" => $item['idconfiguracion_reporte'],
-            "grupo" => $item['grupo'],
-            "nombre" => $item['nombre'],
-            "valor_anterior" => $valor_ant,
-            "valor_actual" => $valor_act,
-            "origen" => $origen,
-            "aplicacion" => $aplicacion,
-            "id_plantilla_superior" => $item['id_plantilla_superior'],
-            "nombre_cuenta_superior" => $cr['nombre_cuenta_superior'],
-        ];
+        $suma_pasi_patri_anterior += $valor_ant;
+        $suma_pasi_patri_actual += $valor_act;
+        $suma_pasi_patri_origen += $origen;
+        $suma_pasi_patri_aplicacion += $aplicacion;
     }
+
+    $confi = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE idconfiguracion_reporte='$item[idconfiguracion_reporte]'");
+    $cr = $this->dbc->fetch($confi);
+
+    $lista[] = [
+        "idconfiguracion_reporte" => $item['idconfiguracion_reporte'],
+        "grupo" => $item['grupo'],
+        "nombre" => $item['nombre'],
+        "valor_anterior" => $valor_ant,
+        "valor_actual" => $valor_act,
+        "origen" => $origen,
+        "aplicacion" => $aplicacion,
+        "id_plantilla_superior" => $item['id_plantilla_superior'],
+        "nombre_cuenta_superior" => $cr['nombre_cuenta_superior'],
+    ];
+}
+
+
 
     // Totales por grupo
     $lista[] = [
@@ -242,6 +252,114 @@ public function listar_plantilla_flujo_efectivo($idplantilla_reporte,$empresa) {
     // echo json_encode($lista, JSON_NUMERIC_CHECK);
     return $lista;
 }
+
+//     private function reporte_estado_ori_apli_privado($gestion_ant, $gestion_act){
+//     // ini_set('display_errors', 1); 
+//     //     ini_set('display_startup_errors', 1);
+//     //     error_reporting(E_ALL);
+//     $lista = [];
+
+//     $get_balance = $this->dbc->query("
+//         SELECT * 
+//         FROM balance_general_por_gestion 
+//         WHERE es_calculable = 'si' 
+//           AND idgestion IN ('$gestion_ant', '$gestion_act')
+//         ORDER BY grupo, idconfiguracion_reporte, idgestion
+//     ");
+
+//     $agrupados = [];
+
+//     while ($row = $this->dbc->fetch($get_balance)) {
+//         $idconf = $row['idconfiguracion_reporte'];
+
+//         if (!isset($agrupados[$idconf])) {
+//             $agrupados[$idconf] = [
+//                 "idconfiguracion_reporte" => $idconf,
+//                 "grupo" => $row['grupo'],
+//                 "nombre" => $row['nombre_actual'],
+//                 "id_plantilla_superior" => $row['id_plantilla_superior'],
+//                 "valor_anterior" => null,
+//                 "valor_actual" => null,
+//             ];
+//         }
+
+//         if ($row['idgestion'] == $gestion_ant) {
+//             $agrupados[$idconf]["valor_anterior"] = $row['valor'];
+//         } else {
+//             $agrupados[$idconf]["valor_actual"] = $row['valor'];
+//         }
+//     }
+
+//     // Totales
+//     $suma_activo_anterior = 0;
+//     $suma_activo_actual = 0;
+//     $suma_activo_origen = 0;
+//     $suma_activo_aplicacion = 0;
+
+//     $suma_pasi_patri_anterior = 0;
+//     $suma_pasi_patri_actual = 0;
+//     $suma_pasi_patri_origen = 0;
+//     $suma_pasi_patri_aplicacion = 0;
+
+//     foreach ($agrupados as $item) {
+//         $valor_ant = $item["valor_anterior"] ?? 0;
+//         $valor_act = $item["valor_actual"] ?? 0;
+
+//         $resultado = $valor_act - $valor_ant;
+//         $origen = $resultado > 0 ? $resultado : 0;
+//         $aplicacion = $resultado < 0 ? $resultado : 0;
+
+//         if ($item['grupo'] == '1') {
+//             $suma_activo_anterior += $valor_ant;
+//             $suma_activo_actual += $valor_act;
+//             $suma_activo_origen += $origen;
+//             $suma_activo_aplicacion += $aplicacion;
+//         } else {
+//             $suma_pasi_patri_anterior += $valor_ant;
+//             $suma_pasi_patri_actual += $valor_act;
+//             $suma_pasi_patri_origen += $origen;
+//             $suma_pasi_patri_aplicacion += $aplicacion;
+//         }
+//         $confi = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE idconfiguracion_reporte='$item[idconfiguracion_reporte]'");
+//         $cr = $this->dbc->fetch($confi);
+
+//         $lista[] = [
+//             "idconfiguracion_reporte" => $item['idconfiguracion_reporte'],
+//             "grupo" => $item['grupo'],
+//             "nombre" => $item['nombre'],
+//             "valor_anterior" => $valor_ant,
+//             "valor_actual" => $valor_act,
+//             "origen" => $origen,
+//             "aplicacion" => $aplicacion,
+//             "id_plantilla_superior" => $item['id_plantilla_superior'],
+//             "nombre_cuenta_superior" => $cr['nombre_cuenta_superior'],
+//         ];
+//     }
+
+//     // Totales por grupo
+//     $lista[] = [
+//         "grupo" => "1",
+//         "nombre" => "TOTAL ACTIVOS",
+//         "valor_anterior" => $suma_activo_anterior,
+//         "valor_actual" => $suma_activo_actual,
+//         "origen" => $suma_activo_origen,
+//         "aplicacion" => $suma_activo_aplicacion,
+//         "id_plantilla_superior" => null,
+//     ];
+
+//     $lista[] = [
+//         "grupo" => "2",
+//         "nombre" => "TOTAL PASIVO Y PATRIMONIO",
+//         "valor_anterior" => $suma_pasi_patri_anterior,
+//         "valor_actual" => $suma_pasi_patri_actual,
+//         "origen" => $suma_pasi_patri_origen,
+//         "aplicacion" => $suma_pasi_patri_aplicacion,
+//         "id_plantilla_superior" => null,
+//     ];
+
+//     // echo json_encode($lista, JSON_NUMERIC_CHECK);
+//     return $lista;
+// }
 
 
     // public function reporte_flujo_efectivo_actual($gestion_ant,$gestion_act) {
