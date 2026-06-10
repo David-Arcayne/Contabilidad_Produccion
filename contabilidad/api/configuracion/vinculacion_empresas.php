@@ -238,9 +238,9 @@ class Vinculacion_empresas extends DB{
         // echo json_encode(array($idempresa));
     }
     public function duplicar_transaccion_otra_empresa($data) {
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
     
         $idempresa = $this->getidempresa($data['empresa']);
         $idsucursal = $this->getidsucursal($data['sucursal']); 
@@ -280,7 +280,7 @@ class Vinculacion_empresas extends DB{
                 FROM transacciones 
                 WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]'
                 AND idgestion = '$ev[idgestion_vinculada]'
-                AND organizacion_idorganiizacion = '$ev[idempresa_vinculada]'
+                AND organizacion_idorganizacion = '$ev[idempresa_vinculada]'
                 ORDER BY codigotransaccion DESC
                 LIMIT 1
             ");
@@ -294,13 +294,21 @@ class Vinculacion_empresas extends DB{
                 LIMIT 1
             ");
         }
+$resultado122 = $nroTransa->fetch_assoc();
+            $nroTransaccion = $resultado122['codigotransaccion'] + 1;
+        // if($nroTransa->num_rows > 0){
+        //     $resultado122 = $nroTransa->fetch_assoc();
+        //     $nroTransaccion = $resultado122['codigotransaccion'] + 1;
+        // }else{
+        //     $nroTransaccion = 1;
+        // }
 
-        $resultado122 = $nroTransa->fetch_assoc();
-        $nroTransaccion = $resultado122['codigotransaccion'] + 1;
-
+        $ediciontrans = $this->dbc->query("UPDATE transacciones
+                                                SET vinculado_otra_empresa = 'si' 
+                                                WHERE idtransacciones = '$data[idtransaccion]';");
 
         $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
-        VALUE('$nroTransaccion','$data[fecha]','$tc[idtipodecambio]','0','$data[glosa]','1','1','$tt[idtipotransaccion]','$ev[idempresa_vinculada]','$idsucursal','$ev[idgestion_vinculada]')");
+        VALUE('$nroTransaccion','$data[fecha]','$tc[idtipodecambio]','0','$data[glosa]','$data[consolidar]','$data[estado]','$tt[idtipotransaccion]','$ev[idempresa_vinculada]','$idsucursal','$ev[idgestion_vinculada]')");
 
         $idtransaccion = $this->dbc->insert_id;
 

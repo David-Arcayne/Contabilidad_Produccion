@@ -832,7 +832,7 @@ elseif($ver[0]=="listar_cobros_comercial_sin_cuenta"){
 //     $cont->obtenerGestionAnterior($ver[1],$ver[2]); eliminar_gestion_contable   
 // }
 
-// listar_balance_general_completo_icono  rp listadegestion listar_select_cuentas_balance_general reporte_calculo_otro_reporte_consolidado
+// alerta_anular_eliminar_documentos  rp listadegestion listar_select_cuentas_balance_general reporte_calculo_otro_reporte_consolidado
 // existe_apertura_pre_cierre listar_facturas_cobro_pago listar_recibo_por_caja_bancos listar_facturas_comercial_cobro
 // lista_pagar_pagado_factura listar_reportes_referencia_select eliminar_otras_operaciones listadegestion listar_factura_comercial_con_transaccion
 

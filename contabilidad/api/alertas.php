@@ -121,7 +121,27 @@ class Alertas extends DB{
         echo json_encode($lista);
     }   
 
-    public function alerta_anular_eliminar_documentos($idempresa,$gestion) {
+    // public function alerta_anular_eliminar_documentos($idempresa,$gestion) {
+    //     ini_set('display_errors', 1); //,$nit,$cobro_pago,$cliente_proveedor,
+    //         ini_set('display_startup_errors', 1);
+    //         error_reporting(E_ALL);
+
+    //     $lista = [];
+    //     // $gestion=$this->getidgestion($idempresa);
+    //     // Consulta SQL
+    //     $sql =$this->dbc->query("SELECT COUNT(*) AS cantidad FROM solicitud_anular_eliminar_documento 
+    //     WHERE md5(idempresa) = '$idempresa' AND estado_solicitud = '1' AND idgestion = '$gestion'");
+    //     $resultado = $sql->fetch_assoc();       
+
+    //     $res = array(
+    //         "cantidad" => $resultado['cantidad']
+    //     );
+    //     // $res2= $contador;
+    //     array_push($lista, $res);
+    //     // Retornar la lista en formato JSON
+    //     echo json_encode($lista);
+    // }   
+    public function alerta_anular_eliminar_documentos($idempresa) {
         ini_set('display_errors', 1); //,$nit,$cobro_pago,$cliente_proveedor,
             ini_set('display_startup_errors', 1);
             error_reporting(E_ALL);
@@ -130,7 +150,7 @@ class Alertas extends DB{
         // $gestion=$this->getidgestion($idempresa);
         // Consulta SQL
         $sql =$this->dbc->query("SELECT COUNT(*) AS cantidad FROM solicitud_anular_eliminar_documento 
-        WHERE md5(idempresa) = '$idempresa' AND estado_solicitud = '1' AND idgestion = '$gestion'");
+        WHERE md5(idempresa) = '$idempresa' AND estado_solicitud = '1'");
         $resultado = $sql->fetch_assoc();       
 
         $res = array(
@@ -139,8 +159,7 @@ class Alertas extends DB{
         // $res2= $contador;
         array_push($lista, $res);
         // Retornar la lista en formato JSON
-        echo json_encode($lista);
-    }   
+    }
     public function getusuario($id) {
         $registro = $this->dbrh->query("
             SELECT u.nombre AS usuario_nombre, t.nombre AS trabajador_nombre, t.apellido, t.ci 
