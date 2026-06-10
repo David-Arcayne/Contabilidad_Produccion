@@ -388,16 +388,16 @@ elseif($ver[0]=="listar_asiento_por_modulo"){
     $cont->listar_recibo_por_caja_bancos($ver[1],$ver[2],$ver[3],$ver[4]);
 }elseif($ver[0]=="alerta_desconsolidacion"){
     $cont=new Alertas();
-    $cont->alerta_desconsolidacion($ver[1],$ver[2]);
+    $cont->alerta_desconsolidacion($ver[1]);
 }elseif($ver[0]=="alerta_transaccionEn_espera"){
     $cont=new Alertas();
-    $cont->alerta_transaccionEn_espera($ver[1],$ver[2]);
+    $cont->alerta_transaccionEn_espera($ver[1]);
 }elseif($ver[0]=="alerta_anular_eliminar_transaccion"){
     $cont=new Alertas();
-    $cont->alerta_anular_eliminar_transaccion($ver[1],$ver[2]);
+    $cont->alerta_anular_eliminar_transaccion($ver[1]);
 }elseif($ver[0]=="alerta_transacciones_comercial"){
     $cont=new Alertas();
-    $cont->alerta_transacciones_comercial($ver[1],$ver[2]);
+    $cont->alerta_transacciones_comercial($ver[1]);
 }elseif($ver[0]=="eliminar_gestion_contable"){
     $cont=new Contabilidad();
     $cont->eliminar_gestion_contable($ver[1]);
@@ -741,7 +741,7 @@ elseif($ver[0]=="facturas_perteneciente_a_cuenta"){
     $cont->listar_recibo_por_caja_bancos_saldo($ver[1],$ver[2]);
 }elseif($ver[0]=="alerta_anular_eliminar_documentos"){
     $cont=new Alertas();
-    $cont->alerta_anular_eliminar_documentos($ver[1],$ver[2]);
+    $cont->alerta_anular_eliminar_documentos($ver[1]);
 }elseif($ver[0]=="listar_tipo_cliente_activos"){
     $cont=new Tipo_cliente_comercial();
     $cont->listar_tipo_cliente_activos($ver[1]);

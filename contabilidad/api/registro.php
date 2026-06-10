@@ -957,9 +957,11 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     }elseif($data['ver'] == "duplicar_transaccion_otra_empresa"){
         $cont=new Vinculacion_empresas();
         $cont->duplicar_transaccion_otra_empresa($data);
+    }elseif($ver == "editar_gestion_empresa_vinculada"){
+        $cont=new Vinculacion_empresas();
+        $cont->editar_gestion_empresa_vinculada($_POST['idvinculacion'],$_POST['idgestion']);
     }
-    
-    
+  
 // asignar asiento desvincular_documentos_de_cuenta editar_recibo_caja_bancos registrocobrarfactura registrar_anular_eliminar_activar_factura_tributario_transaccion
 //   registrar_balance_general_admin registrar_vinculacion_depreciacion editar_registro_flujo_efectivo activar_desactivar_tipo_reportes creartipoasiento
 

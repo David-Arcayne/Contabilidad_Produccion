@@ -222,6 +222,8 @@ class Vinculacion_empresas extends DB{
                 $res = array(
                     // "iddivisa" => $qwe['iddivisa'],
                     // "simbolo" => $qwe['simbolo'],
+                    "idvinculacion" => $qwe['idvinculacion_empresas'],
+                    "idempresa_vinculada" => $qwe['idempresa_vinculada'],
                     "nombre_empresa_vinculada" => $name_em['nombreo'],
                     "idgestion_vinculada" => $qwe['idgestion_vinculada'],
                     "nombre_gestion" => $gg['nombre']
@@ -257,100 +259,235 @@ class Vinculacion_empresas extends DB{
         $gestion_sel = $this->dbc->query("SELECT * FROM gestion WHERE idgestion='$ev[idgestion_vinculada]'");
         $gc = $gestion_sel->fetch_assoc();
 
-        $tipocambio = $this->dbc->query("SELECT * FROM tipodecambio WHERE fecha = '$data[fecha]' AND idorganizacion ='$ev[idempresa_vinculada]'");
-        $tc = $tipocambio->fetch_assoc();
+        if($data['fecha'] >= $gc['fechaini'] && $data['fecha'] <= $gc['fechafin']){
 
-        $tipotransaccion = $this->dbc->query("SELECT * FROM tipotransaccion WHERE nombre = '$data[ttransaccion]' AND idempresa ='$ev[idempresa_vinculada]'");
-        $tt = $tipotransaccion->fetch_assoc();
+            $tipocambio_id = $this->dbc->query("SELECT * FROM tipodecambio WHERE idtipodecambio = '$data[tipodecambio]'");
+            $fech_tc = $tipocambio_id->fetch_assoc();
 
-        if($gc['formato_transaccion'] == 'por_tipo_mes') {
-            $nroTransa = $this->dbc->query("SELECT *
-            --  COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
-            FROM transacciones
-            WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]'
-            AND fechatransaccion BETWEEN '$fecha_inicio' AND '$fecha_fin'
-            AND idgestion = '$ev[idgestion_vinculada]'
-            AND organizacion_idorganizacion = '$ev[idempresa_vinculada]'
-            ORDER BY codigotransaccion DESC
-                LIMIT 1
-            ");
-        } elseif($gc['formato_transaccion'] == 'por_tipo_gestion') {
-            $nroTransa = $this->dbc->query("SELECT *
-            -- COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
-                FROM transacciones 
-                WHERE tipotransaccion_idtipotransaccion = '$tt[idtipotransaccion]'
-                AND idgestion = '$ev[idgestion_vinculada]'
-                AND organizacion_idorganizacion = '$ev[idempresa_vinculada]'
-                ORDER BY codigotransaccion DESC
-                LIMIT 1
-            ");
-        } else { // POR_GESTION
+            $tipocambio = $this->dbc->query("SELECT * FROM tipodecambio WHERE fecha = '$fech_tc[fecha]' AND idorganizacion ='$ev[idempresa_vinculada]'");
+            $tc = $tipocambio->fetch_assoc();
+
+            $tipotransaccion = $this->dbc->query("SELECT * FROM tipotransaccion WHERE nombre = '$data[ttransaccion]' AND idempresa ='$ev[idempresa_vinculada]'");
+            $tt = $tipotransaccion->fetch_assoc();
+
+            $nroTransaccion = 0;
+
+            if($gc['formato_transaccion'] == 'por_tipo_mes') {
+            
+                // Buscar todas las transacciones en el rango de fechas
+                $list_trans = $this->dbc->query("SELECT *
+                    FROM transacciones
+                    WHERE tipotransaccion_idtipotransaccion = '{$tt['idtipotransaccion']}'
+                    AND fechatransaccion BETWEEN '{$fecha_inicio}' AND '{$fecha_fin}'
+                    AND idgestion = '{$ev['idgestion_vinculada']}'
+                    AND organizacion_idorganizacion = '{$ev['idempresa_vinculada']}'
+                    ORDER BY fechatransaccion ASC, codigotransaccion ASC
+                ");
+
+                $nroTransaccion = 0;
+
+                if ($list_trans && $list_trans->num_rows > 0) {
+                    while ($lt = $this->dbc->fetch($list_trans)) {
+                        // Si la fecha que insertas es menor que la actual, significa que debe ir antes
+                        if ($data['fecha'] < $lt['fechatransaccion']) {
+                            $nroTransaccion = $lt['codigotransaccion'];
+
+                            // Desplazar todos los posteriores (+1)
+                            $trans_recorre = $this->dbc->query("SELECT *
+                                FROM transacciones
+                                WHERE tipotransaccion_idtipotransaccion = '{$tt['idtipotransaccion']}'
+                                AND fechatransaccion BETWEEN '{$fecha_inicio}' AND '{$fecha_fin}'
+                                AND idgestion = '{$ev['idgestion_vinculada']}'
+                                AND organizacion_idorganizacion = '{$ev['idempresa_vinculada']}'
+                                AND codigotransaccion >= '{$nroTransaccion}'
+                                ORDER BY codigotransaccion DESC
+                            ");
+
+                            if ($trans_recorre && $trans_recorre->num_rows > 0) {
+                                while ($tr = $this->dbc->fetch($trans_recorre)) {
+                                    $new_codig = $tr['codigotransaccion'] + 1;
+                                    $this->dbc->query("
+                                        UPDATE transacciones 
+                                        SET codigotransaccion = '{$new_codig}' 
+                                        WHERE idtransacciones = '{$tr['idtransacciones']}'
+                                    ");
+                                }
+                            }
+                            break; // ya encontraste el lugar, no sigas recorriendo
+                        }
+                    }
+                }
+
+                // Si no encontró un lugar intermedio, va al final
+                if ($nroTransaccion == 0) {
+                    $ultimo = $this->dbc->query("SELECT MAX(codigotransaccion) AS max_codig 
+                        FROM transacciones
+                        WHERE tipotransaccion_idtipotransaccion = '{$tt['idtipotransaccion']}'
+                        AND fechatransaccion BETWEEN '{$fecha_inicio}' AND '{$fecha_fin}'
+                        AND idgestion = '{$ev['idgestion_vinculada']}'
+                        AND organizacion_idorganizacion = '{$ev['idempresa_vinculada']}'
+                    ");
+                    $row = $this->dbc->fetch($ultimo);
+                    $nroTransaccion = $row ? $row['max_codig'] + 1 : 1;
+                }
+            } elseif($gc['formato_transaccion'] == 'por_tipo_gestion') {
+            
+                // Buscar todas las transacciones de la gestión y tipo
+                $list_trans = $this->dbc->query("SELECT *
+                    FROM transacciones
+                    WHERE tipotransaccion_idtipotransaccion = '{$tt['idtipotransaccion']}'
+                    AND idgestion = '{$ev['idgestion_vinculada']}'
+                    AND organizacion_idorganizacion = '{$ev['idempresa_vinculada']}'
+                    ORDER BY fechatransaccion ASC, codigotransaccion ASC
+                ");
+
+                $nroTransaccion = 0;
+
+                if ($list_trans && $list_trans->num_rows > 0) {
+                    while ($lt = $this->dbc->fetch($list_trans)) {
+                        // Si la fecha que insertas es menor que la actual, significa que debe ir antes
+                        if ($data['fecha'] < $lt['fechatransaccion']) {
+                            $nroTransaccion = $lt['codigotransaccion'];
+
+                            // Desplazar todos los posteriores (+1)
+                            $trans_recorre = $this->dbc->query("SELECT *
+                                FROM transacciones
+                                WHERE tipotransaccion_idtipotransaccion = '{$tt['idtipotransaccion']}'
+                                AND idgestion = '{$ev['idgestion_vinculada']}'
+                                AND organizacion_idorganizacion = '{$ev['idempresa_vinculada']}'
+                                AND codigotransaccion >= '{$nroTransaccion}'
+                                ORDER BY codigotransaccion DESC
+                            ");
+
+                            if ($trans_recorre && $trans_recorre->num_rows > 0) {
+                                while ($tr = $this->dbc->fetch($trans_recorre)) {
+                                    $new_codig = $tr['codigotransaccion'] + 1;
+                                    $this->dbc->query("
+                                        UPDATE transacciones 
+                                        SET codigotransaccion = '{$new_codig}' 
+                                        WHERE idtransacciones = '{$tr['idtransacciones']}'
+                                    ");
+                                }
+                            }
+                            break; // ya encontraste el lugar, no sigas recorriendo
+                        }
+                    }
+                }
+
+                // Si no encontró un lugar intermedio, va al final
+                if ($nroTransaccion == 0) {
+                    $ultimo = $this->dbc->query("SELECT MAX(codigotransaccion) AS max_codig 
+                        FROM transacciones
+                        WHERE tipotransaccion_idtipotransaccion = '{$tt['idtipotransaccion']}'
+                        AND idgestion = '{$ev['idgestion_vinculada']}'
+                        AND organizacion_idorganizacion = '{$ev['idempresa_vinculada']}'
+                    ");
+                    $row = $this->dbc->fetch($ultimo);
+                    $nroTransaccion = $row ? $row['max_codig'] + 1 : 1;
+                }
+
+            } else { // POR_GESTION
+            
+                // Buscar todas las transacciones de la gestión
+                $list_trans = $this->dbc->query("SELECT *
+                    FROM transacciones
+                    WHERE idgestion = '{$ev['idgestion_vinculada']}'
+                    AND organizacion_idorganizacion = '{$ev['idempresa_vinculada']}'
+                    ORDER BY fechatransaccion ASC, codigotransaccion ASC
+                ");
+
+                $nroTransaccion = 0;
+
+                if ($list_trans && $list_trans->num_rows > 0) {
+                    while ($lt = $this->dbc->fetch($list_trans)) {
+                        // Si la fecha que insertas es menor que la actual, significa que debe ir antes
+                        if ($data['fecha'] < $lt['fechatransaccion']) {
+                            $nroTransaccion = $lt['codigotransaccion'];
+
+                            // Desplazar todos los posteriores (+1)
+                            $trans_recorre = $this->dbc->query("SELECT *
+                                FROM transacciones
+                                WHERE idgestion = '{$ev['idgestion_vinculada']}'
+                                AND organizacion_idorganizacion = '{$ev['idempresa_vinculada']}'
+                                AND codigotransaccion >= '{$nroTransaccion}'
+                                ORDER BY codigotransaccion DESC
+                            ");
+
+                            if ($trans_recorre && $trans_recorre->num_rows > 0) {
+                                while ($tr = $this->dbc->fetch($trans_recorre)) {
+                                    $new_codig = $tr['codigotransaccion'] + 1;
+                                    $this->dbc->query("
+                                        UPDATE transacciones 
+                                        SET codigotransaccion = '{$new_codig}' 
+                                        WHERE idtransacciones = '{$tr['idtransacciones']}'
+                                    ");
+                                }
+                            }
+                            break; // ya encontraste el lugar, no sigas recorriendo
+                        }
+                    }
+                }
+
+                // Si no encontró un lugar intermedio, va al final
+                if ($nroTransaccion == 0) {
+                    $ultimo = $this->dbc->query("SELECT MAX(codigotransaccion) AS max_codig 
+                        FROM transacciones
+                        WHERE idgestion = '{$ev['idgestion_vinculada']}'
+                        AND organizacion_idorganizacion = '{$ev['idempresa_vinculada']}'
+                    ");
+                    $row = $this->dbc->fetch($ultimo);
+                    $nroTransaccion = $row ? $row['max_codig'] + 1 : 1;
+                }
+
+            }
+
+            $ediciontrans = $this->dbc->query("UPDATE transacciones
+                                                    SET vinculado_otra_empresa = 'principal' 
+                                                    WHERE idtransacciones = '$data[idtransaccion]';");
+
+            $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,vinculado_otra_empresa,organizacion_idorganizacion,sucursal,idgestion)
+            VALUE('$nroTransaccion','$data[fecha]','$tc[idtipodecambio]','0','$data[glosa]','$data[consolidar]','$data[estado]','$tt[idtipotransaccion]','respaldo','$ev[idempresa_vinculada]','$idsucursal','$ev[idgestion_vinculada]')");
+
+            $idtransaccion = $this->dbc->insert_id;
+
+            foreach ($data['detalle'] as $dt_trans) {
+
+                $plandecuenta = $this->dbc->query("SELECT * FROM plandecuenta WHERE numero = '$dt_trans[numero]' AND organizacion_idorganizacion ='$ev[idempresa_vinculada]'");
+                $pl = $plandecuenta->fetch_assoc();
+
+                $crearDet_trans = $this->dbc->query("INSERT INTO detalletransaccion(debe,haber,nota,transacciones_idtransacciones,idplandecuenta,idcuentapresupuestaria,estado,cobrar,pagar,idorganizacion,idsucursal,orden)
+                VALUES ('$dt_trans[debe]','$dt_trans[haber]','$dt_trans[nota]','$idtransaccion','$pl[idplandecuenta]','0','$dt_trans[estado]','$dt_trans[cobrar]','$dt_trans[pagar]','$ev[idempresa_vinculada]','$idsucursal','$dt_trans[orden]')");
+            }
+
+            // Respuesta
+            if ($writetrans === TRUE) {
+                $res = array("success", "Se Registro Correctamente", "asignar_facturas_A_cuentas",$data['detalle'],$idtransaccion,$ev['idempresa_vinculada']);
+            } else {
+                $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde",$data['detalle'],$idtransaccion,$ev['idempresa_vinculada']);
+            }
+
+        }else{
+            $res = array("danger", "La Fecha de la transaccion no corresponde a la gestion de la empresa que se duplicara");
         
-            $nroTransa = $this->dbc->query("SELECT *
-                FROM transacciones 
-                WHERE organizacion_idorganizacion = '$ev[idempresa_vinculada]'
-                AND idgestion = '$ev[idgestion_vinculada]'
-                ORDER BY codigotransaccion DESC
-                LIMIT 1
-            ");
-        }
-$resultado122 = $nroTransa->fetch_assoc();
-            $nroTransaccion = $resultado122['codigotransaccion'] + 1;
-        // if($nroTransa->num_rows > 0){
-        //     $resultado122 = $nroTransa->fetch_assoc();
-        //     $nroTransaccion = $resultado122['codigotransaccion'] + 1;
-        // }else{
-        //     $nroTransaccion = 1;
-        // }
-
-        $ediciontrans = $this->dbc->query("UPDATE transacciones
-                                                SET vinculado_otra_empresa = 'si' 
-                                                WHERE idtransacciones = '$data[idtransaccion]';");
-
-        $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
-        VALUE('$nroTransaccion','$data[fecha]','$tc[idtipodecambio]','0','$data[glosa]','$data[consolidar]','$data[estado]','$tt[idtipotransaccion]','$ev[idempresa_vinculada]','$idsucursal','$ev[idgestion_vinculada]')");
-
-        $idtransaccion = $this->dbc->insert_id;
-
-        foreach ($data['detalle'] as $dt_trans) {
-
-            $plandecuenta = $this->dbc->query("SELECT * FROM plandecuenta WHERE numero = '$dt_trans[numero]' AND organizacion_idorganizacion ='$ev[idempresa_vinculada]'");
-            $pl = $plandecuenta->fetch_assoc();
-
-            $crearDet_trans = $this->dbc->query("INSERT INTO detalletransaccion(debe,haber,nota,transacciones_idtransacciones,idplandecuenta,idcuentapresupuestaria,estado,cobrar,pagar,idorganizacion,idsucursal,orden)
-            VALUES ('$dt_trans[debe]','$dt_trans[haber]','$dt_trans[nota]','$idtransaccion','$pl[idplandecuenta]','0','$dt_trans[estado]','$dt_trans[cobrar]','$dt_trans[pagar]','$ev[idempresa_vinculada]','$idsucursal','$dt_trans[orden]')");
         }
 
-        // Respuesta
-        if ($writetrans === TRUE) {
-            $res = array("success", "Se Registro Correctamente", "asignar_facturas_A_cuentas",$data['detalle'],$idtransaccion,$ev['idempresa_vinculada']);
-        } else {
-            $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde",$data['detalle'],$idtransaccion,$ev['idempresa_vinculada']);
-        }
-    
         echo json_encode($res);
         // echo json_encode(array());
     }
-    public function activar_divisa($iddivisa){
-        $consulta = $this->dbc->query("SELECT * FROM divisa WHERE iddivisa = '$iddivisa'");
-        $resultado = $consulta->fetch_assoc();
-        $estadoDivisa = $resultado['estado'];
-        $idempresa = $resultado['idempresa'];
+    public function editar_gestion_empresa_vinculada($idvinculacion,$idgestion){
+        
+        $editar_gestion = $this->dbc->query("UPDATE vinculacion_empresas
+                                                SET idgestion_vinculada = '$idgestion'
+                                                WHERE idvinculacion_empresas = '$idvinculacion';");
 
-        if($estadoDivisa == 2){ // desactivado
-            // $edicionDivisa = $this->dbp->query("UPDATE divisas SET estado = '1' WHERE id_divisas = '$id_divisas'");
-            $edicionDivisa = $this->dbc->query("UPDATE divisa
-                                                SET estado = CASE
-                                                    WHEN iddivisa = '$iddivisa' THEN 1
-                                                    ELSE 2
-                                                END
-                                                WHERE idempresa = '$idempresa';
-        ");
-
-            $res = array("success", "la divisa se activo exitosamente","activar_divisa");
-        }        
+        if ($editar_gestion === TRUE) {
+            $res = array("success", "Se Registro Correctamente", "editar_gestion_empresa_vinculada");
+        } else {
+            $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde");
+        }
         echo json_encode($res);
     }
+    
     public function eliminar_divisa($idcaracteristica,$idempresa){
 
             if (0 > 0) {
