@@ -2737,7 +2737,7 @@ class PlantillaReporte extends DB{
 
         $limpiar($array);
     echo json_encode($array, JSON_NUMERIC_CHECK);
-        // return $array; editar registrar_agrupacion_plantilla editar_otras_operaciones calculo buscar
+        // return $array; editar registrar_agrupacion_plantilla editar_otras_operaciones calculo reporte_estado_resultados_actualizado_consolidado_por_niveles
     }
 
 }

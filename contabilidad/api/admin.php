@@ -7,46 +7,33 @@ class Admin extends DB
 
     public function creartipoasiento($nombre, $detalle, $empresa)
     {
-        // Obtener el ID de la empresa 
-        $ide = $this->getidempresa($empresa);
+        // // Obtener el ID de la empresa 
+        // $ide = $this->getidempresa($empresa);
 
-        // Preparar la respuesta por defecto
-        $res = array("ok" => "danger", "mensaje" => "Registro No es Correcto");
+        // // Preparar la consulta SQL
+        // $stmt = $this->dbc->prepare("INSERT INTO tipotransaccion (nombre, detalle, idempresa) VALUES (?, ?, ?)");
 
-        //SI EL ID DE LA EMPRESA EXISTE EN LA TABLA vinculacion_empresa EN EL CAMPO idempresa_actual
-        // SIGNIFICA QUE EL REGISTRO QUE HAGAMOS SE DUPLICARA EN LA EMPRESA VINCULADA
-        
-        // Verificar si se obtuvo un id válido de la empresa
-        if (!$ide) {
-            $res['mensaje'] = 'ID de empresa no válido';
-            echo json_encode($res);
-            return;
-        }
+       $idempresa = $this->getidempresa($empresa);
+        $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM tipotransaccion WHERE nombre = '$nombre' AND idempresa = '$idempresa'");
+        $resultado = $consulta->fetch_assoc();
+        $totalRegistros = $resultado['total'];
 
-        // Preparar la consulta SQL
-        $stmt = $this->dbc->prepare("INSERT INTO tipotransaccion (idtipotransaccion, nombre, detalle, idempresa) VALUES (NULL, ?, ?, ?)");
-
-        // Verificar si la preparación fue exitosa
-        if ($stmt) {
-            // Vincular los parámetros para evitar inyección SQL
-            $stmt->bind_param("ssi", $nombre, $detalle, $ide);
-
-            // Ejecutar la consulta
-            if ($stmt->execute()) {
-                $res = array("ok" => "success", "mensaje" => "Registro Correcto");
-            } else {
-                // Si hubo un error en la ejecución de la consulta
-                $res['mensaje'] = 'Error en la ejecución de la consulta: ' . $stmt->error;
-            }
-
-            // Cerrar la consulta preparada
-            $stmt->close();
+        if ($totalRegistros > 0) {
+            $res = array("danger", "El registro ya existe","Error");
         } else {
-            // Si hubo un error en la preparación de la consulta
-            $res['mensaje'] = 'Error en la preparación de la consulta: ' . $this->dbc->error;
-        }
 
-        // Devolver el resultado en formato JSON
+            $consulta = $this->dbc->query("SELECT * FROM vinculacion_empresas WHERE idempresa_actual = '$idempresa'");
+
+            // Insertar el nuevo registro
+            $registroProveedor = $this->dbc->query("INSERT INTO tipotransaccion(nombre,detalle,idempresa) 
+            VALUES ('$nombre','$detalle','$idempresa')");
+
+            if ($registroProveedor === TRUE) {                                                                                                                                                                
+                $res = array("success", "Registro exitoso","registroCaracteristicas");
+            } else {
+                $res = array("danger", "No se pudo registrar",$nombre);
+            }
+        }
         echo json_encode($res);
     }
 
