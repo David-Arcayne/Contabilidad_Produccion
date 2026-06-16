@@ -42,7 +42,7 @@ $adm=new Admin();
 $adm->registrotipodecambio($_POST['dolar'],$_POST['ufv'],$_POST['fecha'],$_POST['empresa']);
 }elseif($ver=="registrotipodecambiof5"){
 $adm=new Admin();
-$adm->registrotipodecambiof5($_POST['id'],$_POST['dolar'],$_POST['ufv'],$_POST['fecha']);
+$adm->registrotipodecambiof5($_POST['id'],$_POST['dolar'],$_POST['ufv'],$_POST['fecha'],$_POST['empresa']);
 }elseif($ver=="registrotransaccion"){
 $cont=new Transacciones();
 $cont->registrotransaccion($_POST['fecha'],$_POST['tipodecambio'],$_POST['tipotransaccion'],$_POST['descripcion'],$_POST['empresa'],$_POST['sucursal'],$_POST['ufv'],$_POST['dolar'],$_POST['idgestion']);
@@ -966,7 +966,7 @@ if($data['ver'] == "asignar_asiento_A_factura") {
 //   registrar_balance_general_admin registrar_vinculacion_depreciacion editar_registro_flujo_efectivo activar_desactivar_tipo_reportes creartipoasiento
 
 // asignar_comprobantes_A_comprobantes guardar_balance_general_por_gestion registrogestion ss desvincular_facturas_comercial_de_transaccion
-
+//asignar_cobros_comercial_A_cuentas
 } 
 //  registrotransaccion registrar_agrupacion_plantilla registrar_recibo_pago_cajaBancos_en_otras_cuentas asignar_facturas_comercial_A_cuentas
 // creartipoasiento registrar_configuracion_reporte registrar_factura_recibo_pago_cajaBancos registrar_recibo_pago_cajaBancos_en_facturas editar_otras_operaciones

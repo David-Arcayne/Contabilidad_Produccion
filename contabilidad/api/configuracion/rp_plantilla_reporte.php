@@ -2147,6 +2147,11 @@ class PlantillaReporte extends DB{
 
                 $valor_auxi = $this->calculables_estado_resultados_consolidado($pc['idagrupacion_rubro_plandecuenta'], $idempresa, $gestion,$pl_list['idplandecuenta'],$fecha_ini,$fecha_fin,$pl_list['idplantilla']);
 
+                if($valor_auxi == null || $valor_auxi == '0'){
+                    $valor_real = 0;
+            }else{
+                $valor_real = $valor_auxi;
+            }
                 // $suma_nivel_2 = $valor_auxi + $valor2['total'];
                 // if($valor_auxi == null || $valor_auxi == '0'){
                     //-----------------------------------
@@ -2158,7 +2163,8 @@ class PlantillaReporte extends DB{
                     "negrilla_cursiva" => $pl_list['negrilla_cursiva'],
                     "nombre_personalizado" => $nombre_cuenta,
                     "tipo_operacion" => $pl_list['tipo_operacion'],
-                    "suma_nivel_2" => $valor_auxi,
+                    "suma_nivel_2" => $valor_real,
+                    "valor_auxi_real" => $valor_auxi,
                     "nivel_2" => [] //activo
                     );  
                     // array_push($res['nivel_2'], $res2);  
@@ -2175,6 +2181,7 @@ class PlantillaReporte extends DB{
                     "nombre_personalizado" => $nombre_cuenta,
                     "tipo_operacion" => $pl_list['tipo_operacion'],
                     "suma_nivel_2" => 0,
+                    // "valor_auxi_real" => $sum_rest,
                     "nivel_2" => [] //activo
                     );  
 
@@ -2210,7 +2217,12 @@ class PlantillaReporte extends DB{
                         }
                     }
                 }
-                $res['suma_nivel_2'] = $sum_rest;
+                if($sum_rest < '0'){
+                    $res['suma_nivel_2'] = 0;
+                }else{
+                    $res['suma_nivel_2'] = $sum_rest;
+                }
+
             }
             elseif($pl_otro_reporte->num_rows > 0){ // ES UNA PLANTILLA QUE OBTIENE RESULTADO DE OTRO REPORTE
                 //  $pl_list['tipo_operacion'] == 'calculo_otro_reporte'

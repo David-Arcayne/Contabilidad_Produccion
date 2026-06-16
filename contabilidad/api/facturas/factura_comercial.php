@@ -1153,18 +1153,35 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
         $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion ='$idcuenta'");
         $dt = $this->dbc->fetch($detalle_trans);
 
-        $factu_clase = $this->dbc->query("SELECT * FROM transaccion_documentos_comercial 
-        WHERE idempresa ='$idempresa' AND cuenta ='0' AND idtransaccion IN(0,$dt[transacciones_idtransacciones])");
+        // COBROS DE COMERCIAL SIN CUENTA Y QUE ESE COBRO NO ESTE VINCULADO A NINGUNA TRANSACCION 
+        // O SISQUE ESTA VINCULADO A LA TRANSACCION DONDE QUEREMOS LISTAR, MOSTRARLOOOO
+        $cobros_comercial_sin_cuenta = $this->dbc->query("SELECT * FROM transaccion_documentos_comercial 
+        WHERE idempresa ='$idempresa' AND cuenta ='0' AND registro_desde ='cobro_venta_comercial'
+        AND idtransaccion IN(0,$dt[transacciones_idtransacciones])");
 
-        // INCLUIRA ESE COBRO EN EL LISTADO PORQUE ESE COBRO PERTENECE A LA TRANSACCION PERO NO PERTENECE A NINGUNA CUENTA
-        while ($qwe = $this->dbc->fetch($factu_clase)) {
-    
-                $cobro = $this->dbcm->query("SELECT * FROM detalle_cobro WHERE iddetalle_cobro='" . $qwe['id_documento'] . "'");
-                $asd = $this->dbcm->fetch($cobro);
-                $res = array("iddetalle_cobro" => $asd['iddetalle_cobro'], "fecha_actual" => $asd['fecha_actual'], "num_documento" => $asd['num_documento'], "monto" => $asd['monto']);
-     
-                array_push($lista, $res);
+        if($cobros_comercial_sin_cuenta->num_rows > 0){
+            // INCLUIRA ESE COBRO EN EL LISTADO PORQUE ESE COBRO PERTENECE A LA TRANSACCION PERO NO PERTENECE A NINGUNA CUENTA
+            while ($qwe = $this->dbc->fetch($cobros_comercial_sin_cuenta)) {
+        
+                    $dt_cobro = $this->dbcm->query("SELECT * FROM detalle_cobro WHERE iddetalle_cobro='" . $qwe['id_documento'] . "'");
+                    $dtc = $this->dbcm->fetch($dt_cobro);
+
+                    $estado_cobro = $this->dbcm->query("SELECT * FROM estado_cobro WHERE id_estado_cobro='" . $dtc['estado_cobro_id_estado_cobro'] . "'");
+                    $ec = $this->dbcm->fetch($estado_cobro);
+
+                    $venta = $this->dbcm->query("SELECT * FROM venta WHERE id_venta='" . $ec['venta_id_venta'] . "'");
+                    $vt = $this->dbcm->fetch($venta);
+
+                    $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente='" . $vt['cliente_id_cliente1'] . "'");
+                    $cl = $this->dbcm->fetch($cliente);
+
+                    $res = array("idDetalleCobro" => $dtc['iddetalle_cobro'], "fechaCobro" => $dtc['fecha_actual'], "num_documento" => $dtc['num_documento'], "monto" => $dtc['monto'],
+                    "nfactura" => $vt['nfactura'],"fechaVenta" => $vt['fecha_venta'],"cliente" => $cl['nombre']);
+        
+                    array_push($lista, $res);
+            }
         }
+    
 //´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´
 
     if($viv_mister_soft == "vivasoft"){
@@ -1255,7 +1272,7 @@ ORDER BY v.fecha_venta DESC, v.id_venta DESC;
 
                 }   
                 // Guardamos el idfactura_comercial en el array 
-                // $array_ids[] = $factura['idfactura_comercial'];
+                // $array_ids[] = $factura['idfactura_comercial']; 
                 
         }
 

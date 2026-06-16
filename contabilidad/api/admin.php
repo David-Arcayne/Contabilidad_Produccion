@@ -22,14 +22,36 @@ class Admin extends DB
             $res = array("danger", "El registro ya existe","Error");
         } else {
 
-            $consulta = $this->dbc->query("SELECT * FROM vinculacion_empresas WHERE idempresa_actual = '$idempresa'");
+            $existe_vinculacion_act = $this->dbc->query("SELECT * FROM vinculacion_empresas WHERE idempresa_actual = '$idempresa'");
 
-            // Insertar el nuevo registro
-            $registroProveedor = $this->dbc->query("INSERT INTO tipotransaccion(nombre,detalle,idempresa) 
-            VALUES ('$nombre','$detalle','$idempresa')");
+            $existe_vinculacion_vinc = $this->dbc->query("SELECT * FROM vinculacion_empresas WHERE idempresa_vinculada = '$idempresa'");
 
-            if ($registroProveedor === TRUE) {                                                                                                                                                                
-                $res = array("success", "Registro exitoso","registroCaracteristicas");
+            if($existe_vinculacion_act->num_rows > 0){ // EL REGISTRO SE HARA DESDE LA EMPRESA ORIGINAL
+                $ve = $existe_vinculacion_act->fetch_assoc();
+
+                $registro_empr_vinc = $this->dbc->query("INSERT INTO tipotransaccion(nombre,detalle,idempresa) 
+                VALUES ('$nombre','$detalle','$ve[idempresa_vinculada]')");
+
+                $registro_empr_act = $this->dbc->query("INSERT INTO tipotransaccion(nombre,detalle,idempresa) 
+                VALUES ('$nombre','$detalle','$idempresa')");
+
+            }elseif($existe_vinculacion_vinc->num_rows > 0){ // EL REGISTRO SE HARA DESDE LA EMPRESA VINCULADA 
+                $ve = $existe_vinculacion_vinc->fetch_assoc();
+
+                $registro_empr_act = $this->dbc->query("INSERT INTO tipotransaccion(nombre,detalle,idempresa) 
+                VALUES ('$nombre','$detalle','$ve[idempresa_actual]')");
+
+                $registro_empr_vinc = $this->dbc->query("INSERT INTO tipotransaccion(nombre,detalle,idempresa) 
+                VALUES ('$nombre','$detalle','$idempresa')");
+
+            }else{ // EL REGISTRO SE HARA SOLO EN LA EMPRESA ORIGINAL PORQUE NO TIENE VINCULACION CON NINGUNA EMPRESA
+
+                $registro_empr_act = $this->dbc->query("INSERT INTO tipotransaccion(nombre,detalle,idempresa) 
+                VALUES ('$nombre','$detalle','$idempresa')");
+            }
+
+            if ($registro_empr_act === TRUE) {                                                                                                                                                                
+                $res = array("success", "Registro exitoso","creartipoasiento");
             } else {
                 $res = array("danger", "No se pudo registrar",$nombre);
             }
@@ -87,7 +109,8 @@ class Admin extends DB
         try {
             $relacionadas = [
                 // 'detalletransaccion' => 'No se puede eliminar porque hay registros en producción',
-                ['tabla' => 'asientotipo', 'campo' => 'tipo', 'mensaje' => 'No se puede eliminar']
+                ['tabla' => 'asientotipo', 'campo' => 'tipo', 'mensaje' => 'No se puede eliminar'],
+                ['tabla' => 'transacciones ', 'campo' => 'tipotransaccion_idtipotransacion', 'mensaje' => 'No se puede eliminar']
                 // ['tabla' => 'asiento', 'campo' => 'idcuenta', 'mensaje' => 'No se puede eliminar'],
                 // ['tabla' => 'vinculacion_cuenta_xcxp ', 'campo' => 'idplandecuenta', 'mensaje' => 'No se puede eliminar'],
                 // ['tabla' => 'relacionip', 'campo' => 'idplandecuenta', 'mensaje' => 'No se puede eliminar']
@@ -527,24 +550,92 @@ class Admin extends DB
     {
         $res = "";
         $ide = $this->getidempresa($empresa);
-        $registro = $this->dbc->query("insert into tipodecambio(idtipodecambio,dolar,ufv,fecha,idorganizacion)values(NULL,'$dolar','$ufv','$fecha','$ide')");
-        if ($registro === TRUE) {
+        // $registro = $this->dbc->query("INSERT INTO tipodecambio(idtipodecambio,dolar,ufv,fecha,idorganizacion)VALUES(NULL,'$dolar','$ufv','$fecha','$ide')");
+
+        $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM tipodecambio WHERE fecha = '$fecha' AND idorganizacion = '$ide'");
+        $resultado = $consulta->fetch_assoc();
+        $totalRegistros = $resultado['total'];
+
+        if ($totalRegistros > 0) {
+            $res = array("danger", "El registro ya existe","Error");
+        } else {
+
+        $existe_vinculacion_act = $this->dbc->query("SELECT * FROM vinculacion_empresas WHERE idempresa_actual = '$ide'");
+
+        $existe_vinculacion_vinc = $this->dbc->query("SELECT * FROM vinculacion_empresas WHERE idempresa_vinculada = '$ide'");
+
+        if($existe_vinculacion_act->num_rows > 0){ // EL REGISTRO SE HARA DESDE LA EMPRESA ORIGINAL
+            $ve = $existe_vinculacion_act->fetch_assoc();
+
+            $registro_empr_vinc = $this->dbc->query("INSERT INTO tipodecambio(dolar,ufv,fecha,idorganizacion)VALUES('$dolar','$ufv','$fecha','$ve[idempresa_vinculada]')");
+
+            $registro_empr_act = $this->dbc->query("INSERT INTO tipodecambio(dolar,ufv,fecha,idorganizacion)VALUES('$dolar','$ufv','$fecha','$ide')");
+
+        }elseif($existe_vinculacion_vinc->num_rows > 0){ // EL REGISTRO SE HARA DESDE LA EMPRESA VINCULADA 
+            $ve = $existe_vinculacion_vinc->fetch_assoc();
+
+            $registro_empr_act = $this->dbc->query("INSERT INTO tipodecambio(dolar,ufv,fecha,idorganizacion)VALUES('$dolar','$ufv','$fecha','$ve[idempresa_actual]')");
+
+            $registro_empr_vinc = $this->dbc->query("INSERT INTO tipodecambio(dolar,ufv,fecha,idorganizacion)VALUES('$dolar','$ufv','$fecha','$ide')");
+
+        }else{ // EL REGISTRO SE HARA SOLO EN LA EMPRESA ORIGINAL PORQUE NO TIENE VINCULACION CON NINGUNA EMPRESA
+
+            $registro_empr_act = $this->dbc->query("INSERT INTO tipodecambio(dolar,ufv,fecha,idorganizacion)VALUES('$dolar','$ufv','$fecha','$ide')");
+        }
+
+        if ($registro_empr_act === TRUE) {
             $res = array("success", "Se registro Correctamente", "registrotipocambio");
         } else {
             $res = array("danger", "No se pudo realizar el registro");
         }
+
+        }
         echo json_encode($res);
     }
 
-    public function registrotipodecambiof5($id, $dolar, $ufv, $fecha)
+    public function registrotipodecambiof5($id, $dolar, $ufv, $fecha,$empresa)
     {
+        $ide = $this->getidempresa($empresa);
         $res = "";
-        $registro = $this->dbc->query("update tipodecambio set dolar='$dolar',ufv='$ufv',fecha='$fecha' where idtipodecambio='$id'");
-        if ($registro === TRUE) {
-            $res = array("success", "Se registro Correctamente", "registrotipocambiof5");
-        } else {
-            $res = array("danger", "No se pudo realizar el registro");
+
+        $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM tipodecambio WHERE fecha = '$fecha' AND idorganizacion = '$ide' AND idtipodecambio != '$id'");
+        $resultado = $consulta->fetch_assoc();
+        $totalRegistros = $resultado['total'];
+
+        if ($totalRegistros > 0) {
+            $res = array("danger", "El registro ya existe","editarCaracteristicas");
+        }else {
+            $fecha_tc = $this->dbc->query("SELECT * FROM tipodecambio WHERE idtipodecambio = '$id'");
+            $ftc = $fecha_tc->fetch_assoc();
+
+            $existe_vinculacion_act = $this->dbc->query("SELECT * FROM vinculacion_empresas WHERE idempresa_actual = '$ide'");
+
+            $existe_vinculacion_vinc = $this->dbc->query("SELECT * FROM vinculacion_empresas WHERE idempresa_vinculada = '$ide'");
+
+            if($existe_vinculacion_act->num_rows > 0){ // EL REGISTRO SE HARA DESDE LA EMPRESA ORIGINAL
+                $ve = $existe_vinculacion_act->fetch_assoc();
+
+                $edit_tc_otra_empre = $this->dbc->query("UPDATE tipodecambio SET dolar='$dolar',ufv='$ufv',fecha='$fecha' WHERE fecha='$ftc[fecha]' AND idorganizacion ='$ve[idempresa_vinculada]'");
+                $edit_tc = $this->dbc->query("UPDATE tipodecambio SET dolar='$dolar',ufv='$ufv',fecha='$fecha' WHERE idtipodecambio='$id'");
+
+            }elseif($existe_vinculacion_vinc->num_rows > 0){ // EL REGISTRO SE HARA DESDE LA EMPRESA VINCULADA 
+                $ve = $existe_vinculacion_vinc->fetch_assoc();
+
+                $edit_tc_otra_empre = $this->dbc->query("UPDATE tipodecambio SET dolar='$dolar',ufv='$ufv',fecha='$fecha' WHERE fecha='$ftc[fecha]' AND idorganizacion ='$ve[idempresa_actual]'");
+                $edit_tc = $this->dbc->query("UPDATE tipodecambio SET dolar='$dolar',ufv='$ufv',fecha='$fecha' WHERE idtipodecambio='$id'");
+
+            }else{ // EL REGISTRO SE HARA SOLO EN LA EMPRESA ORIGINAL PORQUE NO TIENE VINCULACION CON NINGUNA EMPRESA
+
+                $edit_tc = $this->dbc->query("UPDATE tipodecambio SET dolar='$dolar',ufv='$ufv',fecha='$fecha' WHERE idtipodecambio='$id'");
+            }
+
+            if ($edit_tc === TRUE) {
+                $res = array("success", "Se registro Correctamente", "registrotipocambiof5");
+            } else {
+                $res = array("danger", "No se pudo realizar el registro");
+            }
         }
+    
         echo json_encode($res);
     }
 
@@ -564,7 +655,7 @@ class Admin extends DB
     {
         $ide = $this->getidempresa($empresa);
         $res = "";
-        $registro = $this->dbc->query("delete from tipodecambio where idorganizacion='$ide' and idtipodecambio='$id'");
+        $registro = $this->dbc->query("DELETE FROM tipodecambio WHERE idorganizacion='$ide' AND idtipodecambio='$id'");
         if ($registro == TRUE) {
             $res = array("ok" => "success");
         } else {

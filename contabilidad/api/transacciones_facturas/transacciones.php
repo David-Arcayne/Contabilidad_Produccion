@@ -1790,19 +1790,19 @@ public function asignar_facturas_A_cuentas($data) {
 
             }
                         
-        $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$data[cuenta]'");
-        $dt = $detalle_trans->fetch_assoc();
+        // $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$data[cuenta]'");
+        // $dt = $detalle_trans->fetch_assoc();
 
-            if($dt['debe'] > 0){
-                $nuevo_monto_dt = $dt['debe'] - $monto_documento;
-                $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
-            }else{
-                $nuevo_monto_dt = $dt['haber'] - $monto_documento;
-                $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
-            }
+        //     if($dt['debe'] > 0){
+        //         $nuevo_monto_dt = $dt['debe'] - $monto_documento;
+        //         $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
+        //     }else{
+        //         $nuevo_monto_dt = $dt['haber'] - $monto_documento;
+        //         $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
+        //     }
    
         // Respuesta
-        if ($editar_dt === TRUE) {
+        if ($updatetranscodigo === TRUE) {
             $res = array("success", "Se desvinculo Correctamente", "cobrofacturasaasientomodelo",$data['documentos']);
         } else {
             $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde");
