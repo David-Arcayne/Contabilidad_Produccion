@@ -167,7 +167,7 @@ $adm->importardato($_POST['empresa'],$_POST['template']);
     $adm->creartipoasiento($_POST['nombre'],$_POST['detalle'],$_POST['empresa']);
 }elseif($ver=="creartipoasientof5"){
     $adm=new Admin();
-    $adm->creartipoasientof5($_POST['id'],$_POST['nombre'],$_POST['detalle']);
+    $adm->creartipoasientof5($_POST['id'],$_POST['nombre'],$_POST['detalle'],$_POST['empresa']);
 }elseif($ver=="impuestocrear"){
 $adm=new Admin();
 $adm->impuestocrear($_POST['idempresa'],$_POST['codigo'],$_POST['nombre'],$_POST['tasa'],$_POST['descripcion'],$_POST['vencimiento'],$_POST['periodicidad']);

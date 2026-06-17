@@ -59,58 +59,62 @@ class Admin extends DB
         echo json_encode($res);
     }
 
-    public function creartipoasientof5($id, $nombre, $detalle)
+    public function creartipoasientof5($id, $nombre, $detalle,$empresa)
     {
-        // Validación básica de entrada
-        if (empty($id) || empty($nombre) || empty($detalle)) {
-            $res = array("ok" => "danger", "mensaje" => "Faltan datos necesarios para actualizar el registro");
-            echo json_encode($res);
-            return;
-        }
 
-        // Preparar la respuesta por defecto
-        $res = array("ok" => "danger", "mensaje" => "Registro no Correcto");
+        $ide = $this->getidempresa($empresa);
 
-        // Preparar la consulta SQL con una consulta preparada
-        $stmt = $this->dbc->prepare("UPDATE tipotransaccion SET nombre=?, detalle=? WHERE idtipotransaccion=?");
+        $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM tipotransaccion WHERE nombre = '$nombre' AND idempresa = '$ide' AND idtipotransaccion != '$id'");
+        $resultado = $consulta->fetch_assoc();
+        $totalRegistros = $resultado['total'];
 
-        if ($stmt) {
-            // Vincular los parámetros para evitar inyección SQL
-            $stmt->bind_param("ssi", $nombre, $detalle, $id);
+        if ($totalRegistros > 0) {
+            $res = array("danger", "El registro ya existe","editarCaracteristicas");
+        }else {
+            $nombre_tt = $this->dbc->query("SELECT * FROM tipotransaccion WHERE idtipotransaccion = '$id'");
+            $ntt = $nombre_tt->fetch_assoc();
 
-            // Ejecutar la consulta
-            if ($stmt->execute()) {
-                // Verificar si la actualización fue exitosa
-                if ($stmt->affected_rows > 0) {
-                    $res = array("ok" => "success", "mensaje" => "Registro Correcto");
-                } else {
-                    $res['mensaje'] = 'No se realizaron cambios en el registro';
-                }
-            } else {
-                // Si hubo un error en la ejecución de la consulta
-                $res['mensaje'] = 'Error en la ejecución de la consulta: ' . $stmt->error;
+            $existe_vinculacion_act = $this->dbc->query("SELECT * FROM vinculacion_empresas WHERE idempresa_actual = '$ide'");
+
+            $existe_vinculacion_vinc = $this->dbc->query("SELECT * FROM vinculacion_empresas WHERE idempresa_vinculada = '$ide'");
+
+            if($existe_vinculacion_act->num_rows > 0){ // EL REGISTRO SE HARA DESDE LA EMPRESA ORIGINAL
+                $ve = $existe_vinculacion_act->fetch_assoc();
+
+                $edit_tc_otra_empre = $this->dbc->query("UPDATE tipotransaccion SET nombre='$nombre',detalle='$detalle' WHERE nombre='$ntt[nombre]' AND idempresa ='$ve[idempresa_vinculada]'");
+                $edit_tc = $this->dbc->query("UPDATE tipotransaccion SET nombre='$nombre',detalle='$detalle' WHERE idtipotransaccion='$id'");
+
+            }elseif($existe_vinculacion_vinc->num_rows > 0){ // EL REGISTRO SE HARA DESDE LA EMPRESA VINCULADA 
+                $ve = $existe_vinculacion_vinc->fetch_assoc();
+
+                $edit_tc_otra_empre = $this->dbc->query("UPDATE tipotransaccion SET nombre='$nombre',detalle='$detalle' WHERE nombre='$ntt[nombre]' AND idempresa ='$ve[idempresa_actual]'");
+                $edit_tc = $this->dbc->query("UPDATE tipotransaccion SET nombre='$nombre',detalle='$detalle' WHERE idtipotransaccion='$id'");
+
+            }else{ // EL REGISTRO SE HARA SOLO EN LA EMPRESA ORIGINAL PORQUE NO TIENE VINCULACION CON NINGUNA EMPRESA
+
+                $edit_tc = $this->dbc->query("UPDATE tipotransaccion SET nombre='$nombre',detalle='$detalle' WHERE idtipotransaccion='$id'");
             }
 
-            // Cerrar la consulta preparada
-            $stmt->close();
-        } else {
-            // Si hubo un error al preparar la consulta
-            $res['mensaje'] = 'Error en la preparación de la consulta: ' . $this->dbc->error;
+            if ($edit_tc === TRUE) {
+                $res = array("success", "Se registro Correctamente", "registrotipocambiof5");
+            } else {
+                $res = array("danger", "No se pudo realizar el registro");
+            }
         }
-
-        // Devolver el resultado en formato JSON
         echo json_encode($res);
+        
     }
 
-    public function creartipoasientodelete($id)
+    public function creartipoasientodelete($id,$empresa)
     {
+        $ide = $this->getidempresa($empresa);
         $this->dbc->begin_transaction();
     
         try {
             $relacionadas = [
                 // 'detalletransaccion' => 'No se puede eliminar porque hay registros en producción',
-                ['tabla' => 'asientotipo', 'campo' => 'tipo', 'mensaje' => 'No se puede eliminar'],
-                ['tabla' => 'transacciones ', 'campo' => 'tipotransaccion_idtipotransacion', 'mensaje' => 'No se puede eliminar']
+                ['tabla' => 'asientotipo', 'campo' => 'tipo', 'mensaje' => 'No se puede eliminar, se esta usando en asientotipo'],
+                ['tabla' => 'transacciones', 'campo' => 'tipotransaccion_idtipotransaccion', 'mensaje' => 'No se puede eliminar,se esta usando en transacciones']
                 // ['tabla' => 'asiento', 'campo' => 'idcuenta', 'mensaje' => 'No se puede eliminar'],
                 // ['tabla' => 'vinculacion_cuenta_xcxp ', 'campo' => 'idplandecuenta', 'mensaje' => 'No se puede eliminar'],
                 // ['tabla' => 'relacionip', 'campo' => 'idplandecuenta', 'mensaje' => 'No se puede eliminar']
@@ -123,9 +127,38 @@ class Admin extends DB
                     throw new Exception($relacion['mensaje']);
                 }
             }
-    // $registro = $this->dbc->query("DELETE FROM plandecuenta WHERE idplandecuenta='$dato'");
-            $query = "DELETE FROM tipotransaccion WHERE idtipotransaccion = $id";
-            $this->dbc->query($query);
+    
+            $nombre_tt = $this->dbc->query("SELECT * FROM tipotransaccion WHERE idtipotransaccion = '$id'");
+            $ntt = $nombre_tt->fetch_assoc();
+
+            $existe_vinculacion_act = $this->dbc->query("SELECT * FROM vinculacion_empresas WHERE idempresa_actual = '$ide'");
+
+            $existe_vinculacion_vinc = $this->dbc->query("SELECT * FROM vinculacion_empresas WHERE idempresa_vinculada = '$ide'");
+
+            if($existe_vinculacion_act->num_rows > 0){ // EL REGISTRO SE HARA DESDE LA EMPRESA ORIGINAL
+                $ve = $existe_vinculacion_act->fetch_assoc();
+
+                $query_1 = "DELETE FROM tipotransaccion WHERE nombre='$ntt[nombre]' AND idempresa ='$ve[idempresa_vinculada]'";
+                $this->dbc->query($query_1);
+
+                $query_2 = "DELETE FROM tipotransaccion WHERE idtipotransaccion = $id";
+                $this->dbc->query($query_2);
+
+            }elseif($existe_vinculacion_vinc->num_rows > 0){ // EL REGISTRO SE HARA DESDE LA EMPRESA VINCULADA 
+                $ve = $existe_vinculacion_vinc->fetch_assoc();
+
+                $query_1 = "DELETE FROM tipotransaccion WHERE nombre='$ntt[nombre]' AND idempresa ='$ve[idempresa_actual]'";
+                $this->dbc->query($query_1);
+
+                $query_2 = "DELETE FROM tipotransaccion WHERE idtipotransaccion = $id";
+                $this->dbc->query($query_2);
+
+            }else{ // EL REGISTRO SE HARA SOLO EN LA EMPRESA ORIGINAL PORQUE NO TIENE VINCULACION CON NINGUNA EMPRESA
+
+                $query = "DELETE FROM tipotransaccion WHERE idtipotransaccion = $id";
+                $this->dbc->query($query);
+            }
+            
             
             $this->dbc->commit();
             $res = array("success", "Se eliminó correctamente", "creartipoasientodelete");
@@ -653,14 +686,79 @@ class Admin extends DB
 
     public function eliminartipocambio($id, $empresa)
     {
+        // $ide = $this->getidempresa($empresa);
+        // $res = "";
+        // $registro = $this->dbc->query("DELETE FROM tipodecambio WHERE idorganizacion='$ide' AND idtipodecambio='$id'");
+        // if ($registro == TRUE) {
+        //     $res = array("ok" => "success");
+        // } else {
+        //     $res = array("ok" => "danger");
+        // }
+        // echo json_encode($res);
+
         $ide = $this->getidempresa($empresa);
-        $res = "";
-        $registro = $this->dbc->query("DELETE FROM tipodecambio WHERE idorganizacion='$ide' AND idtipodecambio='$id'");
-        if ($registro == TRUE) {
-            $res = array("ok" => "success");
-        } else {
-            $res = array("ok" => "danger");
+        $this->dbc->begin_transaction();
+    
+        try {
+            $relacionadas = [
+                // 'detalletransaccion' => 'No se puede eliminar porque hay registros en producción',
+                // ['tabla' => 'asientotipo', 'campo' => 'tipo', 'mensaje' => 'No se puede eliminar'],
+                ['tabla' => 'transacciones', 'campo' => 'tipodecambio', 'mensaje' => 'No se puede eliminar']
+                // ['tabla' => 'asiento', 'campo' => 'idcuenta', 'mensaje' => 'No se puede eliminar'],
+                // ['tabla' => 'vinculacion_cuenta_xcxp ', 'campo' => 'idplandecuenta', 'mensaje' => 'No se puede eliminar'],
+                // ['tabla' => 'relacionip', 'campo' => 'idplandecuenta', 'mensaje' => 'No se puede eliminar']
+            ];
+    
+            foreach ($relacionadas as $relacion) {
+                $query = "SELECT 1 FROM {$relacion['tabla']} WHERE {$relacion['campo']} = $id";
+                $result = $this->dbc->query($query);
+                if ($result->num_rows > 0) {
+                    throw new Exception($relacion['mensaje']);
+                }
+            }
+    
+            $fecha_tc = $this->dbc->query("SELECT * FROM tipodecambio WHERE idtipodecambio = '$id'");
+            $ftc = $fecha_tc->fetch_assoc();
+
+            $existe_vinculacion_act = $this->dbc->query("SELECT * FROM vinculacion_empresas WHERE idempresa_actual = '$ide'");
+
+            $existe_vinculacion_vinc = $this->dbc->query("SELECT * FROM vinculacion_empresas WHERE idempresa_vinculada = '$ide'");
+
+            if($existe_vinculacion_act->num_rows > 0){ // EL REGISTRO SE HARA DESDE LA EMPRESA ORIGINAL
+                $ve = $existe_vinculacion_act->fetch_assoc();
+        // $registro = $this->dbc->query("DELETE FROM tipodecambio WHERE idorganizacion='$ide' AND idtipodecambio='$id'");
+
+                $query_1 = "DELETE FROM tipodecambio WHERE fecha='$ftc[fecha]' AND idorganizacion ='$ve[idempresa_vinculada]'";
+                $this->dbc->query($query_1);
+
+                $query_2 = "DELETE FROM tipodecambio WHERE idtipodecambio = $id";
+                $this->dbc->query($query_2);
+
+            }elseif($existe_vinculacion_vinc->num_rows > 0){ // EL REGISTRO SE HARA DESDE LA EMPRESA VINCULADA 
+                $ve = $existe_vinculacion_vinc->fetch_assoc();
+
+                $query_1 = "DELETE FROM tipodecambio WHERE fecha='$ftc[fecha]' AND idorganizacion ='$ve[idempresa_actual]'";
+                $this->dbc->query($query_1);
+
+                $query_2 = "DELETE FROM tipodecambio WHERE idtipodecambio = $id";
+                $this->dbc->query($query_2);
+
+            }else{ // EL REGISTRO SE HARA SOLO EN LA EMPRESA ORIGINAL PORQUE NO TIENE VINCULACION CON NINGUNA EMPRESA
+
+                $query = "DELETE FROM tipodecambio WHERE idtipodecambio = $id";
+                $this->dbc->query($query);
+            }
+            
+            
+            $this->dbc->commit();
+            $res = array("success", "Se eliminó correctamente", "eliminartipodecambio");
+    
+        } catch (Exception $e) {
+            $this->dbc->rollback();
+            $res = array("danger", $e->getMessage(), "eliminartipodecambio");
         }
+
+        // Devolver el resultado en formato JSON
         echo json_encode($res);
     }
 

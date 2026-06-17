@@ -248,7 +248,7 @@ $adm=new Admin();
 $adm->creartipoasientolista($ver[1]);
 }elseif($ver[0]=="creartipoasientodelete"){
 $adm=new Admin();
-$adm->creartipoasientodelete($ver[1]);
+$adm->creartipoasientodelete($ver[1],$ver[2]);
 }elseif($ver[0]=="impuestolista"){
 $adm=new Admin();
 $adm->impuestolista($ver[1]);
@@ -832,7 +832,7 @@ elseif($ver[0]=="listar_cobros_comercial_sin_cuenta"){
 //     $cont->obtenerGestionAnterior($ver[1],$ver[2]); eliminar_gestion_contable   
 // }
 
-// reporte_estado_resultados_actualizado_consolidado_por_niveles  rp listadegestion listar_select_cuentas_balance_general reporte_calculo_otro_reporte_consolidado
+// creartipoasientodelete  rp listadegestion listar_select_cuentas_balance_general reporte_calculo_otro_reporte_consolidado
 // reporte_estado_resultados_actualizado_consolidado_por_niveles listar_facturas_cobro_pago listar_recibo_por_caja_bancos listar_facturas_comercial_cobro
 // lista_pagar_pagado_factura listar_reportes_referencia_select eliminar_otras_operaciones listadegestion listar_factura_comercial_con_transaccion
 
