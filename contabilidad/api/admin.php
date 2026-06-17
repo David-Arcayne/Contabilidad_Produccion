@@ -138,34 +138,78 @@ class Admin extends DB
             if($existe_vinculacion_act->num_rows > 0){ // EL REGISTRO SE HARA DESDE LA EMPRESA ORIGINAL
                 $ve = $existe_vinculacion_act->fetch_assoc();
 
-                $query_1 = "DELETE FROM tipotransaccion WHERE nombre='$ntt[nombre]' AND idempresa ='$ve[idempresa_vinculada]'";
-                $this->dbc->query($query_1);
+                $tt_auxiliar = $this->dbc->query("SELECT * FROM tipotransaccion WHERE nombre='$ntt[nombre]' AND idempresa ='$ve[idempresa_vinculada]'");
+                $tt_aux = $tt_auxiliar->fetch_assoc();
 
-                $query_2 = "DELETE FROM tipotransaccion WHERE idtipotransaccion = $id";
-                $this->dbc->query($query_2);
+                $existe_en_trans = $this->dbc->query("SELECT * FROM transacciones WHERE tipotransaccion_idtipotransaccion='$tt_aux[idtipotransaccion]'");
+
+                if($existe_en_trans->num_rows > 0){
+                    
+                    $se_pudo_eliminar =FALSE;
+                    
+                }else{
+                    $query_1 = "DELETE FROM tipotransaccion WHERE nombre='$ntt[nombre]' AND idempresa ='$ve[idempresa_vinculada]'";
+                    $this->dbc->query($query_1);
+
+                    $query_2 = "DELETE FROM tipotransaccion WHERE idtipotransaccion = $id";
+                    $this->dbc->query($query_2);
+
+                    $se_pudo_eliminar =TRUE;
+                }
 
             }elseif($existe_vinculacion_vinc->num_rows > 0){ // EL REGISTRO SE HARA DESDE LA EMPRESA VINCULADA 
                 $ve = $existe_vinculacion_vinc->fetch_assoc();
 
-                $query_1 = "DELETE FROM tipotransaccion WHERE nombre='$ntt[nombre]' AND idempresa ='$ve[idempresa_actual]'";
-                $this->dbc->query($query_1);
+                $tt_auxiliar = $this->dbc->query("SELECT * FROM tipotransaccion WHERE nombre='$ntt[nombre]' AND idempresa ='$ve[idempresa_actual]'");
+                $tt_aux = $tt_auxiliar->fetch_assoc();
 
-                $query_2 = "DELETE FROM tipotransaccion WHERE idtipotransaccion = $id";
-                $this->dbc->query($query_2);
+                $existe_en_trans = $this->dbc->query("SELECT * FROM transacciones WHERE tipotransaccion_idtipotransaccion='$tt_aux[idtipotransaccion]'");
+
+                if($existe_en_trans->num_rows > 0){
+                    
+                    $se_pudo_eliminar =FALSE;
+                    
+                }else{
+                    $query_1 = "DELETE FROM tipotransaccion WHERE nombre='$ntt[nombre]' AND idempresa ='$ve[idempresa_actual]'";
+                    $this->dbc->query($query_1);
+
+                    $query_2 = "DELETE FROM tipotransaccion WHERE idtipotransaccion = $id";
+                    $this->dbc->query($query_2);
+
+                    $se_pudo_eliminar =TRUE;
+                }
 
             }else{ // EL REGISTRO SE HARA SOLO EN LA EMPRESA ORIGINAL PORQUE NO TIENE VINCULACION CON NINGUNA EMPRESA
 
                 $query = "DELETE FROM tipotransaccion WHERE idtipotransaccion = $id";
                 $this->dbc->query($query);
+
+                $se_pudo_eliminar =TRUE;
             }
             
             
             $this->dbc->commit();
-            $res = array("success", "Se eliminó correctamente", "creartipoasientodelete");
+            if($se_pudo_eliminar ===TRUE){
+                $res = array(
+                        "success" => true,
+                        "message" => "Se eliminó correctamente",
+                        "message_code"   => "eliminacion_exitosa"
+                    );
+            }else{
+                $res = array(
+                        "success" => false,
+                        "message" => "No se puede eliminar debido a que ya se esta usando ese registro",
+                        "message_code"   => "registro_en_uso"
+                    );
+            }
     
         } catch (Exception $e) {
             $this->dbc->rollback();
-            $res = array("danger", $e->getMessage(), "creartipoasientodelete");
+            $res = array(
+                        "success" => false,
+                        "message" => $e->getMessage(),
+                        "message_code"   => "registro_en_uso"
+                    );
         }
 
         // Devolver el resultado en formato JSON
@@ -336,16 +380,66 @@ class Admin extends DB
         $totalCons = $resultado12['total'];
 
         if($totalCons > 0){
-            $res = array("danger", "El numero de codigo ya existe");
+            $res = array(
+                        "success" => false,
+                        "message" => "El numero de codigo ya existe",
+                        "message_code" => "numero_ya_existe"
+                    );
         }elseif(empty($idp)){
-            // $res = array("success", "Se registro Correctamente", "registroplanes"); registroplanesf5
-          $registro = $this->dbc->query("INSERT INTO plandecuenta(idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,idp,idagrupacion_rubro_plandecuenta,organizacion_idorganizacion)
-            VALUES (NULL,'$numero','$plan','$descripcion','$tipo','2','$idp','$rubro','$ide')");
-            if ($registro === TRUE) {
-                $res = array("success", "Se registro Correctamente", "registroplanes");
-            } else {
-                $res = array("danger", "No s epudo registrar");
+
+            $existe_vinculacion_act = $this->dbc->query("SELECT * FROM vinculacion_empresas WHERE idempresa_actual = '$ide'");
+
+            $existe_vinculacion_vinc = $this->dbc->query("SELECT * FROM vinculacion_empresas WHERE idempresa_vinculada = '$ide'");
+
+            if($existe_vinculacion_act->num_rows > 0){ // EL REGISTRO SE HARA DESDE LA EMPRESA ORIGINAL
+                $ve = $existe_vinculacion_act->fetch_assoc();
+
+                $agru_plan = $this->dbc->query("SELECT * FROM agrupacion_rubro_plandecuenta WHERE idagrupacion_rubro_plandecuenta = '$rubro'");
+                $ap = $agru_plan->fetch_assoc();
+
+                $agru_plan_decuenta = $this->dbc->query("SELECT * FROM agrupacion_rubro_plandecuenta WHERE tipo_plandecuenta = '$ap[tipo_plandecuenta]' AND idempresa ='$ve[idempresa_vinculada]'");
+                $apdc = $agru_plan_decuenta->fetch_assoc();
+
+                $registro_vinc = $this->dbc->query("INSERT INTO plandecuenta(idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,idp,idagrupacion_rubro_plandecuenta,organizacion_idorganizacion)
+                VALUES (NULL,'$numero','$plan','$descripcion','$tipo','2','$idp','$apdc[idagrupacion_rubro_plandecuenta]','$ve[idempresa_vinculada]')");
+
+                $registro = $this->dbc->query("INSERT INTO plandecuenta(idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,idp,idagrupacion_rubro_plandecuenta,organizacion_idorganizacion)
+                VALUES (NULL,'$numero','$plan','$descripcion','$tipo','2','$idp','$rubro','$ide')");
+
+            }elseif($existe_vinculacion_vinc->num_rows > 0){ // EL REGISTRO SE HARA DESDE LA EMPRESA VINCULADA 
+                $ve = $existe_vinculacion_vinc->fetch_assoc();
+
+                $agru_plan = $this->dbc->query("SELECT * FROM agrupacion_rubro_plandecuenta WHERE idagrupacion_rubro_plandecuenta = '$rubro'");
+                $ap = $agru_plan->fetch_assoc();
+
+                $agru_plan_decuenta = $this->dbc->query("SELECT * FROM agrupacion_rubro_plandecuenta WHERE tipo_plandecuenta = '$ap[tipo_plandecuenta]' AND idempresa ='$ve[idempresa_actual]'");
+                $apdc = $agru_plan_decuenta->fetch_assoc();
+
+                $registro_vinc = $this->dbc->query("INSERT INTO plandecuenta(idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,idp,idagrupacion_rubro_plandecuenta,organizacion_idorganizacion)
+                VALUES (NULL,'$numero','$plan','$descripcion','$tipo','2','$idp','$apdc[idagrupacion_rubro_plandecuenta]','$ve[idempresa_actual]')");
+
+                $registro = $this->dbc->query("INSERT INTO plandecuenta(idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,idp,idagrupacion_rubro_plandecuenta,organizacion_idorganizacion)
+                VALUES (NULL,'$numero','$plan','$descripcion','$tipo','2','$idp','$rubro','$ide')");
+
+            }else{ // EL REGISTRO SE HARA SOLO EN LA EMPRESA ORIGINAL PORQUE NO TIENE VINCULACION CON NINGUNA EMPRESA
+
+                $registro = $this->dbc->query("INSERT INTO plandecuenta(idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,idp,idagrupacion_rubro_plandecuenta,organizacion_idorganizacion)
+                VALUES (NULL,'$numero','$plan','$descripcion','$tipo','2','$idp','$rubro','$ide')");
             }
+
+                if ($registro === TRUE) {
+                    $res = array(
+                        "success" => true,
+                        "message" => "registro exitoso",
+                        "message_code" => "registro_exitoso"
+                    );
+                } else {
+                    $res = array(
+                        "success" => false,
+                        "message" => "ocurrio un error al registrar",
+                        "message_code" => "error"
+                    );
+                }
         }else{
             $idp2 = $this->dbc->query("SELECT numero FROM plandecuenta WHERE idplandecuenta='$idp'");
             $resultado122 = $idp2->fetch_assoc();
@@ -354,25 +448,95 @@ class Admin extends DB
             $codigo_padre = explode(".", $numeroPadre);
             $codigo = explode(".", $numero);
             if($codigo_padre[0] == $codigo[0]){
-                // $res = array("success", "Se registro Correctamente", "registroplanes");
       
-                $registro = $this->dbc->query("INSERT INTO plandecuenta(idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,idp,idagrupacion_rubro_plandecuenta,organizacion_idorganizacion)
-                VALUES (NULL,'$numero','$plan','$descripcion','$tipo','2','$idp','$rubro','$ide')");
+                // $registro = $this->dbc->query("INSERT INTO plandecuenta(idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,idp,idagrupacion_rubro_plandecuenta,organizacion_idorganizacion)
+                // VALUES (NULL,'$numero','$plan','$descripcion','$tipo','2','$idp','$rubro','$ide')");
+                // if ($registro === TRUE) {
+                //     $res = array("success", "Se registro Correctamente", "registroplanes");
+                // } else {
+                //     $res = array("danger", "No s epudo registrar");
+                // }
+
+                $existe_vinculacion_act = $this->dbc->query("SELECT * FROM vinculacion_empresas WHERE idempresa_actual = '$ide'");
+
+                $existe_vinculacion_vinc = $this->dbc->query("SELECT * FROM vinculacion_empresas WHERE idempresa_vinculada = '$ide'");
+
+                if($existe_vinculacion_act->num_rows > 0){ // EL REGISTRO SE HARA DESDE LA EMPRESA ORIGINAL
+                    $ve = $existe_vinculacion_act->fetch_assoc();
+
+                    $agru_plan = $this->dbc->query("SELECT * FROM agrupacion_rubro_plandecuenta WHERE idagrupacion_rubro_plandecuenta = '$rubro'");
+                    $ap = $agru_plan->fetch_assoc();
+
+                    $agru_plan_decuenta = $this->dbc->query("SELECT * FROM agrupacion_rubro_plandecuenta WHERE tipo_plandecuenta = '$ap[tipo_plandecuenta]' AND idempresa ='$ve[idempresa_vinculada]'");
+                    $apdc = $agru_plan_decuenta->fetch_assoc();
+
+                    $plan_decuenta_padre = $this->dbc->query("SELECT * FROM plandecuenta WHERE idplandecuenta = '$idp'");
+                    $pdp = $plan_decuenta_padre->fetch_assoc();
+
+                    $pdc_auxi = $this->dbc->query("SELECT * FROM plandecuenta WHERE numero = '$pdp[numero]' AND organizacion_idorganizacion ='$ve[idempresa_vinculada]'");
+                    $pdc_ax = $pdc_auxi->fetch_assoc();
+
+                    $registro_vinc = $this->dbc->query("INSERT INTO plandecuenta(idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,idp,idagrupacion_rubro_plandecuenta,organizacion_idorganizacion)
+                    VALUES (NULL,'$numero','$plan','$descripcion','$tipo','2','$pdc_ax[idplandecuenta]','$apdc[idagrupacion_rubro_plandecuenta]','$ve[idempresa_vinculada]')");
+
+                    $registro = $this->dbc->query("INSERT INTO plandecuenta(idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,idp,idagrupacion_rubro_plandecuenta,organizacion_idorganizacion)
+                    VALUES (NULL,'$numero','$plan','$descripcion','$tipo','2','$idp','$rubro','$ide')");
+
+                }elseif($existe_vinculacion_vinc->num_rows > 0){ // EL REGISTRO SE HARA DESDE LA EMPRESA VINCULADA 
+                    $ve = $existe_vinculacion_vinc->fetch_assoc();
+
+                    $agru_plan = $this->dbc->query("SELECT * FROM agrupacion_rubro_plandecuenta WHERE idagrupacion_rubro_plandecuenta = '$rubro'");
+                    $ap = $agru_plan->fetch_assoc();
+
+                    $agru_plan_decuenta = $this->dbc->query("SELECT * FROM agrupacion_rubro_plandecuenta WHERE tipo_plandecuenta = '$ap[tipo_plandecuenta]' AND idempresa ='$ve[idempresa_actual]'");
+                    $apdc = $agru_plan_decuenta->fetch_assoc();
+
+                    $plan_decuenta_padre = $this->dbc->query("SELECT * FROM plandecuenta WHERE idplandecuenta = '$idp'");
+                    $pdp = $plan_decuenta_padre->fetch_assoc();
+
+                    $pdc_auxi = $this->dbc->query("SELECT * FROM plandecuenta WHERE numero = '$pdp[numero]' AND organizacion_idorganizacion ='$ve[idempresa_actual]'");
+                    $pdc_ax = $pdc_auxi->fetch_assoc();
+
+                    $registro_vinc = $this->dbc->query("INSERT INTO plandecuenta(idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,idp,idagrupacion_rubro_plandecuenta,organizacion_idorganizacion)
+                    VALUES (NULL,'$numero','$plan','$descripcion','$tipo','2','$pdc_ax[idplandecuenta]','$apdc[idagrupacion_rubro_plandecuenta]','$ve[idempresa_actual]')");
+
+                    $registro = $this->dbc->query("INSERT INTO plandecuenta(idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,idp,idagrupacion_rubro_plandecuenta,organizacion_idorganizacion)
+                    VALUES (NULL,'$numero','$plan','$descripcion','$tipo','2','$idp','$rubro','$ide')");
+
+                }else{ // EL REGISTRO SE HARA SOLO EN LA EMPRESA ORIGINAL PORQUE NO TIENE VINCULACION CON NINGUNA EMPRESA
+
+                    $registro = $this->dbc->query("INSERT INTO plandecuenta(idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,idp,idagrupacion_rubro_plandecuenta,organizacion_idorganizacion)
+                    VALUES (NULL,'$numero','$plan','$descripcion','$tipo','2','$idp','$rubro','$ide')");
+                }
+
                 if ($registro === TRUE) {
-                    $res = array("success", "Se registro Correctamente", "registroplanes");
+                    $res = array(
+                        "success" => true,
+                        "message" => "registro exitoso",
+                        "message_code" => "registro_exitoso"
+                    );
                 } else {
-                    $res = array("danger", "No s epudo registrar");
+                    $res = array(
+                        "success" => false,
+                        "message" => "ocurrio un error al registrar",
+                        "message_code" => "error"
+                    );
                 }
             }
             else{
-                $res = array("danger", "El numero de codigo no esta en el rango permitido",$codigo_padre[0],$codigo[0],$idp);
+                // $res = array("danger", "El numero de codigo no esta en el rango permitido",$codigo_padre[0],$codigo[0],$idp);
+                $res = array(
+                        "success" => false,
+                        "message" => "El numero de codigo no esta en el rango permitido",
+                        "message_code" => "numero_no_pertenece_rango"
+                    );
             }
         }
 
         echo json_encode($res);
     }
 
-    public function registroplanesf5($idplan, $numero, $plan, $descripcion, $tipo, $idp,$idagrupacion_rubro_plandecuenta,$empresa)
+    public function registroplanesf5($idplan, $numero, $plan, $descripcion, $tipo, $idp,$id_agru,$empresa)
     {
         $ide = $this->getidempresa($empresa);
         $res = "";
@@ -381,20 +545,87 @@ class Admin extends DB
         $totalCons = $resultado12['total'];
 
         if($totalCons > 0){
-            $res = array("danger", "El numero de codigo ya existe");
+            $res = array(
+                        "success" => false,
+                        "message" => "El numero de codigo ya existe",
+                        "message_code" => "numero_ya_existe"
+                    );
         }elseif(empty($idp)){
-            // $res = array("success", "Se registro Correctamente", "registroplanes");
-        $registro = $this->dbc->query("UPDATE plandecuenta 
-        SET numero='$numero',nombreplan='$plan',descripcion='$descripcion',saldonormal='$tipo',idp='$idp',idagrupacion_rubro_plandecuenta = '$idagrupacion_rubro_plandecuenta' 
-        WHERE idplandecuenta='$idplan'");
+            
+            // $registro = $this->dbc->query("UPDATE plandecuenta 
+            // SET numero='$numero',nombreplan='$plan',descripcion='$descripcion',saldonormal='$tipo',idp='$idp',idagrupacion_rubro_plandecuenta = '$idagrupacion_rubro_plandecuenta' 
+            // WHERE idplandecuenta='$idplan'");
 
-        //   $registro = $this->dbc->query("INSERT INTO plandecuenta(idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,idp,organizacion_idorganizacion)
-            // VALUES (NULL,'$numero','$plan','$descripcion','$tipo','2','$idp','$ide')");
-            if ($registro === TRUE) {
-                $res = array("success", "Se Edito Correctamente", "registroplanes");
-            } else {
-                $res = array("danger", "No se epudo registrar");
+            //     if ($registro === TRUE) {
+            //         $res = array("success", "Se Edito Correctamente", "registroplanes");
+            //     } else {
+            //         $res = array("danger", "No se epudo registrar");
+            //     }
+            $existe_vinculacion_act = $this->dbc->query("SELECT * FROM vinculacion_empresas WHERE idempresa_actual = '$ide'");
+
+            $existe_vinculacion_vinc = $this->dbc->query("SELECT * FROM vinculacion_empresas WHERE idempresa_vinculada = '$ide'");
+
+            if($existe_vinculacion_act->num_rows > 0){ // EL REGISTRO SE HARA DESDE LA EMPRESA ORIGINAL
+                $ve = $existe_vinculacion_act->fetch_assoc();
+
+                $agru_plan = $this->dbc->query("SELECT * FROM agrupacion_rubro_plandecuenta WHERE idagrupacion_rubro_plandecuenta = '$id_agru'");
+                $ap = $agru_plan->fetch_assoc();
+
+                $agru_plan_decuenta = $this->dbc->query("SELECT * FROM agrupacion_rubro_plandecuenta WHERE tipo_plandecuenta = '$ap[tipo_plandecuenta]' AND idempresa ='$ve[idempresa_vinculada]'");
+                $apdc = $agru_plan_decuenta->fetch_assoc();
+
+                $plandecuenta = $this->dbc->query("SELECT * FROM plandecuenta WHERE idplandecuenta = '$idplan'");
+                $pc = $plandecuenta->fetch_assoc();
+
+                $registro = $this->dbc->query("UPDATE plandecuenta 
+                SET numero='$numero',nombreplan='$plan',descripcion='$descripcion',saldonormal='$tipo',idp='$idp',idagrupacion_rubro_plandecuenta = '$id_agru' 
+                WHERE idplandecuenta='$idplan'");
+
+                $update_vinc = $this->dbc->query("UPDATE plandecuenta 
+                SET numero='$numero',nombreplan='$plan',descripcion='$descripcion',saldonormal='$tipo',idp='$idp',idagrupacion_rubro_plandecuenta = '$apdc[idagrupacion_rubro_plandecuenta]' 
+                WHERE numero='$pc[numero]' AND organizacion_idorganizacion ='$ve[idempresa_vinculada]'");
+
+            }elseif($existe_vinculacion_vinc->num_rows > 0){ // EL REGISTRO SE HARA DESDE LA EMPRESA VINCULADA 
+                $ve = $existe_vinculacion_vinc->fetch_assoc();
+
+                $agru_plan = $this->dbc->query("SELECT * FROM agrupacion_rubro_plandecuenta WHERE idagrupacion_rubro_plandecuenta = '$id_agru'");
+                $ap = $agru_plan->fetch_assoc();
+
+                $agru_plan_decuenta = $this->dbc->query("SELECT * FROM agrupacion_rubro_plandecuenta WHERE tipo_plandecuenta = '$ap[tipo_plandecuenta]' AND idempresa ='$ve[idempresa_actual]'");
+                $apdc = $agru_plan_decuenta->fetch_assoc();
+
+                $plandecuenta = $this->dbc->query("SELECT * FROM plandecuenta WHERE idplandecuenta = '$idplan'");
+                $pc = $plandecuenta->fetch_assoc();
+
+                $registro = $this->dbc->query("UPDATE plandecuenta 
+                SET numero='$numero',nombreplan='$plan',descripcion='$descripcion',saldonormal='$tipo',idp='$idp',idagrupacion_rubro_plandecuenta = '$id_agru' 
+                WHERE idplandecuenta='$idplan'");
+
+                $update_vinc = $this->dbc->query("UPDATE plandecuenta 
+                SET numero='$numero',nombreplan='$plan',descripcion='$descripcion',saldonormal='$tipo',idp='$idp',idagrupacion_rubro_plandecuenta = '$apdc[idagrupacion_rubro_plandecuenta]' 
+                WHERE numero='$pc[numero]' AND organizacion_idorganizacion ='$ve[idempresa_actual]'");
+
+            }else{ // EL REGISTRO SE HARA SOLO EN LA EMPRESA ORIGINAL PORQUE NO TIENE VINCULACION CON NINGUNA EMPRESA
+
+                $registro = $this->dbc->query("UPDATE plandecuenta 
+                SET numero='$numero',nombreplan='$plan',descripcion='$descripcion',saldonormal='$tipo',idp='$idp',idagrupacion_rubro_plandecuenta = '$id_agru' 
+                WHERE idplandecuenta='$idplan'");
             }
+
+                if ($registro === TRUE) {
+                    $res = array(
+                        "success" => true,
+                        "message" => "edicion exitosa",
+                        "message_code" => "edicion_exitosa"
+                    );
+                } else {
+                    $res = array(
+                        "success" => false,
+                        "message" => "ocurrio un error al editar",
+                        "message_code" => "error"
+                    );
+                }
+
         }else{
             $idp2 = $this->dbc->query("SELECT numero FROM plandecuenta WHERE idplandecuenta='$idp'");
             $resultado122 = $idp2->fetch_assoc();
@@ -403,25 +634,116 @@ class Admin extends DB
             $codigo_padre = explode(".", $numeroPadre);
             $codigo = explode(".", $numero);
             if($codigo_padre[0] == $codigo[0]){
-                // $res = array("success", "Se registro Correctamente", "registroplanes");
-                $registro = $this->dbc->query("UPDATE plandecuenta 
-        SET numero='$numero',nombreplan='$plan',descripcion='$descripcion',saldonormal='$tipo',idp='$idp',idagrupacion_rubro_plandecuenta = '$idagrupacion_rubro_plandecuenta' 
-        WHERE idplandecuenta='$idplan'");
-                // $registro = $this->dbc->query("INSERT INTO plandecuenta(idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,idp,organizacion_idorganizacion)
-                // VALUES (NULL,'$numero','$plan','$descripcion','$tipo','2','$idp','$ide')");
-                if ($registro === TRUE) {
-                    $res = array("success", "Se Edito Correctamente", "registroplanes");
-                } else {
-                    $res = array("danger", "No s epudo registrar");
+         
+                // $registro = $this->dbc->query("UPDATE plandecuenta 
+                // SET numero='$numero',nombreplan='$plan',descripcion='$descripcion',saldonormal='$tipo',idp='$idp',idagrupacion_rubro_plandecuenta = '$idagrupacion_rubro_plandecuenta' 
+                // WHERE idplandecuenta='$idplan'");
+               
+                //     if ($registro === TRUE) {
+                //         $res = array("success", "Se Edito Correctamente", "registroplanes");
+                //     } else {
+                //         $res = array("danger", "No s epudo registrar");
+                //     }
+                $existe_vinculacion_act = $this->dbc->query("SELECT * FROM vinculacion_empresas WHERE idempresa_actual = '$ide'");
+
+                $existe_vinculacion_vinc = $this->dbc->query("SELECT * FROM vinculacion_empresas WHERE idempresa_vinculada = '$ide'");
+
+                if($existe_vinculacion_act->num_rows > 0){ // EL REGISTRO SE HARA DESDE LA EMPRESA ORIGINAL
+                    $ve = $existe_vinculacion_act->fetch_assoc();
+
+                    $agru_plan = $this->dbc->query("SELECT * FROM agrupacion_rubro_plandecuenta WHERE idagrupacion_rubro_plandecuenta = '$id_agru'");
+                    $ap = $agru_plan->fetch_assoc();
+
+                    $agru_plan_decuenta = $this->dbc->query("SELECT * FROM agrupacion_rubro_plandecuenta WHERE tipo_plandecuenta = '$ap[tipo_plandecuenta]' AND idempresa ='$ve[idempresa_vinculada]'");
+                    $apdc = $agru_plan_decuenta->fetch_assoc();
+
+                    $plan_decuenta_padre = $this->dbc->query("SELECT * FROM plandecuenta WHERE idplandecuenta = '$idp'");
+                    $pdp = $plan_decuenta_padre->fetch_assoc();
+
+                    $pdc_auxi = $this->dbc->query("SELECT * FROM plandecuenta WHERE numero = '$pdp[numero]' AND organizacion_idorganizacion ='$ve[idempresa_vinculada]'");
+                    $pdc_ax = $pdc_auxi->fetch_assoc();
+
+                    $plandecuenta = $this->dbc->query("SELECT * FROM plandecuenta WHERE idplandecuenta = '$idplan'");
+                    $pc = $plandecuenta->fetch_assoc();
+                    // $registro_vinc = $this->dbc->query("INSERT INTO plandecuenta(idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,idp,idagrupacion_rubro_plandecuenta,organizacion_idorganizacion)
+                    // VALUES (NULL,'$numero','$plan','$descripcion','$tipo','2','$pdc_ax[idplandecuenta]','$apdc[idagrupacion_rubro_plandecuenta]','$ve[idempresa_vinculada]')");
+
+                    // $registro = $this->dbc->query("INSERT INTO plandecuenta(idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,idp,idagrupacion_rubro_plandecuenta,organizacion_idorganizacion)
+                    // VALUES (NULL,'$numero','$plan','$descripcion','$tipo','2','$idp','$id_agru','$ide')");
+
+                    $registro = $this->dbc->query("UPDATE plandecuenta 
+                SET numero='$numero',nombreplan='$plan',descripcion='$descripcion',saldonormal='$tipo',idp='$idp',idagrupacion_rubro_plandecuenta = '$id_agru' 
+                WHERE idplandecuenta='$idplan'");
+
+                $update_vinc = $this->dbc->query("UPDATE plandecuenta 
+                SET numero='$numero',nombreplan='$plan',descripcion='$descripcion',saldonormal='$tipo',idp='$pdc_ax[idplandecuenta]',idagrupacion_rubro_plandecuenta = '$apdc[idagrupacion_rubro_plandecuenta]' 
+                WHERE numero='$pc[numero]' AND organizacion_idorganizacion ='$ve[idempresa_vinculada]'");
+
+                }elseif($existe_vinculacion_vinc->num_rows > 0){ // EL REGISTRO SE HARA DESDE LA EMPRESA VINCULADA 
+                    $ve = $existe_vinculacion_vinc->fetch_assoc();
+
+                    $agru_plan = $this->dbc->query("SELECT * FROM agrupacion_rubro_plandecuenta WHERE idagrupacion_rubro_plandecuenta = '$id_agru'");
+                    $ap = $agru_plan->fetch_assoc();
+
+                    $agru_plan_decuenta = $this->dbc->query("SELECT * FROM agrupacion_rubro_plandecuenta WHERE tipo_plandecuenta = '$ap[tipo_plandecuenta]' AND idempresa ='$ve[idempresa_actual]'");
+                    $apdc = $agru_plan_decuenta->fetch_assoc();
+
+                    $plan_decuenta_padre = $this->dbc->query("SELECT * FROM plandecuenta WHERE idplandecuenta = '$idp'");
+                    $pdp = $plan_decuenta_padre->fetch_assoc();
+
+                    $pdc_auxi = $this->dbc->query("SELECT * FROM plandecuenta WHERE numero = '$pdp[numero]' AND organizacion_idorganizacion ='$ve[idempresa_actual]'");
+                    $pdc_ax = $pdc_auxi->fetch_assoc();
+
+                    $plandecuenta = $this->dbc->query("SELECT * FROM plandecuenta WHERE idplandecuenta = '$idplan'");
+                    $pc = $plandecuenta->fetch_assoc();
+
+                    // $registro_vinc = $this->dbc->query("INSERT INTO plandecuenta(idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,idp,idagrupacion_rubro_plandecuenta,organizacion_idorganizacion)
+                    // VALUES (NULL,'$numero','$plan','$descripcion','$tipo','2','$pdc_ax[idplandecuenta]','$apdc[idagrupacion_rubro_plandecuenta]','$ve[idempresa_actual]')");
+
+                    // $registro = $this->dbc->query("INSERT INTO plandecuenta(idplandecuenta,numero,nombreplan,descripcion,saldonormal,consolidar,idp,idagrupacion_rubro_plandecuenta,organizacion_idorganizacion)
+                    // VALUES (NULL,'$numero','$plan','$descripcion','$tipo','2','$idp','$id_agru','$ide')");
+
+                    $registro = $this->dbc->query("UPDATE plandecuenta 
+                SET numero='$numero',nombreplan='$plan',descripcion='$descripcion',saldonormal='$tipo',idp='$idp',idagrupacion_rubro_plandecuenta = '$id_agru' 
+                WHERE idplandecuenta='$idplan'");
+
+                $update_vinc = $this->dbc->query("UPDATE plandecuenta 
+                SET numero='$numero',nombreplan='$plan',descripcion='$descripcion',saldonormal='$tipo',idp='$pdc_ax[idplandecuenta]',idagrupacion_rubro_plandecuenta = '$apdc[idagrupacion_rubro_plandecuenta]' 
+                WHERE numero='$pc[numero]' AND organizacion_idorganizacion ='$ve[idempresa_actual]'");
+
+                }else{ // EL REGISTRO SE HARA SOLO EN LA EMPRESA ORIGINAL PORQUE NO TIENE VINCULACION CON NINGUNA EMPRESA
+
+                    $registro = $this->dbc->query("UPDATE plandecuenta 
+                SET numero='$numero',nombreplan='$plan',descripcion='$descripcion',saldonormal='$tipo',idp='$idp',idagrupacion_rubro_plandecuenta = '$id_agru' 
+                WHERE idplandecuenta='$idplan'");
                 }
-            }
-            else{
-                $res = array("danger", "El numero de codigo no esta en el rango permitido",$codigo_padre[0],$codigo[0],$idp);
+
+                if ($registro === TRUE) {
+                    $res = array(
+                        "success" => true,
+                        "message" => "registro exitoso",
+                        "message_code" => "registro_exitoso"
+                    );
+                } else {
+                    $res = array(
+                        "success" => false,
+                        "message" => "ocurrio un error al registrar",
+                        "message_code" => "error"
+                    );
+                }
+            }else{
+                    $res = array(
+                        "success" => false,
+                        "message" => "El numero de codigo no esta en el rango permitido",
+                        "message_code" => "numero_no_pertenece_rango"
+                    );
+                    // $res = array("danger", "El numero de codigo no esta en el rango permitido",$codigo_padre[0],$codigo[0],$idp);
             }
         }
    
         echo json_encode($res);
     }
+
     public function deleteplan($id) {
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
@@ -444,16 +766,93 @@ class Admin extends DB
                     throw new Exception($relacion['mensaje']);
                 }
             }
-    // $registro = $this->dbc->query("DELETE FROM plandecuenta WHERE idplandecuenta='$dato'");
-            $query = "DELETE FROM plandecuenta WHERE idplandecuenta = $id";
-            $this->dbc->query($query);
+
+            $nombre_tt = $this->dbc->query("SELECT * FROM tipotransaccion WHERE idtipotransaccion = '$id'");
+            $ntt = $nombre_tt->fetch_assoc();
+
+            $existe_vinculacion_act = $this->dbc->query("SELECT * FROM vinculacion_empresas WHERE idempresa_actual = '$ide'");
+
+            $existe_vinculacion_vinc = $this->dbc->query("SELECT * FROM vinculacion_empresas WHERE idempresa_vinculada = '$ide'");
+
+            if($existe_vinculacion_act->num_rows > 0){ // EL REGISTRO SE HARA DESDE LA EMPRESA ORIGINAL
+                $ve = $existe_vinculacion_act->fetch_assoc();
+
+                $tt_auxiliar = $this->dbc->query("SELECT * FROM tipotransaccion WHERE nombre='$ntt[nombre]' AND idempresa ='$ve[idempresa_vinculada]'");
+                $tt_aux = $tt_auxiliar->fetch_assoc();
+
+                $existe_en_trans = $this->dbc->query("SELECT * FROM transacciones WHERE tipotransaccion_idtipotransaccion='$tt_aux[idtipotransaccion]'");
+
+                if($existe_en_trans->num_rows > 0){
+                    
+                    $se_pudo_eliminar =FALSE;
+                    
+                }else{
+                    $query_1 = "DELETE FROM tipotransaccion WHERE nombre='$ntt[nombre]' AND idempresa ='$ve[idempresa_vinculada]'";
+                    $this->dbc->query($query_1);
+
+                    $query_2 = "DELETE FROM tipotransaccion WHERE idtipotransaccion = $id";
+                    $this->dbc->query($query_2);
+
+                    $se_pudo_eliminar =TRUE;
+                }
+
+            }elseif($existe_vinculacion_vinc->num_rows > 0){ // EL REGISTRO SE HARA DESDE LA EMPRESA VINCULADA 
+                $ve = $existe_vinculacion_vinc->fetch_assoc();
+
+                $tt_auxiliar = $this->dbc->query("SELECT * FROM tipotransaccion WHERE nombre='$ntt[nombre]' AND idempresa ='$ve[idempresa_actual]'");
+                $tt_aux = $tt_auxiliar->fetch_assoc();
+
+                $existe_en_trans = $this->dbc->query("SELECT * FROM transacciones WHERE tipotransaccion_idtipotransaccion='$tt_aux[idtipotransaccion]'");
+
+                if($existe_en_trans->num_rows > 0){
+                    
+                    $se_pudo_eliminar =FALSE;
+                    
+                }else{
+                    $query_1 = "DELETE FROM tipotransaccion WHERE nombre='$ntt[nombre]' AND idempresa ='$ve[idempresa_actual]'";
+                    $this->dbc->query($query_1);
+
+                    $query_2 = "DELETE FROM tipotransaccion WHERE idtipotransaccion = $id";
+                    $this->dbc->query($query_2);
+
+                    $se_pudo_eliminar =TRUE;
+                }
+
+            }else{ // EL REGISTRO SE HARA SOLO EN LA EMPRESA ORIGINAL PORQUE NO TIENE VINCULACION CON NINGUNA EMPRESA
+
+                $query = "DELETE FROM plandecuenta WHERE idplandecuenta = $id";
+                $this->dbc->query($query);
+
+                $se_pudo_eliminar =TRUE;
+            }
+        
+            // $query = "DELETE FROM plandecuenta WHERE idplandecuenta = $id";
+            // $this->dbc->query($query);
             
             $this->dbc->commit();
-            $res = array("success", "Se eliminó correctamente", "deleteplan");
+            // $res = array("success", "Se eliminó correctamente", "deleteplan");
+            if($se_pudo_eliminar ===TRUE){
+                $res = array(
+                        "success" => true,
+                        "message" => "Se eliminó correctamente",
+                        "message_code"   => "eliminacion_exitosa"
+                    );
+            }else{
+                $res = array(
+                        "success" => false,
+                        "message" => "No se puede eliminar debido a que ya se esta usando ese registro",
+                        "message_code"   => "registro_en_uso"
+                    );
+            }
     
         } catch (Exception $e) {
             $this->dbc->rollback();
-            $res = array("danger", $e->getMessage(), "deleteplan");
+            // $res = array("danger", $e->getMessage(), "deleteplan");
+            $res = array(
+                        "success" => false,
+                        "message" => $e->getMessage(),
+                        "message_code"   => "registro_en_uso"
+                    );
         }
     
         echo json_encode($res);
@@ -703,10 +1102,8 @@ class Admin extends DB
             $relacionadas = [
                 // 'detalletransaccion' => 'No se puede eliminar porque hay registros en producción',
                 // ['tabla' => 'asientotipo', 'campo' => 'tipo', 'mensaje' => 'No se puede eliminar'],
-                ['tabla' => 'transacciones', 'campo' => 'tipodecambio', 'mensaje' => 'No se puede eliminar']
-                // ['tabla' => 'asiento', 'campo' => 'idcuenta', 'mensaje' => 'No se puede eliminar'],
-                // ['tabla' => 'vinculacion_cuenta_xcxp ', 'campo' => 'idplandecuenta', 'mensaje' => 'No se puede eliminar'],
-                // ['tabla' => 'relacionip', 'campo' => 'idplandecuenta', 'mensaje' => 'No se puede eliminar']
+                ['tabla' => 'transacciones', 'campo' => 'tipodecambio', 'mensaje' => 'No se puede eliminar debido a que ya se esta usando ese registro en transaccion']
+            
             ];
     
             foreach ($relacionadas as $relacion) {
@@ -728,34 +1125,78 @@ class Admin extends DB
                 $ve = $existe_vinculacion_act->fetch_assoc();
         // $registro = $this->dbc->query("DELETE FROM tipodecambio WHERE idorganizacion='$ide' AND idtipodecambio='$id'");
 
+            $tc_auxiliar = $this->dbc->query("SELECT * FROM tipodecambio WHERE fecha='$ftc[fecha]' AND idorganizacion ='$ve[idempresa_vinculada]'");
+            $tc_aux = $tc_auxiliar->fetch_assoc();
+
+            $existe_en_trans = $this->dbc->query("SELECT * FROM transacciones WHERE tipodecambio='$tc_aux[idtipodecambio]'");
+
+            if($existe_en_trans->num_rows > 0){
+                // $res = array("success", "Se eliminó correctamente", "eliminartipodecambio");
+                $se_pudo_eliminar =FALSE;
+                
+            }else{
                 $query_1 = "DELETE FROM tipodecambio WHERE fecha='$ftc[fecha]' AND idorganizacion ='$ve[idempresa_vinculada]'";
                 $this->dbc->query($query_1);
 
                 $query_2 = "DELETE FROM tipodecambio WHERE idtipodecambio = $id";
                 $this->dbc->query($query_2);
 
+                $se_pudo_eliminar =TRUE;
+            }
+
             }elseif($existe_vinculacion_vinc->num_rows > 0){ // EL REGISTRO SE HARA DESDE LA EMPRESA VINCULADA 
                 $ve = $existe_vinculacion_vinc->fetch_assoc();
 
-                $query_1 = "DELETE FROM tipodecambio WHERE fecha='$ftc[fecha]' AND idorganizacion ='$ve[idempresa_actual]'";
-                $this->dbc->query($query_1);
+                $tc_auxiliar = $this->dbc->query("SELECT * FROM tipodecambio WHERE fecha='$ftc[fecha]' AND idorganizacion ='$ve[idempresa_actual]'");
+                $tc_aux = $tc_auxiliar->fetch_assoc();
 
-                $query_2 = "DELETE FROM tipodecambio WHERE idtipodecambio = $id";
-                $this->dbc->query($query_2);
+                $existe_en_trans = $this->dbc->query("SELECT * FROM transacciones WHERE tipodecambio='$tc_aux[idtipodecambio]'");
+
+                if($existe_en_trans->num_rows > 0){
+                    // $res = array("success", "Se eliminó correctamente", "eliminartipodecambio");
+                   
+                    $se_pudo_eliminar =FALSE;
+                }else{
+                    $query_1 = "DELETE FROM tipodecambio WHERE fecha='$ftc[fecha]' AND idorganizacion ='$ve[idempresa_actual]'";
+                    $this->dbc->query($query_1);
+
+                    $query_2 = "DELETE FROM tipodecambio WHERE idtipodecambio = $id";
+                    $this->dbc->query($query_2);
+
+                    $se_pudo_eliminar =TRUE;
+                }
 
             }else{ // EL REGISTRO SE HARA SOLO EN LA EMPRESA ORIGINAL PORQUE NO TIENE VINCULACION CON NINGUNA EMPRESA
 
                 $query = "DELETE FROM tipodecambio WHERE idtipodecambio = $id";
                 $this->dbc->query($query);
+
+                $se_pudo_eliminar =TRUE;
             }
             
-            
             $this->dbc->commit();
-            $res = array("success", "Se eliminó correctamente", "eliminartipodecambio");
     
+            if($se_pudo_eliminar ===TRUE){
+                $res = array(
+                        "success" => true,
+                        "message" => "Se eliminó correctamente",
+                        "message_code"   => "eliminacion_exitosa"
+                    );
+            }else{
+                $res = array(
+                        "success" => false,
+                        "message" => "No se puede eliminar debido a que ya se esta usando ese registro en transaccion",
+                        "message_code"   => "registro_existe_en_transaccion"
+                    );
+            }
+            
         } catch (Exception $e) {
             $this->dbc->rollback();
-            $res = array("danger", $e->getMessage(), "eliminartipodecambio");
+            $res = array(
+                        "success" => false,
+                        "message" => $e->getMessage(),
+                        "message_code"   => "registro_existe_en_transaccion"
+                    );
         }
 
         // Devolver el resultado en formato JSON
