@@ -43,7 +43,7 @@ $ad=new Admin();
 $ad->milistaplanes($ver[1]);
 }elseif($ver[0]=="deleteplan"){
     $ad=new Admin();
-    $ad->deleteplan($ver[1]);
+    $ad->deleteplan($ver[1],$ver[2]);
 }elseif($ver[0]=="listaplanesempresa"){
 $ad=new Admin();
 $ad->listaplanesempresa($ver[1]);
@@ -821,6 +821,9 @@ elseif($ver[0]=="listar_cobros_comercial_sin_cuenta"){
 }elseif($ver[0]=="listar_vinculacion_empresas"){
     $cont=new Vinculacion_empresas();
     $cont->listar_vinculacion_empresas($ver[1]);
+}elseif($ver[0]=="existe_vinculacion_empresa"){
+    $cont=new Vinculacion_empresas();
+    $cont->existe_vinculacion_empresa($ver[1]);
 }
 // elseif($ver[0]=="reporte_calculo_otro_reporte_consolidado"){
 //     $cont=new PlantillaReporte();
@@ -832,14 +835,14 @@ elseif($ver[0]=="listar_cobros_comercial_sin_cuenta"){
 //     $cont->obtenerGestionAnterior($ver[1],$ver[2]); eliminar_gestion_contable   
 // }
 
-// creartipoasientodelete  rp listadegestion listar_select_cuentas_balance_general reporte_calculo_otro_reporte_consolidado
+// deleteplan  rp listadegestion listar_select_cuentas_balance_general reporte_calculo_otro_reporte_consolidado
 // reporte_estado_resultados_actualizado_consolidado_por_niveles listar_facturas_cobro_pago listar_recibo_por_caja_bancos listar_facturas_comercial_cobro
 // lista_pagar_pagado_factura listar_reportes_referencia_select eliminar_otras_operaciones listadegestion listar_factura_comercial_con_transaccion
 
 // reportebalancedesumasysaldos listar_caja_bancos listar_facturas_comercial_cobro mayorcuentacontable listar_anular_eliminar_factura
 // listatransacciones listar_balance_general_guardados listar_plantilla_flujo_efectivo listar_cobros_comercial
 // 
-// reporte_balance_general_consolidado listar_usuarios  listar_agrupacion_plantilla reportecuentasderesultado reportedetallefpt
+// reporte_estado_resultados_actualizado_consolidado_por_niveles listar_usuarios  listar_agrupacion_plantilla reportecuentasderesultado reportedetallefpt
 // reportedetallefp lista_pagar_pagado_factura mayorcuentacontable_antiguo listar_solo_usuarios  reporte_estado_resultados_actualizado_consolidado_por_niveles
 //  reporte_balance_general_por_niveles_consolidados listar_todos_documentos_asignado_cuenta  reporteactivodisponible listar_factura_comercial_con_caja_bancos
 //

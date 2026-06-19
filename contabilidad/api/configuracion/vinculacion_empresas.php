@@ -582,20 +582,34 @@ class Vinculacion_empresas extends DB{
         echo json_encode($res);
     }
     
-    public function eliminar_divisa($idcaracteristica,$idempresa){
+    public function existe_vinculacion_empresa($empresa){
 
-            if (0 > 0) {
-                $res = array("danger", "No se puede eliminar porque hay registros en proveedor_has_material","eliminar_proveedor");
-            } else {
-                // Insertar el nuevo registro
-                $registroProveedor = $this->dbp->query("DELETE FROM caracteristicas WHERE idcaracteristicas = '$idcaracteristica'");
-                if ($registroProveedor === TRUE) {                                                                                                                                                    
-                    $res = array("ok", "se elimino exitosamente","eliminarCaracteristica");
-                } else {
-                    $res = array("danger", "No se pudo registrar");
-                }
-            }
-            echo json_encode($res);
+      ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+    $lista = [];
+    $idempresa = $this->getidempresa($empresa);
+
+          $existe_vinculacion_vinc = $this->dbc->query("SELECT * FROM vinculacion_empresas WHERE idempresa_vinculada = '$idempresa'");
+          $existe_vinculacion_act = $this->dbc->query("SELECT * FROM vinculacion_empresas WHERE idempresa_actual = '$idempresa'");
+
+          if($existe_vinculacion_vinc->num_rows > 0){
+                $res = array(
+                "existe_vinculacion" => 'si',
+                "princi_respaldo" => 'respaldo'
+            );
+            array_push($lista, $res);
+          }elseif($existe_vinculacion_act->num_rows > 0){
+                $res = array(
+                "existe_vinculacion" => 'si',
+                "princi_respaldo" => 'principal'
+            );
+            array_push($lista, $res);
+          }
+              
+            
+            echo json_encode($lista);
+            // echo json_encode(array("hola"));
     }
     public function getidempresa($md5)
     {

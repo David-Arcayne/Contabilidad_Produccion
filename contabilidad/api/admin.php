@@ -744,10 +744,12 @@ class Admin extends DB
         echo json_encode($res);
     }
 
-    public function deleteplan($id) {
+    public function deleteplan($id,$empresa) {
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
+
+        $ide = $this->getidempresa($empresa);
         $this->dbc->begin_transaction();
     
         try {
@@ -767,56 +769,66 @@ class Admin extends DB
                 }
             }
 
-            $nombre_tt = $this->dbc->query("SELECT * FROM tipotransaccion WHERE idtipotransaccion = '$id'");
-            $ntt = $nombre_tt->fetch_assoc();
+            $numero_plandecuenta = $this->dbc->query("SELECT * FROM plandecuenta WHERE idplandecuenta = '$id'");
+            $np = $numero_plandecuenta->fetch_assoc();
 
             $existe_vinculacion_act = $this->dbc->query("SELECT * FROM vinculacion_empresas WHERE idempresa_actual = '$ide'");
 
             $existe_vinculacion_vinc = $this->dbc->query("SELECT * FROM vinculacion_empresas WHERE idempresa_vinculada = '$ide'");
 
-            if($existe_vinculacion_act->num_rows > 0){ // EL REGISTRO SE HARA DESDE LA EMPRESA ORIGINAL
+            if($existe_vinculacion_act->num_rows > 0){ // ELIMINACION SE HARA DESDE LA EMPRESA ORIGINAL
                 $ve = $existe_vinculacion_act->fetch_assoc();
 
-                $tt_auxiliar = $this->dbc->query("SELECT * FROM tipotransaccion WHERE nombre='$ntt[nombre]' AND idempresa ='$ve[idempresa_vinculada]'");
+                $tt_auxiliar = $this->dbc->query("SELECT * FROM plandecuenta WHERE numero='$np[numero]' AND organizacion_idorganizacion ='$ve[idempresa_vinculada]'");
                 $tt_aux = $tt_auxiliar->fetch_assoc();
 
-                $existe_en_trans = $this->dbc->query("SELECT * FROM transacciones WHERE tipotransaccion_idtipotransaccion='$tt_aux[idtipotransaccion]'");
-
-                if($existe_en_trans->num_rows > 0){
+                foreach ($relacionadas as $relacion) {
+                    $query = "SELECT 1 FROM {$relacion['tabla']} WHERE {$relacion['campo']} = $tt_aux[idplandecuenta]";
+                    $result = $this->dbc->query($query);
+                    if ($result->num_rows > 0) {
+                        throw new Exception($relacion['mensaje']);
+                    }
+                }
+                // if($existe_en_trans->num_rows > 0){
                     
-                    $se_pudo_eliminar =FALSE;
+                //     $se_pudo_eliminar =FALSE;
                     
-                }else{
-                    $query_1 = "DELETE FROM tipotransaccion WHERE nombre='$ntt[nombre]' AND idempresa ='$ve[idempresa_vinculada]'";
+                // }else{
+                    $query_1 = "DELETE FROM plandecuenta WHERE numero='$np[numero]' AND organizacion_idorganizacion ='$ve[idempresa_vinculada]'";
                     $this->dbc->query($query_1);
 
-                    $query_2 = "DELETE FROM tipotransaccion WHERE idtipotransaccion = $id";
+                    $query_2 = "DELETE FROM plandecuenta WHERE idplandecuenta = $id";
                     $this->dbc->query($query_2);
 
                     $se_pudo_eliminar =TRUE;
-                }
+                // }
 
             }elseif($existe_vinculacion_vinc->num_rows > 0){ // EL REGISTRO SE HARA DESDE LA EMPRESA VINCULADA 
                 $ve = $existe_vinculacion_vinc->fetch_assoc();
 
-                $tt_auxiliar = $this->dbc->query("SELECT * FROM tipotransaccion WHERE nombre='$ntt[nombre]' AND idempresa ='$ve[idempresa_actual]'");
+                $tt_auxiliar = $this->dbc->query("SELECT * FROM plandecuenta WHERE numero='$np[numero]' AND organizacion_idorganizacion ='$ve[idempresa_actual]'");
                 $tt_aux = $tt_auxiliar->fetch_assoc();
 
-                $existe_en_trans = $this->dbc->query("SELECT * FROM transacciones WHERE tipotransaccion_idtipotransaccion='$tt_aux[idtipotransaccion]'");
-
-                if($existe_en_trans->num_rows > 0){
+                foreach ($relacionadas as $relacion) {
+                    $query = "SELECT 1 FROM {$relacion['tabla']} WHERE {$relacion['campo']} = $tt_aux[idplandecuenta]";
+                    $result = $this->dbc->query($query);
+                    if ($result->num_rows > 0) {
+                        throw new Exception($relacion['mensaje']);
+                    }
+                }
+                // if($existe_en_trans->num_rows > 0){
                     
-                    $se_pudo_eliminar =FALSE;
+                //     $se_pudo_eliminar =FALSE;
                     
-                }else{
-                    $query_1 = "DELETE FROM tipotransaccion WHERE nombre='$ntt[nombre]' AND idempresa ='$ve[idempresa_actual]'";
+                // }else{
+                    $query_1 = "DELETE FROM plandecuenta WHERE numero='$np[numero]' AND organizacion_idorganizacion ='$ve[idempresa_actual]'";
                     $this->dbc->query($query_1);
 
-                    $query_2 = "DELETE FROM tipotransaccion WHERE idtipotransaccion = $id";
+                    $query_2 = "DELETE FROM plandecuenta WHERE idplandecuenta = $id";
                     $this->dbc->query($query_2);
 
                     $se_pudo_eliminar =TRUE;
-                }
+                // }
 
             }else{ // EL REGISTRO SE HARA SOLO EN LA EMPRESA ORIGINAL PORQUE NO TIENE VINCULACION CON NINGUNA EMPRESA
 
@@ -837,7 +849,8 @@ class Admin extends DB
                         "message" => "Se eliminó correctamente",
                         "message_code"   => "eliminacion_exitosa"
                     );
-            }else{
+            }
+            else{
                 $res = array(
                         "success" => false,
                         "message" => "No se puede eliminar debido a que ya se esta usando ese registro",

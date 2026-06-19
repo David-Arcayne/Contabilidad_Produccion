@@ -2147,11 +2147,11 @@ class PlantillaReporte extends DB{
 
                 $valor_auxi = $this->calculables_estado_resultados_consolidado($pc['idagrupacion_rubro_plandecuenta'], $idempresa, $gestion,$pl_list['idplandecuenta'],$fecha_ini,$fecha_fin,$pl_list['idplantilla']);
 
-                if($valor_auxi == null || $valor_auxi == '0'){
-                    $valor_real = 0;
-            }else{
-                $valor_real = $valor_auxi;
-            }
+            //     if($valor_auxi == null || $valor_auxi == '0'){
+            //         $valor_real = 0;
+            // }else{
+            //     $valor_real = $valor_auxi;
+            // }
                 // $suma_nivel_2 = $valor_auxi + $valor2['total'];
                 // if($valor_auxi == null || $valor_auxi == '0'){
                     //-----------------------------------
@@ -2163,8 +2163,8 @@ class PlantillaReporte extends DB{
                     "negrilla_cursiva" => $pl_list['negrilla_cursiva'],
                     "nombre_personalizado" => $nombre_cuenta,
                     "tipo_operacion" => $pl_list['tipo_operacion'],
-                    "suma_nivel_2" => $valor_real,
-                    "valor_auxi_real" => $valor_auxi,
+                    "suma_nivel_2" => $valor_auxi,
+                    // "valor_auxi_real" => $valor_auxi,
                     "nivel_2" => [] //activo
                     );  
                     // array_push($res['nivel_2'], $res2);  
@@ -2217,11 +2217,12 @@ class PlantillaReporte extends DB{
                         }
                     }
                 }
-                if($sum_rest < '0'){
-                    $res['suma_nivel_2'] = 0;
-                }else{
-                    $res['suma_nivel_2'] = $sum_rest;
-                }
+                // if($sum_rest < '0'){
+                //     $res['suma_nivel_2'] = 0;
+                // }else{
+                //     $res['suma_nivel_2'] = $sum_rest;
+                // }
+                $res['suma_nivel_2'] = $sum_rest;
 
             }
             elseif($pl_otro_reporte->num_rows > 0){ // ES UNA PLANTILLA QUE OBTIENE RESULTADO DE OTRO REPORTE
@@ -2239,11 +2240,12 @@ class PlantillaReporte extends DB{
                 $gestion
             );
 
-                 if($total_otro_reporte < '0'){
-                    $res['suma_nivel_2'] = 0;
-                }else{
-                    $res['suma_nivel_2'] = $total_otro_reporte;
-                }
+                //  if($total_otro_reporte < '0'){
+                //     $res['suma_nivel_2'] = 0;
+                // }else{
+                //     $res['suma_nivel_2'] = $total_otro_reporte;
+                // }
+                $res['suma_nivel_2'] = $total_otro_reporte;
             }
             elseif($pl_padre_calcu->num_rows > 0){ //ES UNA PLANTILLA CON HIJOS CALCULABLES  (VENTAS)
 
@@ -2265,9 +2267,9 @@ class PlantillaReporte extends DB{
                 // $valor2 = $suma_cuentas2->fetch_assoc();
                 $suma_nivel_2 = $suma_nivel_2 + $valor_total2;
 
-                if($valor_total2 == null || $valor_total2 == '0'){
-                    //-----------------------------------
-                }else{
+                // if($valor_total2 == null || $valor_total2 == '0'){
+                //     //-----------------------------------
+                // }else{
                     $res2 = array(
                         // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
                         "idplandecuenta" => $nombre_cuenta2['idplandecuenta'],
@@ -2282,7 +2284,7 @@ class PlantillaReporte extends DB{
                         );
                     array_push($res['nivel_2'], $res2);  
 
-                } 
+                // } 
                     //----------------------------------------------------------------------------------------------------------------------------------------------------------------
                 }else{ // NO ES CALCULABLE
                     // NIVEL 3 333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333
@@ -2313,9 +2315,9 @@ class PlantillaReporte extends DB{
                             $valor_total3 = $this->calculables_estado_resultados_consolidado($nombre_cuenta3['idagrupacion_rubro_plandecuenta'], $idempresa, $gestion,$aux_nivel_3['idplandecuenta'],$fecha_ini,$fecha_fin,$aux_nivel_3['idplantilla']);
 
                             $suma_nivel_3 = $suma_nivel_3 + $valor_total3;
-                            if($valor_total3 == null || $valor_total3 == '0'){
+                            // if($valor_total3 == null || $valor_total3 == '0'){
                                 //-----------------------------------
-                            }else{
+                            // }else{
                                 $res3 = array(
                                     // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
                                     "idplandecuenta" => $nombre_cuenta3['idplandecuenta'],
@@ -2330,7 +2332,7 @@ class PlantillaReporte extends DB{
                                     );
                                 array_push($res2['nivel_3'], $res3);  
 
-                            }
+                            // }
                         }else{ // NO ES CALCULABLE
                             // NIVEL 4 4444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444
                             $res3 = array(
@@ -2359,9 +2361,9 @@ class PlantillaReporte extends DB{
                                     $valor_total4 = $this->calculables_estado_resultados_consolidado($nombre_cuenta4['idagrupacion_rubro_plandecuenta'], $idempresa, $gestion,$aux_nivel_4['idplandecuenta'],$fecha_ini,$fecha_fin,$aux_nivel_4['idplantilla']);
 
                                     $suma_nivel_4 = $suma_nivel_4 + $valor_total4;
-                                    if($valor_total4 == null || $valor_total4 == '0'){
+                                    // if($valor_total4 == null || $valor_total4 == '0'){
                                         //-----------------------------------
-                                    }else{
+                                    // }else{
                                         $res4 = array(
                                             // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
                                             "idplandecuenta" => $nombre_cuenta4['idplandecuenta'],
@@ -2375,7 +2377,7 @@ class PlantillaReporte extends DB{
                                             // "nivel_4" => [] //activo
                                             );
                                         array_push($res3['nivel_4'], $res4); 
-                                    } 
+                                    // } 
                                 }else{ // NO ES CALCULABLE
                                     // NIVEL 5 55555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555
                                     $res4 = array(
@@ -2403,9 +2405,9 @@ class PlantillaReporte extends DB{
                                         $valor_total5 = $this->calculables_estado_resultados_consolidado($nombre_cuenta5['idagrupacion_rubro_plandecuenta'], $idempresa, $gestion,$aux_nivel_5['idplandecuenta'],$fecha_ini,$fecha_fin,$aux_nivel_5['idplantilla']);
 
                                         $suma_nivel_5 = $suma_nivel_5 + $valor_total5;
-                                        if($valor_total5 == null || $valor_total5 == '0'){
+                                        // if($valor_total5 == null || $valor_total5 == '0'){
                                             //-----------------------------------
-                                        }else{
+                                        // }else{
                                             $res5 = array(
                                                 // "idconfiguracion_reporte" => $pl2['idconfiguracion_reporte'],
                                                 "idplandecuenta" => $nombre_cuenta5['idplandecuenta'],
@@ -2419,7 +2421,7 @@ class PlantillaReporte extends DB{
                                                 // "nivel_4" => [] //activo
                                                 );
                                             array_push($res4['nivel_5'], $res5); 
-                                            }
+                                            // }
                                     } 
                                     // FIN DEL NIVEL 5 55555555555555555555555555555555555555555555555555555555555555555555555555555555
                                     // array_push($res3['nivel_4'], $res4);  
@@ -2473,7 +2475,12 @@ class PlantillaReporte extends DB{
                     }
                     
                 // }
-                $res['suma_nivel_2'] = $resu;
+                if($resu < 0){
+                    $res['suma_nivel_2'] = 0;
+                }else{
+                    $res['suma_nivel_2'] = $resu;
+                }
+                // $res['suma_nivel_2'] = $resu;
             }
             else{ //ES UNA PLANTILLA SIN OPERACION (COSTO_PRODUCCION)
                 
