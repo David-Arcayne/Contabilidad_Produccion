@@ -489,9 +489,6 @@ elseif($ver[0]=="listar_facturas_cobros_sin_transaccion"){
 elseif($ver[0]=="eliminar_configuracion_reporte"){
     $cont=new Reporte_confi();
     $cont->eliminar_configuracion_reporte($ver[1]);
-}elseif($ver[0]=="reporte_balance_general_hasta"){
-    $cont=new Reporte_confi();
-    $cont->reporte_balance_general_hasta($ver[1],$ver[2],$ver[3]);
 }elseif($ver[0]=="listar_factura_comercial_comprobante"){
     $cont=new Factura_comercial();
     $cont->listar_factura_comercial_comprobante($ver[1]);
@@ -824,7 +821,11 @@ elseif($ver[0]=="listar_cobros_comercial_sin_cuenta"){
 }elseif($ver[0]=="existe_vinculacion_empresa"){
     $cont=new Vinculacion_empresas();
     $cont->existe_vinculacion_empresa($ver[1]);
+}elseif($ver[0]=="reporte_balance_general_por_niveles_consolidados_hasta"){
+    $cont=new Reporte_confi();
+    $cont->reporte_balance_general_por_niveles_consolidados_hasta($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
 }
+
 // elseif($ver[0]=="reporte_calculo_otro_reporte_consolidado"){
 //     $cont=new PlantillaReporte();
 //     $cont->reporte_calculo_otro_reporte_consolidado($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
@@ -835,16 +836,16 @@ elseif($ver[0]=="listar_cobros_comercial_sin_cuenta"){
 //     $cont->obtenerGestionAnterior($ver[1],$ver[2]); eliminar_gestion_contable   
 // }
 
-// deleteplan  rp listadegestion listar_select_cuentas_balance_general reporte_calculo_otro_reporte_consolidado
-// reporte_estado_resultados_actualizado_consolidado_por_niveles listar_facturas_cobro_pago listar_recibo_por_caja_bancos listar_facturas_comercial_cobro
-// lista_pagar_pagado_factura listar_reportes_referencia_select eliminar_otras_operaciones listadegestion listar_factura_comercial_con_transaccion
+// listar_anular_eliminar_transaccion  rp listadegestion listar_select_cuentas_balance_general reporte_calculo_otro_reporte_consolidado
+// reporte_balance_general_por_niveles_consolidados listar_facturas_cobro_pago listar_recibo_por_caja_bancos listar_facturas_comercial_cobro
+// reporte_balance_general_por_niveles_consolidados listar_reportes_referencia_select eliminar_otras_operaciones listadegestion listar_factura_comercial_con_transaccion
 
 // reportebalancedesumasysaldos listar_caja_bancos listar_facturas_comercial_cobro mayorcuentacontable listar_anular_eliminar_factura
-// listatransacciones listar_balance_general_guardados listar_plantilla_flujo_efectivo listar_cobros_comercial
+// listatransacciones reporte_flujo_efectivo listar_plantilla_flujo_efectivo listar_cobros_comercial
 // 
-// reporte_estado_resultados_actualizado_consolidado_por_niveles listar_usuarios  listar_agrupacion_plantilla reportecuentasderesultado reportedetallefpt
+// reporte_balance_general_por_niveles_consolidados listar_usuarios  listar_agrupacion_plantilla reportecuentasderesultado reportedetallefpt
 // reportedetallefp lista_pagar_pagado_factura mayorcuentacontable_antiguo listar_solo_usuarios  reporte_estado_resultados_actualizado_consolidado_por_niveles
-//  reporte_balance_general_por_niveles_consolidados listar_todos_documentos_asignado_cuenta  reporteactivodisponible listar_factura_comercial_con_caja_bancos
+//  listatransacciones listar_todos_documentos_asignado_cuenta  reporteactivodisponible listar_factura_comercial_con_caja_bancos
 //
 
 // 

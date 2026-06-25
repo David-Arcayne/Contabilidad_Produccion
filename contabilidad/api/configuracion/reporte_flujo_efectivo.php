@@ -141,11 +141,14 @@ public function listar_plantilla_flujo_efectivo($idplantilla_reporte,$empresa) {
     //     error_reporting(E_ALL);
     $lista = [];
 
-    $get_balance = $this->dbc->query("
-        SELECT * 
+    $get_balance = $this->dbc->query("SELECT * 
         FROM balance_general_por_gestion 
-        WHERE es_calculable = 'si' 
-          AND idgestion IN ('$gestion_ant', '$gestion_act')
+        WHERE (es_calculable = 'si' 
+          AND idgestion IN ('$gestion_ant', '$gestion_act')) 
+          OR
+          (tipo_operacion = 'calculo_otro_reporte' 
+      AND idgestion IN ('$gestion_ant', '$gestion_act')
+    )
         ORDER BY grupo, idconfiguracion_reporte, idgestion
     ");
 
@@ -792,14 +795,15 @@ public function registrar_plantilla_flujo_efectivo(
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
 
- public function reporte_flujo_efectivo($idplantilla_reporte,$gestion_ant,$gestion_act,$empresa) {
+ public function reporte_flujo_efectivo($idplantilla_reporte,$gestion_act,$empresa) {
         // ini_set('display_errors', 1); 
         // ini_set('display_startup_errors', 1);
-        // error_reporting(E_ALL);
+        // error_reporting(E_ALL); 
 $aux_string ="";        
         $lista = [];
         $idempresa = $this->getidempresa($empresa);
         $gestion = $this->getidgestion($empresa);
+        $gestion_ant =$this->obtenerGestionAnterior($gestion_act);
 
         $res2 = "";
         $lista_flujo_gestiones = $this->reporte_estado_ori_apli_privado($gestion_ant, $gestion_act);
@@ -821,43 +825,87 @@ $aux_string ="";
                     );
         }elseif($qwe2['tipo_operacion'] == 'otras_operaciones'){
 
+            // $otrs_oper = $this->dbc->query("SELECT * FROM agrupacion_plantilla 
+            // WHERE idplantilla_padre = '$qwe2[idconfi_reporte_flujo_efectivo]' AND idtipo_reportes = '$idplantilla_reporte'");//
+
+            // $sum_rest = 0;
+            //     // $lista_aux_buscador[] = $res; monto
+            //     // array_push($lista_aux_buscador,$res);
+            //     while ($buscarId = $this->dbc->fetch($otrs_oper)) { // 2agrupados
+            //         foreach ($lista as $item) {
+            //             foreach ($item['nivel_2'] as $nivel2) {
+
+            //                 if ($nivel2['idconfi_reporte_flujo_efectivo'] === $buscarId['idplantilla_hijo']) {
+            //                     //agarro si es suma o resta y agarro su valor 
+            //                     if($buscarId['tipo_operacion'] == 'sumar'){
+            //                         $sum_rest = $sum_rest + $nivel2['valor'];
+            //                     }elseif($buscarId['tipo_operacion'] == 'restar'){
+            //                         $sum_rest = $sum_rest - $nivel2['suma_nivel_2'];
+            //                     }
+            //                     // $item['suma_nivel_2'];
+            //                     // $encontrado = true;
+            //                     break;
+            //                 }else{
+            //                     //seguir buscando
+            //                 }
+
+            //             }
+            //         }
+            //     }
+
+            //     $res2 = array(
+            //         "idconfi_reporte_flujo_efectivo" => $qwe2['idconfi_reporte_flujo_efectivo'],
+            //         "negrilla_cursiva" => $qwe2['negrilla_cursiva'],
+            //         "tipo_operacion" => $qwe2['tipo_operacion'],
+            //         "nombre_registro" => $qwe2['nombre_registro'],
+            //         "suma_nivel_2" => $sum_rest,
+            //         "profundidad" => '1',
+            //         "nivel_2" => [] //activo
+            //         );
+
             $otrs_oper = $this->dbc->query("SELECT * FROM agrupacion_plantilla 
-            WHERE idplantilla_padre = '$qwe2[idconfi_reporte_flujo_efectivo]' AND idtipo_reportes = '$idplantilla_reporte'");//
+    WHERE idplantilla_padre = '$qwe2[idconfi_reporte_flujo_efectivo]' 
+      AND idtipo_reportes = '$idplantilla_reporte'");
 
-            $sum_rest = 0;
-                // $lista_aux_buscador[] = $res; monto
-                // array_push($lista_aux_buscador,$res);
-                while ($buscarId = $this->dbc->fetch($otrs_oper)) { // 2agrupados
-                    foreach ($lista as $item) {
-                        foreach ($item['nivel_2'] as $nivel2) {
+$sum_rest = 0;
 
-                            if ($nivel2['idconfi_reporte_flujo_efectivo'] === $buscarId['idplantilla_hijo']) {
-                                //agarro si es suma o resta y agarro su valor 
-                                if($buscarId['tipo_operacion'] == 'sumar'){
-                                    $sum_rest = $sum_rest + $nivel2['valor'];
-                                }elseif($buscarId['tipo_operacion'] == 'restar'){
-                                    $sum_rest = $sum_rest - $nivel2['suma_nivel_2'];
-                                }
-                                // $item['suma_nivel_2'];
-                                // $encontrado = true;
-                                break;
-                            }else{
-                                //seguir buscando
-                            }
+while ($buscarId = $this->dbc->fetch($otrs_oper)) {
+    foreach ($lista as $item) {
 
-                        }
-                    }
+        // 1. Buscar en el propio item (nivel 1)
+        if ($item['idconfi_reporte_flujo_efectivo'] === $buscarId['idplantilla_hijo']) {
+            if ($buscarId['tipo_operacion'] == 'sumar') {
+                $sum_rest += $item['suma_nivel_2'];
+            } elseif ($buscarId['tipo_operacion'] == 'restar') {
+                $sum_rest -= $item['suma_nivel_2'];
+            }
+            continue; // ya encontrado en nivel 1, no hace falta seguir
+        }
+
+        // 2. Buscar en nivel_2
+        foreach ($item['nivel_2'] as $nivel2) {
+            if ($nivel2['idconfi_reporte_flujo_efectivo'] === $buscarId['idplantilla_hijo']) {
+                if ($buscarId['tipo_operacion'] == 'sumar') {
+                    $sum_rest += $nivel2['valor'];
+                } elseif ($buscarId['tipo_operacion'] == 'restar') {
+                    $sum_rest -= $nivel2['suma_nivel_2'];
                 }
+                break; // encontrado en nivel_2
+            }
+        }
+    }
+}
 
-                $res2 = array(
-                    "idconfi_reporte_flujo_efectivo" => $qwe2['idconfi_reporte_flujo_efectivo'],
-                    "negrilla_cursiva" => $qwe2['negrilla_cursiva'],
-                    "tipo_operacion" => $qwe2['tipo_operacion'],
-                    "nombre_registro" => $qwe2['nombre_registro'],
-                    "suma_nivel_2" => $sum_rest,
-                    "profundidad" => '1',
-                    "nivel_2" => [] //activo
-                    );
+$res2 = array(
+    "idconfi_reporte_flujo_efectivo" => $qwe2['idconfi_reporte_flujo_efectivo'],
+    "negrilla_cursiva" => $qwe2['negrilla_cursiva'],
+    "tipo_operacion" => $qwe2['tipo_operacion'],
+    "nombre_registro" => $qwe2['nombre_registro'],
+    "suma_nivel_2" => $sum_rest,
+    "profundidad" => '1',
+    "nivel_2" => []
+);
+
         }elseif($qwe2['tipo_operacion'] == 'vinculacion'){
 
                     if($qwe2['obtiene_desde'] == 'gestion_anterior'){

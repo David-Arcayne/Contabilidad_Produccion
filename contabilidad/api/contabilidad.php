@@ -53,7 +53,8 @@ class Contabilidad extends DB
                 if($desc_ayuda->num_rows > 0){
                     $resultado_aux = $desc_ayuda->fetch_assoc();
                      
-                    if($qwe_aux['consolidar'] == 1 || $resultado_aux['estado'] == 0){ // estado = 0 es q ya existe una solicitud pendiente
+                    // if($qwe_aux['consolidar'] == 1 || $resultado_aux['estado'] == 0){ // estado = 0 es q ya existe una solicitud pendiente
+                    if($resultado_aux['estado'] == 0){
                     //salirme del bucle porque no se podra realizar la solicitud
                     $se_solicitara = 1;
                     break;

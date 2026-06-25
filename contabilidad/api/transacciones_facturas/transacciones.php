@@ -115,6 +115,109 @@ $nroTransaccion = $resultado122['codigotransaccion'] + 1;
 
     }
 
+//     public function listatransacciones($empresa, $gestion)
+// {
+//     $lista = [];
+//     $ide = $this->getidempresa($empresa);
+
+//     // Obtener formato de gestión
+//     $gestion_sel = $this->dbc->query("SELECT formato_transaccion FROM gestion WHERE idgestion='$gestion'");
+//     $gc = $gestion_sel->fetch_assoc();
+
+//     // Consulta principal con JOINs
+//     $registro = $this->dbc->query("
+//         SELECT 
+//             t.idtransacciones,
+//             t.codigotransaccion,
+//             t.fechatransaccion,
+//             t.glosa,
+//             t.consolidar,
+//             t.tipotransaccion_idtipotransaccion,
+//             t.idgestion,
+//             t.estado,
+//             t.tipodecambio,
+//             tt.nombre AS tipo_nombre,
+//             d.iddetalletransaccion,
+//             p.nombreplan,
+//             d.debe, d.haber, d.nota, d.estado AS estado_detalle,
+//             d.idorganizacion, d.idplandecuenta, d.cobrar, d.pagar, d.orden, p.numero,
+//             LAG(t.fechatransaccion) OVER (ORDER BY t.codigotransaccion DESC) AS fecha_anterior,
+//             LEAD(t.fechatransaccion) OVER (ORDER BY t.codigotransaccion DESC) AS fecha_siguiente,
+//             t.vinculado_otra_empresa
+//         FROM transacciones t
+//         LEFT JOIN tipotransaccion tt ON tt.idtipotransaccion = t.tipotransaccion_idtipotransaccion
+//         LEFT JOIN detalletransaccion d ON d.transacciones_idtransacciones = t.idtransacciones
+//         LEFT JOIN plandecuenta p ON p.idplandecuenta = d.idplandecuenta
+//         WHERE t.organizacion_idorganizacion = '$ide'
+//           AND t.idgestion = '$gestion'
+//           AND t.estado != 6
+//         ORDER BY t.codigotransaccion DESC
+//     ");
+
+//     // Verificar cierre
+//     $existe = $this->dbc->query("
+//         SELECT 1 FROM cierre_transacciones 
+//         WHERE (nombre_operacion = 'precierre' OR nombre_operacion = 'cierre') 
+//           AND idempresa = '$ide' 
+//           AND idgestion ='$gestion'
+//     ");
+
+//     $cerrado = $existe->num_rows > 0 ? 1 : 0;
+
+//     // Procesar resultados agrupando detalle por transacción
+//     $transacciones = [];
+//     while ($row = $registro->fetch_assoc()) {
+//         $id = $row['idtransacciones'];
+
+//         if (!isset($transacciones[$id])) {
+//             $transacciones[$id] = [
+//                 "id" => $row['idtransacciones'],
+//                 "ntransaccion" => $row['codigotransaccion'],
+//                 "fecha" => $row['fechatransaccion'],
+//                 "fecha_anterior" => $row['fecha_anterior'],
+//                 "fecha_siguiente" => $row['fecha_siguiente'],
+//                 "glosa" => $row['glosa'],
+//                 "consolidar" => $row['consolidar'],
+//                 "ttransaccion" => $row['tipo_nombre'],
+//                 "idtipotransaccion" => $row['tipotransaccion_idtipotransaccion'],
+//                 "gestion" => $row['idgestion'],
+//                 "estado" => $row['estado'],
+//                 "tipocambio" => $row['tipodecambio'],
+//                 "existe" => $cerrado,
+//                 "formato_transaccion" => $gc['formato_transaccion'],
+//                 "vinculado_otra_empresa" => $row['vinculado_otra_empresa'],
+//                 "detalle" => []
+//             ];
+//         }
+
+//         // Agregar detalle si existe
+//         if (!empty($row['iddetalletransaccion'])) {
+//             $transacciones[$id]['detalle'][] = [
+//                 "id" => $row['iddetalletransaccion'],
+//                 "plan" => $row['nombreplan'],
+//                 "debe" => $row['debe'],
+//                 "haber" => $row['haber'],
+//                 "nota" => $row['nota'],
+//                 "estado" => $row['estado_detalle'],
+//                 "idempresa" => $row['idorganizacion'],
+//                 "idplan" => $row['idplandecuenta'],
+//                 "cobrar" => $row['cobrar'],
+//                 "pagar" => $row['pagar'],
+//                 "orden" => $row['orden'],
+//                 "idcuentapresupuestaria" => $row['idcuentapresupuestaria'],
+//                 "idsucursal" => $row['idsucursal'],
+//                 "idorganizacion" => $row['idorganizacion'],
+//                 "numero" => $row['numero']
+//             ];
+//         }
+//     }
+
+//     // Convertir a lista
+//     $lista = array_values($transacciones);
+
+//     echo json_encode($lista, JSON_UNESCAPED_UNICODE);
+// }
+
     public function listatransacciones($empresa,$gestion)
     {
         $lista = [];
@@ -256,6 +359,7 @@ ORDER BY
         
         echo json_encode($lista);
     }
+
     public function eliminartransaccion($idt)
     {
         $res = "";
@@ -1830,6 +1934,102 @@ public function asignar_facturas_A_cuentas($data) {
         }
     
         echo json_encode($res);
+    }
+
+    public function revertir_transaccion($data) {
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
+    
+        $idempresa = $this->getidempresa($data['empresa']);
+        $idsucursal = $this->getidsucursal($data['sucursal']); 
+        // $gestion = $this->getgestionactualid($idempresa);
+        $montoRecibos = 0;
+
+        // Construir rango dinámico (primer y último día del mes)
+        $fecha_inicio = date("Y-m-01", strtotime($data['fecha'])); // "2025-03-01"
+        $fecha_fin    = date("Y-m-t", strtotime($data['fecha']));  // "2025-03-31"
+
+        $gestion_sel = $this->dbc->query("SELECT * FROM gestion WHERE idgestion='$data[idgestion]'");
+        $gc = $gestion_sel->fetch_assoc();
+
+            $tipocambio_id = $this->dbc->query("SELECT * FROM tipodecambio WHERE idtipodecambio = '$data[tipodecambio]'");
+            $fech_tc = $tipocambio_id->fetch_assoc();
+
+            // $tipocambio = $this->dbc->query("SELECT * FROM tipodecambio WHERE fecha = '$fech_tc[fecha]' AND idorganizacion ='$ev[idempresa_vinculada]'");
+            // $tc = $tipocambio->fetch_assoc();
+
+            // $tipotransaccion = $this->dbc->query("SELECT * FROM tipotransaccion WHERE nombre = '$data[ttransaccion]' AND idempresa ='$ev[idempresa_vinculada]'");
+            // $tt = $tipotransaccion->fetch_assoc();
+
+            $nroTransaccion = 0;
+
+            // if($gc['formato_transaccion'] == 'por_tipo_mes') {
+
+             if($gc['formato_transaccion'] == 'por_tipo_mes') {
+            $nroTransa = $this->dbc->query("SELECT * 
+                FROM transacciones
+                WHERE tipotransaccion_idtipotransaccion = '$data[idtipotransaccion]'
+                and fechatransaccion BETWEEN '$fecha_inicio' AND '$fecha_fin'
+                AND idgestion = '$data[idgestion]'
+                AND organizacion_idorganizacion = '$idempresa'
+                ORDER BY codigotransaccion DESC
+                LIMIT 1
+            ");
+            }elseif($gc['formato_transaccion'] == 'por_tipo_gestion') {
+                $nroTransa = $this->dbc->query("SELECT * 
+                    -- COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                    FROM transacciones 
+                    WHERE tipotransaccion_idtipotransaccion = '$data[idtipotransaccion]'
+                    AND idgestion = '$data[idgestion]'
+                    AND organizacion_idorganizacion = '$idempresa'
+                    ORDER BY codigotransaccion DESC
+                    LIMIT 1
+                ");
+            } else { // POR_GESTION
+                $nroTransa = $this->dbc->query("SELECT *
+                -- COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                    FROM transacciones 
+                    WHERE organizacion_idorganizacion = '$idempresa'
+                    AND idgestion = '$data[idgestion]'
+                    ORDER BY codigotransaccion DESC
+                    LIMIT 1
+                ");
+            }
+
+        $resultado122 = $nroTransa->fetch_assoc();
+        $nroTransaccion = $resultado122['codigotransaccion'] + 1;
+        $glosa_nueva = "transaccion revertida de trans Nro: ".$data['codigotransaccion'];
+
+            $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,vinculado_otra_empresa,organizacion_idorganizacion,sucursal,idgestion)
+            VALUE('$nroTransaccion','$resultado122[fechatransaccion]','$data[tipodecambio]','0','$glosa_nueva','$data[consolidar]','$data[estado]','$data[idtipotransaccion]','$data[vinculado_otra_empresa]','$idempresa','$idsucursal','$data[idgestion]')");
+
+            $idtransaccion = $this->dbc->insert_id;
+
+            foreach ($data['detalle'] as $dt_trans) {
+
+                $plandecuenta = $this->dbc->query("SELECT * FROM plandecuenta WHERE numero = '$dt_trans[numero]' AND organizacion_idorganizacion ='$idempresa'");
+                $pl = $plandecuenta->fetch_assoc();
+
+                $crearDet_trans = $this->dbc->query("INSERT INTO detalletransaccion(debe,haber,nota,transacciones_idtransacciones,idplandecuenta,idcuentapresupuestaria,estado,cobrar,pagar,idorganizacion,idsucursal,orden)
+                VALUES ('$dt_trans[haber]','$dt_trans[debe]','$dt_trans[nota]','$idtransaccion','$dt_trans[idplandecuenta]','$dt_trans[idcuentapresupuestaria]','$dt_trans[estado]','$dt_trans[cobrar]','$dt_trans[pagar]','$dt_trans[idorganizacion]','$dt_trans[idsucursal]','$dt_trans[orden]')");
+                
+                
+            }
+
+            // Respuesta
+            if ($writetrans === TRUE) {
+                // $res = array("success", "Se Registro Correctamente", "asignar_facturas_A_cuentas",$data['detalle']);
+                $res = TRUE;
+            } else {
+                $res = FALSE;
+                // $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde",$data['detalle']);
+            }
+
+        return $res;
+
+        // echo json_encode($res);
+        // echo json_encode(array());
     }
     
 }

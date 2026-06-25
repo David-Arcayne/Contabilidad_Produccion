@@ -179,6 +179,9 @@ class Transacciones_facturas extends DB{
 
                 $updatetranscodigo = $this->dbc->query("UPDATE factura SET transacciones_idtransacciones = '$dt[transacciones_idtransacciones]', cuenta = '$data[cuenta]' 
                 WHERE idfactura = '{$factura['idfactura']}'");
+
+                // $updatetranscodigo = $this->dbc->query("UPDATE cuentaspof SET transacciones_idtransacciones = '$dt[transacciones_idtransacciones]', cuenta = '$data[cuenta]' 
+                // WHERE idfactura = '{$factura['idfactura']}'");
             }
 
             // $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$data[cuenta]'");

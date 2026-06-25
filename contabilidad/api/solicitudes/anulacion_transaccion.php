@@ -91,12 +91,15 @@ public function registrar_anular_eliminar_activar_transaccion($idtransaccion,$mo
                 // estado_trans = 3--> proceso de eliminacion 
                 $editar=$this->dbc->query("UPDATE transacciones SET estado = '3' WHERE idtransacciones = '$idtransaccion'");    
 
-            }else{//estado_opcion= 3 activar
+            }elseif($estado_opci == 3){//estado_opcion= 3 activar
              // estado_trans = 5--> proceso de activacion 
              $editar=$this->dbc->query("UPDATE transacciones SET estado = '5' WHERE idtransacciones = '$idtransaccion'");       
+            }else{ // estado_opci = 4 revertir
+                // estado_trans = 8--> proceso de revertir 
+                $editar=$this->dbc->query("UPDATE transacciones SET estado = '8' WHERE idtransacciones = '$idtransaccion'"); 
             }
             
-            $res = array("success", "Anulacion exitosa","anular_transaccion");
+            $res = array("success", "Operacion exitosa","anular_transaccion");
         }else{
             $res = array("danger", "No se pudo anular");
         }
@@ -133,6 +136,7 @@ public function registrar_anular_eliminar_activar_transaccion($idtransaccion,$mo
 
                     if ($consulta_detalle->num_rows > 0) {  
 
+                        // ANULAR EL DETALLE DE LA TRANSACCION
                         $update_det=$this->dbc->query("UPDATE detalletransaccion SET estado = '2' 
                         WHERE transacciones_idtransacciones = '$idtransaccion'");        
                     }else{
@@ -277,7 +281,7 @@ public function registrar_anular_eliminar_activar_transaccion($idtransaccion,$mo
                         
                       $res = array("success", "Se Denego el permiso para eliminar transaccion", "cambiarEstado_anular_eliminar_transaccion");
                 }
-            }else{// ACTIVAR --> estado_opcion = 3
+            }elseif($estado_opcion == 3){// ACTIVAR --> estado_opcion = 3
                 $update_soli=$this->dbc->query("UPDATE solicitud_anular_eliminar 
                 SET estado_solicitud = '$estado_solicitud',
                 hora_proceso = '$hora_proceso',
@@ -307,6 +311,47 @@ public function registrar_anular_eliminar_activar_transaccion($idtransaccion,$mo
                 $res = array("success", "Se Denego el permiso para anular", "cambiarEstado_anular_eliminar_transaccion");
 
             }
+            }else{ // REVERTIR --> estado_opcion = 4
+                $update_soli=$this->dbc->query("UPDATE solicitud_anular_eliminar 
+                    SET estado_solicitud = '$estado_solicitud',
+                    hora_proceso = '$hora_proceso',
+                    fecha_proceso = '$fecha_proceso',
+                    idusuario_admin = '$usuario'
+                        WHERE idsolicitud_anular_eliminar = '$idsoli'");   
+
+                if($estado_solicitud == 2){ //ACEPTADO
+
+                    $transaccion=$this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones='$idtransaccion'");
+                    $tr = $transaccion->fetch_assoc();
+                    
+                    // $consulta_detalle=$this->dbc->query("SELECT * FROM detalletransaccion WHERE transacciones_idtransacciones='$idtransaccion'");
+
+                    // Vuelve a estar Activo la transaccion
+                    $update_trans=$this->dbc->query("UPDATE transacciones SET estado = '1' 
+                        WHERE idtransacciones = '$idtransaccion'");  
+
+
+                    // $lista_report_flujo = $this->revertir_transaccion($data);
+
+                    // if ($consulta_detalle->num_rows > 0) {  
+
+                    //     // ANULAR EL DETALLE DE LA TRANSACCION
+                    //     $update_det=$this->dbc->query("UPDATE detalletransaccion SET estado = '2' 
+                    //     WHERE transacciones_idtransacciones = '$idtransaccion'");        
+                    // }else{
+                    
+
+                    // }
+
+                    $res = array("success", "Se Acepto la anulacion de la transaccion", "cambiarEstado_anular_eliminar_transaccion");
+
+                }else{ //DENEGADO --> estado_solicitud == 3
+                    //NO SE ANULARA PERO SI CAMBIARA ESTADO DE TRANSACCION  
+                    $update_trans=$this->dbc->query("UPDATE transacciones SET estado = '1' 
+                        WHERE idtransacciones = '$idtransaccion'");  
+                    $res = array("success", "Se Denego el permiso para anular", "cambiarEstado_anular_eliminar_transaccion");
+
+                }
             }       
 
             echo json_encode($res);
