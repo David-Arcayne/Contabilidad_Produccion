@@ -323,8 +323,45 @@ public function registrar_anular_eliminar_activar_transaccion($idtransaccion,$mo
 
                     $transaccion=$this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones='$idtransaccion'");
                     $tr = $transaccion->fetch_assoc();
+
+                    $data = [
+                    "idempresa" => $tr['organizacion_idorganizacion'],
+                    "idsucursal" => $tr['sucursal'],
+                    "fecha" => $tr['fechatransaccion'],
+                    "idgestion" => $tr['idgestion'],
+                    "tipodecambio" => $tr['tipodecambio'],
+                    // "ttransaccion" => "VENTA", // o el tipo que corresponda
+                    "idtipotransaccion" => $tr['tipotransaccion_idtipotransaccion'],
+                    "codigotransaccion" => $tr['codigotransaccion'],
+                    "consolidar" => $tr['consolidar'],
+                    "estado" => $tr['estado'],
+                    "vinculado_otra_empresa" => $tr['vinculado_otra_empresa'],
+                    "detalle" => [] // aquí llenaremos con foreach
+                    ];
                     
-                    // $consulta_detalle=$this->dbc->query("SELECT * FROM detalletransaccion WHERE transacciones_idtransacciones='$idtransaccion'");
+
+                    $consulta_detalle=$this->dbc->query("SELECT * FROM detalletransaccion WHERE transacciones_idtransacciones='$idtransaccion'");
+
+                    // Recorres todos los registros de detalle y los agregas al array
+                    foreach ($consulta_detalle as $row) {
+                        $data['detalle'][] = [
+                            "numero" => $row['numero'], // si existe en tu tabla
+                            "haber" => $row['haber'],
+                            "debe" => $row['debe'],
+                            "nota" => $row['nota'],
+                            "idplandecuenta" => $row['idplandecuenta'],
+                            "idcuentapresupuestaria" => $row['idcuentapresupuestaria'],
+                            "estado" => $row['estado'],
+                            "cobrar" => $row['cobrar'],
+                            "pagar" => $row['pagar'],
+                            "idorganizacion" => $row['idorganizacion'],
+                            "idsucursal" => $row['idsucursal'],
+                            "orden" => $row['orden']
+                        ];
+                    }
+
+                    // Finalmente llamas a tu función de reversión
+                    $resultado_revertir = $this->revertir_transaccion($data);
 
                     // Vuelve a estar Activo la transaccion
                     $update_trans=$this->dbc->query("UPDATE transacciones SET estado = '1' 
@@ -343,7 +380,7 @@ public function registrar_anular_eliminar_activar_transaccion($idtransaccion,$mo
 
                     // }
 
-                    $res = array("success", "Se Acepto la anulacion de la transaccion", "cambiarEstado_anular_eliminar_transaccion");
+                    $res = array("success", "Se Acepto la Operacion de la transaccion", "cambiarEstado_anular_eliminar_transaccion");
 
                 }else{ //DENEGADO --> estado_solicitud == 3
                     //NO SE ANULARA PERO SI CAMBIARA ESTADO DE TRANSACCION  
@@ -358,6 +395,102 @@ public function registrar_anular_eliminar_activar_transaccion($idtransaccion,$mo
         
         }
     // -----------------------------------------------------------------------------
+
+    private function revertir_transaccion($data) {
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
+    
+        // $idempresa = $this->getidempresa($data['empresa']);
+        // $idsucursal = $this->getidsucursal($data['sucursal']); 
+        // $gestion = $this->getgestionactualid($idempresa);
+        $montoRecibos = 0;
+
+        // Construir rango dinámico (primer y último día del mes)
+        $fecha_inicio = date("Y-m-01", strtotime($data['fecha'])); // "2025-03-01"
+        $fecha_fin    = date("Y-m-t", strtotime($data['fecha']));  // "2025-03-31"
+
+        $gestion_sel = $this->dbc->query("SELECT * FROM gestion WHERE idgestion='$data[idgestion]'");
+        $gc = $gestion_sel->fetch_assoc();
+
+            $tipocambio_id = $this->dbc->query("SELECT * FROM tipodecambio WHERE idtipodecambio = '$data[tipodecambio]'");
+            $fech_tc = $tipocambio_id->fetch_assoc();
+
+            // $tipocambio = $this->dbc->query("SELECT * FROM tipodecambio WHERE fecha = '$fech_tc[fecha]' AND idorganizacion ='$ev[idempresa_vinculada]'");
+            // $tc = $tipocambio->fetch_assoc();
+
+            // $tipotransaccion = $this->dbc->query("SELECT * FROM tipotransaccion WHERE nombre = '$data[ttransaccion]' AND idempresa ='$ev[idempresa_vinculada]'");
+            // $tt = $tipotransaccion->fetch_assoc();
+
+            $nroTransaccion = 0;
+
+            // if($gc['formato_transaccion'] == 'por_tipo_mes') {
+
+             if($gc['formato_transaccion'] == 'por_tipo_mes') {
+            $nroTransa = $this->dbc->query("SELECT * 
+                FROM transacciones
+                WHERE tipotransaccion_idtipotransaccion = '$data[idtipotransaccion]'
+                and fechatransaccion BETWEEN '$fecha_inicio' AND '$fecha_fin'
+                AND idgestion = '$data[idgestion]'
+                AND organizacion_idorganizacion = '$data[idempresa]'
+                ORDER BY codigotransaccion DESC
+                LIMIT 1
+            ");
+            }elseif($gc['formato_transaccion'] == 'por_tipo_gestion') {
+                $nroTransa = $this->dbc->query("SELECT * 
+                    -- COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                    FROM transacciones 
+                    WHERE tipotransaccion_idtipotransaccion = '$data[idtipotransaccion]'
+                    AND idgestion = '$data[idgestion]'
+                    AND organizacion_idorganizacion = '$data[idempresa]'
+                    ORDER BY codigotransaccion DESC
+                    LIMIT 1
+                ");
+            } else { // POR_GESTION
+                $nroTransa = $this->dbc->query("SELECT *
+                -- COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                    FROM transacciones 
+                    WHERE organizacion_idorganizacion = '$data[idempresa]'
+                    AND idgestion = '$data[idgestion]'
+                    ORDER BY codigotransaccion DESC
+                    LIMIT 1
+                ");
+            }
+
+        $resultado122 = $nroTransa->fetch_assoc();
+        $nroTransaccion = $resultado122['codigotransaccion'] + 1;
+        $glosa_nueva = "transaccion revertida de trans Nro: ".$data['codigotransaccion'];
+
+            $writetrans = $this->dbc->query("INSERT INTO transacciones(codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,vinculado_otra_empresa,organizacion_idorganizacion,sucursal,idgestion)
+            VALUE('$nroTransaccion','$resultado122[fechatransaccion]','$data[tipodecambio]','0','$glosa_nueva','$data[consolidar]','1','$data[idtipotransaccion]','$data[vinculado_otra_empresa]','$data[idempresa]','$data[idsucursal]','$data[idgestion]')");
+
+            $idtransaccion = $this->dbc->insert_id;
+
+            foreach ($data['detalle'] as $dt_trans) {
+
+                $plandecuenta = $this->dbc->query("SELECT * FROM plandecuenta WHERE numero = '$dt_trans[numero]' AND organizacion_idorganizacion ='$data[idempresa]'");
+                $pl = $plandecuenta->fetch_assoc();
+
+                $crearDet_trans = $this->dbc->query("INSERT INTO detalletransaccion(debe,haber,nota,transacciones_idtransacciones,idplandecuenta,idcuentapresupuestaria,estado,cobrar,pagar,idorganizacion,idsucursal,orden)
+                VALUES ('$dt_trans[haber]','$dt_trans[debe]','$dt_trans[nota]','$idtransaccion','$dt_trans[idplandecuenta]','$dt_trans[idcuentapresupuestaria]','$dt_trans[estado]','$dt_trans[cobrar]','$dt_trans[pagar]','$dt_trans[idorganizacion]','$dt_trans[idsucursal]','$dt_trans[orden]')");
+                
+            }
+
+            // Respuesta
+            if ($writetrans === TRUE) {
+                // $res = array("success", "Se Registro Correctamente", "asignar_facturas_A_cuentas",$data['detalle']);
+                $res = TRUE;
+            } else {
+                $res = FALSE;
+                // $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde",$data['detalle']);
+            }
+
+        return $res;
+
+        // echo json_encode($res);
+        // echo json_encode(array());
+    }
+
 public function getidempresa($md5)
 {
     $registro = $this->dbe->query("select * from organizacion where md5(idorganizacion)='$md5'");

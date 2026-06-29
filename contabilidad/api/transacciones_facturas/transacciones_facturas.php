@@ -126,7 +126,7 @@ class Transacciones_facturas extends DB{
 
     //------------------------------------------------------------------------------------------------
             $montoFacturas += $factura['monto'];
-            $updatetranscodigo = $this->dbc->query("UPDATE factura SET transacciones_idtransacciones = '$idtrans'
+            $update_factura = $this->dbc->query("UPDATE factura SET transacciones_idtransacciones = '$idtrans'
             WHERE idfactura = '{$factura['idfactura']}'");
 
      //-----------------------------------------------------------------------------------------------------
@@ -167,8 +167,21 @@ class Transacciones_facturas extends DB{
 
         if($data['cuenta'] == ""){ // SOLO SE ASIGNARA TRANSACCION Y NO LA CUENTA
             foreach ($data['facturas'] as $factura) {
-                $updatetranscodigo = $this->dbc->query("UPDATE factura SET transacciones_idtransacciones = '$data[idtrans]'
-                WHERE idfactura = '{$factura['idfactura']}'");
+
+                $consulta_factura = $this->dbc->query("SELECT * FROM factura WHERE idfactura = '{$factura['idfactura']}'");
+                $cf = $consulta_factura->fetch_assoc();
+                
+                if($cf['tipo_factura'] == "contado"){
+                    $update_factura = $this->dbc->query("UPDATE factura SET transacciones_idtransacciones = '$data[idtrans]'
+                    WHERE idfactura = '{$factura['idfactura']}'");
+
+                    $update_comprobante_p = $this->dbc->query("UPDATE cuentaspof SET transaccion = '$data[idtrans]' WHERE idfactura = '{$factura['idfactura']}'");
+                    $update_comprobante_c = $this->dbc->query("UPDATE cuentaspor SET transaccion = '$data[idtrans]' WHERE idfactura = '{$factura['idfactura']}'");
+                }else{
+                    $update_factura = $this->dbc->query("UPDATE factura SET transacciones_idtransacciones = '$data[idtrans]'
+                    WHERE idfactura = '{$factura['idfactura']}'");
+                }
+
             }
         }else{// SE ASIGNARA CUENTA MAS 
             $montoFacturas = 0;
@@ -177,11 +190,19 @@ class Transacciones_facturas extends DB{
             foreach ($data['facturas'] as $factura) {
                 $montoFacturas += $factura['monto'];
 
-                $updatetranscodigo = $this->dbc->query("UPDATE factura SET transacciones_idtransacciones = '$dt[transacciones_idtransacciones]', cuenta = '$data[cuenta]' 
-                WHERE idfactura = '{$factura['idfactura']}'");
+                $consulta_factura = $this->dbc->query("SELECT * FROM factura WHERE idfactura = '{$factura['idfactura']}'");
+                $cf = $consulta_factura->fetch_assoc();
+                
+                if($cf['tipo_factura'] == "contado"){
+                    $update_factura = $this->dbc->query("UPDATE factura SET transacciones_idtransacciones = '$dt[transacciones_idtransacciones]', cuenta = '$data[cuenta]' 
+                    WHERE idfactura = '{$factura['idfactura']}'");
 
-                // $updatetranscodigo = $this->dbc->query("UPDATE cuentaspof SET transacciones_idtransacciones = '$dt[transacciones_idtransacciones]', cuenta = '$data[cuenta]' 
-                // WHERE idfactura = '{$factura['idfactura']}'");
+                    $update_comprobante_p = $this->dbc->query("UPDATE cuentaspof SET transaccion = '$data[idtrans]', cuenta = '$data[cuenta]' WHERE idfactura = '{$factura['idfactura']}'");
+                    $update_comprobante_c = $this->dbc->query("UPDATE cuentaspor SET transaccion = '$data[idtrans]', cuenta = '$data[cuenta]' WHERE idfactura = '{$factura['idfactura']}'");
+                }else{
+                    $update_factura = $this->dbc->query("UPDATE factura SET transacciones_idtransacciones = '$dt[transacciones_idtransacciones]', cuenta = '$data[cuenta]' 
+                    WHERE idfactura = '{$factura['idfactura']}'");
+                }
             }
 
             // $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$data[cuenta]'");
@@ -210,7 +231,7 @@ class Transacciones_facturas extends DB{
         }
         
         // Respuesta 
-        if ($updatetranscodigo === TRUE) {
+        if ($update_factura === TRUE) {
             $res = array("success", "Se Registro Correctamente", "cobrofacturasaasientomodelo",$data['idtrans'],$data['cuenta'],$data['idasientotipo']);
         } else {
             $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde");

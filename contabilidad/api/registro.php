@@ -960,9 +960,6 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     }elseif($ver == "editar_gestion_empresa_vinculada"){
         $cont=new Vinculacion_empresas();
         $cont->editar_gestion_empresa_vinculada($_POST['idvinculacion'],$_POST['idgestion']);
-    }elseif($data['ver'] == "revertir_transaccion"){
-        $cont=new Transacciones();
-        $cont->revertir_transaccion($data);
     }
   
 // rangosolicituddesconsolidar asiento desvincular_documentos_de_cuenta editar_recibo_caja_bancos registrocobrarfactura registrar_anular_eliminar_activar_factura_tributario_transaccion
@@ -971,7 +968,7 @@ if($data['ver'] == "asignar_asiento_A_factura") {
 // asignar_comprobantes_A_comprobantes guardar_balance_general_por_gestion registrogestion ss desvincular_facturas_comercial_de_transaccion
 //asignar_cobros_comercial_A_cuentas
 } 
-//  guardar_balance_general_por_gestion  registrar_agrupacion_plantilla registrar_recibo_pago_cajaBancos_en_otras_cuentas asignar_facturas_comercial_A_cuentas
+//  proveedor  registrar_agrupacion_plantilla registrar_recibo_pago_cajaBancos_en_otras_cuentas asignar_facturas_comercial_A_cuentas
 // creartipoasiento registrar_configuracion_reporte registrar_factura_recibo_pago_cajaBancos registrar_recibo_pago_cajaBancos_en_facturas editar_otras_operaciones
-// cobrar_contratacion_con_factura_cajaBancos vincular_rubro_plandecuentas
+// asignar_asiento_A_factura vincular_rubro_plandecuentas
 ?> 
