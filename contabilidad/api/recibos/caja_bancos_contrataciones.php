@@ -201,5 +201,8 @@ class Caja_bancos_contrataciones extends DB{
 
     }
 
+    public function traspaso($idcaja_origen,$idcaja_destino,$monto,$trans){
+        $cont
+    }
     }
 ?>
