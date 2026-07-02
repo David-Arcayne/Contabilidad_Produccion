@@ -30,6 +30,7 @@ require_once "./configuracion/tipo_cliente_comercial.php";
 require_once "./configuracion/reporte_flujo_efectivo.php";
 require_once "./configuracion/usuario_gestion.php";
 require_once "./configuracion/vinculacion_empresas.php";
+require_once "./configuracion/reporte_evolucion_patrimonio.php";
 
 $ver=explode("/",$_GET['ver']); 
 if($ver[0]=="verificacion"){
@@ -824,6 +825,12 @@ elseif($ver[0]=="listar_cobros_comercial_sin_cuenta"){
 }elseif($ver[0]=="reporte_balance_general_por_niveles_consolidados_hasta"){
     $cont=new Reporte_confi();
     $cont->reporte_balance_general_por_niveles_consolidados_hasta($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
+}elseif($ver[0]=="select_patrimonio_gestion_anterior"){
+    $cont=new Reporte_evolucion_patrimonio();
+    $cont->select_patrimonio_gestion_anterior($ver[1]);
+}elseif($ver[0]=="listar_planilla_actualizacion_patrimonio"){
+    $cont=new Reporte_evolucion_patrimonio();
+    $cont->listar_planilla_actualizacion_patrimonio($ver[1],$ver[2]);
 }
 
 // elseif($ver[0]=="reporte_calculo_otro_reporte_consolidado"){
@@ -849,7 +856,7 @@ elseif($ver[0]=="listar_cobros_comercial_sin_cuenta"){
 //
 
 // 
-//  listar_cobros_comercial_sin_cuenta reportedetallefpt  listatipodecambio reportedeplanes activar_desactivar_gestiones listar_comprobantes_cobro_pago
+//  reporte_estado_origen_aplicacion reportedetallefpt  listatipodecambio reportedeplanes activar_desactivar_gestiones listar_comprobantes_cobro_pago
 //  reporte_balance_general_por_niveles_consolidados listar_factura_comercial listatransacciones reporte_balance_general_prueba listar_agrupacion_plantilla facturas_perteneciente_a_cuenta
 // 
 // 

@@ -26,6 +26,7 @@ require_once "./configuracion/tipo_cliente_comercial.php";
 require_once "./configuracion/reporte_flujo_efectivo.php";
 require_once "./configuracion/usuario_gestion.php";
 require_once "./configuracion/vinculacion_empresas.php";
+require_once "./configuracion/reporte_evolucion_patrimonio.php";
 // require_once "./recibos/caja_bancos_contrataciones.php";
 
 $ver=$_POST['ver'];
@@ -474,20 +475,20 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         }
     }
     elseif($ver=="registrar_cuenta_pre_cierre"){
-        if(isset($_POST['fecha'],$_POST['empresa'],$_POST['sucursal'],$_POST['idgestion'])){
+        if(isset($_POST['fecha'],$_POST['idtipo_transaccion'],$_POST['empresa'],$_POST['sucursal'],$_POST['idgestion'])){
             $cont=new Transacciones();
-            $cont->registrar_cuenta_pre_cierre($_POST['fecha'],$_POST['empresa'],$_POST['sucursal'],$_POST['idgestion']);
+            $cont->registrar_cuenta_pre_cierre($_POST['fecha'],$_POST['idtipo_transaccion'],$_POST['empresa'],$_POST['sucursal'],$_POST['idgestion']);
         }
         else{
-            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['fecha'],$_POST['empresa'],$_POST['sucursal'],$_POST['idgestion']));
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['fecha'],$_POST['idtipo_transaccion'],$_POST['empresa'],$_POST['sucursal'],$_POST['idgestion']));
         }
     }elseif($ver=="registrar_cuenta_cierre"){
-        if(isset($_POST['fecha'],$_POST['empresa'],$_POST['sucursal'],$_POST['idgestion'])){
+        if(isset($_POST['fecha'],$_POST['idtipo_transaccion'],$_POST['empresa'],$_POST['sucursal'],$_POST['idgestion'])){
             $cont=new Transacciones();
-            $cont->registrar_cuenta_cierre($_POST['fecha'],$_POST['empresa'],$_POST['sucursal'],$_POST['idgestion']);
+            $cont->registrar_cuenta_cierre($_POST['fecha'],$_POST['idtipo_transaccion'],$_POST['empresa'],$_POST['sucursal'],$_POST['idgestion']);
         }
         else{
-            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['fecha'],$_POST['empresa'],$_POST['sucursal'],$_POST['idgestion']));
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['fecha'],$_POST['idtipo_transaccion'],$_POST['empresa'],$_POST['sucursal'],$_POST['idgestion']));
         }
     }elseif($ver=="registrar_cuenta_apertura"){
         if(isset($_POST['fecha'],$_POST['idgestion_anterior'],$_POST['empresa'],$_POST['sucursal'],$_POST['idgestion'])){
@@ -960,6 +961,9 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     }elseif($ver == "editar_gestion_empresa_vinculada"){
         $cont=new Vinculacion_empresas();
         $cont->editar_gestion_empresa_vinculada($_POST['idvinculacion'],$_POST['idgestion']);
+    }elseif($ver == "registrar_actualizacion_patrimonio"){
+        $cont=new Reporte_evolucion_patrimonio();
+        $cont->registrar_actualizacion_patrimonio($_POST['idplantilla_reporte'],$_POST['idcuenta_patrimonio'],$_POST['valor'],$_POST['idgestion'],$_POST['idempresa']);
     }
   
 // rangosolicituddesconsolidar asiento desvincular_documentos_de_cuenta editar_recibo_caja_bancos registrocobrarfactura registrar_anular_eliminar_activar_factura_tributario_transaccion
@@ -968,7 +972,7 @@ if($data['ver'] == "asignar_asiento_A_factura") {
 // asignar_comprobantes_A_comprobantes guardar_balance_general_por_gestion registrogestion ss desvincular_facturas_comercial_de_transaccion
 //asignar_cobros_comercial_A_cuentas
 } 
-//  proveedor  registrar_agrupacion_plantilla registrar_recibo_pago_cajaBancos_en_otras_cuentas asignar_facturas_comercial_A_cuentas
+//  proveedor  cierre registrar_recibo_pago_cajaBancos_en_otras_cuentas asignar_facturas_comercial_A_cuentas
 // creartipoasiento registrar_configuracion_reporte registrar_factura_recibo_pago_cajaBancos registrar_recibo_pago_cajaBancos_en_facturas editar_otras_operaciones
 // asignar_asiento_A_factura vincular_rubro_plandecuentas
 ?> 

@@ -871,24 +871,6 @@ class Admin extends DB
         echo json_encode($res);
     }
     
-    // public function deleteplan($dato)
-    // {
-    //     $res = "";
-    //     $detalle = $this->dbc->query("select * from detalletransaccion where idplandecuenta='$dato'");
-    //     $qwe = $this->dbc->fetch($detalle);
-    //     if ($qwe['idplandecuenta'] == $dato) {
-    //         $res = array("danger", "No se pudo Eliminar, por que contiene datos registrados.");
-    //     } else {
-    //         $registro = $this->dbc->query("DELETE FROM plandecuenta WHERE idplandecuenta='$dato'");
-    //         if ($registro === TRUE) {
-    //             $res = array("success", "Se Elimino Correctamente", "registroplanes");
-    //         } else {
-    //             $res = array("danger", "No se pudo Eliminar");
-    //         }
-    //     }
-    //     echo json_encode($res);
-    // }
-
     public function reemplazar_todos_planescuentas($empresa)
     {
         $res = "";

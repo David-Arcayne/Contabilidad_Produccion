@@ -44,12 +44,6 @@ class Transacciones extends DB{
                 LIMIT 1
             ");
         } else { // POR_GESTION
-        //     $ultimo_trans = $this->dbc->query("SELECT * FROM transacciones 
-        //         WHERE organizacion_idorganizacion = '$ide'
-        //         AND idgestion = '$idgestion'
-        //         ORDER BY codigotransaccion DESC
-        //         LIMIT 1");
-        // $ut = $ultimo_trans->fetch_assoc();
         
             $nroTransa = $this->dbc->query("SELECT *
                 FROM transacciones 
@@ -988,7 +982,7 @@ if($filtrado->num_rows > 0){
 
     } 
 
-     public function registrar_cuenta_pre_cierre($fecha,$empresa,$sucursal,$idgestion) {
+     public function registrar_cuenta_pre_cierre($fecha,$tipotransaccion,$empresa,$sucursal,$idgestion) {
 
         $idsucursal = $this->getidsucursal($sucursal);
         $ide = $this->getidempresa($empresa);
@@ -997,6 +991,7 @@ if($filtrado->num_rows > 0){
         $existe_cuenta = $this->dbc->query("SELECT * FROM vinculacion_cuenta_xcxp WHERE cobrar_pagar ='3' AND idempresa = '$ide'");
 
         if($existe_cuenta->num_rows > 0){
+
 
         $control_consolidado = 0;
         $arre = [];
@@ -1034,76 +1029,122 @@ if($filtrado->num_rows > 0){
                 $editar = $this->dbc->query("UPDATE transacciones SET consolidar = '2' WHERE idtransacciones ='$trans_2[idtransacciones]'");
             }
 
-        $nroTrans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE organizacion_idorganizacion=$ide AND idgestion='$idgestion' ORDER BY codigotransaccion DESC LIMIT 1;");
-        $resultado12 = $nroTrans->fetch_assoc();
-        $nroTransaccion = $resultado12['codigotransaccion'] + 1;
+        // $nroTrans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE organizacion_idorganizacion=$ide AND idgestion='$idgestion' ORDER BY codigotransaccion DESC LIMIT 1;");
+        // $resultado12 = $nroTrans->fetch_assoc();
+        // $nroTransaccion = $resultado12['codigotransaccion'] + 1;
 
-        //REGISTRAR TRANSACCION
+        // Construir rango dinámico (primer y último día del mes)
+        $fecha_inicio = date("Y-m-01", strtotime($fecha)); // "2025-03-01"
+        $fecha_fin    = date("Y-m-t", strtotime($fecha));  // "2025-03-31"
 
-         $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
-        VALUE(NULL,'$nroTransaccion','$fecha', '1', '0', 'Registro de Precierre', '2','1', '0', '$ide', '$idsucursal', '$idgestion')");
+        // aqui la condicional si hay una nueva gestion
 
-          $idtransaccion = $this->dbc->insert_id;
+        $gestion_sel = $this->dbc->query("SELECT * FROM gestion WHERE idgestion='$idgestion'");
+        $gc = $gestion_sel->fetch_assoc();
 
-          $cuenta_vinculada = $this->dbc->query("SELECT * FROM vinculacion_cuenta_xcxp WHERE cobrar_pagar='3' AND idempresa ='$ide'");
-          $vinculacion = $cuenta_vinculada->fetch_assoc();
-
-
-            $cuenta_resultados = $this->dbc->query("SELECT p.idplandecuenta,p.numero,p.nombreplan,SUM(d.debe) as debe,SUM(d.haber) as haber,SUM(debe)-SUM(haber) as deudor,SUM(haber)-SUM(debe) as acreedor 
-            FROM plandecuenta as p
-                INNER JOIN transacciones as t ON t.organizacion_idorganizacion='$ide'
-                INNER JOIN detalletransaccion as d ON d.idplandecuenta=p.idplandecuenta AND t.idtransacciones=d.transacciones_idtransacciones
-                WHERE p.organizacion_idorganizacion='$ide' AND p.numero>'4.0.0.00.00' AND p.numero<'7.0.0.00.00' AND t.idgestion='$idgestion'  
-                GROUP by p.nombreplan 
-                ORDER by p.numero ASC;");
-
-            $orden_ultimo = 0;
-        while($cr=$this->dbc->fetch($cuenta_resultados)){
+        if($gc['formato_transaccion'] == 'por_tipo_mes') {
+            $nroTransa = $this->dbc->query("SELECT *
+            --  COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+            FROM transacciones
+            WHERE tipotransaccion_idtipotransaccion = '$tipotransaccion'
+            and fechatransaccion BETWEEN '$fecha_inicio' AND '$fecha_fin'
+            AND idgestion = '$idgestion'
+            AND organizacion_idorganizacion = '$ide'
+            ORDER BY codigotransaccion DESC
+                LIMIT 1
+            ");
+        } elseif($gc['formato_transaccion'] == 'por_tipo_gestion') {
+            $nroTransa = $this->dbc->query("SELECT *
+            -- COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                FROM transacciones 
+                WHERE tipotransaccion_idtipotransaccion = '$tipotransaccion'
+                AND idgestion = '$idgestion'
+                AND organizacion_idorganizacion = '$ide'
+                ORDER BY codigotransaccion DESC
+                LIMIT 1
+            ");
+        } else { // POR_GESTION
         
-        $listaUltimoDetalle = $this->dbc->query("SELECT orden FROM detalletransaccion WHERE transacciones_idtransacciones='$idtransaccion' ORDER BY orden DESC LIMIT 1;");
-        $ulti_registro = $listaUltimoDetalle->fetch_assoc();
-        $nuevaOrden = $ulti_registro['orden'] + 1;
-            // REGISTRAR DETALLE_TRANSACCION CON LA NUEVA CUENTA DE PRE_CIERRE
-            $deudor = 0;
-            $acreedor = 0;
-            if($cr['deudor'] > 0){
-                $deudor = $cr['deudor'];
-            }else{
-                $acreedor = $cr['acreedor'];
+            $nroTransa = $this->dbc->query("SELECT *
+                FROM transacciones 
+                WHERE organizacion_idorganizacion = '$ide'
+                AND idgestion = '$idgestion'
+                ORDER BY codigotransaccion DESC
+                LIMIT 1
+            ");
+        }
+
+        $resultado122 = $nroTransa->fetch_assoc();
+        $nroTransaccion = $resultado122['codigotransaccion'] + 1;
+
+        if($fecha >= $resultado122['fechatransaccion']){ 
+            //REGISTRAR TRANSACCION
+            $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
+            VALUE(NULL,'$nroTransaccion','$fecha', '1', '0', 'Registro de Precierre', '2','1', '0', '$ide', '$idsucursal', '$idgestion')");
+
+            $idtransaccion = $this->dbc->insert_id;
+
+            $cuenta_vinculada = $this->dbc->query("SELECT * FROM vinculacion_cuenta_xcxp WHERE cobrar_pagar='3' AND idempresa ='$ide'");
+            $vinculacion = $cuenta_vinculada->fetch_assoc();
+
+
+                $cuenta_resultados = $this->dbc->query("SELECT p.idplandecuenta,p.numero,p.nombreplan,SUM(d.debe) as debe,SUM(d.haber) as haber,SUM(debe)-SUM(haber) as deudor,SUM(haber)-SUM(debe) as acreedor 
+                FROM plandecuenta as p
+                    INNER JOIN transacciones as t ON t.organizacion_idorganizacion='$ide'
+                    INNER JOIN detalletransaccion as d ON d.idplandecuenta=p.idplandecuenta AND t.idtransacciones=d.transacciones_idtransacciones
+                    WHERE p.organizacion_idorganizacion='$ide' AND p.numero>'4.0.0.00.00' AND p.numero<'7.0.0.00.00' AND t.idgestion='$idgestion'  
+                    GROUP by p.nombreplan 
+                    ORDER by p.numero ASC;");
+
+                $orden_ultimo = 0;
+            while($cr=$this->dbc->fetch($cuenta_resultados)){
+            
+            $listaUltimoDetalle = $this->dbc->query("SELECT orden FROM detalletransaccion WHERE transacciones_idtransacciones='$idtransaccion' ORDER BY orden DESC LIMIT 1;");
+            $ulti_registro = $listaUltimoDetalle->fetch_assoc();
+            $nuevaOrden = $ulti_registro['orden'] + 1;
+                // REGISTRAR DETALLE_TRANSACCION CON LA NUEVA CUENTA DE PRE_CIERRE
+                $deudor = 0;
+                $acreedor = 0;
+                if($cr['deudor'] > 0){
+                    $deudor = $cr['deudor'];
+                }else{
+                    $acreedor = $cr['acreedor'];
+                }
+
+                $crearDet_trans = $this->dbc->query("INSERT INTO detalletransaccion(debe,haber,nota,transacciones_idtransacciones,idplandecuenta,idcuentapresupuestaria,estado,cobrar,pagar,idorganizacion,idsucursal,orden)
+                VALUES ('$acreedor','$deudor','-','$idtransaccion','$cr[idplandecuenta]','0','1','2','2','$ide','$idsucursal','$nuevaOrden')");
+
+                $orden_ultimo = $nuevaOrden + 1;
             }
 
+            $lista_ulti_transaccion = $this->dbc->query("SELECT SUM(debe) as debe,SUM(haber) as haber FROM detalletransaccion WHERE transacciones_idtransacciones ='$idtransaccion'");
+            $sumas_nuevas = $lista_ulti_transaccion->fetch_assoc(); 
+
+            $debe_nuevo =0;
+            $haber_nuevo =0;
+
+            if($sumas_nuevas['debe'] > $sumas_nuevas['haber']){
+                $diferencia_sumas = $sumas_nuevas['debe'] - $sumas_nuevas['haber'];
+                $haber_nuevo = $diferencia_sumas;
+            }else{
+                $diferencia_sumas = $sumas_nuevas['haber'] - $sumas_nuevas['debe'];
+                $debe_nuevo = $diferencia_sumas;
+            }
             $crearDet_trans = $this->dbc->query("INSERT INTO detalletransaccion(debe,haber,nota,transacciones_idtransacciones,idplandecuenta,idcuentapresupuestaria,estado,cobrar,pagar,idorganizacion,idsucursal,orden)
-            VALUES ('$acreedor','$deudor','-','$idtransaccion','$cr[idplandecuenta]','0','1','2','2','$ide','$idsucursal','$nuevaOrden')");
+                VALUES ('$debe_nuevo','$haber_nuevo','-','$idtransaccion','$vinculacion[idplandecuenta]','0','1','2','2','$ide','$idsucursal','$orden_ultimo')");
 
-            $orden_ultimo = $nuevaOrden + 1;
-        }
+            if ($crearDet_trans === TRUE) {
 
-        $lista_ulti_transaccion = $this->dbc->query("SELECT SUM(debe) as debe,SUM(haber) as haber FROM detalletransaccion WHERE transacciones_idtransacciones ='$idtransaccion'");
-        $sumas_nuevas = $lista_ulti_transaccion->fetch_assoc(); 
+                $crear_cierre = $this->dbc->query("INSERT INTO cierre_transacciones(nombre_operacion,estado,idtransacciones,idgestion,idempresa)
+                VALUES ('precierre','1','$idtransaccion','$idgestion','$ide')");
 
-        $debe_nuevo =0;
-        $haber_nuevo =0;
-
-        if($sumas_nuevas['debe'] > $sumas_nuevas['haber']){
-            $diferencia_sumas = $sumas_nuevas['debe'] - $sumas_nuevas['haber'];
-            $haber_nuevo = $diferencia_sumas;
+                $res = array("success", "Se Registro Correctamente", "detalletransaccionnormal");
+            } else {
+                $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde","aa si entre a crear trans precierre pero falle a medio camino");
+            }
         }else{
-            $diferencia_sumas = $sumas_nuevas['haber'] - $sumas_nuevas['debe'];
-            $debe_nuevo = $diferencia_sumas;
+            $res = array("danger", "La fecha debe ser posterior al último registro realizado: ".$resultado122['fechatransaccion']);
         }
-          $crearDet_trans = $this->dbc->query("INSERT INTO detalletransaccion(debe,haber,nota,transacciones_idtransacciones,idplandecuenta,idcuentapresupuestaria,estado,cobrar,pagar,idorganizacion,idsucursal,orden)
-            VALUES ('$debe_nuevo','$haber_nuevo','-','$idtransaccion','$vinculacion[idplandecuenta]','0','1','2','2','$ide','$idsucursal','$orden_ultimo')");
-
-        if ($crearDet_trans === TRUE) {
-
-            $crear_cierre = $this->dbc->query("INSERT INTO cierre_transacciones(nombre_operacion,estado,idtransacciones,idgestion,idempresa)
-            VALUES ('precierre','1','$idtransaccion','$idgestion','$ide')");
-
-            $res = array("success", "Se Registro Correctamente", "detalletransaccionnormal");
-        } else {
-            $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde","aa si entre a crear trans precierre pero falle a medio camino");
-        }
-
     }else{
             // NO SE PODRA HACER LA CONSOLIDACION MULTIPLE NI EL CIERRE
            
@@ -1117,7 +1158,7 @@ if($filtrado->num_rows > 0){
     // echo json_encode(array($control_consolidado,$fecha,$empresa,$sucursal,$arre));
     } 
 
-       public function registrar_cuenta_cierre($fecha,$empresa,$sucursal,$idgestion) {
+       public function registrar_cuenta_cierre($fecha,$tipotransaccion,$empresa,$sucursal,$idgestion) {
 
         $idsucursal = $this->getidsucursal($sucursal);
         $ide = $this->getidempresa($empresa);
@@ -1133,11 +1174,56 @@ if($filtrado->num_rows > 0){
         if($existe->num_rows > 0){
             //se creara transaccion de cierre nada mas
 
-            $nroTrans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE organizacion_idorganizacion=$ide AND idgestion='$idgestion' ORDER BY codigotransaccion DESC LIMIT 1;");
-            $resultado12 = $nroTrans->fetch_assoc();
-            $nroTransaccion = $resultado12['codigotransaccion'] + 1;
-            //REGISTRAR TRANSACCION
+            // $nroTrans = $this->dbc->query("SELECT codigotransaccion FROM transacciones WHERE organizacion_idorganizacion=$ide AND idgestion='$idgestion' ORDER BY codigotransaccion DESC LIMIT 1;");
+            // $resultado12 = $nroTrans->fetch_assoc();
+            // $nroTransaccion = $resultado12['codigotransaccion'] + 1;
 
+            // Construir rango dinámico (primer y último día del mes)
+        $fecha_inicio = date("Y-m-01", strtotime($fecha)); // "2025-03-01"
+        $fecha_fin    = date("Y-m-t", strtotime($fecha));  // "2025-03-31"
+
+        // aqui la condicional si hay una nueva gestion
+
+        $gestion_sel = $this->dbc->query("SELECT * FROM gestion WHERE idgestion='$idgestion'");
+        $gc = $gestion_sel->fetch_assoc();
+
+        if($gc['formato_transaccion'] == 'por_tipo_mes') {
+            $nroTransa = $this->dbc->query("SELECT *
+            --  COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+            FROM transacciones
+            WHERE tipotransaccion_idtipotransaccion = '$tipotransaccion'
+            and fechatransaccion BETWEEN '$fecha_inicio' AND '$fecha_fin'
+            AND idgestion = '$idgestion'
+            AND organizacion_idorganizacion = '$ide'
+            ORDER BY codigotransaccion DESC
+                LIMIT 1
+            ");
+        } elseif($gc['formato_transaccion'] == 'por_tipo_gestion') {
+            $nroTransa = $this->dbc->query("SELECT *
+            -- COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
+                FROM transacciones 
+                WHERE tipotransaccion_idtipotransaccion = '$tipotransaccion'
+                AND idgestion = '$idgestion'
+                AND organizacion_idorganizacion = '$ide'
+                ORDER BY codigotransaccion DESC
+                LIMIT 1
+            ");
+        } else { // POR_GESTION
+        
+            $nroTransa = $this->dbc->query("SELECT *
+                FROM transacciones 
+                WHERE organizacion_idorganizacion = '$ide'
+                AND idgestion = '$idgestion'
+                ORDER BY codigotransaccion DESC
+                LIMIT 1
+            ");
+        }
+
+        $resultado122 = $nroTransa->fetch_assoc();
+        $nroTransaccion = $resultado122['codigotransaccion'] + 1;
+
+        if($fecha >= $resultado122['fechatransaccion']){ 
+            //REGISTRAR TRANSACCION
             $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
             VALUE(NULL,'$nroTransaccion','$fecha', '1', '0', 'Registro de Cierre', '2','10', '0', '$ide', '$idsucursal', '$idgestion')");
 
@@ -1200,6 +1286,10 @@ if($filtrado->num_rows > 0){
             } else {
                 $res = array("danger", "Lo siento hubo un problema,por favor vuelva a intentar mas tarde");
             }
+        }else{
+
+            $res = array("danger", "La fecha debe ser posterior al último registro realizado: ".$resultado122['fechatransaccion']);
+        }
 
         }else{
             // no se creara transaccion de cierre porque todavia no existe transaccion de precierre 
