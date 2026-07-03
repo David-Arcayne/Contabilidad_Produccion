@@ -974,5 +974,5 @@ if($data['ver'] == "asignar_asiento_A_factura") {
 } 
 //  proveedor  cierre registrar_recibo_pago_cajaBancos_en_otras_cuentas asignar_facturas_comercial_A_cuentas
 // creartipoasiento registrar_configuracion_reporte registrar_factura_recibo_pago_cajaBancos registrar_recibo_pago_cajaBancos_en_facturas editar_otras_operaciones
-// asignar_asiento_A_factura vincular_rubro_plandecuentas
+// apertura vincular_rubro_plandecuentas
 ?> 

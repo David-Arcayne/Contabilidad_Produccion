@@ -1024,7 +1024,7 @@ if($filtrado->num_rows > 0){
          if($control_consolidado == 0){ //todas las transacciones si estan sus sumas iguales CUADRANDO
 
 
-            $transaccion_2 = $this->dbc->query("SELECT * FROM transacciones WHERE idgestion ='$idgestion' AND consolidar = '1' AND codigotransaccion > '0'");
+            $transaccion_2 = $this->dbc->query("SELECT * FROM transacciones WHERE idgestion ='$idgestion' AND consolidar = '1' AND codigotransaccion > '0' AND estado ='1'");
             while($trans_2=$this->dbc->fetch($transaccion_2)){
                 $editar = $this->dbc->query("UPDATE transacciones SET consolidar = '2' WHERE idtransacciones ='$trans_2[idtransacciones]'");
             }
@@ -1080,7 +1080,7 @@ if($filtrado->num_rows > 0){
         if($fecha >= $resultado122['fechatransaccion']){ 
             //REGISTRAR TRANSACCION
             $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
-            VALUE(NULL,'$nroTransaccion','$fecha', '1', '0', 'Registro de Precierre', '2','1', '0', '$ide', '$idsucursal', '$idgestion')");
+            VALUE(NULL,'$nroTransaccion','$fecha', '1', '0', 'Registro de Precierre', '2','1', '$tipotransaccion', '$ide', '$idsucursal', '$idgestion')");
 
             $idtransaccion = $this->dbc->insert_id;
 
@@ -1225,7 +1225,7 @@ if($filtrado->num_rows > 0){
         if($fecha >= $resultado122['fechatransaccion']){ 
             //REGISTRAR TRANSACCION
             $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
-            VALUE(NULL,'$nroTransaccion','$fecha', '1', '0', 'Registro de Cierre', '2','10', '0', '$ide', '$idsucursal', '$idgestion')");
+            VALUE(NULL,'$nroTransaccion','$fecha', '1', '0', 'Registro de Cierre', '2','10', '$tipotransaccion', '$ide', '$idsucursal', '$idgestion')");
 
             $idtransaccion = $this->dbc->insert_id;
 
