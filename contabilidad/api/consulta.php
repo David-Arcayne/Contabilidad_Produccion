@@ -843,12 +843,12 @@ elseif($ver[0]=="listar_cobros_comercial_sin_cuenta"){
 //     $cont->obtenerGestionAnterior($ver[1],$ver[2]); eliminar_gestion_contable   
 // }
 
-// listar_anular_eliminar_transaccion  rp listadegestion listar_select_cuentas_balance_general reporte_calculo_otro_reporte_consolidado
+// listar_recibo_por_caja_bancos  rp listadegestion listar_select_cuentas_balance_general reporte_calculo_otro_reporte_consolidado
 // reporte_balance_general_por_niveles_consolidados listar_facturas_cobro_pago listar_recibo_por_caja_bancos listar_facturas_comercial_cobro
 // reporte_balance_general_por_niveles_consolidados listar_reportes_referencia_select eliminar_otras_operaciones listadegestion listar_factura_comercial_con_transaccion
 
 // reportebalancedesumasysaldos listar_caja_bancos listar_facturas_comercial_cobro mayorcuentacontable listar_anular_eliminar_factura
-// listatransacciones reporte_flujo_efectivo listar_plantilla_flujo_efectivo listar_cobros_comercial
+// guardar reporte_flujo_efectivo listar_plantilla_flujo_efectivo listar_cobros_comercial
 // 
 // reporte_balance_general_por_niveles_consolidados listar_usuarios  listar_agrupacion_plantilla reportecuentasderesultado reportedetallefpt
 // reportedetallefp lista_pagar_pagado_factura mayorcuentacontable_antiguo listar_solo_usuarios  reporte_estado_resultados_actualizado_consolidado_por_niveles

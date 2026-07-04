@@ -53,7 +53,7 @@ class Reporte_evolucion_patrimonio extends DB{
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
 
-    public function registrar_actualizacion_patrimonio($idplantilla_reporte,$idcuenta_patrimonio,$valor,$idgestion,$idempresa){
+    public function registrar_actualizacion_patrimonio($idplantilla_reporte,$idcuenta_patrimonio,$valor,$idgestion,$idempresa){//ESTA API SERA PARA EL REGISTRO DE LA PLANTILLA DE ACTUALIZACION PATRIMONIO
         // $idempresa = Empresa::getidempresa($empresa);
         // $idempresa = $this->getidempresa($empresa);
        

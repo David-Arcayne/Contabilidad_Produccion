@@ -491,12 +491,12 @@ if($data['ver'] == "asignar_asiento_A_factura") {
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['fecha'],$_POST['idtipo_transaccion'],$_POST['empresa'],$_POST['sucursal'],$_POST['idgestion']));
         }
     }elseif($ver=="registrar_cuenta_apertura"){
-        if(isset($_POST['fecha'],$_POST['idgestion_anterior'],$_POST['empresa'],$_POST['sucursal'],$_POST['idgestion'])){
+        if(isset($_POST['fecha'],$_POST['idtipo_transaccion'],$_POST['idgestion_anterior'],$_POST['empresa'],$_POST['sucursal'],$_POST['idgestion'])){
             $cont=new Transacciones();
-            $cont->registrar_cuenta_apertura($_POST['fecha'],$_POST['idgestion_anterior'],$_POST['empresa'],$_POST['sucursal'],$_POST['idgestion']);
+            $cont->registrar_cuenta_apertura($_POST['fecha'],$_POST['idtipo_transaccion'],$_POST['idgestion_anterior'],$_POST['empresa'],$_POST['sucursal'],$_POST['idgestion']);
         }
         else{
-            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['fecha'],$_POST['idgestion_anterior'],$_POST['empresa'],$_POST['sucursal'],$_POST['idgestion']));
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['fecha'],$_POST['idtipo_transaccion'],$_POST['idgestion_anterior'],$_POST['empresa'],$_POST['sucursal'],$_POST['idgestion']));
         }
     }elseif($ver=="editar_caja_bancos_usuarios"){
         if(isset($_POST['idcaja_banco_usuario'],$_POST['idcaja_bancos'],$_POST['idtrabajador'],$_POST['funcion'],$_POST['permiso_registrar'],$_POST['empresa'])){
@@ -972,7 +972,7 @@ if($data['ver'] == "asignar_asiento_A_factura") {
 // asignar_comprobantes_A_comprobantes guardar_balance_general_por_gestion registrogestion ss desvincular_facturas_comercial_de_transaccion
 //asignar_cobros_comercial_A_cuentas
 } 
-//  proveedor  cierre registrar_recibo_pago_cajaBancos_en_otras_cuentas asignar_facturas_comercial_A_cuentas
+//  guardar  cierre registrar_recibo_pago_cajaBancos_en_otras_cuentas asignar_facturas_comercial_A_cuentas
 // creartipoasiento registrar_configuracion_reporte registrar_factura_recibo_pago_cajaBancos registrar_recibo_pago_cajaBancos_en_facturas editar_otras_operaciones
 // apertura vincular_rubro_plandecuentas
 ?> 
