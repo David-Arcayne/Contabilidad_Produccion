@@ -963,14 +963,14 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         $cont->editar_gestion_empresa_vinculada($_POST['idvinculacion'],$_POST['idgestion']);
     }elseif($ver == "registrar_actualizacion_patrimonio"){
         $cont=new Reporte_evolucion_patrimonio();
-        $cont->registrar_actualizacion_patrimonio($_POST['idplantilla_reporte'],$_POST['idcuenta_patrimonio'],$_POST['valor'],$_POST['idgestion'],$_POST['idempresa']);
+        $cont->registrar_actualizacion_patrimonio($_POST['idplantilla_reporte'],$_POST['idcuenta_patrimonio'],$_POST['orden'],$_POST['idgestion'],$_POST['idempresa']);
     }
   
 // rangosolicituddesconsolidar asiento desvincular_documentos_de_cuenta editar_recibo_caja_bancos registrocobrarfactura registrar_anular_eliminar_activar_factura_tributario_transaccion
 //   registrar_balance_general_admin registrar_vinculacion_depreciacion editar_registro_flujo_efectivo activar_desactivar_tipo_reportes creartipoasiento
 
 // asignar_comprobantes_A_comprobantes guardar_balance_general_por_gestion registrogestion ss desvincular_facturas_comercial_de_transaccion
-//asignar_cobros_comercial_A_cuentas
+//asignar_recibos_A_cuentas
 } 
 //  guardar  cierre registrar_recibo_pago_cajaBancos_en_otras_cuentas asignar_facturas_comercial_A_cuentas
 // creartipoasiento registrar_configuracion_reporte registrar_factura_recibo_pago_cajaBancos registrar_recibo_pago_cajaBancos_en_facturas editar_otras_operaciones

@@ -467,19 +467,29 @@ ORDER BY
     public function eliminardetalle($dato)
     {
         $res = "";
-        $detallet = $this->dbc->query("SELECT COUNT(*) AS total FROM factura WHERE cuenta='$dato'");
-        $resultado = $detallet->fetch_assoc();
-        $totalRegistros = $resultado['total'];
-        if($totalRegistros > 0){
-            $res = array("danger", "No se pudo eliminar");
-        }else{
+        // $detallet = $this->dbc->query("SELECT COUNT(*) AS total FROM factura WHERE cuenta='$dato'");
+        // $resultado = $detallet->fetch_assoc();
+        // $totalRegistros = $resultado['total'];
+      
+            // $update_recibo_c=$this->dbc->query("UPDATE recibo SET cuenta = '0' 
+            //             WHERE cuenta = '$dato'");  
+
+            //             $update_factura_c=$this->dbc->query("UPDATE factura SET cuenta = '0' 
+            //             WHERE cuenta = '$dato'");   
+
+            //             $update_compr_c=$this->dbc->query("UPDATE cuentaspof SET cuenta = '0' 
+            //                     WHERE cuenta = '$dato'");  
+
+            //             $update_comprob_c=$this->dbc->query("UPDATE cuentaspor SET cuenta = '0' 
+            //                     WHERE cuenta = '$dato'"); 
+
             $registro = $this->dbc->query("DELETE FROM detalletransaccion WHERE iddetalletransaccion='$dato'");
             if ($registro === TRUE) {
                 $res = array("success", "Se Elimino");
             } else {
                 $res = array("danger", "No se pudo eliminar");
             }
-        }
+        
         
         echo json_encode($res);
     }
@@ -1766,7 +1776,26 @@ public function asignar_facturas_A_cuentas($data) {
                     WHERE iddetalletransaccion = '$data[cuenta]'
                 ");
             }
+        }elseif($data['sumar_reemplazar'] == 'reemplazo'){ // REEMPLAZAR
+
+        // desvincular todos los documentos de esta cuenta
+            $desv_recibo = $this->dbc->query("UPDATE recibo SET cuenta = '0',transaccion = '0' WHERE cuenta = '$data[cuenta]'");
+            $desv_factura = $this->dbc->query("UPDATE factura SET cuenta = '0',transacciones_idtransacciones = '0' WHERE cuenta = '$data[cuenta]'");
+            $desv_comprob_cobr = $this->dbc->query("UPDATE cuentaspof SET cuenta = '0',transaccion = '0' WHERE cuenta = '$data[cuenta]'");
+            $desv_comprob_pag = $this->dbc->query("UPDATE cuentaspor SET cuenta = '0',transaccion = '0' WHERE cuenta = '$data[cuenta]'");
+            $desv_comer = $this->dbc->query("DELETE FROM transaccion_documentos_comercial WHERE cuenta = '$data[cuenta]'");
+            
+            if($dt['debe'] > 0){
+                $nuevo_monto_dt = $montoRecibos;
+                $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
+            }else{
+                $nuevo_monto_dt = $montoRecibos;
+                $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
+            }
+        }else{
+            // SOLO VINCULARA
         }
+
         
         foreach ($data['recibos'] as $recibo) {
 

@@ -167,6 +167,21 @@ public function registrar_anular_eliminar_activar_transaccion($idtransaccion,$mo
 
                 if ($consulta_detalle->num_rows > 0) {  
 
+                    while ($cd = $this->dbc->fetch($consulta_detalle)) {
+
+                        $update_recibo_c=$this->dbc->query("UPDATE recibo SET cuenta = '0' 
+                        WHERE cuenta = '$cd[iddetalletransaccion]'");  
+
+                        $update_factura_c=$this->dbc->query("UPDATE factura SET cuenta = '0' 
+                        WHERE cuenta = '$cd[iddetalletransaccion]'");   
+
+                        $update_compr_c=$this->dbc->query("UPDATE cuentaspof SET cuenta = '0' 
+                                WHERE cuenta = '$cd[iddetalletransaccion]'");  
+
+                        $update_comprob_c=$this->dbc->query("UPDATE cuentaspor SET cuenta = '0' 
+                                WHERE cuenta = '$cd[iddetalletransaccion]'");  
+                    }
+
                     // ELIMINAR DETALLES_TRANSACCION
                     $update_det=$this->dbc->query("DELETE FROM detalletransaccion 
                     WHERE transacciones_idtransacciones = '$idtransaccion'");        
@@ -184,13 +199,16 @@ public function registrar_anular_eliminar_activar_transaccion($idtransaccion,$mo
 
                 }
 
+                $update_recibo=$this->dbc->query("UPDATE recibo SET transaccion = '0' 
+                        WHERE transaccion = '$idtransaccion'"); 
+
                 $update_factura=$this->dbc->query("UPDATE factura SET transacciones_idtransacciones = '0' 
                         WHERE transacciones_idtransacciones = '$idtransaccion'");   
 
-                $update_recibo=$this->dbc->query("UPDATE cuentaspof SET transaccion = '0' 
+                $update_comprobante=$this->dbc->query("UPDATE cuentaspof SET transaccion = '0' 
                         WHERE transaccion = '$idtransaccion'");  
 
-                $update_recibo=$this->dbc->query("UPDATE cuentaspor SET transaccion = '0' 
+                $update_comprobante=$this->dbc->query("UPDATE cuentaspor SET transaccion = '0' 
                         WHERE transaccion = '$idtransaccion'");  
                 
                 $delete_trans_fact=$this->dbc->query("DELETE FROM transaccion_documentos_comercial
@@ -274,7 +292,7 @@ public function registrar_anular_eliminar_activar_transaccion($idtransaccion,$mo
 
                 $res = array("success", "Se Acepto la eliminacion de transaccion", "cambiarEstado_anular_eliminar_transaccion", $idgestion, $codig, $tipo_trans, $fecha_inicio, $fecha_fin,$fecha_trans);
 
-                }else{
+                }else{ //DENEGADO
                       //NO SE ANULARA NI CAMBIARA ESTADO DE TRANSACCION NI DETALLE TRANSACCION  
                       $update_trans=$this->dbc->query("UPDATE transacciones SET estado = '1' 
                         WHERE idtransacciones = '$idtransaccion'");  
