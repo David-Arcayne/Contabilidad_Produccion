@@ -136,7 +136,7 @@ class Cuentas_transacciones extends DB{
 
             }else{
                 // es pago
-                $recibo_clase = $this->dbc->query("SELECT * FROM recibo WHERE idempresa ='$idempresa' AND pagado != '1' AND cuenta ='0' AND transaccion IN(0,$dt[transacciones_idtransacciones]) ORDER BY fecha DESC");
+                $recibo_clase = $this->dbc->query("SELECT * FROM recibo WHERE idempresa ='$idempresa' AND pagado != '0' AND cuenta ='0' AND transaccion IN(0,$dt[transacciones_idtransacciones]) ORDER BY fecha DESC");
             }
         }else{
             //listara todas las facturas de cobro y pago porque no tiene ninguna factura todavia dentro
