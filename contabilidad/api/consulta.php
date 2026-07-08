@@ -831,6 +831,21 @@ elseif($ver[0]=="listar_cobros_comercial_sin_cuenta"){
 }elseif($ver[0]=="listar_planilla_actualizacion_patrimonio"){
     $cont=new Reporte_evolucion_patrimonio();
     $cont->listar_planilla_actualizacion_patrimonio($ver[1],$ver[2]);
+}elseif($ver[0]=="listar_divisa_activo"){
+    $cont=new Divisa();
+    $cont->listar_divisa_activo($ver[1]);
+}elseif($ver[0]=="eliminar_divisa"){
+    $cont=new Divisa();
+    $cont->eliminar_divisa($ver[1]);
+}elseif($ver[0]=="reporte_actualizacion_patrimonio"){
+    $cont=new Reporte_evolucion_patrimonio();
+    $cont->reporte_actualizacion_patrimonio($ver[1],$ver[2],$ver[3]);
+}elseif($ver[0]=="listar_operacion_actualizacion_patrimonio"){
+    $cont=new Reporte_evolucion_patrimonio();
+    $cont->listar_operacion_actualizacion_patrimonio($ver[1]);
+}elseif($ver[0]=="eliminar_operacion_actualizacion_patrimonio"){
+    $cont=new Reporte_evolucion_patrimonio();
+    $cont->eliminar_operacion_actualizacion_patrimonio($ver[1]);
 }
 
 // elseif($ver[0]=="reporte_calculo_otro_reporte_consolidado"){
@@ -844,7 +859,7 @@ elseif($ver[0]=="listar_cobros_comercial_sin_cuenta"){
 // }
 
 // listar_recibo_por_caja_bancos  rp listadegestion listar_select_cuentas_balance_general reporte_calculo_otro_reporte_consolidado
-// reporte_balance_general_por_niveles_consolidados listar_facturas_cobro_pago listar_recibo_por_caja_bancos listar_facturas_comercial_cobro
+// eliminar_divisa listar_facturas_cobro_pago listar_recibo_por_caja_bancos listar_facturas_comercial_cobro
 // reporte_balance_general_por_niveles_consolidados listar_reportes_referencia_select eliminar_otras_operaciones listadegestion listar_factura_comercial_con_transaccion
 
 // reportebalancedesumasysaldos listar_caja_bancos listar_facturas_comercial_cobro mayorcuentacontable listar_anular_eliminar_factura

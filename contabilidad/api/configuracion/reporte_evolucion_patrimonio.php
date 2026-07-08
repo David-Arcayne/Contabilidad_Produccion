@@ -129,13 +129,14 @@ class Reporte_evolucion_patrimonio extends DB{
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
 
-    public function registrar_operacion_actualizacion_patrimonio($idcuenta_involucrada,$columna_involucrada,$operacion,$idcuenta_padre,$idgestion,$idempresa){
+    public function registrar_operacion_actualizacion_patrimonio($idcuenta_patrimonio,$columna_obtenido,$operacion,$idcuenta_padre,$idgestion,$idempresa){
         // $idempresa = Empresa::getidempresa($empresa);
         // $idempresa = $this->getidempresa($empresa);
        
             // Insertar el nuevo registro
-            $registroProveedor = $this->dbc->query("INSERT INTO agrupacion_actualizacion_patrimonio(idcuenta_involucrada,columna_involucrada,operacion,idcuenta_padre,registro_desde,idgestion,idempresa) 
-            VALUES ('$idcuenta_involucrada','$columna_involucrada','$operacion','$idcuenta_padre','actualizacion_patrimonio','$idgestion','$idempresa')");
+            //EL idcuenta_patrimonio es EL idactualizacion_patrimonio 
+            $registroProveedor = $this->dbc->query("INSERT INTO agrupacion_actualizacion_patrimonio(idcuenta_patrimonio,columna_obtenido,operacion,idcuenta_padre,registro_desde,idgestion,idempresa) 
+            VALUES ('$idcuenta_patrimonio','$columna_obtenido','$operacion','$idcuenta_padre','actualizacion_patrimonio','$idgestion','$idempresa')");
             if ($registroProveedor === TRUE) {                                                                                                                                                                
                 // $res = array("success", "Registro exitoso","registroCaracteristicas");
 
@@ -158,8 +159,47 @@ class Reporte_evolucion_patrimonio extends DB{
         
     }
 
-    public function reporte_actualizacion_patrimonio($empresa) {
+    public function listar_operacion_actualizacion_patrimonio($idactualizacion_patri) {
+
+    // $idempresa = $this->getidempresa($empresa);
         $lista = [];
+        // $gestion_ant =$this->obtenerGestionAnterior($idgestion_actual);
+        $list_agr_act = $this->dbc->query("SELECT * FROM agrupacion_actualizacion_patrimonio WHERE idcuenta_padre ='$idactualizacion_patri'");
+    
+        while ($qwe = $this->dbc->fetch($list_agr_act)) {
+
+            $get_balance = $this->dbc->query("SELECT * FROM balance_general_por_gestion 
+            WHERE idbalance_general_por_gestion ='$qwe[idcuenta_patrimonio]'");
+
+            $gb = $get_balance->fetch_assoc();
+            $res = array(
+                "idagrupacion_actualizacion_patrimonio" => $qwe['idagrupacion_actualizacion_patrimonio'],
+                "operacion" => $qwe['operacion'],
+                "columna_obtenido" => $qwe['columna_obtenido'], //ESTE CAMPO SE OBTIENE DE LA TABLA balance_genereal_por_gestion del campo idbalance_genereal_por_gestion
+                "nombre" => $gb['nombre_actual']
+            );
+            array_push($lista, $res);
+        }
+
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
+
+    public function eliminar_operacion_actualizacion_patrimonio($id_agru_patr){
+
+                // Insertar el nuevo registro
+                $eliminar_agru_patr = $this->dbc->query("DELETE FROM agrupacion_actualizacion_patrimonio WHERE idagrupacion_actualizacion_patrimonio = '$id_agru_patr'");
+                if ($eliminar_agru_patr === TRUE) {                                                                                                                                                    
+                    $res = array("success", "se elimino exitosamente","eliminarCaracteristica");
+                } else {
+                    $res = array("danger", "No se pudo registrar");
+                }
+            
+            echo json_encode($res);
+    }
+
+    public function reporte_actualizacion_patrimonio($tc_1,$tc_2,$empresa) {
+        $lista = [];
+        $lista2 = [];
         $idempresa = $this->getidempresa($empresa);
     
         // Preparar la consulta
@@ -167,18 +207,75 @@ class Reporte_evolucion_patrimonio extends DB{
     
         while ($qwe = $this->dbc->fetch($get_act_patr)) {
 
-            $get_act_patr = $this->dbc->query("SELECT * FROM balance_general_por_gestion WHERE idbalance_general_por_gestion = '$idempresa' ORDER BY orden ASC");
+            $bg_pg = $this->dbc->query("SELECT * FROM balance_general_por_gestion WHERE idbalance_general_por_gestion = '$qwe[idcuenta_patrimonio]'");
+            $bg_aux = $this->dbc->fetch($bg_pg);
+
+            $div_tc = $tc_2/$tc_1;
+            $multipli_tc = $div_tc - 1;
+            $actualizacion = $bg_aux['valor'] * $multipli_tc;
 
             $res = array(
-                "nombre" => $qwe['iddivisa'],
-                "valor" => $qwe['simbolo'],
-                "actualizacion" => $qwe['nombre'],
-                "total" => $qwe['estado']
+                "idactualizacion_patrimonio" => $qwe['idactualizacion_patrimonio'],
+                "idcuenta_patrimonio" => $qwe['idcuenta_patrimonio'],
+                "nombre" => $bg_aux['nombre_actual'],
+                "valor" => $bg_aux['valor'],
+                "actualizacion" => $actualizacion
+                // "total" => $qwe['estado']
             );
             array_push($lista, $res);
         }
+
+        foreach ($lista as $item) {
+            $agru_act_patr = $this->dbc->query("SELECT * FROM agrupacion_actualizacion_patrimonio WHERE idcuenta_padre = '$item[idactualizacion_patrimonio]'");
+            // $acp = $this->dbc->fetch($agru_act_patr);
+
+            $suma = 0;
+            while ($acp = $this->dbc->fetch($agru_act_patr)) {
+                $bal_gen_gest = $this->dbc->query("SELECT * FROM balance_general_por_gestion WHERE idbalance_general_por_gestion = '$acp[idcuenta_patrimonio]'");
+                $bgg = $this->dbc->fetch($bal_gen_gest);
+                if($acp['columna_obtenido'] == "valor"){
+                    foreach ($lista as $item_aux) {
+                        if ($item_aux['idcuenta_patrimonio'] == $acp['idcuenta_patrimonio']) {
+                            
+                            $suma = $suma + $item_aux['valor'];
+                            break; // detener el bucle al encontrarlo
+                        }
+                    }
+
+                    // $suma = $suma + $bgg['valor'];
+                }elseif($acp['columna_obtenido'] == "actualizacion"){
+                    foreach ($lista as $item_aux) {
+                        if ($item_aux['idcuenta_patrimonio'] == $acp['idcuenta_patrimonio']) {
+                            
+                            $suma = $suma + $item_aux['actualizacion'];
+                            break; // detener el bucle al encontrarlo
+                        }
+                    }
+                    
+                }else{ // VALOR_ACTUALIZACION
+                    foreach ($lista as $item_aux) {
+                        if ($item_aux['idcuenta_patrimonio'] == $acp['idcuenta_patrimonio']) {
+                            
+                            $suma = $suma + $item_aux['actualizacion'] + $item_aux['valor'];
+                            break; // detener el bucle al encontrarlo
+                        }
+                    }
+                }
+            
+            }
+            // $id = $item['idactualizacion_patrimonio'];
+            $res2 = array(
+                "idactualizacion_patrimonio" => $item['idactualizacion_patrimonio'],
+                "nombre" => $item['nombre'],
+                "valor" => $item['valor'],
+                "actualizacion" => $item['actualizacion'],
+                "total" => $suma
+            );
+            array_push($lista2, $res2);
+        }
     
-        echo json_encode($lista, JSON_NUMERIC_CHECK);
+
+        echo json_encode($lista2, JSON_NUMERIC_CHECK);
     }
 
     public function getidempresa($md5)

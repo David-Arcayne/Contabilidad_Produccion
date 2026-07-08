@@ -44,6 +44,48 @@ class Divisa extends DB{
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
     
+    // public function listar_divisa_activo($empresa) {
+    //     $lista = [];
+    //     $idempresa = $this->getidempresa($empresa);
+    
+    //     // Preparar la consulta
+    //     $divisa_activo = $this->dbc->query("SELECT * FROM divisa WHERE idempresa = '$idempresa' AND estado = '1'");
+    
+    //     while ($qwe = $this->dbc->fetch($divisa_activo)) {
+    //         $res = array(
+    //             "iddivisa" => $qwe['iddivisa'],
+    //             "simbolo" => $qwe['simbolo'],
+    //             "nombre" => $qwe['nombre'],
+    //             "estado" => $qwe['estado']
+    //         );
+    //         array_push($lista, $res);
+    //     }
+    
+    //     echo json_encode($lista, JSON_NUMERIC_CHECK);
+    // }
+
+    public function listar_divisa_activo($empresa) {
+        $idempresa = $this->getidempresa($empresa);
+
+        // Preparar la consulta
+        $divisa_activo = $this->dbc->query("SELECT * FROM divisa WHERE idempresa = '$idempresa' AND estado = '1'");
+
+        // Obtener solo el primer registro
+        if ($qwe = $this->dbc->fetch($divisa_activo)) {
+            $res = array(
+                "iddivisa" => $qwe['iddivisa'],
+                "simbolo"  => $qwe['simbolo'],
+                "nombre"   => $qwe['nombre'],
+                "estado"   => $qwe['estado']
+            );
+
+            echo json_encode($res, JSON_NUMERIC_CHECK);
+        } else {
+            echo json_encode(null);
+        }
+    }
+
+
     public function editar_divisa($id,$simbolo,$nombre,$empresa) {
         $idempresa = $this->getidempresa($empresa);
 
@@ -87,15 +129,15 @@ class Divisa extends DB{
         }        
         echo json_encode($res);
     }
-    public function eliminar_divisa($idcaracteristica,$idempresa){
+    public function eliminar_divisa($iddivisa){
 
             if (0 > 0) {
                 $res = array("danger", "No se puede eliminar porque hay registros en proveedor_has_material","eliminar_proveedor");
             } else {
                 // Insertar el nuevo registro
-                $registroProveedor = $this->dbp->query("DELETE FROM caracteristicas WHERE idcaracteristicas = '$idcaracteristica'");
+                $registroProveedor = $this->dbc->query("DELETE FROM divisa WHERE iddivisa = '$iddivisa'");
                 if ($registroProveedor === TRUE) {                                                                                                                                                    
-                    $res = array("ok", "se elimino exitosamente","eliminarCaracteristica");
+                    $res = array("success", "se elimino exitosamente","eliminarCaracteristica");
                 } else {
                     $res = array("danger", "No se pudo registrar");
                 }

@@ -964,6 +964,9 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     }elseif($ver == "registrar_actualizacion_patrimonio"){
         $cont=new Reporte_evolucion_patrimonio();
         $cont->registrar_actualizacion_patrimonio($_POST['idplantilla_reporte'],$_POST['idcuenta_patrimonio'],$_POST['orden'],$_POST['idgestion'],$_POST['idempresa']);
+    }elseif($ver == "registrar_operacion_actualizacion_patrimonio"){
+        $cont=new Reporte_evolucion_patrimonio();
+        $cont->registrar_operacion_actualizacion_patrimonio($_POST['idcuenta_patrimonio'],$_POST['columna_obtenido'],$_POST['operacion'],$_POST['idcuenta_padre'],$_POST['idgestion'],$_POST['idempresa']);
     }
   
 // rangosolicituddesconsolidar asiento desvincular_documentos_de_cuenta editar_recibo_caja_bancos registrocobrarfactura registrar_anular_eliminar_activar_factura_tributario_transaccion
