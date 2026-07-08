@@ -112,11 +112,16 @@ class Reporte_evolucion_patrimonio extends DB{
         $list_act_patr = $this->dbc->query("SELECT * FROM actualizacion_patrimonio WHERE idplantilla_reporte ='$idplantilla_reporte' AND idempresa ='$idempresa'");
     
         while ($qwe = $this->dbc->fetch($list_act_patr)) {
+
+            $get_balance = $this->dbc->query("SELECT * FROM balance_general_por_gestion 
+            WHERE idbalance_general_por_gestion ='$qwe[idcuenta_patrimonio]'");
+            $gb = $get_balance->fetch_assoc();
             $res = array(
                 "idactualizacion_patrimonio" => $qwe['idactualizacion_patrimonio'],
                 "idplantilla_reporte" => $qwe['idplantilla_reporte'],
                 "idcuenta_patrimonio" => $qwe['idcuenta_patrimonio'], //ESTE CAMPO SE OBTIENE DE LA TABLA balance_genereal_por_gestion del campo idbalance_genereal_por_gestion
-                "orden" => $qwe['orden']
+                "orden" => $qwe['orden'],
+                "nombre" => $gb['nombre_actual']
             );
             array_push($lista, $res);
         }
