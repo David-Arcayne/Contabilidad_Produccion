@@ -827,7 +827,7 @@ elseif($ver[0]=="listar_cobros_comercial_sin_cuenta"){
     $cont->reporte_balance_general_por_niveles_consolidados_hasta($ver[1],$ver[2],$ver[3],$ver[4],$ver[5]);
 }elseif($ver[0]=="select_patrimonio_gestion_anterior"){
     $cont=new Reporte_evolucion_patrimonio();
-    $cont->select_patrimonio_gestion_anterior($ver[1]);
+    $cont->select_patrimonio_gestion_anterior($ver[1],$ver[2],$ver[3]);
 }elseif($ver[0]=="listar_planilla_actualizacion_patrimonio"){
     $cont=new Reporte_evolucion_patrimonio();
     $cont->listar_planilla_actualizacion_patrimonio($ver[1],$ver[2]);
@@ -858,7 +858,7 @@ elseif($ver[0]=="listar_cobros_comercial_sin_cuenta"){
 //     $cont->obtenerGestionAnterior($ver[1],$ver[2]); eliminar_gestion_contable   
 // }
 
-// listar_recibo_por_caja_bancos  rp listadegestion listar_select_cuentas_balance_general reporte_calculo_otro_reporte_consolidado
+// select_patrimonio_gestion_anterior  rp listadegestion listar_select_cuentas_balance_general reporte_calculo_otro_reporte_consolidado
 // eliminar_divisa listar_facturas_cobro_pago listar_recibo_por_caja_bancos listar_facturas_comercial_cobro
 // reporte_balance_general_por_niveles_consolidados listar_reportes_referencia_select eliminar_otras_operaciones listadegestion listar_factura_comercial_con_transaccion
 
