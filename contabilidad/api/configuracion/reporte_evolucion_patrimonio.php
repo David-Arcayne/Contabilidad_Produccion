@@ -33,32 +33,39 @@ class Reporte_evolucion_patrimonio extends DB{
         // echo json_encode(array($idgestion_anterior));
     }
 
-    public function select_patrimonio_gestion_anterior($idgestion_actual,$aux_parametro,$idcuenta_padre) {
+    public function select_patrimonio_gestion_anterior($aux_parametro,$idplantilla_reporte_vinculado_BG,$idcuenta_padre) {
 
         $lista = [];
-        $gestion_ant =$this->obtenerGestionAnterior($idgestion_actual);
-        $selct_patrimonio = $this->dbc->query("SELECT * FROM balance_general_por_gestion WHERE idgestion ='$gestion_ant' and grupo='3' and nivel ='2'");
+        // $gestion_ant =$this->obtenerGestionAnterior($idgestion_actual);
+        // $selct_patrimonio = $this->dbc->query("SELECT * FROM balance_general_por_gestion WHERE idgestion ='$gestion_ant' and grupo='3' and nivel ='2'");
+        $selct_patrimonio = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE idplantilla_reporte = '$idplantilla_reporte_vinculado_BG' 
+        AND grupo='3' AND  es_calculable ='si'");
     
-        if($aux_parametro == "actualizacion_patrimonio"){
+        if($aux_parametro == "actualizacion_patrimonio"){ // SELECT FUERA DEL ICONO AZUL
             while ($qwe = $this->dbc->fetch($selct_patrimonio)) {
-                $existe_act_patrimonio = $this->dbc->query("SELECT * FROM actualizacion_patrimonio WHERE idcuenta_patrimonio ='$qwe[idbalance_general_por_gestion]'");
+                $existe_act_patrimonio = $this->dbc->query("SELECT * FROM actualizacion_patrimonio WHERE idcuenta_patrimonio ='$qwe[idconfiguracion_reporte]'");
 
                 if($existe_act_patrimonio->num_rows > 0){
                     // SALTAR EL REGISTRO QUE YA TENEMOS REGISTRADO EN LA TABLA
                 }else{
+                    // ANTES DE IR ALMORZAR ME QUEDE AQUI MODIFICAR LO DE ABAJOOO
+                    $get_pl_cuenta = $this->dbc->query("SELECT * FROM plandecuenta 
+                    WHERE idplandecuenta ='$qwe[idplandecuenta]'");
+                    $pl_c = $get_pl_cuenta->fetch_assoc();
+
                     $res = array(
-                    "idbalance_general_por_gestion" => $qwe['idbalance_general_por_gestion'],
-                    "idplantilla_reporte" => $qwe['idplantilla_reporte'],
-                    "nombre_actual" => $qwe['nombre_actual'],
-                    "valor" => $qwe['valor'],
-                    "idgestion" => $qwe['idgestion'],
-                    "idempresa" => $qwe['idempresa']
+                        "idconfiguracion_reporte" => $qwe['idconfiguracion_reporte'],
+                        "idplantilla_reporte" => $qwe['idplantilla_reporte'],
+                        "nombre_actual" => $pl_c['nombreplan'],
+                        // "valor" => $qwe['valor'],//TALVEZ SE QUITE
+                        // "idgestion" => $qwe['idgestion'],//TALVEZ SE BORRE
+                        "idempresa" => $qwe['idempresa']
                     );
                     array_push($lista, $res);
                 }
 
             }
-        }else{
+        }else{ // SELECT DENTRO DEL ICONO AZUL
                 $ids_excluir = []; // array para guardar los IDs
                 $agr_act = $this->dbc->query("SELECT * FROM agrupacion_actualizacion_patrimonio WHERE idcuenta_padre ='$idcuenta_padre'");
                 while ($ac = $this->dbc->fetch($agr_act)) {
@@ -73,16 +80,24 @@ class Reporte_evolucion_patrimonio extends DB{
                     $ids_string = "0"; 
                 }
 
-                $listar_balance_limitado = $this->dbc->query("SELECT * FROM balance_general_por_gestion WHERE idgestion ='$gestion_ant' and grupo='3' 
-                and nivel ='2' and idbalance_general_por_gestion not in($ids_string)");
+                // $listar_balance_limitado = $this->dbc->query("SELECT * FROM balance_general_por_gestion WHERE idgestion ='$gestion_ant' and grupo='3' 
+                // and nivel ='2' and idbalance_general_por_gestion not in($ids_string)");
 
+                $listar_balance_limitado = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE idplantilla_reporte = '$idplantilla_reporte_vinculado_BG' 
+                AND grupo='3' AND  es_calculable ='si' and idconfiguracion_reporte not in($ids_string)");
+// WHERE idplantilla_reporte = '3' AND grupo='3' AND  es_calculable ='si';
                 while ($lbl = $this->dbc->fetch($listar_balance_limitado)) {
+
+                $get_pl_cuenta = $this->dbc->query("SELECT * FROM plandecuenta 
+                WHERE idplandecuenta ='$lbl[idplandecuenta]'");
+                $pl_c = $get_pl_cuenta->fetch_assoc();
+                
                     $res = array(
-                    "idbalance_general_por_gestion" => $lbl['idbalance_general_por_gestion'],
+                    "idconfiguracion_reporte" => $lbl['idconfiguracion_reporte'],
                     "idplantilla_reporte" => $lbl['idplantilla_reporte'],
-                    "nombre_actual" => $lbl['nombre_actual'],
-                    "valor" => $lbl['valor'],
-                    "idgestion" => $lbl['idgestion'],
+                    "nombre_actual" => $pl_c['nombreplan'],
+                    // "valor" => $lbl['valor'],
+                    // "idgestion" => $lbl['idgestion'],
                     "idempresa" => $lbl['idempresa']
                     );
                     array_push($lista, $res);
@@ -146,15 +161,20 @@ class Reporte_evolucion_patrimonio extends DB{
     
         while ($qwe = $this->dbc->fetch($list_act_patr)) {
 
-            $get_balance = $this->dbc->query("SELECT * FROM balance_general_por_gestion 
-            WHERE idbalance_general_por_gestion ='$qwe[idcuenta_patrimonio]'");
+            $get_balance = $this->dbc->query("SELECT * FROM configuracion_reporte 
+            WHERE idconfiguracion_reporte ='$qwe[idcuenta_patrimonio]'");
             $gb = $get_balance->fetch_assoc();
+
+            $get_pl_cuenta = $this->dbc->query("SELECT * FROM plandecuenta 
+            WHERE idplandecuenta ='$gb[idplandecuenta]'");
+            $pl_c = $get_pl_cuenta->fetch_assoc();
+
             $res = array(
                 "idactualizacion_patrimonio" => $qwe['idactualizacion_patrimonio'],
                 "idplantilla_reporte" => $qwe['idplantilla_reporte'],
                 "idcuenta_patrimonio" => $qwe['idcuenta_patrimonio'], //ESTE CAMPO SE OBTIENE DE LA TABLA balance_genereal_por_gestion del campo idbalance_genereal_por_gestion
                 "orden" => $qwe['orden'],
-                "nombre" => $gb['nombre_actual']
+                "nombre" => $pl_c['nombreplan']
             );
             array_push($lista, $res);
         }
@@ -201,15 +221,20 @@ class Reporte_evolucion_patrimonio extends DB{
     
         while ($qwe = $this->dbc->fetch($list_agr_act)) {
 
-            $get_balance = $this->dbc->query("SELECT * FROM balance_general_por_gestion 
-            WHERE idbalance_general_por_gestion ='$qwe[idcuenta_patrimonio]'");
+            $get_balance = $this->dbc->query("SELECT * FROM configuracion_reporte 
+            WHERE idconfiguracion_reporte ='$qwe[idcuenta_patrimonio]'");
+            $gb = $get_balance->fetch_assoc();
+
+            $get_pl_cuenta = $this->dbc->query("SELECT * FROM plandecuenta 
+            WHERE idplandecuenta ='$gb[idplandecuenta]'");
+            $pl_c = $get_pl_cuenta->fetch_assoc();
 
             $gb = $get_balance->fetch_assoc();
             $res = array(
                 "idagrupacion_actualizacion_patrimonio" => $qwe['idagrupacion_actualizacion_patrimonio'],
                 "operacion" => $qwe['operacion'],
                 "columna_obtenido" => $qwe['columna_obtenido'], //ESTE CAMPO SE OBTIENE DE LA TABLA balance_genereal_por_gestion del campo idbalance_genereal_por_gestion
-                "nombre" => $gb['nombre_actual']
+                "nombre" => $pl_c['nombreplan']
             );
             array_push($lista, $res);
         }
@@ -230,11 +255,12 @@ class Reporte_evolucion_patrimonio extends DB{
             echo json_encode($res);
     }
 
-    public function reporte_actualizacion_patrimonio($fecha_tc_1,$fecha_tc_2,$empresa) {
+    public function reporte_actualizacion_patrimonio($fecha_tc_1,$fecha_tc_2,$empresa,$idgestion_actual) {
         $lista = [];
         $lista2 = [];
         $idempresa = $this->getidempresa($empresa);
     
+        $gestion_ant =$this->obtenerGestionAnterior($idgestion_actual);
         // Preparar la consulta
         $get_act_patr = $this->dbc->query("SELECT * FROM actualizacion_patrimonio WHERE idempresa = '$idempresa' ORDER BY orden ASC");
     
@@ -246,8 +272,12 @@ class Reporte_evolucion_patrimonio extends DB{
 
         while ($qwe = $this->dbc->fetch($get_act_patr)) {
 
-            $bg_pg = $this->dbc->query("SELECT * FROM balance_general_por_gestion WHERE idbalance_general_por_gestion = '$qwe[idcuenta_patrimonio]'");
+            $bg_pg = $this->dbc->query("SELECT * FROM balance_general_por_gestion 
+            WHERE idconfiguracion_reporte = '$qwe[idcuenta_patrimonio]' AND idgestion='$gestion_ant'");
             $bg_aux = $this->dbc->fetch($bg_pg);
+            
+            // $bg_pg = $this->dbc->query("SELECT * FROM balance_general_por_gestion WHERE idbalance_general_por_gestion = '$qwe[idcuenta_patrimonio]'");
+            // $bg_aux = $this->dbc->fetch($bg_pg);
 
             if($qwe['calculo_actualizacion'] == 'no'){
                 $res = array(
@@ -283,8 +313,8 @@ class Reporte_evolucion_patrimonio extends DB{
 
             $suma = 0;
             while ($acp = $this->dbc->fetch($agru_act_patr)) {
-                $bal_gen_gest = $this->dbc->query("SELECT * FROM balance_general_por_gestion WHERE idbalance_general_por_gestion = '$acp[idcuenta_patrimonio]'");
-                $bgg = $this->dbc->fetch($bal_gen_gest);
+                // $bal_gen_gest = $this->dbc->query("SELECT * FROM balance_general_por_gestion WHERE idbalance_general_por_gestion = '$acp[idcuenta_patrimonio]'");
+                // $bgg = $this->dbc->fetch($bal_gen_gest);
                 if($acp['columna_obtenido'] == "valor"){
                     foreach ($lista as $item_aux) {
                         if ($item_aux['idcuenta_patrimonio'] == $acp['idcuenta_patrimonio']) {
@@ -374,12 +404,66 @@ class Reporte_evolucion_patrimonio extends DB{
         
     }
 
+    public function guardar_actualizacion_patrimonio_por_gestion($jsonData) {
+        // Decodificar el JSON a un array asociativo
+        $registros = json_decode($jsonData, true);
+
+        // Validar que se haya decodificado correctamente
+        if (!is_array($registros)) {
+            throw new Exception("El parámetro no es un JSON válido");
+        }
+
+        // Recorrer cada registro e insertar en la base de datos
+        foreach ($registros as $registro) {
+            $id = $registro['idactualizacion_patrimonio'];
+            $nombre = $registro['nombre'];
+            $valor = $registro['valor'];
+            $actualizacion = $registro['actualizacion'];
+            $total = $registro['total'];
+
+            // Preparar la consulta SQL
+            $sql = "INSERT INTO actualizacion_patrimonio_por_gestion 
+                    (idplantilla_reporte,idactualizacion_patrimonio, nombre, valor, actualizacion, total,orden, idgestion, idempresa) 
+                    VALUES (?, ?, ?, ?, ?)";
+
+            // Usar prepared statements para mayor seguridad
+            $stmt = $this->dbc->prepare($sql);
+            $stmt->bind_param("isdid", $id, $nombre, $valor, $actualizacion, $total);
+
+            // Ejecutar la inserción
+            if (!$stmt->execute()) {
+                throw new Exception("Error al insertar registro con ID $id: " . $stmt->error);
+            }
+        }
+
+        echo "Todos los registros fueron insertados correctamente.";
+    }
+
+    public function eliminar_actualizacion_patrimonio($id){
+
+        $consulta = $this->dbc->query("SELECT * FROM agrupacion_actualizacion_patrimonio WHERE idcuenta_padre = '$id'");
+
+            if ($consulta->num_rows > 0) {
+                $res = array("danger", "No se puede eliminar porque hay registros dentro","eliminar_proveedor");
+            } else {
+                // Insertar el nuevo registro
+                $registroProveedor = $this->dbc->query("DELETE FROM actualizacion_patrimonio WHERE idactualizacion_patrimonio = '$id'");
+                if ($registroProveedor === TRUE) {                                                                                                                                                    
+                    $res = array("success", "se elimino exitosamente","eliminarCaracteristica");
+                } else {
+                    $res = array("danger", "No se pudo registrar");
+                }
+            }
+            echo json_encode($res);
+    }
+
     public function getidempresa($md5)
     {
         $registro = $this->dbe->query("select * from organizacion where md5(idorganizacion)='$md5'");
         $qwe = $this->dbe->fetch($registro);
         return $qwe['idorganizacion'];
     }
+
 
 //     public function listar_divisa($empresa) {
 //     $lista = [];
