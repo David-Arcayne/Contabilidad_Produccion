@@ -963,7 +963,13 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         $cont->editar_gestion_empresa_vinculada($_POST['idvinculacion'],$_POST['idgestion']);
     }elseif($ver == "registrar_actualizacion_patrimonio"){
         $cont=new Reporte_evolucion_patrimonio();
-        $cont->registrar_actualizacion_patrimonio($_POST['idplantilla_reporte'],$_POST['idcuenta_patrimonio'],$_POST['orden'],$_POST['idgestion'],$_POST['idempresa']);
+        $cont->registrar_actualizacion_patrimonio($_POST['idplantilla_reporte'],$_POST['idcuenta_patrimonio'],$_POST['calculo_actualizacion'],$_POST['orden'],$_POST['idgestion'],$_POST['idempresa']);
+    }elseif($ver == "registrar_operacion_actualizacion_patrimonio"){
+        $cont=new Reporte_evolucion_patrimonio();
+        $cont->registrar_operacion_actualizacion_patrimonio($_POST['idcuenta_patrimonio'],$_POST['columna_obtenido'],$_POST['operacion'],$_POST['idcuenta_padre'],$_POST['idgestion'],$_POST['idempresa']);
+    }elseif($ver == "registrar_estado_evolucion_patrimonio"){
+        $cont=new Reporte_evolucion_patrimonio();
+        $cont->registrar_estado_evolucion_patrimonio($_POST['idplantilla_reporte'],$_POST['nombre_personalizado'],$_POST['orden'],$_POST['idgestion'],$_POST['idempresa']);
     }
   
 // rangosolicituddesconsolidar asiento desvincular_documentos_de_cuenta editar_recibo_caja_bancos registrocobrarfactura registrar_anular_eliminar_activar_factura_tributario_transaccion
