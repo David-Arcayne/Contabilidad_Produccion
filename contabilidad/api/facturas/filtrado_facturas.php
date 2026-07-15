@@ -562,7 +562,8 @@ class Filtrado_facturas extends DB{
           // echo json_encode(array($caja_bancos,$factura_comas));
       }
 
-    public function busqueda_facturas_contabilidad($nfactura,$nit,$cobro_pago,$id_cliente_proveedor,$fecha,$monto,$idgestion,$empresa) {
+    public function busqueda_facturas_contabilidad($nfactura,$nit,$cobro_pago,$id_cliente_proveedor,$fecha,$monto,$idgestion,$empresa) 
+    {
         // ini_set('display_errors', 1); //,$nit,$cobro_pago,$cliente_proveedor,
         // ini_set('display_startup_errors', 1);
         // error_reporting(E_ALL);
@@ -675,9 +676,22 @@ class Filtrado_facturas extends DB{
                 if($qwe['clasefactura'] == '1'){ //PAGADO --PROVEEDOR
                     $proveedor2 = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor = '$qwe[proveedorcliente_idproveedorcliente]'");
                     $prov_client_2 = $proveedor2->fetch_assoc();
+
+                    $dt_cajabanco = $this->dbc->query("SELECT * FROM detalle_caja_bancos_pagar WHERE idfactura = '$qwe[idfactura]'");
+                    $dt_cb = $dt_cajabanco->fetch_assoc();
+
+                    $caja_banco = $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '$dt_cb[idcaja_bancos]'");
+                    $cb = $caja_banco->fetch_assoc();
+
                 }else{//COBRADO -- CLIENTE
                     $cliente2 = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente = '$qwe[proveedorcliente_idproveedorcliente]'");
                     $prov_client_2 = $cliente2->fetch_assoc();
+
+                    $dt_cajabanco = $this->dbc->query("SELECT * FROM detalle_caja_bancos_cobrar WHERE idfactura = '$qwe[idfactura]'");
+                    $dt_cb = $dt_cajabanco->fetch_assoc();
+
+                    $caja_banco = $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '$dt_cb[idcaja_bancos]'");
+                    $cb = $caja_banco->fetch_assoc();
                 }
                  $res = array(
                 "idfactura" => $qwe['idfactura'],
@@ -687,6 +701,7 @@ class Filtrado_facturas extends DB{
                 "estado" => $qwe['estado'],
                 "razon_social" => $prov_client_2['nombre'],
                 "nit" => $prov_client_2['nit'],
+                "caja_banco" => $cb['tipo_cuenta'],
                 "nro_transaccion" => $transaccion['codigotransaccion']
             );
             array_push($lista, $res);
@@ -699,9 +714,22 @@ class Filtrado_facturas extends DB{
                 if($qwe['clasefactura'] == '1'){ //PAGADO --PROVEEDOR
                     $proveedor2 = $this->dbcm->query("SELECT * FROM proveedor WHERE id_proveedor = '$qwe[proveedorcliente_idproveedorcliente]'");
                     $prov_client_2 = $proveedor2->fetch_assoc();
+
+                    $dt_cajabanco = $this->dbc->query("SELECT * FROM detalle_caja_bancos_pagar WHERE idfactura = '$qwe[idfactura]'");
+                    $dt_cb = $dt_cajabanco->fetch_assoc();
+
+                    $caja_banco = $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '$dt_cb[idcaja_bancos]'");
+                    $cb = $caja_banco->fetch_assoc();
+
                 }else{//COBRADO -- CLIENTE
                     $cliente2 = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente = '$qwe[proveedorcliente_idproveedorcliente]'");
                     $prov_client_2 = $cliente2->fetch_assoc();
+
+                    $dt_cajabanco = $this->dbc->query("SELECT * FROM detalle_caja_bancos_pagar WHERE idfactura = '$qwe[idfactura]'");
+                    $dt_cb = $dt_cajabanco->fetch_assoc();
+
+                    $caja_banco = $this->dbc->query("SELECT * FROM caja_bancos WHERE idcaja_bancos = '$dt_cb[idcaja_bancos]'");
+                    $cb = $caja_banco->fetch_assoc();
                 }
 
             if($transaccion['idgestion'] == $idgestion){
@@ -713,6 +741,7 @@ class Filtrado_facturas extends DB{
                 "estado" => $qwe['estado'],
                 "razon_social" => $prov_client_2['nombre'],
                 "nit" => $prov_client_2['nit'],
+                "caja_banco" => $cb['tipo_cuenta'],
                 "nro_transaccion" => $transaccion['codigotransaccion']
             );
   
