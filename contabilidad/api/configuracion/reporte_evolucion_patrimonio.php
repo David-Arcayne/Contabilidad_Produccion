@@ -360,50 +360,6 @@ class Reporte_evolucion_patrimonio extends DB{
         echo json_encode($lista2, JSON_NUMERIC_CHECK);
     }
 
-    public function registrar_estado_evolucion_patrimonio($idplantilla_reporte,$nombre_personalizado,$orden,$idgestion,$empresa){//ESTA API SERA PARA EL REGISTRO DE LA PLANTILLA DE ACTUALIZACION PATRIMONIO
-        // $idempresa = Empresa::getidempresa($empresa);
-         ini_set('display_errors', 1); 
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
-
-        $idempresa = $this->getidempresa($empresa);
-       
-        if($orden == ""){
-            $get_act_patr = $this->dbc->query("SELECT COUNT(*) AS total FROM actualizacion_patrimonio WHERE idempresa = '$idempresa'");
-            $total_registro = $get_act_patr->fetch_assoc();
-            $orden_nuevo = $total_registro['total'] + 1;
-
-            //EL CAMPO idcuenta_patrimonio SE OBTIENE DE LA TABLA balance_genereal_por_gestion del campo idbalance_general_por_gestion
-            $registro_actualizacion = $this->dbc->query("INSERT INTO estado_ev_patrimonio(idplantilla_reporte,nombre_personalizado,orden,idgestion,idempresa) 
-            VALUES ('$idplantilla_reporte','$nombre_personalizado','$orden_nuevo','$idgestion','$idempresa')");
-
-        }else{
-            //EL CAMPO idcuenta_patrimonio SE OBTIENE DE LA TABLA balance_genereal_por_gestion del campo idbalance_general_por_gestion
-            $registro_actualizacion = $this->dbc->query("INSERT INTO estado_ev_patrimonio(idplantilla_reporte,nombre_personalizado,orden,idgestion,idempresa) 
-            VALUES ('$idplantilla_reporte','$nombre_personalizado','$orden','$idgestion','$idempresa')");
-        }   
-        
-
-        if ($registro_actualizacion === TRUE){                                                                                                                                                                
-            // $res = array("success", "Registro exitoso","registroCaracteristicas");
-            $res = array(
-                "success" => true,
-                "message" => "Registro exitoso",
-                "message_code"   => "registro_exitoso"
-            );
-        }else {
-                // $res = array("danger", "No se pudo registrar");
-            $res = array(
-                "success" => false,
-                "message" => "Ocurrio un error",
-                "message_code"   => "error_registro"
-            );
-        }
-        
-        echo json_encode($res);
-        
-    }
-
     public function guardar_actualizacion_patrimonio_por_gestion($jsonData) {
         // Decodificar el JSON a un array asociativo
         $registros = json_decode($jsonData, true);
@@ -455,6 +411,81 @@ class Reporte_evolucion_patrimonio extends DB{
                 }
             }
             echo json_encode($res);
+    }
+
+        public function registrar_estado_evolucion_patrimonio($idplantilla_reporte,$nombre_personalizado,$orden,$empresa){//ESTA API SERA PARA EL REGISTRO DE LA PLANTILLA DE ACTUALIZACION PATRIMONIO
+        // $idempresa = Empresa::getidempresa($empresa);
+         ini_set('display_errors', 1); 
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+
+        $idempresa = $this->getidempresa($empresa);
+       
+        if($orden == ""){
+            $get_act_patr = $this->dbc->query("SELECT COUNT(*) AS total FROM estado_ev_patrimonio WHERE idempresa = '$idempresa'");
+            $total_registro = $get_act_patr->fetch_assoc();
+            $orden_nuevo = $total_registro['total'] + 1;
+
+            //EL CAMPO idcuenta_patrimonio SE OBTIENE DE LA TABLA balance_genereal_por_gestion del campo idbalance_general_por_gestion
+            $registro_actualizacion = $this->dbc->query("INSERT INTO estado_ev_patrimonio(idplantilla_reporte,nombre_personalizado,orden,idempresa) 
+            VALUES ('$idplantilla_reporte','$nombre_personalizado','$orden_nuevo','$idempresa')");
+
+        }else{
+            //EL CAMPO idcuenta_patrimonio SE OBTIENE DE LA TABLA balance_genereal_por_gestion del campo idbalance_general_por_gestion
+            $registro_actualizacion = $this->dbc->query("INSERT INTO estado_ev_patrimonio(idplantilla_reporte,nombre_personalizado,orden,idempresa) 
+            VALUES ('$idplantilla_reporte','$nombre_personalizado','$orden','$idempresa')");
+        }   
+        
+
+        if ($registro_actualizacion === TRUE){                                                                                                                                                                
+            // $res = array("success", "Registro exitoso","registroCaracteristicas");
+            $res = array(
+                "success" => true,
+                "message" => "Registro exitoso",
+                "message_code"   => "registro_exitoso"
+            );
+        }else {
+                // $res = array("danger", "No se pudo registrar");
+            $res = array(
+                "success" => false,
+                "message" => "Ocurrio un error",
+                "message_code"   => "error_registro"
+            );
+        }
+        
+        echo json_encode($res);
+        
+    }
+
+    
+    public function registrar_operacion_estado_ev_patrimonio($idplantilla,$idestado_ev_patr,$columna_registro,$obtiene_desde_planti,$idplantilla_cuenta,$columna_obtiene,$empresa){
+        // $idempresa = Empresa::getidempresa($empresa);
+        $idempresa = $this->getidempresa($empresa);
+       
+            // Insertar el nuevo registro
+            //EL idcuenta_patrimonio es EL idactualizacion_patrimonio 
+            $registroProveedor = $this->dbc->query("INSERT INTO agrupacion_estado_ev_patrimonio(idplantilla_reporte,,idestado_ev_patrimonio,columna_registro,obtiene_desde_plantilla,idplantilla_cuenta,columna_obtiene,idempresa) 
+            VALUES ('$idplantilla','$idestado_ev_patr','$columna_registro','$obtiene_desde_planti','$idplantilla_cuenta','$columna_obtiene','$idempresa')");
+            if ($registroProveedor === TRUE) {                                                                                                                                                                
+                // $res = array("success", "Registro exitoso","registroCaracteristicas");
+
+                $res = array(
+                        "success" => true,
+                        "message" => "Registro exitoso",
+                        "message_code"   => "registro_exitoso"
+                    );
+                
+            } else {
+                // $res = array("danger", "No se pudo registrar");
+                $res = array(
+                        "success" => false,
+                        "message" => "Ocurrio un error",
+                        "message_code"   => "error_registro"
+                    );
+            }
+        
+        echo json_encode($res);
+        
     }
 
     public function getidempresa($md5)

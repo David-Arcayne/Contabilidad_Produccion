@@ -969,9 +969,12 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         $cont->registrar_operacion_actualizacion_patrimonio($_POST['idcuenta_patrimonio'],$_POST['columna_obtenido'],$_POST['operacion'],$_POST['idcuenta_padre'],$_POST['idgestion'],$_POST['idempresa']);
     }elseif($ver == "registrar_estado_evolucion_patrimonio"){
         $cont=new Reporte_evolucion_patrimonio();
-        $cont->registrar_estado_evolucion_patrimonio($_POST['idplantilla_reporte'],$_POST['nombre_personalizado'],$_POST['orden'],$_POST['idgestion'],$_POST['idempresa']);
+        $cont->registrar_estado_evolucion_patrimonio($_POST['idplantilla_reporte'],$_POST['nombre_personalizado'],$_POST['orden'],$_POST['empresa']);
+    }elseif($ver == "registrar_operacion_estado_ev_patrimonio"){
+        $cont=new Reporte_evolucion_patrimonio();
+        $cont->registrar_operacion_estado_ev_patrimonio($_POST['idplantilla'],$_POST['idestado_ev_patr'],$_POST['columna_registro'],$_POST['obtiene_desde_planti'],$_POST['idplantilla_cuenta'],$_POST['columna_obtiene'],$_POST['empresa']);
     }
-  
+
 // rangosolicituddesconsolidar asiento desvincular_documentos_de_cuenta editar_recibo_caja_bancos registrocobrarfactura registrar_anular_eliminar_activar_factura_tributario_transaccion
 //   registrar_balance_general_admin registrar_vinculacion_depreciacion editar_registro_flujo_efectivo activar_desactivar_tipo_reportes creartipoasiento
 
