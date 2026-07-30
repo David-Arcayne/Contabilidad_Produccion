@@ -1,5 +1,5 @@
 <?php
-    session_start();
+    // session_start();
     
     header('Access-Control-Allow-Origin:*');
     header("Access-Control-Allow-Headers: X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Request-Method");

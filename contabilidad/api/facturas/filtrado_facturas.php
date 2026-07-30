@@ -1,5 +1,5 @@
 <?php
-session_start();
+// session_start();
 //require_once "db.php"; gestion
 require_once "../../db/db.php";
 class Filtrado_facturas extends DB{

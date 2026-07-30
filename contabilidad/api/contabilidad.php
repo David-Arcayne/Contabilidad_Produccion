@@ -1,5 +1,5 @@
 <?php
-session_start();
+// session_start();
 //require_once "db.php"; lista_cobrar_cobrado_factura crearfacturas listadesconsolidar decode cuentaspof gestion
 require_once "../../db/db.php";
 class Contabilidad extends DB

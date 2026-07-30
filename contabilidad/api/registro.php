@@ -966,22 +966,29 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         $cont->registrar_actualizacion_patrimonio($_POST['idplantilla_reporte'],$_POST['idcuenta_patrimonio'],$_POST['calculo_actualizacion'],$_POST['orden'],$_POST['idgestion'],$_POST['idempresa']);
     }elseif($ver == "registrar_operacion_actualizacion_patrimonio"){
         $cont=new Reporte_evolucion_patrimonio();
-        $cont->registrar_operacion_actualizacion_patrimonio($_POST['idcuenta_patrimonio'],$_POST['columna_obtenido'],$_POST['operacion'],$_POST['idcuenta_padre'],$_POST['idgestion'],$_POST['idempresa']);
+        $cont->registrar_operacion_actualizacion_patrimonio($_POST['idplantilla_reporte'],$_POST['idactualizacion_patrimonio'],$_POST['idcuenta_patrimonio'],$_POST['columna_obtenido'],$_POST['operacion'],$_POST['idcuenta_padre'],$_POST['idgestion'],$_POST['idempresa']);
     }elseif($ver == "registrar_estado_evolucion_patrimonio"){
         $cont=new Reporte_evolucion_patrimonio();
         $cont->registrar_estado_evolucion_patrimonio($_POST['idplantilla_reporte'],$_POST['nombre_personalizado'],$_POST['orden'],$_POST['empresa']);
     }elseif($ver == "registrar_operacion_estado_ev_patrimonio"){
         $cont=new Reporte_evolucion_patrimonio();
         $cont->registrar_operacion_estado_ev_patrimonio($_POST['idplantilla'],$_POST['idestado_ev_patr'],$_POST['columna_registro'],$_POST['obtiene_desde_planti'],$_POST['idplantilla_cuenta'],$_POST['columna_obtiene'],$_POST['empresa']);
+    }elseif($data['ver']=="reporte_actualizacion_patrimonio"){
+        $cont=new Reporte_evolucion_patrimonio();
+        $cont->reporte_actualizacion_patrimonio($data);
+    }elseif($data['ver'] == "guardar_actualizacion_patrimonio_por_gestion") {
+        $cont=new Reporte_evolucion_patrimonio();
+        $cont->guardar_actualizacion_patrimonio_por_gestion($data);
     }
 
+    
 // rangosolicituddesconsolidar asiento desvincular_documentos_de_cuenta editar_recibo_caja_bancos registrocobrarfactura registrar_anular_eliminar_activar_factura_tributario_transaccion
 //   registrar_balance_general_admin registrar_vinculacion_depreciacion editar_registro_flujo_efectivo activar_desactivar_tipo_reportes creartipoasiento
 
-// asignar_comprobantes_A_comprobantes guardar_balance_general_por_gestion registrogestion ss desvincular_facturas_comercial_de_transaccion
+// data guardar_balance_general_por_gestion guardar_actualizacion_patrimonio_por_gestion ss desvincular_facturas_comercial_de_transaccion
 //asignar_recibos_A_cuentas
 } 
 //  guardar  cierre cambio asignar_facturas_comercial_A_cuentas
-// creartipoasiento registrar_configuracion_reporte registrar_factura_recibo_pago_cajaBancos registrar_recibo_pago_cajaBancos_en_facturas editar_otras_operaciones
+// asignar registrar_configuracion_reporte registrar_factura_recibo_pago_cajaBancos registrar_recibo_pago_cajaBancos_en_facturas editar_otras_operaciones
 // apertura vincular_rubro_plandecuentas
 ?> 

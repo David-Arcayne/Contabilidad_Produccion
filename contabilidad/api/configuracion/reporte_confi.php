@@ -43,8 +43,22 @@ class Reporte_confi extends DB{
         error_reporting(E_ALL);
         $idempresa = $this->getidempresa($empresa);
 
+        if($tipo_reporte == 'estado_evolucion_patrimonio'){
+            $registro_act_patr = $this->dbc->query("INSERT INTO tipo_reportes(nombre, descripcion, tipo_reporte,estado, id_plantilla_reporte, idempresa) 
+            VALUES ('Actualizacion de Patrimonio', '-', 'actualizacion_patrimonio','0', '$id_plantilla_reporte', '$idempresa')");
+
+            $id_actualiza = $this->dbc->insert_id;
+
+            $registro = $this->dbc->query("INSERT INTO tipo_reportes(nombre, descripcion, tipo_reporte,estado, id_plantilla_reporte, idempresa) 
+            VALUES ('$nombre', '$descripcion', '$tipo_reporte','0', '$id_actualiza', '$idempresa')");
+
+        }else{
+             
         // Insertar el nuevo registro
         $registro = $this->dbc->query("INSERT INTO tipo_reportes(nombre, descripcion, tipo_reporte,estado, id_plantilla_reporte, idempresa) VALUES ('$nombre', '$descripcion', '$tipo_reporte','0', '$id_plantilla_reporte', '$idempresa')");
+       
+        }
+        
         if ($registro === TRUE) {                                                                                                                                                                
             $res = array("success", "Registro exitoso","rp_registrar_reporte");
         } else {
@@ -54,23 +68,44 @@ class Reporte_confi extends DB{
     }
 
     public function listar_tipo_reportes($empresa) {
-    $idempresa = $this->getidempresa($empresa);
+        $idempresa = $this->getidempresa($empresa);
         $lista = [];
         $registro = $this->dbc->query("SELECT * FROM tipo_reportes WHERE idempresa='$idempresa'");
     
         while ($row = $this->dbc->fetch($registro)) {
 
-            $get_tipo_report = $this->dbc->query("SELECT * FROM tipo_reportes WHERE idtipo_reportes='$row[id_plantilla_reporte]'");
-            $tr = $get_tipo_report->fetch_assoc();
-            $lista[] = [
-                "idtipo_reportes" => $row['idtipo_reportes'],
-                "nombre"=>$row['nombre'],
-                "descripcion" => $row['descripcion'],
-                "tipo_reporte" => $row['tipo_reporte'],
-                "id_plantilla_reporte" => $row['id_plantilla_reporte'],
-                "nombre_tipo_reporte_referencia" => $tr['nombre'],
-                "estado" => $row['estado']
-            ];
+            if($row['tipo_reporte'] == 'actualizacion_patrimonio'){
+                // SALTAR NO MOSTRAR DEBE ESTAR OCULTO
+            }else{
+                $get_tipo_report = $this->dbc->query("SELECT * FROM tipo_reportes WHERE idtipo_reportes='$row[id_plantilla_reporte]'");
+                $tr = $get_tipo_report->fetch_assoc();
+
+                if($row['tipo_reporte'] == 'estado_evolucion_patrimonio'){
+                    $act_patr = $this->dbc->query("SELECT * FROM tipo_reportes WHERE idtipo_reportes='$tr[id_plantilla_reporte]'");
+                    $ap = $act_patr->fetch_assoc();
+
+                    $lista[] = [
+                        "idtipo_reportes" => $row['idtipo_reportes'],
+                        "nombre"=>$row['nombre'],
+                        "descripcion" => $row['descripcion'],
+                        "tipo_reporte" => $row['tipo_reporte'],
+                        "id_plantilla_reporte" => $row['id_plantilla_reporte'],
+                        "nombre_tipo_reporte_referencia" => $ap['nombre'],
+                        "estado" => $row['estado']
+                    ];
+                }else{
+                    $lista[] = [
+                        "idtipo_reportes" => $row['idtipo_reportes'],
+                        "nombre"=>$row['nombre'],
+                        "descripcion" => $row['descripcion'],
+                        "tipo_reporte" => $row['tipo_reporte'],
+                        "id_plantilla_reporte" => $row['id_plantilla_reporte'],
+                        "nombre_tipo_reporte_referencia" => $tr['nombre'],
+                        "estado" => $row['estado']
+                    ];
+                }
+            }
+        
         }
     
         echo json_encode($lista, JSON_PRETTY_PRINT);
@@ -82,31 +117,39 @@ class Reporte_confi extends DB{
     
         if($es_activo == '1'){
             while ($row = $this->dbc->fetch($tipo_reportes)) {
-                if($row['estado'] == '1'){ // DEDO ARRIBA, MOSTRAR
-                    $lista[] = [
-                    "idtipo_reportes" => $row['idtipo_reportes'],
-                    "nombre"=>$row['nombre'],
-                    "descripcion" => $row['descripcion'],
-                    "tipo_reporte" => $row['tipo_reporte'],
-                    "estado" => $row['estado']
-                    ];
-                }else{
+                if($row['tipo_reporte'] == 'actualizacion_patrimonio'){
                     //NO MOSTRAR 
+                }else{
+                    if($row['estado'] == '1'){ // DEDO ARRIBA, MOSTRAR
+                        $lista[] = [
+                        "idtipo_reportes" => $row['idtipo_reportes'],
+                        "nombre"=>$row['nombre'],
+                        "descripcion" => $row['descripcion'],
+                        "tipo_reporte" => $row['tipo_reporte'],
+                        "estado" => $row['estado']
+                        ];
+                    }else{
+                        //NO MOSTRAR 
+                    }
                 }
     
             }
         }elseif($es_activo == '2'){
             while ($row = $this->dbc->fetch($tipo_reportes)) {
-                if($row['estado'] == '2'){ // DEDO ABAJO, MOSTRAR
-                    $lista[] = [
-                    "idtipo_reportes" => $row['idtipo_reportes'],
-                    "nombre"=>$row['nombre'],
-                    "descripcion" => $row['descripcion'],
-                    "tipo_reporte" => $row['tipo_reporte'],
-                    "estado" => $row['estado']
-                    ];
-                }else{
+                if($row['tipo_reporte'] == 'actualizacion_patrimonio'){
                     //NO MOSTRAR 
+                }else{
+                    if($row['estado'] == '2'){ // DEDO ABAJO, MOSTRAR
+                        $lista[] = [
+                        "idtipo_reportes" => $row['idtipo_reportes'],
+                        "nombre"=>$row['nombre'],
+                        "descripcion" => $row['descripcion'],
+                        "tipo_reporte" => $row['tipo_reporte'],
+                        "estado" => $row['estado']
+                        ];
+                    }else{
+                        //NO MOSTRAR 
+                    }
                 }
     
             }
@@ -3492,20 +3535,6 @@ public function listar_balance_general_completo_icono($idgestion) {
         // error_reporting(E_ALL);
         $lista = [];
         // $idempresa = $this->getidempresa($empresa);
-    
-        // Preparar la consulta
-        // $getPedido = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE nivel_registrado = '1' AND idempresa = '$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
-        // $getPedido = $this->dbc->query("SELECT DISTINCT(reporte) FROM configuracion_reporte WHERE idempresa='$idempresa' AND reporte = 'balance_general' AND idplantilla_reporte ='$idplantilla_reporte'");// ACTIVO, PASIVO, PATRIMONIO
-
-        // while ($qwe = $this->dbc->fetch($getPedido)) {
-            // $res = array(
-            //     "reporte" => $qwe['reporte'],
-            //     "nivel_1" => [] //activo
-            //     // "nivel_3" => $qwe['nombre'],// 
-            //     // "estado" => $qwe['estado']
-            // );
-        
-        // $get_nivel_2 = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE nivel_registrado = '2' AND idempresa = '$idempresa'");// ACTIVO, PASIVO, PATRIMONIO
 
         $get_nivel_2 = $this->dbc->query("SELECT * FROM balance_general_por_gestion WHERE idgestion = '$idgestion' AND nivel ='1'");// ACTIVO, PASIVO, PATRIMONIO
         

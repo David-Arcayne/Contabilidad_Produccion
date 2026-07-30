@@ -1,5 +1,5 @@
 <?php
-session_start();
+// session_start();
 //require_once "db.php"; editar
 require_once "../../db/db.php";
 class Transacciones_facturas extends DB{
