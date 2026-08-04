@@ -1,6 +1,6 @@
 <?php
 require_once "../../db/db.php";
-// require_once "../configuracion/rp_plantilla_reporte.php"; 
+// require_once "../configuracion/empresa.php"; editar
 
 class Reporte_evolucion_patrimonio extends DB{
 
@@ -673,99 +673,38 @@ class Reporte_evolucion_patrimonio extends DB{
     }
 
     
-    // public function registrar_operacion_estado_ev_patrimonio($idplantilla,$idestado_ev_patr,$columna_registro,$obtiene_desde_planti,$idplantilla_cuenta,$columna_obtiene,$empresa){
-    //     ini_set('display_errors', 1); 
-    //     ini_set('display_startup_errors', 1);
-    //     error_reporting(E_ALL);
-    //     // $idempresa = Empresa::getidempresa($empresa);
-    //     $idempresa = $this->getidempresa($empresa);
+    public function registrar_operacion_estado_ev_patrimonio($idplantilla,$idestado_ev_patr,$columna_registro,$obtiene_desde_planti,$idplantilla_cuenta,$columna_obtiene,$empresa){
+        ini_set('display_errors', 1); 
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+        // $idempresa = Empresa::getidempresa($empresa);
+        $idempresa = $this->getidempresa($empresa);
        
-    //     $idsplantilla = $_POST['idplantilla_cuenta'] ?? [];
+            // Insertar el nuevo registro
+            //EL idcuenta_patrimonio es EL idactualizacion_patrimonio 
+            $registroProveedor = $this->dbc->query("INSERT INTO agrupacion_estado_ev_patrimonio(idplantilla_reporte,idestado_ev_patrimonio,columna_registro,obtiene_desde_plantilla,idplantilla_cuenta,columna_obtiene,idempresa) 
+            VALUES ('$idplantilla','$idestado_ev_patr','$columna_registro','$obtiene_desde_planti','$idplantilla_cuenta','$columna_obtiene','$idempresa')");
+            if ($registroProveedor === TRUE) {                                                                                                                                                                
+                // $res = array("success", "Registro exitoso","registroCaracteristicas");
 
-    //         // Insertar el nuevo registro
-    //         //EL idcuenta_patrimonio es EL idactualizacion_patrimonio 
-    //         $registroProveedor = $this->dbc->query("INSERT INTO agrupacion_estado_ev_patrimonio(idplantilla_reporte,idestado_ev_patrimonio,columna_registro,obtiene_desde_plantilla,idplantilla_cuenta,columna_obtiene,idempresa) 
-    //         VALUES ('$idplantilla','$idestado_ev_patr','$columna_registro','$obtiene_desde_planti','$idplantilla_cuenta','$columna_obtiene','$idempresa')");
-    //         if ($registroProveedor === TRUE) {                                                                                                                                                                
-    //             // $res = array("success", "Registro exitoso","registroCaracteristicas");
-
-    //             $res = array(
-    //                     "success" => true,
-    //                     "message" => "Registro exitoso",
-    //                     "message_code"   => "registro_exitoso"
-    //                 );
+                $res = array(
+                        "success" => true,
+                        "message" => "Registro exitoso",
+                        "message_code"   => "registro_exitoso"
+                    );
                 
-    //         } else {
-    //             // $res = array("danger", "No se pudo registrar");
-    //             $res = array(
-    //                     "success" => false,
-    //                     "message" => "Ocurrio un error",
-    //                     "message_code"   => "error_registro"
-    //                 );
-    //         }
+            } else {
+                // $res = array("danger", "No se pudo registrar");
+                $res = array(
+                        "success" => false,
+                        "message" => "Ocurrio un error",
+                        "message_code"   => "error_registro"
+                    );
+            }
         
-    //     echo json_encode($res);
+        echo json_encode($res);
         
-    // }
-
-    public function registrar_operacion_estado_ev_patrimonio(
-    $idplantilla,
-    $idestado_ev_patr,
-    $columna_registro,
-    $obtiene_desde_planti,
-    $idplantilla_cuenta, // puede ser string o array
-    $columna_obtiene,
-    $empresa
-){
-    ini_set('display_errors', 1); 
-    ini_set('display_startup_errors', 1);
-    error_reporting(E_ALL);
-
-    $idempresa = $this->getidempresa($empresa);
-
-    // Normalizar: si es array, lo convertimos en string separado por comas
-    if (is_array($idplantilla_cuenta)) {
-        $idplantilla_cuenta = implode(",", $idplantilla_cuenta);
     }
-
-    // Insertar el nuevo registro
-    $registroProveedor = $this->dbc->query("
-        INSERT INTO agrupacion_estado_ev_patrimonio(
-            idplantilla_reporte,
-            idestado_ev_patrimonio,
-            columna_registro,
-            obtiene_desde_plantilla,
-            idplantilla_cuenta,
-            columna_obtiene,
-            idempresa
-        ) VALUES (
-            '$idplantilla',
-            '$idestado_ev_patr',
-            '$columna_registro',
-            '$obtiene_desde_planti',
-            '$idplantilla_cuenta',
-            '$columna_obtiene',
-            '$idempresa'
-        )
-    ");
-
-    if ($registroProveedor === TRUE) {
-        $res = [
-            "success" => true,
-            "message" => "Registro exitoso",
-            "message_code" => "registro_exitoso"
-        ];
-    } else {
-        $res = [
-            "success" => false,
-            "message" => "Ocurrió un error",
-            "message_code" => "error_registro"
-        ];
-    }
-
-    echo json_encode($res);
-}
-
 
     public function listar_cuadro_auxiliar_para_editar($idplantilla_reporte) {
         $lista = [];
@@ -981,30 +920,6 @@ class Reporte_evolucion_patrimonio extends DB{
     
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
-    public function listar_agrupacion_evolucion_patrimonio($id_ev_patrimonio) {
-        $lista = [];
-        // $idempresa = $this->getidempresa($empresa);
-    
-        // Preparar la consulta
-        $agrup_ev_get = $this->dbc->query("SELECT * FROM agrupacion_estado_ev_patrimonio WHERE idestado_ev_patrimonio = '$id_ev_patrimonio'");
-    
-        if($agrup_ev_get->num_rows > 0){
-            while ($qwe = $this->dbc->fetch($agrup_ev_get)) {
-                $res = array(
-                    "idagrupacion_estado_ev_patrimonio" => $qwe['idagrupacion_estado_ev_patrimonio'],
-                    "idestado_ev_patrimonio" => $qwe['idestado_ev_patrimonio'],
-                    "columna_registro" => $qwe['columna_registro'],
-                    "obtiene_desde_plantilla" => $qwe['obtiene_desde_plantilla'],
-                    // "orden" => $qwe['orden']
-                );
-                array_push($lista, $res);
-            }
-        }else{
-            //SALTAR PORQUE LA LISTA ESTARA VACIA
-        }
-    
-        echo json_encode($lista, JSON_NUMERIC_CHECK);
-    }
     public function getidempresa($md5)
     {
         $registro = $this->dbe->query("select * from organizacion where md5(idorganizacion)='$md5'");
@@ -1049,17 +964,13 @@ class Reporte_evolucion_patrimonio extends DB{
         
     //         echo json_encode($lista, JSON_NUMERIC_CHECK);
     // }
-    public function reporte_evaluacion_patrimonio($idgestion,$idplantilla_reporte,$empresa) {
-
-       ini_set('display_errors', 1); 
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+    public function reporte_evaluacion_patrimonio($idgestion,$idplantilla_reporte) {
     $lista = [];
 
     // Consulta principal
-     $reporte_ev_patrimonio = $this->dbc->query("SELECT * FROM estado_ev_patrimonio WHERE idplantilla_reporte = '$idplantilla_reporte'");
+    $reporte_ev_patrimonio = $this->dbc->query("SELECT * FROM estado_ev_patrimonio WHERE idplantilla_reporte = '$idplantilla_reporte'");
 
-    // // Consulta de columnas a mostrar
+    // Consulta de columnas a mostrar
     $columnas_mostrar = $this->dbc->query("SELECT * FROM actualizacion_patrimonio_por_gestion WHERE idgestion = '$idgestion'");
     $campos = [];
     while ($col = $this->dbc->fetch($columnas_mostrar)) {
@@ -1081,55 +992,14 @@ class Reporte_evolucion_patrimonio extends DB{
         $agr_ev_patri = $this->dbc->query("SELECT * FROM agrupacion_estado_ev_patrimonio WHERE idestado_ev_patrimonio = '$qwe[idestado_ev_patrimonio]'");
         while ($agr = $this->dbc->fetch($agr_ev_patri)) {
             $columna = trim($agr['columna_registro']); // ej: "Capital Social"
-            if($agr['obtiene_desde_plantilla'] == 'actualizacion_patrimonio'){
-                $columna_obtiene = trim($agr['columna_obtiene']);
-
-                // ⚡ Manejo de múltiples IDs separados por coma
-                // $ids = explode(',', $agr['idplantilla_cuenta']); 
-                $ids = $agr['idplantilla_cuenta'];
-                
-                $obtener_valor = $this->dbc->query("
-                SELECT SUM($columna_obtiene) AS total
-                FROM actualizacion_patrimonio_por_gestion
-                WHERE idactualizacion_patrimonio IN ($ids)
-                AND idgestion = '$idgestion'
-                ");
-
-                $ov = $obtener_valor->fetch_assoc();
-
-                $res[$columna] = floatval($ov['total']);
-
-            }else{ // ESTADO DE RESULTADOS
-
-            $gestion = $this->dbc->query("SELECT * FROM gestion WHERE idgestion = '$idgestion'");
-            $g = $gestion->fetch_assoc();
-
-            $pr_plantilla = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla = '$agr[idplantilla_cuenta]'");
-            $pp = $pr_plantilla->fetch_assoc();
-
-    //         // $obj = new PlantillaReporte(); // crear objeto
-
-    $url = "https://mistersofts.com/app/ct/api/reporte_estado_resultados_actualizado_consolidado_por_niveles/".$pp['idplantilla_reporte']."/".$g['fechaini']."/".$g['fechafin']."/".$empresa."/".'5'."/".$idgestion;
-        $array_estado_resultados = json_decode(file_get_contents($url), true);
-
-            foreach ($array_estado_resultados as $eerr) {
-                if($eerr['idplantilla'] == $agr['idplantilla_cuenta']){
-                    $valor = $eerr['suma_nivel_2'];
-                    break;
-                }     
-            }
-
-                // $valor   = $ov[$columna_obtiene];       // ej: 100
-                $res[$columna] = $valor;       // sobreescribe el null con el valor real
-            }
-
+            $valor   = $agr['valor'];                  // ej: 100
+            $res[$columna] = $valor;                   // sobreescribe el null con el valor real
         }
 
         $lista[] = $res;
     }
-
-     echo json_encode($lista, JSON_NUMERIC_CHECK);
-
+    $this->dbc->close();
+    echo json_encode($lista, JSON_NUMERIC_CHECK);
 }
 
 public function listar_tipo_reportes_select_ev_patrimonio($empresa) {
@@ -1173,19 +1043,7 @@ public function listar_tipo_reportes_select_ev_patrimonio($empresa) {
         echo json_encode($lista, JSON_PRETTY_PRINT);
     }
 
-    public function eliminar_operacion_estado_ev_patrimonio($id){
 
-                // Insertar el nuevo registro
-                $eliminar_agru_patr = $this->dbc->query("DELETE FROM agrupacion_estado_ev_patrimonio WHERE idagrupacion_estado_ev_patrimonio = '$id'");
-                if ($eliminar_agru_patr === TRUE) {                                                                                                                                                    
-                    $res = array("success", "se elimino exitosamente","eliminarCaracteristica");
-                } else {
-                    $res = array("danger", "No se pudo registrar");
-                }
-            
-            echo json_encode($res);
-    }
-//listar_agrupacion_evolucion_patrimonio
 }
 
 

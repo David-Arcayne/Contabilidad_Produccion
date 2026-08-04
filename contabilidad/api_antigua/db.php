@@ -1,5 +1,5 @@
 <?php
-require_once "../../db/dbusiness.php";
+require_once "../db/dbusiness.php";
 class DB{
     protected $db,$dbe,$dba,$dbc,$emp,$idu;
     public function __construct()
