@@ -2927,6 +2927,26 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
     
     public function eliminar_configuracion_reporte($id){
         
+        // $this->dbc->begin_transaction();
+    
+        try {
+
+        $relacionadas = [
+                // 'detalletransaccion' => 'No se puede eliminar porque hay registros en producción',
+                ['tabla' => 'balance_general_por_gestion', 'campo' => 'idconfiguracion_reporte', 'mensaje' => 'No se puede eliminar, el registro esta siendo usado'],
+                ['tabla' => 'confi_reporte_flujo_efectivo', 'campo' => 'idconfiguracion_reporte', 'mensaje' => 'No se puede eliminar, el registro esta siendo usado'],
+                ['tabla' => 'agrupacion_actualizacion_patrimonio ', 'campo' => 'idcuenta_patrimonio', 'mensaje' => 'No se puede eliminar, el registro esta siendo usado']
+                // ['tabla' => 'relacionip', 'campo' => 'idplandecuenta', 'mensaje' => 'No se puede eliminar']
+            ];
+    
+            foreach ($relacionadas as $relacion) {
+                $query = "SELECT 1 FROM {$relacion['tabla']} WHERE {$relacion['campo']} = '$id'";
+                $result = $this->dbc->query($query);
+                if ($result->num_rows > 0) {
+                    throw new Exception($relacion['mensaje']);
+                }
+            }
+
             $consulta3 = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE idconfiguracion_reporte = '$id'");
             $resultado3 = $consulta3->fetch_assoc();
 
@@ -2987,7 +3007,10 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                         }
                     $delete_confi = $this->dbc->query("DELETE FROM configuracion_reporte WHERE idconfiguracion_reporte = '$id'");
                     $delete_vincu = $this->dbc->query("DELETE FROM vinculacion_cuenta_depreciacion WHERE idvinculacion_cuenta_depreciacion = '$resultado33[idvinculacion_cuenta_depreciacion]'");
-                }   
+                }  
+                $this->dbc->commit();
+                $res = array("success", "se elimino exitosamente","eliminarCaracteristica");
+
             }else{ // ESTE REGISTRO NO ES UN ACTIVO FIJO POR ESO LA ELIMINACION ES SIMPLE
                 $confi_elim = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE idconfiguracion_reporte = '$id'");
                     $resu_aux = $confi_elim->fetch_assoc();             
@@ -3005,13 +3028,21 @@ public function eliminar_tipo_reportes($idtipo_reportes) {
                         }
                         
                 $delete_confi = $this->dbc->query("DELETE FROM configuracion_reporte WHERE idconfiguracion_reporte = '$id'");
+                $this->dbc->commit();
+                $res = array("success", "se elimino exitosamente","eliminarCaracteristica");
             }
 
-            if ($delete_confi === TRUE) {                                                                                                                                                    
-                $res = array("success", "se elimino exitosamente","eliminarCaracteristica");
-            } else {
-                $res = array("danger", "No se pudo registrar");
-            }
+        } // fin del TRY
+        catch (Exception $e) {
+            $this->dbc->rollback();
+            $res = array("danger", $e->getMessage(), "creartipoasientodelete");
+        }
+
+            // if ($delete_confi === TRUE) {                                                                                                                                                    
+            //     $res = array("success", "se elimino exitosamente","eliminarCaracteristica");
+            // } else {
+            //     $res = array("danger", "No se pudo registrar");
+            // }
 
                 echo json_encode($res);
     }

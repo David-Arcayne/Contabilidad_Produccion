@@ -951,7 +951,7 @@ $res2 = array(
                     }elseif($qwe3['obtiene_desde'] == 'origen'){
                         $valor_obtenido = $resultado['origen'];
                     }else{ // APLICACION
-                        $valor_obtenido = $resultado['aplicacion'];
+                        $valor_obtenido = $resultado['aplicacion'] * -1;
                     }
 
                     $total_suma = $total_suma + $valor_obtenido;
@@ -1177,7 +1177,7 @@ $res2 = array(
         // ini_set('display_startup_errors', 1);
         // error_reporting(E_ALL);
         $lista = [];
-        // $registro = $this->dbc->query("SELECT * FROM agrupacion_plantilla WHERE idplantilla_padre='$id_plantilla_padre'");
+        // $registro = $this->dbc->query("SELECT * FROM agrupacion_plantilla WHERE idplantilla_padre='$id_plantilla_padre'"); 
         $suma_resta = $this->dbc->query("SELECT * FROM agrupacion_plantilla WHERE idplantilla_padre='$id_plantilla_padre' 
         AND (tipo_operacion = 'sumar' || tipo_operacion = 'restar') AND idtipo_reportes = '$idplantilla_reporte'");
 
