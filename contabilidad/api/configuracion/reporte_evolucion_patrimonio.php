@@ -990,10 +990,43 @@ class Reporte_evolucion_patrimonio extends DB{
     
         if($agrup_ev_get->num_rows > 0){
             while ($qwe = $this->dbc->fetch($agrup_ev_get)) {
+                if($qwe['obtiene_desde_plantilla'] == 'actualizacion_patrimonio'){
+
+                    $act_patr = $this->dbc->query("SELECT * FROM actualizacion_patrimonio 
+                    WHERE idactualizacion_patrimonio = '$qwe[idplantilla_cuenta]'");
+
+                    $ap = $act_patr->fetch_assoc();  
+
+                    $confi_report = $this->dbc->query("SELECT * FROM configuracion_reporte 
+                    WHERE idconfiguracion_reporte = '$ap[idcuenta_patrimonio]'");
+
+                    $cr = $confi_report->fetch_assoc();  
+
+                    $plandecuenta = $this->dbc->query("SELECT * FROM plandecuenta 
+                        WHERE idplandecuenta = '$cr[idplandecuenta]'");
+
+                        $pc = $plandecuenta->fetch_assoc();
+                        $nombre_cuenta_jala = $pc['nombreplan'];
+                }else{
+                    $estad_resu = $this->dbc->query("SELECT * FROM pr_plantilla 
+                    WHERE idplantilla = '$qwe[idplantilla_cuenta]'");
+                    $es_res = $estad_resu->fetch_assoc();
+                    if($es_res['nombre_personalizado'] != null){ //SI TIENE NOMBRE PERSONALIZADO
+                        $nombre_cuenta_jala = $es_res['nombre_personalizado'];
+                    }else{
+                        $plandecuenta = $this->dbc->query("SELECT * FROM plandecuenta 
+                        WHERE idplandecuenta = '$es_res[idplandecuenta]'");
+
+                        $pc = $plandecuenta->fetch_assoc();
+                        $nombre_cuenta_jala = $pc['nombreplan'];
+                    }
+                }
                 $res = array(
                     "idagrupacion_estado_ev_patrimonio" => $qwe['idagrupacion_estado_ev_patrimonio'],
                     "idestado_ev_patrimonio" => $qwe['idestado_ev_patrimonio'],
                     "columna_registro" => $qwe['columna_registro'],
+                    "columna_obtiene" => $qwe['columna_obtiene'],
+                    "nombre_cuenta_jala" => $nombre_cuenta_jala,
                     "obtiene_desde_plantilla" => $qwe['obtiene_desde_plantilla'],
                     // "orden" => $qwe['orden']
                 );

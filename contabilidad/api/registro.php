@@ -1009,7 +1009,7 @@ if($data['ver'] == "asignar_asiento_A_factura") {
 // rangosolicituddesconsolidar asiento desvincular_documentos_de_cuenta editar_recibo_caja_bancos registrocobrarfactura registrar_anular_eliminar_activar_factura_tributario_transaccion
 //   registrar_balance_general_admin registrar_vinculacion_depreciacion editar_registro_flujo_efectivo activar_desactivar_tipo_reportes creartipoasiento
 
-// data desvincular_documentos_de_cuenta guardar_actualizacion_patrimonio_por_gestion ss desvincular_facturas_comercial_de_transaccion
+// cierre desvincular_documentos_de_cuenta guardar_actualizacion_patrimonio_por_gestion ss desvincular_facturas_comercial_de_transaccion
 //editar_tipo_reportes
 } 
 //  guardar  cierre cambio asignar_facturas_comercial_A_cuentas
