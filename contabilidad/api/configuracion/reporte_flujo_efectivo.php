@@ -201,6 +201,9 @@ public function listar_plantilla_flujo_efectivo($idplantilla_reporte,$empresa) {
         $suma_activo_actual += $valor_act;
         $suma_activo_origen += $origen;
         $suma_activo_aplicacion += $aplicacion;
+
+        $suma_pasi_patri_origen += $origen;
+        $suma_pasi_patri_aplicacion += $aplicacion;
     } else {
         // Mantener la lógica original para grupo 2 y 3
         $resultado = $valor_act - $valor_ant;

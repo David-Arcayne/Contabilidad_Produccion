@@ -891,7 +891,7 @@ elseif($ver[0]=="listar_cobros_comercial_sin_cuenta"){
 //     $cont->obtenerGestionAnterior($ver[1],$ver[2]); eliminar_gestion_contable   
 // }
 
-// reporte_flujo_efectivo  rp listadegestion listar_tipo_reportes_activos listar_balance_general_completo_icono
+// reporte_estado_origen_aplicacion  rp listadegestion listar_tipo_reportes_activos listar_balance_general_completo_icono
 // listar_select_cuentas_balance_general listar_facturas_cobro_pago listar_recibo_por_caja_bancos listar_facturas_comercial_cobro
 // reporte_estado_resultados_actualizado_consolidado_por_niveles listar_reportes_referencia_select eliminar_otras_operaciones listadegestion listar_factura_comercial_con_transaccion
 
@@ -908,7 +908,7 @@ elseif($ver[0]=="listar_cobros_comercial_sin_cuenta"){
 //  listar_asignacion_asiento_operacion listar_factura_comercial listatransacciones reporte_balance_general_prueba listar_agrupacion_plantilla facturas_perteneciente_a_cuenta
 // 
 // 
-//  listar_cobros_comercial_sin_cuenta listatransacciones listar_facturas_comercial_cobro
+//  reporte_estado_origen_aplicacion listatransacciones listar_facturas_comercial_cobro
 //  reporte_balance_general_por_niveles_consolidados  reporte_estado_origen_aplicacion  listar_solo_usuarios listar_usuarios_por_gestion  
 
 //   insertar_transaccion.php    reporte_balance_general_hasta reportecomprobantecontable reporteactivodiaponibledos eliminar_registro_flujo_efectivo eliminar_configuracion_reporte

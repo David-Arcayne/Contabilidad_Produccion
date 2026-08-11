@@ -214,5 +214,150 @@ class Asiento extends DB{
     
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
+
+    public function vincular_ventas_a_transaccion($data) {
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
+    
+        // $idempresa = $this->getidempresa($data['idempresa']);
+        // $idsucursal = $this->getidsucursal($data['idsucursal']); 
+        $montoRecibos = 0;
+
+        // $ids_vinculados = [];
+
+        // $es_cobro = "";
+        $existe_confi_conta = $this->dbc->query("SELECT *
+        FROM operacion_modulos om
+        INNER JOIN asignacion_asiento_operacion_modulos aso 
+            ON aso.idoperacion_modulos = om.idoperacion_modulos
+        WHERE om.nombre_operacion = 'venta' AND aso.idempresa ='$data[idempresa]';");
+
+        if($existe_confi_conta->num_rows > 0){ //SI EXISTE LA CONFIGURACION.
+            $confi_cuenta = $existe_confi_conta->fetch_assoc();
+            //PREGUNTAREMOS SI LA CONFI ES DE DIA, MES, AÑO?
+            if($confi_cuenta[''] == 'dia'){ // DIA
+
+            }elseif($confi_cuenta[''] == 'semana'){ //SEMANA
+
+                $fecha_actual = date("Y-m-d"); // hoy
+                $dia_semana = date("N", strtotime($fecha_actual)); // 1 = lunes, 7 = domingo
+
+                // Calcular lunes de esa semana
+                $lunes = date("Y-m-d", strtotime($fecha_actual . " -".($dia_semana-1)." days"));
+
+                // Calcular domingo de esa semana (opcional, si quieres todo el rango)
+                $domingo = date("Y-m-d", strtotime($lunes . " +6 days"));
+
+                //pregntar ya existe una transacción automática en esta semana?? 
+                $existe_trans_auto = $this->dbc->query("SELECT * FROM transacciones 
+                WHERE fechatransaccion >= '$lunes' 
+                AND fechatransaccion <= '$domingo'
+                AND tipo_registro = 'automatico_venta'");
+
+                if($existe_trans_auto->num_rows > 0){ //SI EXISTE TRANS PARA VENTA EN ESTA SEMANA
+
+                    //VINCULAMOS A LA TRANS QUE YA EXISTE
+                    $trans_aut = $existe_trans_auto->fetch_assoc();
+
+                    foreach ($data['venta'] as $venta) {
+                        $registrar_fact_trans = $this->dbc->query("INSERT INTO transaccion_documentos_comercial(id_documento,idtransaccion,cuenta,registro_desde,idempresa)
+                        VALUES('$venta[idventa]','$trans_aut[idtransacciones]','0','contado_venta_comercial','$data[idempresa]')");  
+                    }
+
+                }else{ // NO EXISTE TRANS, CREAR UNO NUEVO
+                    $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion,tipo_registro)
+                    VALUES(NULL,'$nroTransaccion','$fecha','$idtipo_cambio','$ndocumento','$glosa','1','1','$tipotransaccion','$ide','$idsucursal','$idgestion','automatico_venta')");
+
+                    $idtransaccion = $this->dbc->insert_id;
+
+                    foreach ($data['venta'] as $venta) {
+                        $registrar_fact_trans = $this->dbc->query("INSERT INTO transaccion_documentos_comercial(id_documento,idtransaccion,cuenta,registro_desde,idempresa)
+                        VALUES('$venta[idventa]','$idtransaccion','0','contado_venta_comercial','$data[idempresa]')");  
+                    }
+
+                }
+            }elseif($confi_cuenta[''] == 'mes'){ // MES
+
+            }
+        }else{
+
+        }
+        // foreach ($data['venta'] as $venta) {
+        //     if('venta' == )
+        //     $id_venta += $venta['idventa'];
+        // }
+
+        if ($data['sumar_reemplazar'] == 'suma') {
+            if ($dt['debe'] > 0) {
+                $nuevo_monto_dt = $dt['debe'] + $montoRecibos;
+                $editar_dt = $this->dbc->query("
+                    UPDATE detalletransaccion 
+                    SET debe = '$nuevo_monto_dt' 
+                    WHERE iddetalletransaccion = '$data[cuenta]'
+                ");
+            } else {
+                $nuevo_monto_dt = $dt['haber'] + $montoRecibos;
+                $editar_dt = $this->dbc->query("
+                    UPDATE detalletransaccion 
+                    SET haber = '$nuevo_monto_dt' 
+                    WHERE iddetalletransaccion = '$data[cuenta]'
+                ");
+            }
+        }elseif($data['sumar_reemplazar'] == 'reemplazo'){ // REEMPLAZAR
+
+        // desvincular todos los documentos de esta cuenta
+            $desv_recibo = $this->dbc->query("UPDATE recibo SET cuenta = '0',transaccion = '0' WHERE cuenta = '$data[cuenta]'");
+            $desv_factura = $this->dbc->query("UPDATE factura SET cuenta = '0',transacciones_idtransacciones = '0' WHERE cuenta = '$data[cuenta]'");
+            $desv_comprob_cobr = $this->dbc->query("UPDATE cuentaspof SET cuenta = '0',transaccion = '0' WHERE cuenta = '$data[cuenta]'");
+            $desv_comprob_pag = $this->dbc->query("UPDATE cuentaspor SET cuenta = '0',transaccion = '0' WHERE cuenta = '$data[cuenta]'");
+            $desv_comer = $this->dbc->query("DELETE FROM transaccion_documentos_comercial WHERE cuenta = '$data[cuenta]'");
+            
+            if($dt['debe'] > 0){
+                $nuevo_monto_dt = $montoRecibos;
+                $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
+            }else{
+                $nuevo_monto_dt = $montoRecibos;
+                $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
+            }
+        }else{
+            // SOLO VINCULARA
+        }
+
+        
+        foreach ($data['recibos'] as $recibo) {
+
+            $updatetranscodigo = $this->dbc->query("UPDATE recibo 
+                SET cuenta = '$data[cuenta]', transaccion = '$dt[transacciones_idtransacciones]'  
+                WHERE idrecibo = '{$recibo['idrecibo']}'
+            ");
+
+            $recib_dats = $this->dbc->query("SELECT * FROM recibo WHERE idrecibo = '$recibo[idrecibo]'");
+            $rec = $recib_dats->fetch_assoc();
+
+            if($rec['cobrado'] != 0){
+                $vincular_comprobante = $this->dbc->query("UPDATE cuentaspof 
+                SET cuenta = '$data[cuenta]', transaccion = '$dt[transacciones_idtransacciones]'  
+                WHERE idrecibo = '{$recibo['idrecibo']}'
+            ");
+        
+            }else{
+                $vincular_comprobante = $this->dbc->query("UPDATE cuentaspor 
+                SET cuenta = '$data[cuenta]', transaccion = '$dt[transacciones_idtransacciones]'  
+                WHERE idrecibo = '{$recibo['idrecibo']}'
+            ");
+            
+            }
+        }
+
+        // Respuesta
+        if ($updatetranscodigo === TRUE) {
+            $res = array("success", "Se Registro Correctamente", "asignar_facturas_A_cuentas",$data['cuenta'],$dt['transacciones_idtransacciones'],$nuevo_monto_dt,$dt['debe'],$dt['haber']);
+        } else {
+            $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde");
+        }
+    
+        echo json_encode($res);
+    }
 }
 ?>
