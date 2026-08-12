@@ -236,9 +236,9 @@ class Asiento extends DB{
         if($existe_confi_conta->num_rows > 0){ //SI EXISTE LA CONFIGURACION.
             $confi_cuenta = $existe_confi_conta->fetch_assoc();
             //PREGUNTAREMOS SI LA CONFI ES DE DIA, MES, AÑO?
-            if($confi_cuenta[''] == 'dia'){ // DIA
+            if($confi_cuenta['frecuencia_registro'] == 'dia'){ // DIA
 
-            }elseif($confi_cuenta[''] == 'semana'){ //SEMANA
+            }elseif($confi_cuenta['frecuencia_registro'] == 'semana'){ //SEMANA
 
                 $fecha_actual = date("Y-m-d"); // hoy
                 $dia_semana = date("N", strtotime($fecha_actual)); // 1 = lunes, 7 = domingo
@@ -266,8 +266,11 @@ class Asiento extends DB{
                     }
 
                 }else{ // NO EXISTE TRANS, CREAR UNO NUEVO
+                    // $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion,tipo_registro)
+                    // VALUES(NULL,'$nroTransaccion','$fecha','$idtipo_cambio','$ndocumento','$glosa','1','1','$tipotransaccion','$ide','$idsucursal','$idgestion','automatico_venta')");
+
                     $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion,tipo_registro)
-                    VALUES(NULL,'$nroTransaccion','$fecha','$idtipo_cambio','$ndocumento','$glosa','1','1','$tipotransaccion','$ide','$idsucursal','$idgestion','automatico_venta')");
+                    VALUES(NULL,'-1','$fecha_actual','0','0','transaccion automatica de venta','1','1','0','$data[idempresa]','0','$idgestion','automatico_venta')");
 
                     $idtransaccion = $this->dbc->insert_id;
 
@@ -277,7 +280,7 @@ class Asiento extends DB{
                     }
 
                 }
-            }elseif($confi_cuenta[''] == 'mes'){ // MES
+            }elseif($confi_cuenta['frecuencia_registro'] == 'mes'){ // MES
 
             }
         }else{
