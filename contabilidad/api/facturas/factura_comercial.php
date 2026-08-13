@@ -37,6 +37,11 @@ class Factura_comercial extends DB{
         }
         
         $data = json_decode(file_get_contents($url), true);
+
+        //  $data = mejorar_data_factura_comercial($idmd5, $viv_mister_soft);
+        // $url = "https://mistersofts.com/app/ct/api/mejorar_data_factura_comercial/".$idmd5."/".$viv_mister_soft;
+        // $data = json_decode(file_get_contents($url), true);
+
         $lista_factura_venta = [];
 
         foreach($data as $plantilla){

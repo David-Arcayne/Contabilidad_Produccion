@@ -270,9 +270,33 @@ class Asiento extends DB{
                     // VALUES(NULL,'$nroTransaccion','$fecha','$idtipo_cambio','$ndocumento','$glosa','1','1','$tipotransaccion','$ide','$idsucursal','$idgestion','automatico_venta')");
 
                     $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion,tipo_registro)
-                    VALUES(NULL,'-1','$fecha_actual','0','0','transaccion automatica de venta','1','1','0','$data[idempresa]','0','$idgestion','automatico_venta')");
+                    VALUES(NULL,'1000','$fecha_actual','0','0','transaccion automatica de venta','1','1','0','$data[idempresa]','0','0','automatico_venta')");
 
                     $idtransaccion = $this->dbc->insert_id;
+
+                    $debe = 0; 
+                    $haber = 0;
+
+                    $tasiento = $this->dbc->query("SELECT * FROM asiento WHERE idasientotipo= '$confi_cuenta[idasientotipo]'");
+                    $orden = 1;
+                    while ($qwe = $this->dbc->fetch($tasiento)) {
+                        $pcuenta = $qwe['idcuenta'];
+                        if ($qwe['tipo'] == "DEBE") {
+                            // $debe = $monto * ($qwe['porciento'] / 100);
+                            $haber = 0;
+                        } elseif ($qwe['tipo'] == "HABER") {
+                            $debe = 0;
+                            // $haber = $monto * ($qwe['porciento'] / 100);
+                        }
+                        //$pcuenta=$_POST['plandecuenta']; 
+                        $ppresupuestario = 0; //$_POST['planpresupuestario'];
+                        $nota = "-";
+                        $estado = 1; //$_POST['estado'];
+                        $crear = $this->dbc->query("INSERT INTO detalletransaccion(debe,haber,nota,transacciones_idtransacciones,idplandecuenta,idcuentapresupuestaria,estado,cobrar,pagar,idorganizacion,idsucursal,orden)
+                        VALUES ('$debe','$haber','$nota','$idtransaccion','$pcuenta','$ppresupuestario','$estado','2','2','$data[idempresa]','0','$orden')");
+
+                        $orden = $orden + 1;
+                    }
 
                     foreach ($data['venta'] as $venta) {
                         $registrar_fact_trans = $this->dbc->query("INSERT INTO transaccion_documentos_comercial(id_documento,idtransaccion,cuenta,registro_desde,idempresa)
@@ -284,78 +308,12 @@ class Asiento extends DB{
 
             }
         }else{
-
-        }
-        // foreach ($data['venta'] as $venta) {
-        //     if('venta' == )
-        //     $id_venta += $venta['idventa'];
-        // }
-
-        if ($data['sumar_reemplazar'] == 'suma') {
-            if ($dt['debe'] > 0) {
-                $nuevo_monto_dt = $dt['debe'] + $montoRecibos;
-                $editar_dt = $this->dbc->query("
-                    UPDATE detalletransaccion 
-                    SET debe = '$nuevo_monto_dt' 
-                    WHERE iddetalletransaccion = '$data[cuenta]'
-                ");
-            } else {
-                $nuevo_monto_dt = $dt['haber'] + $montoRecibos;
-                $editar_dt = $this->dbc->query("
-                    UPDATE detalletransaccion 
-                    SET haber = '$nuevo_monto_dt' 
-                    WHERE iddetalletransaccion = '$data[cuenta]'
-                ");
-            }
-        }elseif($data['sumar_reemplazar'] == 'reemplazo'){ // REEMPLAZAR
-
-        // desvincular todos los documentos de esta cuenta
-            $desv_recibo = $this->dbc->query("UPDATE recibo SET cuenta = '0',transaccion = '0' WHERE cuenta = '$data[cuenta]'");
-            $desv_factura = $this->dbc->query("UPDATE factura SET cuenta = '0',transacciones_idtransacciones = '0' WHERE cuenta = '$data[cuenta]'");
-            $desv_comprob_cobr = $this->dbc->query("UPDATE cuentaspof SET cuenta = '0',transaccion = '0' WHERE cuenta = '$data[cuenta]'");
-            $desv_comprob_pag = $this->dbc->query("UPDATE cuentaspor SET cuenta = '0',transaccion = '0' WHERE cuenta = '$data[cuenta]'");
-            $desv_comer = $this->dbc->query("DELETE FROM transaccion_documentos_comercial WHERE cuenta = '$data[cuenta]'");
-            
-            if($dt['debe'] > 0){
-                $nuevo_monto_dt = $montoRecibos;
-                $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
-            }else{
-                $nuevo_monto_dt = $montoRecibos;
-                $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
-            }
-        }else{
-            // SOLO VINCULARA
-        }
-
-        
-        foreach ($data['recibos'] as $recibo) {
-
-            $updatetranscodigo = $this->dbc->query("UPDATE recibo 
-                SET cuenta = '$data[cuenta]', transaccion = '$dt[transacciones_idtransacciones]'  
-                WHERE idrecibo = '{$recibo['idrecibo']}'
-            ");
-
-            $recib_dats = $this->dbc->query("SELECT * FROM recibo WHERE idrecibo = '$recibo[idrecibo]'");
-            $rec = $recib_dats->fetch_assoc();
-
-            if($rec['cobrado'] != 0){
-                $vincular_comprobante = $this->dbc->query("UPDATE cuentaspof 
-                SET cuenta = '$data[cuenta]', transaccion = '$dt[transacciones_idtransacciones]'  
-                WHERE idrecibo = '{$recibo['idrecibo']}'
-            ");
-        
-            }else{
-                $vincular_comprobante = $this->dbc->query("UPDATE cuentaspor 
-                SET cuenta = '$data[cuenta]', transaccion = '$dt[transacciones_idtransacciones]'  
-                WHERE idrecibo = '{$recibo['idrecibo']}'
-            ");
-            
-            }
+            // SE REGISTRARA NORMAL LA VENTA SIN INVOLUCRARSE CON CONTABILIDAD
         }
 
         // Respuesta
-        if ($updatetranscodigo === TRUE) {
-            $res = array("success", "Se Registro Correctamente", "asignar_facturas_A_cuentas",$data['cuenta'],$dt['transacciones_idtransacciones'],$nuevo_monto_dt,$dt['debe'],$dt['haber']);
+        if (TRUE === TRUE) {
+            $res = array("success", "Se Registro Correctamente", "asignar_facturas_A_cuentas",$data['venta']);
         } else {
             $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde");
         }

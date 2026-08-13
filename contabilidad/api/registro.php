@@ -1003,6 +1003,9 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     }elseif($data['ver'] == "guardar_actualizacion_patrimonio_por_gestion") {
         $cont=new Reporte_evolucion_patrimonio();
         $cont->guardar_actualizacion_patrimonio_por_gestion($data);
+    }elseif($data['ver'] == "vincular_ventas_a_transaccion") {
+        $cont=new Asiento();
+        $cont->vincular_ventas_a_transaccion($data);
     }
 
     

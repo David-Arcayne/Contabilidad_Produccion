@@ -275,6 +275,157 @@ class Cuentas_transacciones extends DB{
         echo json_encode($lista);
     }
 
+    public function mejorar_data_factura_comercial($empresa, $viv_mister_soft)
+{
+    // ==========================================
+// URL API
+// ==========================================
+
+if ($viv_mister_soft == "vivasoft") {
+
+    $url = "https://vivasoft.link/app/cmv1/api/listaVentas/" . $empresa;
+
+} else {
+
+    $url = "https://mistersofts.com/app/cmv1/api/listaVentas/" . $empresa;
+}
+
+
+// ==========================================
+// CONSUMIR API CON CURL
+// ==========================================
+
+$ch = curl_init();
+
+curl_setopt_array($ch, array(
+    CURLOPT_URL => $url,
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_FOLLOWLOCATION => true,
+    CURLOPT_TIMEOUT => 30,
+    CURLOPT_CONNECTTIMEOUT => 10,
+    CURLOPT_SSL_VERIFYPEER => false,
+    CURLOPT_SSL_VERIFYHOST => false,
+    CURLOPT_HTTPHEADER => array(
+        "Accept: application/json"
+    )
+));
+
+$respuesta = curl_exec($ch);
+
+$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+$curlError = curl_error($ch);
+
+curl_close($ch);
+
+
+// ==========================================
+// VALIDAR CURL
+// ==========================================
+
+if ($respuesta === false) {
+
+    echo json_encode(array(
+        "success" => false,
+        "mensaje" => "Error al consumir la API",
+        "error" => $curlError
+    ));
+
+    return;
+}
+
+
+// ==========================================
+// VALIDAR HTTP
+// ==========================================
+
+if ($httpCode < 200 || $httpCode >= 300) {
+
+    echo json_encode(array(
+        "success" => false,
+        "mensaje" => "La API respondió con un error HTTP",
+        "http_code" => $httpCode,
+        "respuesta" => $respuesta
+    ));
+
+    return;
+}
+
+
+// ==========================================
+// LIMPIAR RESPUESTA
+// ==========================================
+
+// Encontrar el inicio del JSON
+$inicio = strpos($respuesta, '[');
+
+// Encontrar el final del JSON
+$fin = strrpos($respuesta, ']');
+
+
+if ($inicio === false || $fin === false) {
+
+    echo json_encode(array(
+        "success" => false,
+        "mensaje" => "No se encontró un arreglo JSON en la respuesta",
+        "respuesta" => $respuesta
+    ));
+
+    return;
+}
+
+
+// Quedarnos únicamente con el JSON
+$respuesta = substr(
+    $respuesta,
+    $inicio,
+    $fin - $inicio + 1
+);
+
+
+// ==========================================
+// CORREGIR ESCAPES INVÁLIDOS
+// ==========================================
+
+$respuesta = preg_replace(
+    '/\\\\(?!["\\\\\/bfnrtu])/',
+    '',
+    $respuesta
+);
+
+
+// ==========================================
+// DECODIFICAR JSON
+// ==========================================
+
+$data = json_decode($respuesta, true);
+
+
+// ==========================================
+// VALIDAR JSON
+// ==========================================
+
+if ($data === null && json_last_error() !== JSON_ERROR_NONE) {
+
+    echo json_encode(array(
+        "success" => false,
+        "mensaje" => "La respuesta de la API no es un JSON válido",
+        "error_json" => json_last_error_msg(),
+        "respuesta_limpia" => $respuesta
+    ));
+
+    return;
+}
+
+
+// ==========================================
+// YA TENEMOS EL ARRAY
+// ==========================================
+
+// echo json_encode($data);
+    return $data;
+}
+
     public function listar_facturas_comercial_cobro($idcuenta,$empresa,$viv_mister_soft)
     {
         $idempresa = $this->getidempresa($empresa); 
@@ -296,16 +447,17 @@ class Cuentas_transacciones extends DB{
         }
 //´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´
         // $url = "https://vivasoft.link/app/cmv1/api/listaVentas/".$empresa;
-        if($viv_mister_soft == "vivasoft"){
-            $url = "https://vivasoft.link/app/cmv1/api/listaVentas/".$empresa;
-        }else{ // mistersofts
-            $url = "https://mistersofts.com/app/cmv1/api/listaVentas/".$empresa;
-        }
+        // if($viv_mister_soft == "vivasoft"){
+        //     $url = "https://vivasoft.link/app/cmv1/api/listaVentas/".$empresa;
+        // }else{ // mistersofts
+        //     $url = "https://mistersofts.com/app/cmv1/api/listaVentas/".$empresa;
+        // }
 
+        $data = $this->mejorar_data_factura_comercial($empresa, $viv_mister_soft);
         // $url = "https://mistersofts.com/app/cmv1/api/listaVentas/".$empresa;
-        $data = json_decode(file_get_contents($url), true);
+        // $data = json_decode(file_get_contents($url), true);
         $lista_factura_venta = [];
-
+//en el data me devuelve null, entonces talves la decodificacion esta mal
         foreach($data as $plantilla){
             $trans_fact = $this->dbc->query("SELECT id_documento
                                             FROM transaccion_documentos_comercial 
