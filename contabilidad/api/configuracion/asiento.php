@@ -1,7 +1,7 @@
 <?php
 require_once "../../db/db.php";
 class Asiento extends DB{
-    public function registrar_asignacion_asiento_operacion($idoperacion_modulos,$idasientotipo,$bandera,$empresa){
+    public function registrar_asignacion_asiento_operacion($idoperacion_modulos,$idasientotipo,$bandera,$frecuencia_registro,$idgestion,$empresa){
         $idempresa = $this->getidempresa($empresa);
         // $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM divisa WHERE nombre = '$nombre' AND idempresa = '$idempresa'");
         // $resultado = $consulta->fetch_assoc();
@@ -11,7 +11,8 @@ class Asiento extends DB{
             $res = array("danger", "El registro ya existe","Error");
         } else {
             // Insertar el nuevo registro
-            $registroProveedor = $this->dbc->query("INSERT INTO asignacion_asiento_operacion_modulos(idoperacion_modulos,idasientotipo,bandera,idempresa) VALUES ('$idoperacion_modulos','$idasientotipo','$bandera','$idempresa')");
+            $registroProveedor = $this->dbc->query("INSERT INTO asignacion_asiento_operacion_modulos(idoperacion_modulos,idasientotipo,bandera,frecuencia_registro,idgestion,idempresa) 
+            VALUES ('$idoperacion_modulos','$idasientotipo','$bandera','$frecuencia_registro','$idgestion','$idempresa')");
             if ($registroProveedor === TRUE) {                                                                                                                                                                
                 $res = array("success", "Registro exitoso","registroCaracteristicas");
             } else {
@@ -71,6 +72,8 @@ class Asiento extends DB{
                 "idasientotipo" => $qwe['idasientotipo'],
                 "nombre_asiento" => $asiento['nombre'],
                 "bandera" => $qwe['bandera'],
+                "frecuencia_registro" => $qwe['frecuencia_registro'],
+                "idgestion" => $qwe['idgestion'],
             );
             array_push($lista, $res);
         }
@@ -215,6 +218,97 @@ class Asiento extends DB{
         echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
 
+    public function obtener_operacion_despacho_diario($fecha_actual) {
+
+        $lista = [];
+
+        $lista_asignacion_dia = $this->dbc->query("SELECT * FROM asignacion_asiento_operacion_modulos 
+            WHERE frecuencia_registro='dia'
+            ORDER BY idempresa;");
+
+            while ($lad = $this->dbc->fetch($lista_asignacion_dia)) {
+                $operacion_modu_dia = $this->dbc->query("SELECT * FROM operacion_modulos 
+                WHERE idoperacion_modulos='$lad[idoperacion_modulos]'");
+
+                $oml = $operacion_modu_dia->fetch_assoc();
+
+            $res1 = array(
+                // "iddivisa" => $qwe['iddivisa'],
+                "idasignacion_asiento_operacion_modulos" => $lad['idasignacion_asiento_operacion_modulos'],
+                "nombre_operacion" => $oml['nombre_operacion'],
+                "idempresa" => $lad['idempresa']
+            );
+            array_push($lista, $res1);
+        }
+
+        $timestamp = strtotime($fecha_actual);
+
+
+        // Verificar si es domingo (N=7)
+        $esDomingo = (date("N", $timestamp) == 7);
+
+        if($esDomingo){
+            $lista_asignacion_semana = $this->dbc->query("SELECT * FROM asignacion_asiento_operacion_modulos 
+            WHERE frecuencia_registro='semana'
+            ORDER BY idempresa;");
+
+            while ($las = $this->dbc->fetch($lista_asignacion_semana)) {
+                $operacion_modu_sema = $this->dbc->query("SELECT * FROM operacion_modulos 
+                WHERE idoperacion_modulos='$las[idoperacion_modulos]'");
+
+                $oms = $operacion_modu_sema->fetch_assoc();
+
+            $res2 = array(
+                // "iddivisa" => $qwe['iddivisa'],
+                // "simbolo" => $qwe['simbolo'],
+                "idasignacion_asiento_operacion_modulos" => $las['idasignacion_asiento_operacion_modulos'],
+                "nombre_operacion" => $oms['nombre_operacion'],
+                "idempresa" => $las['idempresa']
+            );
+            array_push($lista, $res2);
+        }
+        }
+        // Verificar si es último día del mes
+        $ultimoDiaMes = date("t", $timestamp); // total de días del mes
+        $diaActual = date("j", $timestamp);    // día actual
+        $esUltimoDiaMes = ($diaActual == $ultimoDiaMes);
+
+        if($esUltimoDiaMes){
+            $lista_asignacion_mes = $this->dbc->query("SELECT * FROM asignacion_asiento_operacion_modulos 
+            WHERE frecuencia_registro='mes'
+            ORDER BY idempresa;");
+
+            while ($lam = $this->dbc->fetch($lista_asignacion_mes)) {
+                $operacion_modu = $this->dbc->query("SELECT * FROM operacion_modulos 
+                WHERE idoperacion_modulos='$lam[idoperacion_modulos]'");
+
+                $om = $operacion_modu->fetch_assoc();
+
+            $res3 = array(
+                // "iddivisa" => $qwe['iddivisa'],
+                // "simbolo" => $qwe['simbolo'],
+                "idasignacion_asiento_operacion_modulos" => $lam['idasignacion_asiento_operacion_modulos'],
+                "nombre_operacion" => $om['nombre_operacion'],
+                "idempresa" => $lam['idempresa']
+            );
+            array_push($lista, $res3);
+        }
+
+        }
+
+        // $asom = $this->dbc->query("SELECT * FROM asignacion_asiento_operacion_modulos ORDER BY idempresa;");
+
+        // while ($qwe = $this->dbc->fetch($asom)) {
+        //     $res = array(
+        //         "iddivisa" => $qwe['iddivisa'],
+        //         "simbolo" => $qwe['simbolo'],
+        //         "nombre" => $qwe['nombre'],
+        //         "estado" => $qwe['estado']
+        //     );
+        //     array_push($lista, $res);
+        // }
+         echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
     public function vincular_ventas_a_transaccion($data) {
         // ini_set('display_errors', 1);
         // ini_set('display_startup_errors', 1);
@@ -269,8 +363,11 @@ class Asiento extends DB{
                     // $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion,tipo_registro)
                     // VALUES(NULL,'$nroTransaccion','$fecha','$idtipo_cambio','$ndocumento','$glosa','1','1','$tipotransaccion','$ide','$idsucursal','$idgestion','automatico_venta')");
 
+                    $tipoasiento = $this->dbc->query("SELECT * FROM asientotipo WHERE idasientotipo= '$confi_cuenta[idasientotipo]'");
+                    $type_as = $tipoasiento->fetch_assoc();
+
                     $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion,tipo_registro)
-                    VALUES(NULL,'1000','$fecha_actual','0','0','transaccion automatica de venta','1','1','0','$data[idempresa]','0','0','automatico_venta')");
+                    VALUES(NULL,'1000','$fecha_actual','0','0','transaccion automatica de venta','1','1','$type_as[tipo]','$data[idempresa]','0','0','automatico_venta')");
 
                     $idtransaccion = $this->dbc->insert_id;
 

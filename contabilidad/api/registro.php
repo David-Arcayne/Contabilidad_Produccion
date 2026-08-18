@@ -399,12 +399,12 @@ if($data['ver'] == "asignar_asiento_A_factura") {
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['iddivisa']));
         }
     }elseif($ver=="registrar_asignacion_asiento_operacion"){
-        if(isset($_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['bandera'],$_POST['idempresa'])){
+        if(isset($_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['bandera'],$_POST['frecuencia_registro'],$_POST['idgestion'],$_POST['idempresa'])){
             $cont=new Asiento();
-            $cont->registrar_asignacion_asiento_operacion($_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['bandera'],$_POST['idempresa']);
+            $cont->registrar_asignacion_asiento_operacion($_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['bandera'],$_POST['frecuencia_registro'],$_POST['idgestion'],$_POST['idempresa']);
         }
         else{
-            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['bandera'],$_POST['idempresa']));
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['bandera'],$_POST['frecuencia_registro'],$_POST['idgestion'],$_POST['idempresa']));
         }
     }elseif($ver=="registro_transaccion_comercial"){
         if(isset($_POST['fecha'],$_POST['idasignacion_asiento'],$_POST['monto'],$_POST['empresa'],$_POST['sucursal'],$_POST['idgestion'])){
@@ -1009,7 +1009,7 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     }
 
     
-// rangosolicituddesconsolidar asiento desvincular_documentos_de_cuenta editar_recibo_caja_bancos registrocobrarfactura registrar_anular_eliminar_activar_factura_tributario_transaccion
+// registrar_asignacion_asiento_operacion asiento desvincular_documentos_de_cuenta editar_recibo_caja_bancos registrocobrarfactura registrar_anular_eliminar_activar_factura_tributario_transaccion
 //   registrar_balance_general_admin registrar_vinculacion_depreciacion editar_registro_flujo_efectivo activar_desactivar_tipo_reportes creartipoasiento
 
 // cierre asignar guardar_actualizacion_patrimonio_por_gestion ss desvincular_facturas_comercial_de_transaccion

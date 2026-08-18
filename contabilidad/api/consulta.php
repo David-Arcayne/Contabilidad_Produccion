@@ -879,6 +879,9 @@ elseif($ver[0]=="listar_cobros_comercial_sin_cuenta"){
 }elseif($ver[0]=="eliminar_operacion_estado_ev_patrimonio"){
     $cont=new Reporte_evolucion_patrimonio();
     $cont->eliminar_operacion_estado_ev_patrimonio($ver[1]);
+}elseif($ver[0]=="obtener_operacion_despacho_diario"){
+    $cont=new Asiento();
+    $cont->obtener_operacion_despacho_diario($ver[1]);
 }
 
 // elseif($ver[0]=="reporte_calculo_otro_reporte_consolidado"){
