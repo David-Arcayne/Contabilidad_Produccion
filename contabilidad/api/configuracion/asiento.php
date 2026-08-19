@@ -309,7 +309,7 @@ class Asiento extends DB{
         // }
          echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
-    public function vincular_ventas_a_transaccion($data) {
+    public function vincular_ventas_a_transaccion_antiguo($data) {
         // ini_set('display_errors', 1);
         // ini_set('display_startup_errors', 1);
         // error_reporting(E_ALL);
@@ -407,6 +407,91 @@ class Asiento extends DB{
         }else{
             // SE REGISTRARA NORMAL LA VENTA SIN INVOLUCRARSE CON CONTABILIDAD
         }
+
+        // Respuesta
+        if (TRUE === TRUE) {
+            $res = array("success", "Se Registro Correctamente", "asignar_facturas_A_cuentas",$data['venta']);
+        } else {
+            $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde");
+        }
+    
+        echo json_encode($res);
+    }
+
+    public function vincular_ventas_a_transaccion($data) {
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
+    
+        // $idempresa = $this->getidempresa($data['idempresa']);
+        // $idsucursal = $this->getidsucursal($data['idsucursal']); 
+        $montoRecibos = 0;
+
+        // $ids_vinculados = [];
+
+        // $es_cobro = "";
+        $existe_confi_conta = $this->dbc->query("SELECT *
+        FROM operacion_modulos om
+        INNER JOIN asignacion_asiento_operacion_modulos aso 
+            ON aso.idoperacion_modulos = om.idoperacion_modulos
+        WHERE om.nombre_operacion = 'venta' AND aso.idempresa ='$data[idempresa]';");
+
+            $confi_cuenta = $existe_confi_conta->fetch_assoc();
+
+                $fecha_actual = date("Y-m-d"); // hoy
+                $dia_semana = date("N", strtotime($fecha_actual)); // 1 = lunes, 7 = domingo
+
+                // Calcular lunes de esa semana
+                $lunes = date("Y-m-d", strtotime($fecha_actual . " -".($dia_semana-1)." days"));
+
+                // Calcular domingo de esa semana (opcional, si quieres todo el rango)
+                $domingo = date("Y-m-d", strtotime($lunes . " +6 days"));
+
+                //pregntar ya existe una transacción automática en esta semana?? 
+                $existe_trans_auto = $this->dbc->query("SELECT * FROM transacciones 
+                WHERE fechatransaccion >= '$lunes' 
+                AND fechatransaccion <= '$domingo'
+                AND tipo_registro = 'automatico_venta'");
+
+                    // $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion,tipo_registro)
+                    // VALUES(NULL,'$nroTransaccion','$fecha','$idtipo_cambio','$ndocumento','$glosa','1','1','$tipotransaccion','$ide','$idsucursal','$idgestion','automatico_venta')");
+
+                    $tipoasiento = $this->dbc->query("SELECT * FROM asientotipo WHERE idasientotipo= '$confi_cuenta[idasientotipo]'");
+                    $type_as = $tipoasiento->fetch_assoc();
+
+                    $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion,tipo_registro)
+                    VALUES(NULL,'1000','$fecha_actual','0','0','transaccion automatica de venta','1','1','$type_as[tipo]','$data[idempresa]','0','0','automatico_venta')");
+
+                    $idtransaccion = $this->dbc->insert_id;
+
+                    $debe = 0; 
+                    $haber = 0;
+
+                    $tasiento = $this->dbc->query("SELECT * FROM asiento WHERE idasientotipo= '$confi_cuenta[idasientotipo]'");
+                    $orden = 1;
+                    while ($qwe = $this->dbc->fetch($tasiento)) {
+                        $pcuenta = $qwe['idcuenta'];
+                        if ($qwe['tipo'] == "DEBE") {
+                            // $debe = $monto * ($qwe['porciento'] / 100);
+                            $haber = 0;
+                        } elseif ($qwe['tipo'] == "HABER") {
+                            $debe = 0;
+                            // $haber = $monto * ($qwe['porciento'] / 100);
+                        }
+                        //$pcuenta=$_POST['plandecuenta']; 
+                        $ppresupuestario = 0; //$_POST['planpresupuestario'];
+                        $nota = "-";
+                        $estado = 1; //$_POST['estado'];
+                        $crear = $this->dbc->query("INSERT INTO detalletransaccion(debe,haber,nota,transacciones_idtransacciones,idplandecuenta,idcuentapresupuestaria,estado,cobrar,pagar,idorganizacion,idsucursal,orden)
+                        VALUES ('$debe','$haber','$nota','$idtransaccion','$pcuenta','$ppresupuestario','$estado','2','2','$data[idempresa]','0','$orden')");
+
+                        $orden = $orden + 1;
+                    }
+
+                    foreach ($data['venta'] as $venta) {
+                        $registrar_fact_trans = $this->dbc->query("INSERT INTO transaccion_documentos_comercial(id_documento,idtransaccion,cuenta,registro_desde,idempresa)
+                        VALUES('$venta[idventa]','$idtransaccion','0','contado_venta_comercial','$data[idempresa]')");  
+                    }
 
         // Respuesta
         if (TRUE === TRUE) {
