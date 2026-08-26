@@ -27,6 +27,7 @@ require_once "./configuracion/reporte_flujo_efectivo.php";
 require_once "./configuracion/usuario_gestion.php";
 require_once "./configuracion/vinculacion_empresas.php";
 require_once "./configuracion/reporte_evolucion_patrimonio.php";
+require_once "./configuracion/vinculacion_comercial.php";
 // require_once "./recibos/caja_bancos_contrataciones.php";
 
 $ver=$_POST['ver'];
@@ -399,12 +400,12 @@ if($data['ver'] == "asignar_asiento_A_factura") {
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['iddivisa']));
         }
     }elseif($ver=="registrar_asignacion_asiento_operacion"){
-        if(isset($_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['bandera'],$_POST['frecuencia_registro'],$_POST['idgestion'],$_POST['idempresa'])){
+        if(isset($_POST['fecha_registro'],$_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['bandera'],$_POST['frecuencia_registro'],$_POST['idgestion'],$_POST['idempresa'])){
             $cont=new Asiento();
-            $cont->registrar_asignacion_asiento_operacion($_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['bandera'],$_POST['frecuencia_registro'],$_POST['idgestion'],$_POST['idempresa']);
+            $cont->registrar_asignacion_asiento_operacion($_POST['fecha_registro'],$_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['bandera'],$_POST['frecuencia_registro'],$_POST['idgestion'],$_POST['idempresa']);
         }
         else{
-            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['bandera'],$_POST['frecuencia_registro'],$_POST['idgestion'],$_POST['idempresa']));
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['fecha_registro'],$_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['bandera'],$_POST['frecuencia_registro'],$_POST['idgestion'],$_POST['idempresa']));
         }
     }elseif($ver=="registro_transaccion_comercial"){
         if(isset($_POST['fecha'],$_POST['idasignacion_asiento'],$_POST['monto'],$_POST['empresa'],$_POST['sucursal'],$_POST['idgestion'])){
@@ -1004,11 +1005,16 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         $cont=new Reporte_evolucion_patrimonio();
         $cont->guardar_actualizacion_patrimonio_por_gestion($data);
     }elseif($data['ver'] == "vincular_ventas_a_transaccion") {
-        $cont=new Asiento();
+        $cont=new Vinculacion_comercial();
         $cont->vincular_ventas_a_transaccion($data);
+    }elseif($data['ver'] == "vincular_cotizaciones_a_transaccion") {
+        $cont=new Vinculacion_comercial();
+        $cont->vincular_cotizaciones_a_transaccion($data);
+    }elseif($ver == "aceptar_transaccion_comercial_en_revision"){
+        $cont=new Asiento();
+        $cont->aceptar_transaccion_comercial_en_revision($_POST['idtransaccion'],$_POST['idgestion'],$_POST['fecha']);
     }
 
-    
 // registrar_asignacion_asiento_operacion asiento desvincular_documentos_de_cuenta editar_recibo_caja_bancos registrocobrarfactura registrar_anular_eliminar_activar_factura_tributario_transaccion
 //   registrar_balance_general_admin registrar_vinculacion_depreciacion editar_registro_flujo_efectivo activar_desactivar_tipo_reportes creartipoasiento
 

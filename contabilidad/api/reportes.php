@@ -1748,9 +1748,9 @@ ORDER BY p.numero ASC, t.fechatransaccion ASC
 
     // echo json_encode(array($fechaIni,$fechaFin,$numeroIni,$numeroFin,$esIngreso,$empresa));
 
-    ini_set('display_errors', 1);
-      ini_set('display_startup_errors', 1);
-      error_reporting(E_ALL);
+    // ini_set('display_errors', 1);
+    //   ini_set('display_startup_errors', 1);
+    //   error_reporting(E_ALL);
         $lista=[];
   
         $ide=$this->getidempresa($empresa);

@@ -140,9 +140,9 @@ class Usuario_gestion extends DB{
     }
     
     public function listar_usuarios_por_gestion($idgestion) {
-         ini_set('display_errors', 1); 
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+        //  ini_set('display_errors', 1); 
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
         $lista = [];
         // $idempresa = $this->getidempresa($empresa);
     

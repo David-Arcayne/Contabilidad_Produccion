@@ -377,7 +377,7 @@ elseif($ver[0]=="listar_asiento_por_modulo"){
     $cont->listar_asiento_por_modulo($ver[1],$ver[2]);
 }elseif($ver[0]=="listar_operacion_modulo_filtrado"){
     $cont=new Asiento();
-    $cont->listar_operacion_modulo_filtrado($ver[1]);
+    $cont->listar_operacion_modulo_filtrado($ver[1],$ver[2]);
 }elseif($ver[0]=="listatransacciones_comercial"){
     $cont=new Transacciones();
     $cont->listatransacciones_comercial($ver[1],$ver[2]);
@@ -882,6 +882,12 @@ elseif($ver[0]=="listar_cobros_comercial_sin_cuenta"){
 }elseif($ver[0]=="obtener_operacion_despacho_diario"){
     $cont=new Asiento();
     $cont->obtener_operacion_despacho_diario($ver[1]);
+}elseif($ver[0]=="listar_fecha_ultima_transaccion"){
+    $cont=new Transacciones();
+    $cont->listar_fecha_ultima_transaccion($ver[1]);
+}elseif($ver[0]=="listar_transaccion_en_espera"){
+    $cont=new Transacciones();
+    $cont->listar_transaccion_en_espera($ver[1]);
 }
 
 // elseif($ver[0]=="reporte_calculo_otro_reporte_consolidado"){
@@ -894,20 +900,20 @@ elseif($ver[0]=="listar_cobros_comercial_sin_cuenta"){
 //     $cont->obtenerGestionAnterior($ver[1],$ver[2]); eliminar_gestion_contable   
 // }
 
-// listar_facturas_cobro_pago  rp listadegestion listar_tipo_reportes_activos listar_balance_general_completo_icono
-// listar_select_cuentas_balance_general listar_facturas_cobro_pago listar_recibo_por_caja_bancos listar_facturas_comercial_cobro
+// listadetalletransaccion  rp listadegestion listar_tipo_reportes_activos listar_balance_general_completo_icono
+// listar_usuarios_por_gestion listar_facturas_cobro_pago listar_recibo_por_caja_bancos listar_facturas_comercial_cobro
 // reporte_estado_resultados_actualizado_consolidado_por_niveles listar_reportes_referencia_select eliminar_otras_operaciones listadegestion listar_factura_comercial_con_transaccion
 
-// listar_agrupacion_evolucion_patrimonio transaccion listar_facturas_comercial_cobro mayorcuentacontable listar_anular_eliminar_factura
+// listatransacciones_comercial transaccion listar_facturas_comercial_cobro mayorcuentacontable listar_anular_eliminar_factura
 // reporte_balance_general_por_niveles_consolidados reporte_flujo_efectivo listar_plantilla_flujo_efectivo listar_cobros_comercial
 // 
-//  listar_usuarios  listar_agrupacion_plantilla reportecuentasderesultado reportedetallefpt
-// reportedetallefp lista_pagar_pagado_factura mayorcuentacontable_antiguo listar_solo_usuarios  reporte_estado_resultados_actualizado_consolidado_por_niveles
+//  reporte_comprobante_ingreso_egreso  listar_agrupacion_plantilla reportecuentasderesultado reportedetallefpt
+// listar_asignacion_asiento_operacion lista_pagar_pagado_factura mayorcuentacontable_antiguo listar_solo_usuarios  reporte_estado_resultados_actualizado_consolidado_por_niveles
 //  listar_factura_comercial listar_todos_documentos_asignado_cuenta  reporteactivodisponible listar_factura_comercial_con_caja_bancos
 //
 
 // 
-//  listar_reportes_referencia reportedetallefpt  listatipodecambio reportedeplanes activar_desactivar_gestiones listar_comprobantes_cobro_pago
+//  listar_operacion_modulo_filtrado reportedetallefpt  listatipodecambio reportedeplanes activar_desactivar_gestiones listar_comprobantes_cobro_pago
 //  desvincular_facturas_comercial_de_transaccion listar_factura_comercial listatransacciones reporte_balance_general_prueba listar_agrupacion_plantilla facturas_perteneciente_a_cuenta
 // 
 // 

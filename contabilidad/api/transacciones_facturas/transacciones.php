@@ -54,13 +54,29 @@ class Transacciones extends DB{
             ");
         }
 
-$resultado122 = $nroTransa->fetch_assoc();
-$nroTransaccion = $resultado122['codigotransaccion'] + 1;
+    $resultado122 = $nroTransa->fetch_assoc();
+    $nroTransaccion = $resultado122['codigotransaccion'] + 1;
 
 
         // echo json_encode(array($fecha, $tipocambio, $tipotransaccion, $glosa, $empresa,$ide, $sucursal,$ufv,$dolar,$idgestion,$nroTransaccion,$resultado122['codigotransaccion']));
     if($fecha >= $resultado122['fechatransaccion']){    
         if($tipocambio != ""){
+            $getTransacciones = $this->dbc->query("SELECT *
+                FROM transacciones 
+                WHERE fechatransaccion <= '$fecha'
+                AND idgestion = '$idgestion'
+                AND codigotransaccion ='-3'
+                ORDER BY fechatransaccion ASC
+            ");
+
+            if($getTransacciones->num_rows > 0){
+                while ($qwe3 = $this->dbc->fetch($getTransacciones)) {
+                    $update_trans = $this->dbc->query("UPDATE transacciones SET codigotransaccion ='$nroTransaccion' WHERE idtransacciones ='$qwe3[idtransacciones]'");
+                    $nroTransaccion = $nroTransaccion + 1;
+                }
+            }else{
+                // SALTAR PORQ NO OCURRIRA NADA
+            }
             // EXISTE TIPO DE CAMBIO PARA LA FECHA DE HOY O SE SELECCIONARA UNA Q YA EXISTE
             $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
             VALUE(NULL,'$nroTransaccion','$fecha','$tipocambio','$ndocumento','$glosa','1','1','$tipotransaccion','$ide','$idsucursal','$idgestion')");
@@ -74,6 +90,23 @@ $nroTransaccion = $resultado122['codigotransaccion'] + 1;
 
             $idtipo_cambio = $this->dbc->insert_id;   
         
+            $getTransacciones = $this->dbc->query("SELECT *
+                FROM transacciones 
+                WHERE fechatransaccion <= '$fecha'
+                AND idgestion = '$idgestion'
+                AND codigotransaccion ='-3'
+                ORDER BY fechatransaccion ASC
+            ");
+
+            if($getTransacciones->num_rows > 0){
+                while ($qwe3 = $this->dbc->fetch($getTransacciones)) {
+                    $update_trans = $this->dbc->query("UPDATE transacciones SET codigotransaccion ='$nroTransaccion' WHERE idtransacciones ='$qwe3[idtransacciones]'");
+                    $nroTransaccion = $nroTransaccion + 1;
+                }
+            }else{
+                // SALTAR PORQ NO OCURRIRA NADA
+            }
+
         $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
         VALUE(NULL,'$nroTransaccion','$fecha','$idtipo_cambio','$ndocumento','$glosa','1','1','$tipotransaccion','$ide','$idsucursal','$idgestion')");
 
@@ -2144,6 +2177,58 @@ public function asignar_facturas_A_cuentas($data) {
         }
     
         echo json_encode($res);
+    }
+
+    public function listar_fecha_ultima_transaccion($gestion) {
+        $lista = [];
+        // $idempresa = $this->getidempresa($empresa);
+    
+        // Preparar la consulta
+        $getPedido = $this->dbc->query("SELECT
+            t.fechatransaccion
+        FROM
+            transacciones AS t
+        WHERE t.idgestion = '$gestion'
+            AND t.estado != 6 
+        order by
+            t.codigotransaccion desc
+            limit 1;");
+    
+        while ($qwe = $this->dbc->fetch($getPedido)) {
+            $res = array(
+                "fecha_transaccion" => $qwe['fechatransaccion']
+            );
+            array_push($lista, $res);
+        }
+    
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
+
+    public function listar_transaccion_en_espera($idgestion) {
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+        $lista = [];
+        // $idempresa = $this->getidempresa($empresa);
+    
+        // Preparar la consulta
+        $getPedido = $this->dbc->query("SELECT * FROM transacciones WHERE idgestion = '$idgestion' AND codigotransaccion = '-3' ORDER BY fechatransaccion DESC");
+    
+        while ($qwe = $this->dbc->fetch($getPedido)) {
+
+        $getTipo = $this->dbc->query("SELECT * FROM tipotransaccion WHERE idtipotransaccion = '$qwe[tipotransaccion_idtipotransaccion]'");
+        $gt = $getTipo->fetch_assoc();
+            $res = array(
+                "idtransacciones" => $qwe['idtransacciones'],
+                "codigotransaccion" => $qwe['codigotransaccion'],
+                "fechatransaccion" => $qwe['fechatransaccion'],
+                "glosa" => $qwe['glosa'],
+                "tipo" => $gt['nombre']
+            );
+            array_push($lista, $res);
+        }
+    
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
     
 }
