@@ -2,6 +2,8 @@
 // session_start();
 //require_once "db.php";  
 require_once "../../db/db.php";
+// require 'vendor/autoload.php';
+// use PhpOffice\PhpSpreadsheet\IOFactory;
 class Admin extends DB
 {
 
@@ -193,7 +195,7 @@ class Admin extends DB
                 $res = array(
                         "success" => true,
                         "message" => "Se eliminó correctamente",
-                        "message_code"   => "eliminacion_exitosa"
+                        "message_code"   => "eliminacion_"
                     );
             }else{
                 $res = array(
@@ -615,8 +617,8 @@ class Admin extends DB
                 if ($registro === TRUE) {
                     $res = array(
                         "success" => true,
-                        "message" => "edicion exitosa",
-                        "message_code" => "edicion_exitosa"
+                        "message" => "edicion ",
+                        "message_code" => "edicion_"
                     );
                 } else {
                     $res = array(
@@ -847,7 +849,7 @@ class Admin extends DB
                 $res = array(
                         "success" => true,
                         "message" => "Se eliminó correctamente",
-                        "message_code"   => "eliminacion_exitosa"
+                        "message_code"   => "eliminacion_"
                     );
             }
             else{
@@ -973,6 +975,101 @@ class Admin extends DB
         $res = array("success", "Se agrego correctamente", "sitio");
         echo json_encode($res);
     }
+    // public function importar_tipodecambio($tipoCambio_excel,$empresa) 
+    // {
+    //     ini_set('display_errors', 1); 
+    //         ini_set('display_startup_errors', 1);
+    //         error_reporting(E_ALL);
+    //     $res = "";
+    //     $ide = $this->getidempresa($empresa);
+
+    //     $filePath = $tipoCambio_excel['tmp_name'];
+
+    //     // Usa PhpSpreadsheet para leer el archivo
+        
+
+    //     $spreadsheet = IOFactory::load($filePath);
+    //     $sheet = $spreadsheet->getActiveSheet();
+    //     $rows = $sheet->toArray();
+    //     // $registro = $this->dbc->query("INSERT INTO tipodecambio(idtipodecambio,dolar,ufv,fecha,idorganizacion)VALUES(NULL,'$dolar','$ufv','$fecha','$ide')");
+
+    //     $existe_vinculacion_act = $this->dbc->query("SELECT * FROM vinculacion_empresas WHERE idempresa_actual = '$ide'");
+
+    //     $existe_vinculacion_vinc = $this->dbc->query("SELECT * FROM vinculacion_empresas WHERE idempresa_vinculada = '$ide'");
+
+    //     if($existe_vinculacion_act->num_rows > 0){ // EL REGISTRO SE HARA DESDE LA EMPRESA ORIGINAL
+    //         $ve = $existe_vinculacion_act->fetch_assoc();
+
+    //         foreach ($rows as $row) {
+    //             $dolar   = $row[0];
+    //             $ufv     = $row[1];
+    //             $fecha   = $row[2];
+    //             // $empresa = $row[3];
+
+    //             $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM tipodecambio WHERE fecha = '$fecha' AND idorganizacion = '$ide'");
+    //             $resultado = $consulta->fetch_assoc();
+    //             $totalRegistros = $resultado['total'];
+
+    //             if ($totalRegistros > 0) {
+    //                 //SOLO SALTAS YA QUE SI EXISTE EL REGISTRO
+    //             } else {
+    //                 $registro_empr_vinc = $this->dbc->query("INSERT INTO tipodecambio(dolar,ufv,fecha,idorganizacion)VALUES('$dolar','$ufv','$fecha','$ve[idempresa_vinculada]')");
+
+    //                 $registro_empr_act = $this->dbc->query("INSERT INTO tipodecambio(dolar,ufv,fecha,idorganizacion)VALUES('$dolar','$ufv','$fecha','$ide')");
+    //             }
+    //         }
+
+    //     }elseif($existe_vinculacion_vinc->num_rows > 0){ // EL REGISTRO SE HARA DESDE LA EMPRESA VINCULADA 
+    //         $ve = $existe_vinculacion_vinc->fetch_assoc();
+
+    //         foreach ($rows as $row) {
+    //             $dolar   = $row[0];
+    //             $ufv     = $row[1];
+    //             $fecha   = $row[2];
+    //             // $empresa = $row[3];
+
+    //             $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM tipodecambio WHERE fecha = '$fecha' AND idorganizacion = '$ide'");
+    //             $resultado = $consulta->fetch_assoc();
+    //             $totalRegistros = $resultado['total'];
+
+    //             if ($totalRegistros > 0) {
+    //                 //SOLO SALTAS YA QUE SI EXISTE EL REGISTRO
+    //             } else {
+    //                 $registro_empr_act = $this->dbc->query("INSERT INTO tipodecambio(dolar,ufv,fecha,idorganizacion)VALUES('$dolar','$ufv','$fecha','$ve[idempresa_actual]')");
+
+    //                 $registro_empr_vinc = $this->dbc->query("INSERT INTO tipodecambio(dolar,ufv,fecha,idorganizacion)VALUES('$dolar','$ufv','$fecha','$ide')");
+    //             }
+    //         }
+
+    //     }else{ // EL REGISTRO SE HARA SOLO EN LA EMPRESA ORIGINAL PORQUE NO TIENE VINCULACION CON NINGUNA EMPRESA
+
+    //         foreach ($rows as $row) {
+    //             $dolar   = $row[0];
+    //             $ufv     = $row[1];
+    //             $fecha   = $row[2];
+    //             // $empresa = $row[3];
+
+    //             $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM tipodecambio WHERE fecha = '$fecha' AND idorganizacion = '$ide'");
+    //             $resultado = $consulta->fetch_assoc();
+    //             $totalRegistros = $resultado['total'];
+
+    //             if ($totalRegistros > 0) {
+    //                 //SOLO SALTAS YA QUE SI EXISTE EL REGISTRO
+    //             } else {
+    //                 $registro_empr_act = $this->dbc->query("INSERT INTO tipodecambio(dolar,ufv,fecha,idorganizacion)VALUES('$dolar','$ufv','$fecha','$ide')");
+    //             }
+    //         }
+    //     }
+
+    //     if ($registro_empr_act === TRUE) {
+    //         $res = array("success", "Se registro Correctamente", "registrotipocambio");
+    //     } else {
+    //         $res = array("danger", "No se pudo realizar el registro");
+    //     }
+
+        
+    //     echo json_encode($res);
+    // }
     public function registrotipodecambio($dolar, $ufv, $fecha, $empresa) 
     {
         $res = "";
@@ -1175,7 +1272,7 @@ class Admin extends DB
                 $res = array(
                         "success" => true,
                         "message" => "Se eliminó correctamente",
-                        "message_code"   => "eliminacion_exitosa"
+                        "message_code"   => "eliminacion_"
                     );
             }else{
                 $res = array(
@@ -1545,5 +1642,241 @@ public function codigo_correlativo_plandecuenta($codigo,$empresa)
         }
         echo json_encode($lista);
     }
-//impuestocrear milista impuestolista impuestocreardelete
+
+    public function importar_tipodecambio() {
+//Formato no soportado
+        try {
+
+            if (!isset($_FILES['archivo'])) {
+                throw new Exception('No se recibió ningún archivo');
+            }
+
+            $archivo = $_FILES['archivo'];
+            $empresa = $_POST['empresa'];
+            if ($archivo['error'] !== UPLOAD_ERR_OK) {
+                throw new Exception('Error al subir el archivo');
+            }
+
+            $extension = strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION));
+            if ($extension !== 'csv') {
+                throw new Exception('Formato no soportado. El archivo debe ser CSV');
+            }
+
+            $filas = $this->leerCSV($archivo['tmp_name']);
+            if (count($filas) < 2) {
+                throw new Exception('El archivo está vacío');
+            }
+
+            $encabezados = array_shift($filas);
+            $items = $this->procesarFilasExcel($encabezados, $filas);
+
+            $batchSize = 200;
+            $lotes = array_chunk($items, $batchSize);
+            $resultados = [];
+
+            foreach ($lotes as $indiceLote => $lote) {
+
+                try {
+                    foreach ($lote as $item) {
+                        $res_import = $this->importar_tipodecambio_version_final($item,$empresa);
+                    }
+                    if($res_import == TRUE){
+                        $resultados[] = [
+                        'status' => 'success',
+                        'message' => "registro existoso"
+                    ];
+                    }else{
+                        $resultados[] = [
+                        'status' => 'error',
+                        'message' => "Algunos registros ya existen"
+                    ];
+                    }
+                } catch (Exception $e) {
+                   
+                    $resultados[] = [
+                        'status' => 'error',
+                        'message' => "Error en lote " . ($indiceLote + 1) . ": " . $e->getMessage()
+                    ];
+                }
+            }
+
+            echo json_encode(['resultados' => $resultados]);
+
+        } catch (Exception $e) {
+            http_response_code(400);
+            echo json_encode(['error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Lee un archivo CSV y devuelve un array similar a toArray() de PhpSpreadsheet.
+     * Cada fila será un array asociativo con claves 'A', 'B', 'C', ... (letras de columna).
+     */
+    private function leerCSV($rutaArchivo) {
+        $filas = [];
+        $manejador = fopen($rutaArchivo, 'r');
+
+        if (!$manejador) {
+            throw new Exception('No se pudo abrir el archivo CSV');
+        }
+
+        // Leer la primera línea para detectar el delimitador
+        $primeraLinea = fgets($manejador);
+        if ($primeraLinea === false) {
+            fclose($manejador);
+            return $filas;
+        }
+
+        // Contar ocurrencias de coma y punto y coma
+        $numComas = substr_count($primeraLinea, ',');
+        $numPuntoComa = substr_count($primeraLinea, ';');
+
+        // Elegir el que tenga más ocurrencias
+        $delimitador = ($numPuntoComa > $numComas) ? ';' : ',';
+
+        // Rebobinar para leer desde el principio
+        rewind($manejador);
+
+        $primeraFila = true;
+
+        while (($fila = fgetcsv($manejador, 0, $delimitador, '"', '\\')) !== false) {
+            if ($primeraFila && isset($fila[0])) {
+                // Eliminar BOM (Byte Order Mark) si existe
+                $fila[0] = preg_replace('/^\xEF\xBB\xBF/', '', $fila[0]);
+                $primeraFila = false;
+            }
+
+            // Limpiar cada celda: quitar espacios y filtrar vacías (opcional)
+            $filaLimpia = [];
+            foreach ($fila as $valor) {
+                $valorLimpio = trim($valor);
+                // Puedes omitir celdas vacías, pero es mejor conservarlas para no alterar índices
+                $filaLimpia[] = $valorLimpio;
+            }
+
+            $filas[] = $filaLimpia;
+        }
+
+        fclose($manejador);
+        return $filas;
+    }
+    
+    private function procesarFilasExcel($encabezados, $filas) {
+        // Mapear índices de columnas
+        $mapa = [];
+        foreach ($encabezados as $indice => $nombre) {
+            $mapa[strtolower(trim((string)$nombre))] = $indice;
+        }
+
+        // // Validar columnas obligatorias
+        // $requeridos = [
+        //     'idproducto',
+        //     'productos_almacen_id_productos_almacen',
+        //     'costo_unitario',
+        //     'cantidad',
+        //     'sku'
+        // ];
+
+        // foreach ($requeridos as $req) {
+        //     if (!isset($mapa[$req])) {
+        //         throw new Exception("Falta la columna requerida: $req");
+        //     }
+        // }
+
+        $items = [];
+
+        foreach ($filas as $fila) {
+            $item = [
+                'fecha' => $fila[$mapa['fecha']] ?? null,
+                'dolar' => $fila[$mapa['dolar']] ?? null,
+                'ufv' => $fila[$mapa['ufv']] ?? null
+            ];
+
+            $items[] = $item;
+        }
+
+        return $items;
+    }
+
+    private function importar_tipodecambio_version_final($item,$empresa) 
+    {
+        ini_set('display_errors', 1); 
+            ini_set('display_startup_errors', 1);
+            error_reporting(E_ALL);
+        $res = "";
+        $ide = $this->getidempresa($empresa);
+
+        // $filePath = $tipoCambio_excel['tmp_name'];
+
+        // // Usa PhpSpreadsheet para leer el archivo
+        
+
+        // $spreadsheet = IOFactory::load($filePath);
+        // $sheet = $spreadsheet->getActiveSheet();
+        // $rows = $sheet->toArray();
+        // $registro = $this->dbc->query("INSERT INTO tipodecambio(idtipodecambio,dolar,ufv,fecha,idorganizacion)VALUES(NULL,'$dolar','$ufv','$fecha','$ide')");
+
+        $existe_vinculacion_act = $this->dbc->query("SELECT * FROM vinculacion_empresas WHERE idempresa_actual = '$ide'");
+
+        $existe_vinculacion_vinc = $this->dbc->query("SELECT * FROM vinculacion_empresas WHERE idempresa_vinculada = '$ide'");
+
+        if($existe_vinculacion_act->num_rows > 0){ // EL REGISTRO SE HARA DESDE LA EMPRESA ORIGINAL
+            $ve = $existe_vinculacion_act->fetch_assoc();
+
+                $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM tipodecambio WHERE fecha = '$item[fecha]' AND idorganizacion = '$ide'");
+                $resultado = $consulta->fetch_assoc();
+                $totalRegistros = $resultado['total'];
+
+                if ($totalRegistros > 0) {
+                    //SOLO SALTAS YA QUE SI EXISTE EL REGISTRO
+                    $registro_empr_act = FALSE;
+                } else {
+                    $registro_empr_vinc = $this->dbc->query("INSERT INTO tipodecambio(dolar,ufv,fecha,idorganizacion)VALUES('$item[dolar]','$item[ufv]','$item[fecha]','$ve[idempresa_vinculada]')");
+
+                    $registro_empr_act = $this->dbc->query("INSERT INTO tipodecambio(dolar,ufv,fecha,idorganizacion)VALUES('$item[dolar]','$item[ufv]','$item[fecha]','$ide')");
+                }
+            
+
+        }elseif($existe_vinculacion_vinc->num_rows > 0){ // EL REGISTRO SE HARA DESDE LA EMPRESA VINCULADA 
+            $ve = $existe_vinculacion_vinc->fetch_assoc();
+
+                $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM tipodecambio WHERE fecha = '$item[fecha]' AND idorganizacion = '$ide'");
+                $resultado = $consulta->fetch_assoc();
+                $totalRegistros = $resultado['total'];
+
+                if ($totalRegistros > 0) {
+                    //SOLO SALTAS YA QUE SI EXISTE EL REGISTRO
+                    $registro_empr_act = FALSE;
+                } else {
+                    $registro_empr_act = $this->dbc->query("INSERT INTO tipodecambio(dolar,ufv,fecha,idorganizacion)VALUES('$item[dolar]','$item[ufv]','$item[fecha]','$ve[idempresa_actual]')");
+
+                    $registro_empr_vinc = $this->dbc->query("INSERT INTO tipodecambio(dolar,ufv,fecha,idorganizacion)VALUES('$item[dolar]','$item[ufv]','$item[fecha]','$ide')");
+                }
+            
+
+        }else{ // EL REGISTRO SE HARA SOLO EN LA EMPRESA ORIGINAL PORQUE NO TIENE VINCULACION CON NINGUNA EMPRESA
+
+                $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM tipodecambio WHERE fecha = '$item[fecha]' AND idorganizacion = '$ide'");
+                $resultado = $consulta->fetch_assoc();
+                $totalRegistros = $resultado['total'];
+
+                if ($totalRegistros > 0) {
+                    //SOLO SALTAS YA QUE SI EXISTE EL REGISTRO
+                    $registro_empr_act = FALSE;
+                } else {
+                    $registro_empr_act = $this->dbc->query("INSERT INTO tipodecambio(dolar,ufv,fecha,idorganizacion)VALUES('$item[dolar]','$item[ufv]','$item[fecha]','$ide')");
+                }
+            
+        }
+
+        // if ($registro_empr_act === TRUE) {
+        //     $res = array("success", "Se registro Correctamente", "registrotipocambio");
+        // } else {
+        //     $res = array("danger", "No se pudo realizar el registro");
+        // }
+
+        return $registro_empr_act;
+        // echo json_encode($res);
+    }
+//impuestocrear milista impuestolista importar_tipodecambio
 }

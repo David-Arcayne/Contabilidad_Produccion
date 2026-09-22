@@ -2515,6 +2515,27 @@ class PlantillaReporte extends DB{
 
     private function calculables_estado_resultados_consolidado($id_agru_rubro, $idempresa, $gestion,$idplandecuenta,$fecha_ini,$fecha_fin,$idplantilla)
     {
+
+        // 1. Obtener IDs desde cierre_transacciones
+        $ids_excluir = [];
+        $cierre_pre = $this->dbc->query("SELECT idtransacciones 
+            FROM cierre_transacciones 
+            WHERE nombre_operacion IN ('precierre','cierre') 
+            AND idempresa = '$idempresa'
+        ");
+        if($cierre_pre->num_rows > 0){
+            while ($row = $this->dbc->fetch($cierre_pre)) {
+                $ids_excluir[] = $row['idtransacciones'];
+            }
+
+            // 2. Convertir array en string separado por comas
+            $ids_string = implode(',', $ids_excluir);
+            $excluir_cierres = "AND t.idtransacciones NOT IN ($ids_string)";
+
+        }else{
+            $excluir_cierres = "";
+        }
+
         $agru = $this->dbc->query("SELECT * from agrupacion_rubro_plandecuenta where idagrupacion_rubro_plandecuenta = '$id_agru_rubro'");// HIJOS DE LAS PLANTILLAS AGRUPADORAS 
         $agru_aux = $agru->fetch_assoc();
 
@@ -2526,7 +2547,8 @@ class PlantillaReporte extends DB{
                 INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
                 INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
                 where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$idplandecuenta'
-                AND t.estado NOT IN (4, 5, 6) AND t.consolidar = '2' AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
+                AND t.estado NOT IN (4, 5, 6) AND t.consolidar = '2' AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'
+                $excluir_cierres");
 
             $valor_auxi = $calcu->fetch_assoc();
             $valor_total = $valor_auxi['total'];
@@ -2536,7 +2558,8 @@ class PlantillaReporte extends DB{
                 INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
                 INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
                 where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$idplandecuenta'
-                AND t.estado NOT IN (4, 5, 6) AND t.consolidar = '2' AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
+                AND t.estado NOT IN (4, 5, 6) AND t.consolidar = '2' AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'
+                $excluir_cierres");
 
             $valor_auxi = $calcu->fetch_assoc();
             $valor_total = $valor_auxi['total'];
@@ -2551,14 +2574,16 @@ class PlantillaReporte extends DB{
                 INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
                 INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
                 where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$idplandecuenta'
-                AND t.estado NOT IN (4, 5, 6) AND t.consolidar = 2 AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
+                AND t.estado NOT IN (4, 5, 6) AND t.consolidar = 2 AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'
+                $excluir_cierres");
             }elseif($pl_tipo['ingreso_egreso'] == 'egreso'){ // ES GASTO
                 // EGRESOS_GASTOS
                 $calcu = $this->dbc->query("SELECT SUM(dt.debe) - SUM(dt.haber) AS total FROM transacciones t
                 INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
                 INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
                 where t.organizacion_idorganizacion='$idempresa' and t.idgestion = '$gestion' and p.idplandecuenta = '$idplandecuenta'
-                AND t.estado NOT IN (4, 5, 6) AND t.consolidar = 2 AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'");
+                AND t.estado NOT IN (4, 5, 6) AND t.consolidar = 2 AND t.fechatransaccion>='$fecha_ini' AND t.fechatransaccion<='$fecha_fin'
+                $excluir_cierres");
             }else{ // SON NULL PERO TALVEZ BORREMOS ESTA OPCION, SIEMPRE DEBERIA SER INGRESO O GASTO SI ES CUENTA DE ORDEN
 
             }

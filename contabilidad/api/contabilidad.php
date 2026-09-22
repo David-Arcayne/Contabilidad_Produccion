@@ -1325,24 +1325,25 @@ WHERE
         echo json_encode($registro);
     }
   
-    public function lista_cobrar_cobrado_factura($sucursal)
+    public function lista_cobrar_cobrado_factura($empresa)
     {
         // ini_set('display_errors', 1);
         // ini_set('display_startup_errors', 1);
         // error_reporting(E_ALL);
         //cobrar
+        $idempresa = $this->getidempresa($empresa);
         $lista = [];
         $cf = 2;
-        $idsucursal = $this->getidsucursal($sucursal);
+        // $idsucursal = $this->getidsucursal($sucursal);
         // $registro = $this->dbc->query("SELECT f.idfactura,f.fecha,f.nfactura,t.codigotransaccion, f.montofactura,f.proveedorcliente_idproveedorcliente,f.transacciones_idtransacciones,f.cuenta,f.cobrado,f.por_concepto_de
         //  FROM factura f,transacciones t
         //  WHERE f.clasefactura='$cf' AND f.sucursal='$idsucursal' 
         //  AND f.transacciones_idtransacciones=t.idtransacciones
         //  ORDER BY f.idfactura DESC");
         $registro = $this->dbc->query("SELECT f.idfactura,f.fecha,f.nfactura, f.montofactura,f.proveedorcliente_idproveedorcliente,
-        f.transacciones_idtransacciones,f.cuenta,f.cobrado,f.por_concepto_de,f.registro_desde,f.estado,f.tipo_factura
+        f.transacciones_idtransacciones,f.cuenta,f.cobrado,f.por_concepto_de,f.registro_desde,f.estado,f.tipo_factura,f.idorganizacion
          FROM factura f
-         WHERE f.clasefactura='$cf' AND f.sucursal='$idsucursal' 
+         WHERE f.clasefactura='$cf' AND f.idorganizacion='$idempresa' 
          ORDER BY f.idfactura DESC");
         while ($qwe = $this->dbc->fetch($registro)) {
             $pagados=[];

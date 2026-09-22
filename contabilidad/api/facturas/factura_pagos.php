@@ -601,7 +601,8 @@ class Factura_pagos extends DB{
             factura as f
             WHERE
             md5(f.idorganizacion)= '$idempresa'
-            AND f.cuenta='0'
+            -- AND f.cuenta='0'
+            AND f.transacciones_idtransacciones='0'
             AND f.pagado != '0'
             ORDER BY
             f.fecha DESC");

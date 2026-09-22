@@ -2810,6 +2810,12 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
 
                 }elseif($qwe['modulo'] == 'COMERCIAL'){
 
+                    $transaccion_comer = $this->dbc->query("SELECT * FROM transaccion_documentos_comercial WHERE id_documento= '$qwe[id_documento]'");
+                        $trans_comer = $transaccion_comer->fetch_assoc();
+
+                        $transaccion = $this->dbc->query("SELECT * FROM transacciones WHERE idtransacciones= '$trans_comer[idtransaccion]'");
+                        $tr_comer = $transaccion->fetch_assoc();
+
                     if($qwe['ingreso_egreso'] == 'ingreso'){
 
                         if($qwe['estado'] == 'no_autorizado'){
@@ -2817,6 +2823,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                         }else{
                                 $saldo = $saldo + $qwe['monto'];
                         }
+                        // $id_client_prov = $cl['id_cliente'];
 
                         $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente= '$qwe[cliente_proveedor]'");
                         $cl = $cliente->fetch_assoc();
@@ -2836,7 +2843,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "por_concepto_de" => $qwe['concepto'],
                             // "idotras_cuentas" => "$fact[idotras_cuentas]",
                             "estado_documento" => "activo",
-                            "codigotransaccion" => $tr['codigotransaccion'],
+                            "codigotransaccion" => $tr_comer['codigotransaccion'],
                             "id_cliente" => $id_client_prov,
                             "nombre_cliente" => $cl['nombre'],
                             //descripcion saldra de la factura o otras cuentas 
@@ -2874,7 +2881,7 @@ $cuentas_cobro_grupal = $getTabla->fetch_assoc();
                             "por_concepto_de" => $qwe['concepto'],
                             // "idotras_cuentas" => "$fact[idotras_cuentas]",
                             "estado_documento" => "activo",
-                            "codigotransaccion" => $tr['codigotransaccion'],
+                            "codigotransaccion" => $tr_comer['codigotransaccion'],
                             "id_cliente" => $id_client_prov,
                             "nombre_cliente" => $cl['nombre'],
                             //descripcion saldra de la factura o otras cuentas 

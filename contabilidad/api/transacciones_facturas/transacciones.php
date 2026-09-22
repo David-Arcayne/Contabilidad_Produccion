@@ -26,9 +26,9 @@ class Transacciones extends DB{
             $nroTransa = $this->dbc->query("SELECT *
             --  COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
             FROM transacciones
-            WHERE tipotransaccion_idtipotransaccion = '$tipotransaccion'
+            
+            AND idgestion = '$idgestion'WHERE tipotransaccion_idtipotransaccion = '$tipotransaccion'
             and fechatransaccion BETWEEN '$fecha_inicio' AND '$fecha_fin'
-            AND idgestion = '$idgestion'
             AND organizacion_idorganizacion = '$ide'
             ORDER BY codigotransaccion DESC
                 LIMIT 1
@@ -61,27 +61,72 @@ class Transacciones extends DB{
         // echo json_encode(array($fecha, $tipocambio, $tipotransaccion, $glosa, $empresa,$ide, $sucursal,$ufv,$dolar,$idgestion,$nroTransaccion,$resultado122['codigotransaccion']));
     if($fecha >= $resultado122['fechatransaccion']){    
         if($tipocambio != ""){
-            $getTransacciones = $this->dbc->query("SELECT *
-                FROM transacciones 
-                WHERE fechatransaccion <= '$fecha'
-                AND idgestion = '$idgestion'
-                AND codigotransaccion ='-3'
-                ORDER BY fechatransaccion ASC
-            ");
 
-            if($getTransacciones->num_rows > 0){
-                while ($qwe3 = $this->dbc->fetch($getTransacciones)) {
-                    $update_trans = $this->dbc->query("UPDATE transacciones SET codigotransaccion ='$nroTransaccion' WHERE idtransacciones ='$qwe3[idtransacciones]'");
-                    $nroTransaccion = $nroTransaccion + 1;
+        $fecha_fin    = date("Y-m-t", strtotime($fecha));  // "2025-03-31"
+        $fecha_inicio = date("Y-m-01", strtotime($fecha)); // "2025-03-01"
+
+            if($gc['formato_transaccion'] == 'por_tipo_mes') {
+
+                $getTransacciones = $this->dbc->query("SELECT *
+                    FROM transacciones 
+                    WHERE fechatransaccion >= '$fecha_inicio' AND fechatransaccion <= '$fecha'
+                    AND tipotransaccion_idtipotransaccion ='$tipotransaccion'
+                    AND idgestion = '$idgestion'
+                    AND codigotransaccion ='-3'
+                    ORDER BY fechatransaccion ASC
+                ");
+
+                if($getTransacciones->num_rows > 0){
+                    while ($qwe3 = $this->dbc->fetch($getTransacciones)) {
+                        $update_trans = $this->dbc->query("UPDATE transacciones SET codigotransaccion ='$nroTransaccion' WHERE idtransacciones ='$qwe3[idtransacciones]'");
+                        $nroTransaccion = $nroTransaccion + 1;
+                    }
+                }else{
+                    // SALTAR PORQ NO OCURRIRA NADA
                 }
-            }else{
-                // SALTAR PORQ NO OCURRIRA NADA
+            }elseif($gc['formato_transaccion'] == 'por_tipo_gestion') {
+
+                $getTransacciones = $this->dbc->query("SELECT *
+                    FROM transacciones 
+                    WHERE tipotransaccion_idtipotransaccion ='$tipotransaccion'
+                    AND idgestion = '$idgestion'
+                    AND codigotransaccion ='-3'
+                    ORDER BY fechatransaccion ASC
+                ");
+
+                if($getTransacciones->num_rows > 0){
+                    while ($qwe3 = $this->dbc->fetch($getTransacciones)) {
+                        $update_trans = $this->dbc->query("UPDATE transacciones SET codigotransaccion ='$nroTransaccion' WHERE idtransacciones ='$qwe3[idtransacciones]'");
+                        $nroTransaccion = $nroTransaccion + 1;
+                    }
+                }else{
+                    // SALTAR PORQ NO OCURRIRA NADA
+                }
+
+            }else{ // POR GESTION
+                $getTransacciones = $this->dbc->query("SELECT *
+                    FROM transacciones 
+                    WHERE fechatransaccion <= '$fecha'
+                    AND idgestion = '$idgestion'
+                    AND codigotransaccion ='-3'
+                    ORDER BY fechatransaccion ASC
+                ");
+
+                if($getTransacciones->num_rows > 0){
+                    while ($qwe3 = $this->dbc->fetch($getTransacciones)) {
+                        $update_trans = $this->dbc->query("UPDATE transacciones SET codigotransaccion ='$nroTransaccion' WHERE idtransacciones ='$qwe3[idtransacciones]'");
+                        $nroTransaccion = $nroTransaccion + 1;
+                    }
+                }else{
+                    // SALTAR PORQ NO OCURRIRA NADA
+                }
             }
+            
             // EXISTE TIPO DE CAMBIO PARA LA FECHA DE HOY O SE SELECCIONARA UNA Q YA EXISTE
             $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
             VALUE(NULL,'$nroTransaccion','$fecha','$tipocambio','$ndocumento','$glosa','1','1','$tipotransaccion','$ide','$idsucursal','$idgestion')");
 
-        $idtransaccion = $this->dbc->insert_id;
+            $idtransaccion = $this->dbc->insert_id;
 
         }else{
             //HAY Q CREAR TIPO DE CAMBIO 
@@ -90,21 +135,64 @@ class Transacciones extends DB{
 
             $idtipo_cambio = $this->dbc->insert_id;   
         
-            $getTransacciones = $this->dbc->query("SELECT *
-                FROM transacciones 
-                WHERE fechatransaccion <= '$fecha'
-                AND idgestion = '$idgestion'
-                AND codigotransaccion ='-3'
-                ORDER BY fechatransaccion ASC
-            ");
+            $fecha_fin    = date("Y-m-t", strtotime($fecha));  // "2025-03-31"
+            $fecha_inicio = date("Y-m-01", strtotime($fecha)); // "2025-03-01"
 
-            if($getTransacciones->num_rows > 0){
-                while ($qwe3 = $this->dbc->fetch($getTransacciones)) {
-                    $update_trans = $this->dbc->query("UPDATE transacciones SET codigotransaccion ='$nroTransaccion' WHERE idtransacciones ='$qwe3[idtransacciones]'");
-                    $nroTransaccion = $nroTransaccion + 1;
+            if($gc['formato_transaccion'] == 'por_tipo_mes') {
+
+                $getTransacciones = $this->dbc->query("SELECT *
+                    FROM transacciones 
+                    WHERE fechatransaccion >= '$fecha_inicio' AND fechatransaccion <= '$fecha'
+                    AND tipotransaccion_idtipotransaccion ='$tipotransaccion'
+                    AND idgestion = '$idgestion'
+                    AND codigotransaccion ='-3'
+                    ORDER BY fechatransaccion ASC
+                ");
+
+                if($getTransacciones->num_rows > 0){
+                    while ($qwe3 = $this->dbc->fetch($getTransacciones)) {
+                        $update_trans = $this->dbc->query("UPDATE transacciones SET codigotransaccion ='$nroTransaccion' WHERE idtransacciones ='$qwe3[idtransacciones]'");
+                        $nroTransaccion = $nroTransaccion + 1;
+                    }
+                }else{
+                    // SALTAR PORQ NO OCURRIRA NADA
                 }
-            }else{
-                // SALTAR PORQ NO OCURRIRA NADA
+            }elseif($gc['formato_transaccion'] == 'por_tipo_gestion') {
+
+                $getTransacciones = $this->dbc->query("SELECT *
+                    FROM transacciones 
+                    WHERE tipotransaccion_idtipotransaccion ='$tipotransaccion'
+                    AND idgestion = '$idgestion'
+                    AND codigotransaccion ='-3'
+                    ORDER BY fechatransaccion ASC
+                ");
+
+                if($getTransacciones->num_rows > 0){
+                    while ($qwe3 = $this->dbc->fetch($getTransacciones)) {
+                        $update_trans = $this->dbc->query("UPDATE transacciones SET codigotransaccion ='$nroTransaccion' WHERE idtransacciones ='$qwe3[idtransacciones]'");
+                        $nroTransaccion = $nroTransaccion + 1;
+                    }
+                }else{
+                    // SALTAR PORQ NO OCURRIRA NADA
+                }
+
+            }else{ // POR GESTION
+                $getTransacciones = $this->dbc->query("SELECT *
+                    FROM transacciones 
+                    WHERE fechatransaccion <= '$fecha'
+                    AND idgestion = '$idgestion'
+                    AND codigotransaccion ='-3'
+                    ORDER BY fechatransaccion ASC
+                ");
+
+                if($getTransacciones->num_rows > 0){
+                    while ($qwe3 = $this->dbc->fetch($getTransacciones)) {
+                        $update_trans = $this->dbc->query("UPDATE transacciones SET codigotransaccion ='$nroTransaccion' WHERE idtransacciones ='$qwe3[idtransacciones]'");
+                        $nroTransaccion = $nroTransaccion + 1;
+                    }
+                }else{
+                    // SALTAR PORQ NO OCURRIRA NADA
+                }
             }
 
         $writetrans = $this->dbc->query("INSERT INTO transacciones(idtransacciones,codigotransaccion,fechatransaccion,tipodecambio,ndocumento,glosa,consolidar,estado,tipotransaccion_idtipotransaccion,organizacion_idorganizacion,sucursal,idgestion)
@@ -832,13 +920,13 @@ if($filtrado->num_rows > 0){
         echo json_encode($res);
     }
 
-    public function listatransacciones_comercial($empresa,$todos)
+    public function listatransacciones_comercial($empresa,$todos,$gestion)
     {
         $lista = [];
         // 
         $ide = $this->getidempresa($empresa);
-        $getG = $this->getgestionactualC($empresa);
-        $gestion = $getG['id'];
+        // $getG = $this->getgestionactualC($empresa);
+        // $gestion = $getG['id'];
         if($todos == '0'){
             //LISTAR SOLO LOS QUE PERTENECEN A LA GESTION
               $registro = $this->dbc->query("SELECT
@@ -2087,24 +2175,28 @@ public function asignar_facturas_A_cuentas($data) {
                     $monto_documento += $docu['monto'];
                     $updatetranscodigo = $this->dbc->query("UPDATE factura SET cuenta = '0', transacciones_idtransacciones = '0' WHERE idfactura = '{$docu['id']}'");
 
-                }elseif($docu['tipo'] == 'factura_comercial'){
+                }elseif($docu['tipo'] == 'contado_venta_sin_factura_comercial'){
 
 
                     $monto_documento += $docu['monto'];
-                    $updatetranscodigo = $this->dbc->query("UPDATE transaccion_documentos_comercial SET cuenta = '0' WHERE id_documento = '{$docu['id']}' AND registro_desde ='contado_venta_comercial'");
+                    $updatetranscodigo = $this->dbc->query("DELETE FROM transaccion_documentos_comercial WHERE id_documento = '{$docu['id']}' AND registro_desde ='contado_venta_sin_factura_comercial'");
+                }elseif($docu['tipo'] == 'contado_venta_con_factura_comercial'){
+
+                    $monto_documento += $docu['monto'];
+                    $updatetranscodigo = $this->dbc->query("DELETE FROM transaccion_documentos_comercial WHERE id_documento = '{$docu['id']}' AND registro_desde ='contado_venta_con_factura_comercial'");
                 }elseif($docu['tipo'] == 'cobro_venta_comercial'){
 
 
                     $monto_documento += $docu['monto'];
-                    $updatetranscodigo = $this->dbc->query("UPDATE transaccion_documentos_comercial SET cuenta = '0' WHERE id_documento = '{$docu['id']}' AND registro_desde ='cobro_venta_comercial'");
+                    $updatetranscodigo = $this->dbc->query("DELETE FROM transaccion_documentos_comercial WHERE id_documento = '{$docu['id']}' AND registro_desde ='cobro_venta_comercial'");
                 }elseif($docu['tipo'] == 'comprobante de cobro'){
 
                     $monto_documento += $docu['monto'];
-                    $updatetranscodigo = $this->dbc->query("UPDATE cuentaspof SET cuenta = '0' WHERE idcuentaspof = '{$docu['id']}'");
+                    $updatetranscodigo = $this->dbc->query("UPDATE cuentaspof SET cuenta = '0', transaccion = '0' WHERE idcuentaspof = '{$docu['id']}'");
                 }elseif($docu['tipo'] == 'comprobante de pago'){
 
                     $monto_documento += $docu['monto'];
-                    $updatetranscodigo = $this->dbc->query("UPDATE cuentaspor SET cuenta = '0' WHERE idcuentaspor = '{$docu['id']}'");
+                    $updatetranscodigo = $this->dbc->query("UPDATE cuentaspor SET cuenta = '0', transaccion = '0' WHERE idcuentaspor = '{$docu['id']}'");
                 }elseif($docu['tipo'] == 'recibo'){
 
                      // se desvinculara el comprobante mas

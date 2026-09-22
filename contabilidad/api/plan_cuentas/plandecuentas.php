@@ -479,6 +479,24 @@ class Plandecuentas extends DB{
 
         echo json_encode($res, JSON_NUMERIC_CHECK); 
     }
+    public function listar_select_rubros() {
+        $lista = [];
+        // $idempresa = $this->getidempresa($empresa);
+    
+        // Preparar la consulta
+        $get_rubro = $this->dbc->query("SELECT * FROM rubro");
+    
+        while ($qwe = $this->dbc->fetch($get_rubro)){
+            $res = array(
+                "idrubro" => $qwe['idrubro'],
+                "nombre" => $qwe['nombre'],
+                "codigo_nombre" => $qwe['codigo_nombre']
+            );
+            array_push($lista, $res);
+        }
+    
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
     public function getidusuario($md5){
         $registro=$this->dbrh->query("select * from usuario where md5(idusuario)='$md5'");
         $qwe=$this->dbrh->fetch($registro);

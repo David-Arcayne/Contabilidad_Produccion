@@ -283,11 +283,11 @@ class Cuentas_transacciones extends DB{
 
 if ($viv_mister_soft == "vivasoft") {
 
-    $url = "https://vivasoft.link/app/cmv1/api/listaVentas/" . $empresa;
+    $url = "https://vivasoft.link/app/cmv1/api/listadoventasContabilidad/" . $empresa;
 
 } else {
 
-    $url = "https://mistersofts.com/app/cmv1/api/listaVentas/" . $empresa;
+    $url = "https://mistersofts.com/app/cmv1/api/listadoventasContabilidad/" . $empresa;
 }
 
 
@@ -479,8 +479,8 @@ if ($data === null && json_last_error() !== JSON_ERROR_NONE) {
 {
     $lista = [];
 
-    // FACTURAS COMERCIALES
-    $registro = $this->dbc->query("SELECT * FROM transaccion_documentos_comercial WHERE cuenta = '$idcuenta' AND registro_desde ='contado_venta_comercial'");
+    // VENTAS COMERCIALES CON FACTURA
+    $registro = $this->dbc->query("SELECT * FROM transaccion_documentos_comercial WHERE cuenta = '$idcuenta' AND registro_desde ='contado_venta_con_factura_comercial'");
     while ($qwe = $this->dbc->fetch($registro)) {
         $venta = $this->dbcm->query("SELECT * FROM venta WHERE id_venta= '$qwe[id_documento]'");
         $asd = $this->dbcm->fetch($venta);
@@ -489,10 +489,33 @@ if ($data === null && json_last_error() !== JSON_ERROR_NONE) {
         $cl = $this->dbcm->fetch($cliente);
 
         $res = array(
-            "tipo" => "factura_comercial",
+            "tipo" => "contado_venta_con_factura_comercial",
             "id" => $asd['id_venta'],
             "fecha" => $asd['fecha_venta'],
             "nro_documento" => $asd['nfactura'],
+            "monto" => $asd['monto_total'],
+            "cobrado" => "cobro",
+            "pagado" => "",
+            "concepto" => "",
+            "cobro_pago" => "cobro",
+            "cliente_proveedor" => $cl['nombre']
+        );
+        $lista[] = $res;
+    }
+    // VENTAS COMERCIAL SIN FACTURA
+    $registro = $this->dbc->query("SELECT * FROM transaccion_documentos_comercial WHERE cuenta = '$idcuenta' AND registro_desde ='contado_venta_sin_factura_comercial'");
+    while ($qwe = $this->dbc->fetch($registro)) {
+        $venta = $this->dbcm->query("SELECT * FROM cotizacion WHERE id_cotizacion= '$qwe[id_documento]'");
+        $asd = $this->dbcm->fetch($venta);
+
+        $cliente = $this->dbcm->query("SELECT * FROM cliente WHERE id_cliente= '$asd[cliente_id_cliente]'");
+        $cl = $this->dbcm->fetch($cliente);
+
+        $res = array(
+            "tipo" => "contado_venta_sin_factura_comercial",
+            "id" => $asd['id_cotizacion'],
+            "fecha" => $asd['fecha_cotizacion'],
+            "nro_documento" => $asd['num'],
             "monto" => $asd['monto_total'],
             "cobrado" => "cobro",
             "pagado" => "",

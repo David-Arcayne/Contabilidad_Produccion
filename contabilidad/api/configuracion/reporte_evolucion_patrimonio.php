@@ -45,7 +45,7 @@ class Reporte_evolucion_patrimonio extends DB{
         if($aux_parametro == "actualizacion_patrimonio"){ // SELECT FUERA DEL ICONO AZUL
 
             $selct_patrimonio = $this->dbc->query("SELECT * FROM configuracion_reporte WHERE idplantilla_reporte = '$idplantilla_reporte_vinculado_BG' 
-            AND grupo='3' AND  es_calculable ='si'");
+            AND grupo='3' AND  (es_calculable ='si' || tipo_operacion ='calculo_otro_reporte')");
             while ($qwe = $this->dbc->fetch($selct_patrimonio)) {
                 $existe_act_patrimonio = $this->dbc->query("SELECT * FROM actualizacion_patrimonio WHERE idcuenta_patrimonio ='$qwe[idconfiguracion_reporte]'");
 
@@ -440,23 +440,38 @@ class Reporte_evolucion_patrimonio extends DB{
         $lista = [];
         $lista2 = [];
         $idempresa = $this->getidempresa($data['empresa']);
-    
-        // $gestion_ant =$this->obtenerGestionAnterior($idgestion_actual);
-        // Preparar la consulta
-        // $get_act_patr = $this->dbc->query("SELECT * FROM actualizacion_patrimonio WHERE idempresa = '$idempresa' ORDER BY orden ASC");
-    
+        // $cadena = $data['idgestion_anterior'];
+        // $idgestion = intval($cadena); // Resultado: 123
+        if($data['idgestion_anterior'] == '0'){ // ENTONCES POR DEFECTO DEBE SER LA GESTION ANTERIOR
+            $obt_gest_ant = $this->dbc->query("SELECT g2.idgestion, g2.nombre
+            FROM gestion g1
+            JOIN gestion g2 
+            ON g2.fechafin < g1.fechaini
+            WHERE g1.idgestion = '$data[idgestion]' 
+            AND g1.idempresa = '$idempresa'
+            AND g2.idempresa = g1.idempresa
+            ORDER BY g2.fechafin DESC
+            LIMIT 1;");
+            $gest_ant = $obt_gest_ant->fetch_assoc();
+            
+            $idgestion_anterior = $gest_ant['idgestion'];
+            $nombre_gestion_ant = $gest_ant['nombre'];
+        }else{
+            $idgestion_anterior = $data['idgestion_anterior'];
+            $obt_nom_gest = $this->dbc->query("SELECT nombre FROM gestion WHERE idgestion ='$idgestion_anterior'");
+                $nombre_gest = $obt_nom_gest->fetch_assoc();
+                $nombre_gestion_ant = $nombre_gest['nombre'];
+        }
         foreach($data['actualizacion_patrimonios'] as $act_patr){
 
-            $calcular_valor = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(haber) - SUM(debe) AS total FROM transacciones t
-                                INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
-                                INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
-                                where t.organizacion_idorganizacion='$idempresa' 
-#                                 and t.idgestion = '76' 
-                                and p.idplandecuenta = '$act_patr[idplandecuenta]'
-                                AND t.estado NOT IN (4, 5, 6) AND t.consolidar = '2' AND t.fechatransaccion>='$act_patr[fecha_ini]' 
-                                AND t.fechatransaccion<='$act_patr[fecha_fin]'");
-            
-            $valor = $calcular_valor->fetch_assoc();
+            if($act_patr['valor_editable'] == ''){ // NO TENDRA VALOR EDITABLE
+                
+                $calcular_valor = $this->dbc->query("SELECT valor AS total FROM balance_general_por_gestion WHERE idgestion ='$idgestion_anterior' AND idconfiguracion_reporte ='$act_patr[idconfiguracion_reporte]'");
+                $valorObtenido = $calcular_valor->fetch_assoc();
+                $valor = $valorObtenido['total'];
+            }else{
+                $valor = $act_patr['valor_editable'];
+            }
 
             if($act_patr['visualizar'] == "si"){
                 if($act_patr['calculo_actualizacion'] == 'no'){
@@ -464,7 +479,7 @@ class Reporte_evolucion_patrimonio extends DB{
                         "idactualizacion_patrimonio" => $act_patr['idactualizacion_patrimonio'],
                         "idcuenta_patrimonio" => $act_patr['idconfiguracion_reporte'],
                         "nombre" => $act_patr['nombre'],
-                        "valor" => $valor['total'],
+                        "valor" => $valor,
                         "actualizacion" => 0,
                         "orden" => $act_patr['orden'],
                         "idplantilla_reporte" => $act_patr['idplantilla_reporte'],
@@ -484,13 +499,13 @@ class Reporte_evolucion_patrimonio extends DB{
                         // }
                         $div_tc = $ftc_2['ufv'] / $ftc_1['ufv'];
                         $multipli_tc = $div_tc - 1;
-                        $actualizacion = $valor['total'] * $multipli_tc;
+                        $actualizacion = $valor * $multipli_tc;
 
                         $res = array(
                             "idactualizacion_patrimonio" => $act_patr['idactualizacion_patrimonio'],
                             "idcuenta_patrimonio" => $act_patr['idconfiguracion_reporte'],
                             "nombre" => $act_patr['nombre'],
-                            "valor" => $valor['total'],
+                            "valor" => $valor,
                             "actualizacion" => $actualizacion,
                             "orden" => $act_patr['orden'],
                             "idplantilla_reporte" => $act_patr['idplantilla_reporte'],
@@ -498,7 +513,7 @@ class Reporte_evolucion_patrimonio extends DB{
                                 // "total" => $qwe['estado']
                         );
                         
-                            // $res = array("danger", "No existen esas fechas en el tipo de cambio");
+                            // $res = array("danger", "No existen esas fechas en el tipo de cambio"); idplandecuenta
                     
                 }
                 array_push($lista, $res);
@@ -573,7 +588,8 @@ class Reporte_evolucion_patrimonio extends DB{
                 "actualizacion" => $item['actualizacion'],
                 "total" => $suma,
                 "orden" => $item['orden'],
-                "idplantilla_reporte" => $item['idplantilla_reporte']
+                "idplantilla_reporte" => $item['idplantilla_reporte'],
+                "nombre_gestion_anterior" => $nombre_gestion_ant
             );
             array_push($lista2, $res2);
         }
@@ -715,6 +731,7 @@ class Reporte_evolucion_patrimonio extends DB{
     $obtiene_desde_planti,
     $idplantilla_cuenta, // puede ser string o array
     $columna_obtiene,
+    $signo,
     $empresa
 ){
     ini_set('display_errors', 1); 
@@ -737,6 +754,7 @@ class Reporte_evolucion_patrimonio extends DB{
             obtiene_desde_plantilla,
             idplantilla_cuenta,
             columna_obtiene,
+            signo,
             idempresa
         ) VALUES (
             '$idplantilla',
@@ -745,6 +763,7 @@ class Reporte_evolucion_patrimonio extends DB{
             '$obtiene_desde_planti',
             '$idplantilla_cuenta',
             '$columna_obtiene',
+            '$signo',
             '$idempresa'
         )
     ");
@@ -1121,8 +1140,7 @@ class Reporte_evolucion_patrimonio extends DB{
                 // $ids = explode(',', $agr['idplantilla_cuenta']); 
                 $ids = $agr['idplantilla_cuenta'];
                 
-                $obtener_valor = $this->dbc->query("
-                SELECT SUM($columna_obtiene) AS total
+                $obtener_valor = $this->dbc->query("SELECT SUM($columna_obtiene) AS total
                 FROM actualizacion_patrimonio_por_gestion
                 WHERE idactualizacion_patrimonio IN ($ids)
                 AND idgestion = '$idgestion'
@@ -1130,7 +1148,7 @@ class Reporte_evolucion_patrimonio extends DB{
 
                 $ov = $obtener_valor->fetch_assoc();
 
-                $res[$columna] = floatval($ov['total']);
+                $res[$columna] = floatval($ov['total']) * $agr['signo'];
 
             }else{ // ESTADO DE RESULTADOS
 
@@ -1140,10 +1158,10 @@ class Reporte_evolucion_patrimonio extends DB{
             $pr_plantilla = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla = '$agr[idplantilla_cuenta]'");
             $pp = $pr_plantilla->fetch_assoc();
 
-    //         // $obj = new PlantillaReporte(); // crear objeto
+            //         // $obj = new PlantillaReporte(); // crear objeto
 
-    $url = "https://mistersofts.com/app/ct/api/reporte_estado_resultados_actualizado_consolidado_por_niveles/".$pp['idplantilla_reporte']."/".$g['fechaini']."/".$g['fechafin']."/".$empresa."/".'5'."/".$idgestion;
-        $array_estado_resultados = json_decode(file_get_contents($url), true);
+            $url = "https://mistersofts.com/app/ct/api/reporte_estado_resultados_actualizado_consolidado_por_niveles/".$pp['idplantilla_reporte']."/".$g['fechaini']."/".$g['fechafin']."/".$empresa."/".'5'."/".$idgestion;
+            $array_estado_resultados = json_decode(file_get_contents($url), true);
 
             foreach ($array_estado_resultados as $eerr) {
                 if($eerr['idplantilla'] == $agr['idplantilla_cuenta']){
@@ -1218,7 +1236,7 @@ public function listar_tipo_reportes_select_ev_patrimonio($empresa) {
             
             echo json_encode($res);
     }
-//listar_agrupacion_evolucion_patrimonio
+//guardar
 }
 
 

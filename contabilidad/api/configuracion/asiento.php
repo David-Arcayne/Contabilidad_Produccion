@@ -23,7 +23,7 @@ class Asiento extends DB{
         
     }
 
-    public function editar_asignacion_asiento_operacion($id,$idoperacion_modulos,$idasientotipo,$bandera) {
+    public function editar_asignacion_asiento_operacion($id,$idoperacion_modulos,$idasientotipo,$bandera,$idgestion,$frecuencia_registro) {
         // $idempresa = $this->getidempresa($empresa);
 
         // $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM divisa WHERE nombre = '$nombre' AND idempresa = '$idempresa' AND iddivisa != '$id'");
@@ -37,7 +37,9 @@ class Asiento extends DB{
             $registroListaCompra = $this->dbc->query("UPDATE asignacion_asiento_operacion_modulos
                                     SET idoperacion_modulos = '$idoperacion_modulos',
                                     idasientotipo = '$idasientotipo',
-                                    bandera = '$bandera'
+                                    bandera = '$bandera',
+                                    idgestion = '$idgestion',
+                                    frecuencia_registro = '$frecuencia_registro'
                                     WHERE idasignacion_asiento_operacion_modulos = '$id';");
             if ($registroListaCompra === TRUE) {                                                                                                                                                                
                 $res = array("success", "Edición exitosa","editarCaracteristicas");
@@ -227,7 +229,7 @@ class Asiento extends DB{
         $lista = [];
 
         $lista_asignacion_dia = $this->dbc->query("SELECT * FROM asignacion_asiento_operacion_modulos 
-            WHERE frecuencia_registro='dia'
+            WHERE frecuencia_registro IN('dia','por_operacion')
             ORDER BY idempresa;");
 
             while ($lad = $this->dbc->fetch($lista_asignacion_dia)) {
@@ -312,39 +314,131 @@ class Asiento extends DB{
          echo json_encode($lista, JSON_NUMERIC_CHECK);
     }
 
-    public function aceptar_transaccion_comercial_en_revision($idtransaccion,$idgestion, $fecha) {
+    public function aceptar_transaccion_comercial_en_revision($idtransaccion,$idgestion, $fecha,$tipo_trans) {
         // $lista = [];
     
-        $existe_trans_post = $this->dbc->query("SELECT *
-        FROM transacciones
-        WHERE fechatransaccion > '$fecha' and idgestion ='$idgestion' order by codigotransaccion desc;");
+        $gestion_sel = $this->dbc->query("SELECT * FROM gestion WHERE idgestion='$idgestion'");
+        $gc = $gestion_sel->fetch_assoc();
 
-        if($existe_trans_post->num_rows > 0){ // SE DEBE INSERTAR Y RECORRER NUMERACION
+        $fecha_fin    = date("Y-m-t", strtotime($fecha));  // "2025-03-31"
+        $fecha_inicio = date("Y-m-01", strtotime($fecha)); // "2025-03-01"
 
-            $nro_transaccion = $this->dbc->query("SELECT COUNT(*) + 1 AS posicion
+        if($gc['formato_transaccion'] == 'por_tipo_mes') {
+            $existe_trans_post = $this->dbc->query("SELECT *
             FROM transacciones
-            WHERE fechatransaccion <= '$fecha' and idgestion ='$idgestion';");
+            WHERE fechatransaccion > '$fecha' AND fechatransaccion <= '$fecha_fin'
+            AND tipotransaccion_idtipotransaccion ='$tipo_trans'
+            AND idgestion ='$idgestion' ORDER BY codigotransaccion DESC;");
 
-            $nt = $nro_transaccion->fetch_assoc();
+            if($existe_trans_post->num_rows > 0){ // SE DEBE INSERTAR Y RECORRER NUMERACION
 
-            $mover_numeracion = $this->dbc->query("SELECT *
-            FROM transacciones
-            WHERE fechatransaccion > '$fecha' and idgestion ='$idgestion' order by codigotransaccion asc;");
+            $nro_transaccion = $this->dbc->query("SELECT codigotransaccion + 1 AS posicion
+                FROM transacciones
+                WHERE fechatransaccion >= '$fecha_inicio' AND fechatransaccion <= '$fecha' AND idgestion ='$idgestion'
+                AND tipotransaccion_idtipotransaccion ='$tipo_trans'
+                ORDER BY codigotransaccion DESC
+                LIMIT 1;");
 
-            while ($m_n = $this->dbc->fetch($mover_numeracion)) {
-                $codigo_trns = $m_n['codigotransaccion'] + 1;
-                $update_trans = $this->dbc->query("UPDATE transacciones
-                SET codigotransaccion = '$codigo_trns'
-                WHERE idtransacciones ='$m_n[idtransacciones]'");
+                $nt = $nro_transaccion->fetch_assoc();
+
+                $mover_numeracion = $this->dbc->query("SELECT *
+                FROM transacciones
+                WHERE fechatransaccion > '$fecha' AND fechatransaccion <= '$fecha_fin'
+                AND tipotransaccion_idtipotransaccion ='$tipo_trans'
+                AND idgestion ='$idgestion' ORDER BY codigotransaccion ASC;");
+
+                while ($m_n = $this->dbc->fetch($mover_numeracion)) {
+                    $codigo_trns = $m_n['codigotransaccion'] + 1;
+                    $update_trans = $this->dbc->query("UPDATE transacciones
+                    SET codigotransaccion = '$codigo_trns'
+                    WHERE idtransacciones ='$m_n[idtransacciones]'");
+                }
+
+                $update_trans_original = $this->dbc->query("UPDATE transacciones
+                    SET codigotransaccion = '$nt[posicion]', estado = '1'
+                    WHERE idtransacciones ='$idtransaccion'");
+            }else{ // ESTARA EN ESPERA CON -3 PARA ESPERAR EL MOMENTO QUE LE TOQUE INGRESAR A LA LISTA DE TRANSACCIONES
+                $update_trans_original = $this->dbc->query("UPDATE transacciones
+                    SET codigotransaccion = '-3'
+                    WHERE idtransacciones ='$idtransaccion'");
             }
 
-            $update_trans_original = $this->dbc->query("UPDATE transacciones
-                SET codigotransaccion = '$nt[posicion]'
-                WHERE idtransacciones ='$idtransaccion'");
-        }else{ // ESTARA EN ESPERA CON -3 PARA ESPERAR EL MOMENTO QUE LE TOQUE INGRESAR A LA LISTA DE TRANSACCIONES
-            $update_trans_original = $this->dbc->query("UPDATE transacciones
-                SET codigotransaccion = '-3'
-                WHERE idtransacciones ='$idtransaccion'");
+        }elseif($gc['formato_transaccion'] == 'por_tipo_gestion') {
+
+            $existe_trans_post = $this->dbc->query("SELECT *
+            FROM transacciones
+            WHERE fechatransaccion > '$fecha'
+            AND tipotransaccion_idtipotransaccion ='$tipo_trans'
+            AND idgestion ='$idgestion' order by codigotransaccion desc;");
+
+            if($existe_trans_post->num_rows > 0){ // SE DEBE INSERTAR Y RECORRER NUMERACION
+
+            $nro_transaccion = $this->dbc->query("SELECT codigotransaccion + 1 AS posicion
+                FROM transacciones
+                WHERE fechatransaccion <= '$fecha' AND idgestion ='$idgestion'
+                AND tipotransaccion_idtipotransaccion = '$tipo_trans'
+                ORDER BY codigotransaccion DESC
+                LIMIT 1;");
+
+                $nt = $nro_transaccion->fetch_assoc();
+
+                $mover_numeracion = $this->dbc->query("SELECT *
+                FROM transacciones
+                WHERE fechatransaccion > '$fecha'
+                AND tipotransaccion_idtipotransaccion ='$tipo_trans'
+                AND idgestion ='$idgestion' ORDER BY codigotransaccion ASC;");
+
+                while ($m_n = $this->dbc->fetch($mover_numeracion)) {
+                    $codigo_trns = $m_n['codigotransaccion'] + 1;
+                    $update_trans = $this->dbc->query("UPDATE transacciones
+                    SET codigotransaccion = '$codigo_trns'
+                    WHERE idtransacciones ='$m_n[idtransacciones]'");
+                }
+
+                $update_trans_original = $this->dbc->query("UPDATE transacciones
+                    SET codigotransaccion = '$nt[posicion]', estado = '1'
+                    WHERE idtransacciones ='$idtransaccion'");
+            }else{ // ESTARA EN ESPERA CON -3 PARA ESPERAR EL MOMENTO QUE LE TOQUE INGRESAR A LA LISTA DE TRANSACCIONES
+                $update_trans_original = $this->dbc->query("UPDATE transacciones
+                    SET codigotransaccion = '-3'
+                    WHERE idtransacciones ='$idtransaccion'");
+            }
+
+        }else { // POR_GESTION
+            $existe_trans_post = $this->dbc->query("SELECT *
+            FROM transacciones
+            WHERE fechatransaccion > '$fecha' and idgestion ='$idgestion' order by codigotransaccion desc;");
+
+            if($existe_trans_post->num_rows > 0){ // SE DEBE INSERTAR Y RECORRER NUMERACION
+
+                $nro_transaccion = $this->dbc->query("SELECT codigotransaccion + 1 AS posicion
+                FROM transacciones
+                WHERE fechatransaccion <= '$fecha' and idgestion ='$idgestion'
+                order by codigotransaccion desc
+                limit 1;");
+
+                $nt = $nro_transaccion->fetch_assoc();
+
+                $mover_numeracion = $this->dbc->query("SELECT *
+                FROM transacciones
+                WHERE fechatransaccion > '$fecha' and idgestion ='$idgestion' order by codigotransaccion asc;");
+
+                while ($m_n = $this->dbc->fetch($mover_numeracion)) {
+                    $codigo_trns = $m_n['codigotransaccion'] + 1;
+                    $update_trans = $this->dbc->query("UPDATE transacciones
+                    SET codigotransaccion = '$codigo_trns'
+                    WHERE idtransacciones ='$m_n[idtransacciones]'");
+                }
+
+                $update_trans_original = $this->dbc->query("UPDATE transacciones
+                    SET codigotransaccion = '$nt[posicion]', estado = '1'
+                    WHERE idtransacciones ='$idtransaccion'");
+            }else{ // ESTARA EN ESPERA CON -3 PARA ESPERAR EL MOMENTO QUE LE TOQUE INGRESAR A LA LISTA DE TRANSACCIONES
+                $update_trans_original = $this->dbc->query("UPDATE transacciones
+                    SET codigotransaccion = '-3'
+                    WHERE idtransacciones ='$idtransaccion'");
+            }
+
         }
 
         if ($update_trans_original === TRUE) {                                                                                                                                                                

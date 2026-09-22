@@ -416,12 +416,12 @@ if($data['ver'] == "asignar_asiento_A_factura") {
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['fecha'],$_POST['idasignacion_asiento'],$_POST['monto'],$_POST['empresa'],$_POST['sucursal'],$_POST['idgestion']));
         }
     }elseif($ver=="editar_asignacion_asiento_operacion"){
-        if(isset($_POST['idasignacion_asiento_operacion_modulos'],$_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['bandera'])){
+        if(isset($_POST['idasignacion_asiento_operacion_modulos'],$_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['bandera'],$_POST['idgestion'],$_POST['frecuencia_registro'])){
             $cont=new Asiento();
-            $cont->editar_asignacion_asiento_operacion($_POST['idasignacion_asiento_operacion_modulos'],$_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['bandera']);
+            $cont->editar_asignacion_asiento_operacion($_POST['idasignacion_asiento_operacion_modulos'],$_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['bandera'],$_POST['idgestion'],$_POST['frecuencia_registro']);
         }
         else{
-            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idasignacion_asiento_operacion_modulos'],$_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['bandera']));
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idasignacion_asiento_operacion_modulos'],$_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['bandera'],$_POST['idgestion'],$_POST['frecuencia_registro']));
         }
     }elseif($ver=="registrar_factura_recibo_cobro_cajaBancos"){
         if(isset($_POST['idotras_cuentas'],$_POST['por_concepto_de'],$_POST['fecha'],$_POST['nfactura'],$_POST['nautorizacion'],$_POST['codigocontrol'],$_POST['montofactura'],$_POST['tasacero'],$_POST['export'],$_POST['npoliza'],$_POST['iceiecdhotros'],$_POST['descuentobonificacion'],$_POST['clasefactura'],$_POST['cobrado'],$_POST['pagado'],$_POST['especificacion'],$_POST['trans'],$_POST['cliente'],$_POST['empresa'],$_POST['sucursal'],$_POST['asiento'],$_POST['idcaja_bancos'],$_FILES['archivo'],$_POST['registro_desde'],$_POST['zona_horaria'],$_POST['fecha_transaccion'],$_POST['cuenta'],$_POST['tipo'],$_POST['idgestion'])){
@@ -994,6 +994,7 @@ if($data['ver'] == "asignar_asiento_A_factura") {
         $_POST['obtiene_desde_planti'],
         $idplantilla_cuenta, // ya concatenado
         $_POST['columna_obtiene'],
+        $_POST['signo'],
         $_POST['empresa']
     );
 }
@@ -1004,24 +1005,42 @@ if($data['ver'] == "asignar_asiento_A_factura") {
     }elseif($data['ver'] == "guardar_actualizacion_patrimonio_por_gestion") {
         $cont=new Reporte_evolucion_patrimonio();
         $cont->guardar_actualizacion_patrimonio_por_gestion($data);
-    }elseif($data['ver'] == "vincular_ventas_a_transaccion") {
+    }elseif($data['ver'] == "vincular_ventasConFactura_contado_a_transaccion") {
         $cont=new Vinculacion_comercial();
-        $cont->vincular_ventas_a_transaccion($data);
-    }elseif($data['ver'] == "vincular_cotizaciones_a_transaccion") {
+        $cont->vincular_ventasConFactura_contado_a_transaccion($data);
+    }elseif($data['ver'] == "vincular_ventasSinFactura_contado_a_transaccion") {
         $cont=new Vinculacion_comercial();
-        $cont->vincular_cotizaciones_a_transaccion($data);
+        $cont->vincular_ventasSinFactura_contado_a_transaccion($data);
+    }elseif($data['ver'] == "vincular_ventasConFactura_credito_a_transaccion") {
+        $cont=new Vinculacion_comercial();
+        $cont->vincular_ventasConFactura_credito_a_transaccion($data);
+    }elseif($data['ver'] == "vincular_ventasSinFactura_credito_a_transaccion") {
+        $cont=new Vinculacion_comercial();
+        $cont->vincular_ventasSinFactura_credito_a_transaccion($data);
     }elseif($ver == "aceptar_transaccion_comercial_en_revision"){
         $cont=new Asiento();
-        $cont->aceptar_transaccion_comercial_en_revision($_POST['idtransaccion'],$_POST['idgestion'],$_POST['fecha']);
+        $cont->aceptar_transaccion_comercial_en_revision($_POST['idtransaccion'],$_POST['idgestion'],$_POST['fecha'],$_POST['tipo_transaccion']);
+    }
+    elseif($ver=="importar_tipodecambio"){
+
+        if(isset($_FILES['archivo'],$_POST['empresa'])){
+            // decode echo json_encode(array("danger", "Faltan parámetros en la solicitud", $_POST['idfactura'],$_POST['idtransaccion'],$_POST['idcuenta'],$_POST['fecha'],$_POST['nrecibo'],$_POST['persona'],$_POST['ci'],$_POST['monto'],$_POST['asiento'],$_POST['idcliente'],$_POST['sucursal'],$_POST['empresa'],$facturas));
+            $adm=new Admin();
+            $adm->importar_tipodecambio();
+        }
+        else{
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_FILES['archivo'],$_POST['empresa']));
+        }
     }
 
-// registrar_asignacion_asiento_operacion asiento desvincular_documentos_de_cuenta editar_recibo_caja_bancos registrocobrarfactura registrar_anular_eliminar_activar_factura_tributario_transaccion
+// vincular_cobros_comercial_caja_bancos asiento reporte_actualizacion_patrimonio editar_recibo_caja_bancos registrocobrarfactura registrar_anular_eliminar_activar_factura_tributario_transaccion
 //   registrar_balance_general_admin registrar_vinculacion_depreciacion editar_registro_flujo_efectivo activar_desactivar_tipo_reportes creartipoasiento
 
-// cierre asignar guardar_actualizacion_patrimonio_por_gestion ss desvincular_facturas_comercial_de_transaccion
-//editar_tipo_reportes
+// cambiar_cajaBanco_de_facturas_comercial_desde_conta reporte_actualizacion_patrimonio guardar_actualizacion_patrimonio_por_gestion ss desvincular_facturas_comercial_de_transaccion
+//asignar_facturas_comercial_A_cuentas FILE
 } 
-//  guardar  cierre cambio asignar_facturas_comercial_A_cuentas
-// asignar registrar_configuracion_reporte registrar_factura_recibo_pago_cajaBancos registrar_recibo_pago_cajaBancos_en_facturas editar_otras_operaciones
-// apertura vincular_rubro_plandecuentas
+//  guardar  asignar_facturas_comercial_A_cuentas cambio asignar_facturas_comercial_A_cuentas
+// asignar registrar_configuracion_reporte registrar_factura_recibo_pago_cajaBancos registrar_recibo_pago_cajaBancos_en_facturas reporte_actualizacion_patrimonio
+// apertura vincular_rubro_plandecuentas desvincular
+//asignar_facturas_comercial_A_cuentas desvincular_documentos_de_cuenta
 ?> 
