@@ -862,9 +862,13 @@ class Factura_comercial extends DB{
    
         foreach ($facturas as $factura) {
 
-            if($factura['tipo'] == "FAC"){
+            if($factura['tipo'] == "FAC" && $factura['tipopago'] == 'contado'){
                 $registro_desde = 'contado_venta_con_factura_comercial';
-            }else{ // PREF
+            }elseif($factura['tipo'] == "FAC" && $factura['tipopago'] == 'credito'){
+                $registro_desde = 'credito_venta_con_factura_comercial';
+            }elseif($factura['tipo'] == "PREF" && $factura['tipopago'] == 'credito'){
+                $registro_desde = 'credito_venta_sin_factura_comercial';
+            }elseif($factura['tipo'] == "PREF" && $factura['tipopago'] == 'contado'){ // PREF CONTADO
                 $registro_desde = 'contado_venta_sin_factura_comercial';
             }
                 // $montoFacturas += $factura['monto'];
