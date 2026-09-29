@@ -6,6 +6,9 @@ class Transacciones extends DB{
     
     public function registrotransaccion($fecha, $tipocambio, $tipotransaccion, $glosa, $empresa, $sucursal,$ufv,$dolar,$idgestion)
     {
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
         $ndocumento = "0";
         $ide = $this->getidempresa($empresa);
         $idsucursal = $this->getidsucursal($sucursal);
@@ -27,7 +30,8 @@ class Transacciones extends DB{
             --  COALESCE(MAX(codigotransaccion), 0) + 1 AS siguiente
             FROM transacciones
             
-            AND idgestion = '$idgestion'WHERE tipotransaccion_idtipotransaccion = '$tipotransaccion'
+            WHERE tipotransaccion_idtipotransaccion = '$tipotransaccion'
+            AND idgestion = '$idgestion'
             and fechatransaccion BETWEEN '$fecha_inicio' AND '$fecha_fin'
             AND organizacion_idorganizacion = '$ide'
             ORDER BY codigotransaccion DESC
@@ -2147,94 +2151,231 @@ public function asignar_facturas_A_cuentas($data) {
     
         echo json_encode($res);
     }
-    public function desvincular_documentos_de_cuenta($data) {
-        // ini_set('display_errors', 1);
-        // ini_set('display_startup_errors', 1);
-        // error_reporting(E_ALL);
+    // public function desvincular_documentos_de_cuenta($data) {
+    //     // ini_set('display_errors', 1);
+    //     // ini_set('display_startup_errors', 1);
+    //     // error_reporting(E_ALL);
     
+    //     $idempresa = $this->getidempresa($data['idempresa']);
+    //     // $idsucursal = $this->getidsucursal($data['idsucursal']); 
+    //     $gestion = $this->getgestionactualid($idempresa);
+    //     $monto_documento = 0;
+    //         foreach ($data['documentos'] as $docu) {
+
+    //             if($docu['tipo'] == 'factura_contabilidad'){
+
+    //                 if($docu['tipo_documento'] == 'contado'){
+    //                     // se desvinculara el comprobante mas
+    //                     if($docu['documento_cobro_pago'] == 'factura_cobro'){
+    //                         $editar_comprobante = $this->dbc->query("UPDATE cuentaspof 
+    //                         SET cuenta = '0', transaccion = '0' WHERE idfactura = '{$docu['id']}'");
+    //                     }else{ // factura_pago
+    //                         $editar_comprobante = $this->dbc->query("UPDATE cuentaspor 
+    //                         SET cuenta = '0', transaccion = '0' WHERE idfactura = '{$docu['id']}'");
+    //                     }
+    //                 }else{ 
+    //                     // no pasara nada ya que solo se desvinculara la factura
+    //                 }
+    //                 $monto_documento += $docu['monto'];
+    //                 $updatetranscodigo = $this->dbc->query("UPDATE factura SET cuenta = '0', transacciones_idtransacciones = '0' WHERE idfactura = '{$docu['id']}'");
+
+    //             }elseif($docu['tipo'] == 'contado_venta_sin_factura_comercial'){
+
+
+    //                 $monto_documento += $docu['monto'];
+    //                 $updatetranscodigo = $this->dbc->query("DELETE FROM transaccion_documentos_comercial WHERE id_documento = '{$docu['id']}' AND registro_desde ='contado_venta_sin_factura_comercial'");
+
+    //                 // Actualizamos la tabla cotizacion
+    //                 $update = $this->dbcm->query("UPDATE cotizacion SET estadoVinculacionC = '2' WHERE id_cotizacion = '{$docu['id']}'");
+    //                 if (!$update) throw new Exception("Error al actualizar cotizacion en dbcm");
+                    
+    //             }elseif($docu['tipo'] == 'credito_venta_sin_factura_comercial'){
+
+
+    //                 $monto_documento += $docu['monto'];
+    //                 $updatetranscodigo = $this->dbc->query("DELETE FROM transaccion_documentos_comercial WHERE id_documento = '{$docu['id']}' AND registro_desde ='credito_venta_sin_factura_comercial'");
+
+    //                 // Actualizamos la tabla cotizacion
+    //                 $update = $this->dbcm->query("UPDATE cotizacion SET estadoVinculacionC = '2' WHERE id_cotizacion = '{$docu['id']}'");
+    //                 if (!$update) throw new Exception("Error al actualizar cotizacion en dbcm");
+                    
+    //             }elseif($docu['tipo'] == 'contado_venta_con_factura_comercial'){
+
+    //                 $monto_documento += $docu['monto'];
+    //                 $updatetranscodigo = $this->dbc->query("DELETE FROM transaccion_documentos_comercial WHERE id_documento = '{$docu['id']}' AND registro_desde ='contado_venta_con_factura_comercial'");
+
+    //                 // Actualizamos la tabla cotizacion
+    //                 $update = $this->dbcm->query("UPDATE venta SET estadoVinculacionC = '2' WHERE id_venta = '{$docu['id']}'");
+    //                 if (!$update) throw new Exception("Error al actualizar cotizacion en dbcm");
+
+    //             }elseif($docu['tipo'] == 'credito_venta_con_factura_comercial'){
+
+    //                 $monto_documento += $docu['monto'];
+    //                 $updatetranscodigo = $this->dbc->query("DELETE FROM transaccion_documentos_comercial WHERE id_documento = '{$docu['id']}' AND registro_desde ='credito_venta_con_factura_comercial'");
+
+    //                 // Actualizamos la tabla cotizacion
+    //                 $update = $this->dbcm->query("UPDATE venta SET estadoVinculacionC = '2' WHERE id_venta = '{$docu['id']}'");
+    //                 if (!$update) throw new Exception("Error al actualizar cotizacion en dbcm");
+
+    //             }elseif($docu['tipo'] == 'cobro_venta_comercial'){
+
+
+    //                 $monto_documento += $docu['monto'];
+    //                 $updatetranscodigo = $this->dbc->query("DELETE FROM transaccion_documentos_comercial WHERE id_documento = '{$docu['id']}' AND registro_desde ='cobro_venta_comercial'");
+    //             }elseif($docu['tipo'] == 'comprobante de cobro'){
+
+    //                 $monto_documento += $docu['monto'];
+    //                 $updatetranscodigo = $this->dbc->query("UPDATE cuentaspof SET cuenta = '0', transaccion = '0' WHERE idcuentaspof = '{$docu['id']}'");
+    //             }elseif($docu['tipo'] == 'comprobante de pago'){
+
+    //                 $monto_documento += $docu['monto'];
+    //                 $updatetranscodigo = $this->dbc->query("UPDATE cuentaspor SET cuenta = '0', transaccion = '0' WHERE idcuentaspor = '{$docu['id']}'");
+    //             }elseif($docu['tipo'] == 'recibo'){
+
+    //                  // se desvinculara el comprobante mas
+    //                     if($docu['documento_cobro_pago'] == 'recibo_cobro'){
+    //                         $editar_comprobante = $this->dbc->query("UPDATE cuentaspof 
+    //                         SET cuenta = '0', transaccion = '0' WHERE idrecibo = '{$docu['id']}'");
+    //                     }else{ // recibo_pago
+    //                         $editar_comprobante = $this->dbc->query("UPDATE cuentaspor 
+    //                         SET cuenta = '0', transaccion = '0' WHERE idrecibo = '{$docu['id']}'");
+    //                     }
+
+    //                 $monto_documento += $docu['monto'];
+    //                 $updatetranscodigo = $this->dbc->query("UPDATE recibo SET cuenta = '0', transaccion = '0'
+    //                 WHERE idrecibo = '{$docu['id']}'");
+    //             }
+
+    //         }
+   
+    //     // Respuesta
+    //     if ($updatetranscodigo === TRUE) {
+    //         $res = array("success", "Se desvinculo Correctamente", "cobrofacturasaasientomodelo",$data['documentos']);
+    //     } else {
+    //         $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde");
+    //     }
+    
+    //     echo json_encode($res);
+    // }
+    public function desvincular_documentos_de_cuenta($data) {
+
+    // 1. Desactivar el autocommit para iniciar transacciones en ambas conexiones
+    $this->dbc->autocommit(FALSE);
+    $this->dbcm->autocommit(FALSE);
+
+    try {
         $idempresa = $this->getidempresa($data['idempresa']);
-        // $idsucursal = $this->getidsucursal($data['idsucursal']); 
         $gestion = $this->getgestionactualid($idempresa);
         $monto_documento = 0;
-            foreach ($data['documentos'] as $docu) {
+        $updatetranscodigo = false;
 
-                if($docu['tipo'] == 'factura_contabilidad'){
+        foreach ($data['documentos'] as $docu) {
 
-                    if($docu['tipo_documento'] == 'contado'){
-                        // se desvinculara el comprobante mas
-                        if($docu['documento_cobro_pago'] == 'factura_cobro'){
-                            $editar_comprobante = $this->dbc->query("UPDATE cuentaspof 
-                            SET cuenta = '0', transaccion = '0' WHERE idfactura = '{$docu['id']}'");
-                        }else{ // factura_pago
-                            $editar_comprobante = $this->dbc->query("UPDATE cuentaspor 
-                            SET cuenta = '0', transaccion = '0' WHERE idfactura = '{$docu['id']}'");
-                        }
-                    }else{ 
-                        // no pasara nada ya que solo se desvinculara la factura
+            if ($docu['tipo'] == 'factura_contabilidad') {
+
+                if ($docu['tipo_documento'] == 'contado') {
+                    if ($docu['documento_cobro_pago'] == 'factura_cobro') {
+                        $editar_comprobante = $this->dbc->query("UPDATE cuentaspof SET cuenta = '0', transaccion = '0' WHERE idfactura = '{$docu['id']}'");
+                    } else { // factura_pago
+                        $editar_comprobante = $this->dbc->query("UPDATE cuentaspor SET cuenta = '0', transaccion = '0' WHERE idfactura = '{$docu['id']}'");
                     }
-                    $monto_documento += $docu['monto'];
-                    $updatetranscodigo = $this->dbc->query("UPDATE factura SET cuenta = '0', transacciones_idtransacciones = '0' WHERE idfactura = '{$docu['id']}'");
-
-                }elseif($docu['tipo'] == 'contado_venta_sin_factura_comercial'){
-
-
-                    $monto_documento += $docu['monto'];
-                    $updatetranscodigo = $this->dbc->query("DELETE FROM transaccion_documentos_comercial WHERE id_documento = '{$docu['id']}' AND registro_desde ='contado_venta_sin_factura_comercial'");
-                }elseif($docu['tipo'] == 'contado_venta_con_factura_comercial'){
-
-                    $monto_documento += $docu['monto'];
-                    $updatetranscodigo = $this->dbc->query("DELETE FROM transaccion_documentos_comercial WHERE id_documento = '{$docu['id']}' AND registro_desde ='contado_venta_con_factura_comercial'");
-                }elseif($docu['tipo'] == 'cobro_venta_comercial'){
-
-
-                    $monto_documento += $docu['monto'];
-                    $updatetranscodigo = $this->dbc->query("DELETE FROM transaccion_documentos_comercial WHERE id_documento = '{$docu['id']}' AND registro_desde ='cobro_venta_comercial'");
-                }elseif($docu['tipo'] == 'comprobante de cobro'){
-
-                    $monto_documento += $docu['monto'];
-                    $updatetranscodigo = $this->dbc->query("UPDATE cuentaspof SET cuenta = '0', transaccion = '0' WHERE idcuentaspof = '{$docu['id']}'");
-                }elseif($docu['tipo'] == 'comprobante de pago'){
-
-                    $monto_documento += $docu['monto'];
-                    $updatetranscodigo = $this->dbc->query("UPDATE cuentaspor SET cuenta = '0', transaccion = '0' WHERE idcuentaspor = '{$docu['id']}'");
-                }elseif($docu['tipo'] == 'recibo'){
-
-                     // se desvinculara el comprobante mas
-                        if($docu['documento_cobro_pago'] == 'recibo_cobro'){
-                            $editar_comprobante = $this->dbc->query("UPDATE cuentaspof 
-                            SET cuenta = '0', transaccion = '0' WHERE idrecibo = '{$docu['id']}'");
-                        }else{ // recibo_pago
-                            $editar_comprobante = $this->dbc->query("UPDATE cuentaspor 
-                            SET cuenta = '0', transaccion = '0' WHERE idrecibo = '{$docu['id']}'");
-                        }
-
-                    $monto_documento += $docu['monto'];
-                    $updatetranscodigo = $this->dbc->query("UPDATE recibo SET cuenta = '0', transaccion = '0'
-                    WHERE idrecibo = '{$docu['id']}'");
+                    if (!$editar_comprobante) throw new Exception("Error al actualizar comprobante de factura");
                 }
 
-            }
-                        
-        // $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion = '$data[cuenta]'");
-        // $dt = $detalle_trans->fetch_assoc();
+                $monto_documento += $docu['monto'];
+                $updatetranscodigo = $this->dbc->query("UPDATE factura SET cuenta = '0', transacciones_idtransacciones = '0' WHERE idfactura = '{$docu['id']}'");
+                if (!$updatetranscodigo) throw new Exception("Error al desvincular factura");
 
-        //     if($dt['debe'] > 0){
-        //         $nuevo_monto_dt = $dt['debe'] - $monto_documento;
-        //         $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET debe = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
-        //     }else{
-        //         $nuevo_monto_dt = $dt['haber'] - $monto_documento;
-        //         $editar_dt = $this->dbc->query("UPDATE detalletransaccion SET haber = '$nuevo_monto_dt' WHERE iddetalletransaccion = '$data[cuenta]'");
-        //     }
-   
-        // Respuesta
-        if ($updatetranscodigo === TRUE) {
-            $res = array("success", "Se desvinculo Correctamente", "cobrofacturasaasientomodelo",$data['documentos']);
-        } else {
-            $res = array("danger", "Lo siento hubo un problema, por favor vuelva a intentar más tarde");
+            } elseif ($docu['tipo'] == 'contado_venta_sin_factura_comercial') {
+
+                $monto_documento += $docu['monto'];
+                $updatetranscodigo = $this->dbc->query("DELETE FROM transaccion_documentos_comercial WHERE id_documento = '{$docu['id']}' AND registro_desde ='contado_venta_sin_factura_comercial'");
+                if (!$updatetranscodigo) throw new Exception("Error al eliminar documento comercial (contado sin factura)");
+
+                $update = $this->dbcm->query("UPDATE cotizacion SET estadoVinculacionC = '2' WHERE id_cotizacion = '{$docu['id']}'");
+                if (!$update) throw new Exception("Error al actualizar cotizacion en dbcm");
+
+            } elseif ($docu['tipo'] == 'credito_venta_sin_factura_comercial') {
+
+                $monto_documento += $docu['monto'];
+                $updatetranscodigo = $this->dbc->query("DELETE FROM transaccion_documentos_comercial WHERE id_documento = '{$docu['id']}' AND registro_desde ='credito_venta_sin_factura_comercial'");
+                if (!$updatetranscodigo) throw new Exception("Error al eliminar documento comercial (credito sin factura)");
+
+                $update = $this->dbcm->query("UPDATE cotizacion SET estadoVinculacionC = '2' WHERE id_cotizacion = '{$docu['id']}'");
+                if (!$update) throw new Exception("Error al actualizar cotizacion en dbcm");
+
+            } elseif ($docu['tipo'] == 'contado_venta_con_factura_comercial') {
+
+                $monto_documento += $docu['monto'];
+                $updatetranscodigo = $this->dbc->query("DELETE FROM transaccion_documentos_comercial WHERE id_documento = '{$docu['id']}' AND registro_desde ='contado_venta_con_factura_comercial'");
+                if (!$updatetranscodigo) throw new Exception("Error al eliminar documento comercial (contado con factura)");
+
+                $update = $this->dbcm->query("UPDATE venta SET estadoVinculacionC = '2' WHERE id_venta = '{$docu['id']}'");
+                if (!$update) throw new Exception("Error al actualizar venta en dbcm");
+
+            } elseif ($docu['tipo'] == 'credito_venta_con_factura_comercial') {
+
+                $monto_documento += $docu['monto'];
+                $updatetranscodigo = $this->dbc->query("DELETE FROM transaccion_documentos_comercial WHERE id_documento = '{$docu['id']}' AND registro_desde ='credito_venta_con_factura_comercial'");
+                if (!$updatetranscodigo) throw new Exception("Error al eliminar documento comercial (credito con factura)");
+
+                $update = $this->dbcm->query("UPDATE venta SET estadoVinculacionC = '2' WHERE id_venta = '{$docu['id']}'");
+                if (!$update) throw new Exception("Error al actualizar venta en dbcm");
+
+            } elseif ($docu['tipo'] == 'cobro_venta_comercial') {
+
+                $monto_documento += $docu['monto'];
+                $updatetranscodigo = $this->dbc->query("DELETE FROM transaccion_documentos_comercial WHERE id_documento = '{$docu['id']}' AND registro_desde ='cobro_venta_comercial'");
+                if (!$updatetranscodigo) throw new Exception("Error al eliminar documento comercial (cobro venta)");
+
+            } elseif ($docu['tipo'] == 'comprobante de cobro') {
+
+                $monto_documento += $docu['monto'];
+                $updatetranscodigo = $this->dbc->query("UPDATE cuentaspof SET cuenta = '0', transaccion = '0' WHERE idcuentaspof = '{$docu['id']}'");
+                if (!$updatetranscodigo) throw new Exception("Error al desvincular comprobante de cobro");
+
+            } elseif ($docu['tipo'] == 'comprobante de pago') {
+
+                $monto_documento += $docu['monto'];
+                $updatetranscodigo = $this->dbc->query("UPDATE cuentaspor SET cuenta = '0', transaccion = '0' WHERE idcuentaspor = '{$docu['id']}'");
+                if (!$updatetranscodigo) throw new Exception("Error al desvincular comprobante de pago");
+
+            } elseif ($docu['tipo'] == 'recibo') {
+
+                if ($docu['documento_cobro_pago'] == 'recibo_cobro') {
+                    $editar_comprobante = $this->dbc->query("UPDATE cuentaspof SET cuenta = '0', transaccion = '0' WHERE idrecibo = '{$docu['id']}'");
+                } else { // recibo_pago
+                    $editar_comprobante = $this->dbc->query("UPDATE cuentaspor SET cuenta = '0', transaccion = '0' WHERE idrecibo = '{$docu['id']}'");
+                }
+                if (!$editar_comprobante) throw new Exception("Error al actualizar comprobante de recibo");
+
+                $monto_documento += $docu['monto'];
+                $updatetranscodigo = $this->dbc->query("UPDATE recibo SET cuenta = '0', transaccion = '0' WHERE idrecibo = '{$docu['id']}'");
+                if (!$updatetranscodigo) throw new Exception("Error al desvincular recibo");
+
+            }
         }
-    
-        echo json_encode($res);
+
+        // Si todo salió bien, guardamos los cambios definitivamente
+        $this->dbc->commit();
+        $this->dbcm->commit();
+
+        $res = array("success", "Se desvinculo Correctamente", "cobrofacturasaasientomodelo", $data['documentos']);
+
+    } catch (Exception $e) {
+        // Si ocurre un error, revertimos todos los cambios en ambas bases de datos
+        $this->dbc->rollback();
+        $this->dbcm->rollback();
+
+        $res = array("danger", "Lo siento hubo un problema: " . $e->getMessage());
+    } finally {
+        // Restaurar el modo autocommit a TRUE
+        $this->dbc->autocommit(TRUE);
+        $this->dbcm->autocommit(TRUE);
     }
+
+    echo json_encode($res);
+}
     public function desvincular_facturas_contabilidad_de_transaccion($data) {
         // ini_set('display_errors', 1);
         // ini_set('display_startup_errors', 1);

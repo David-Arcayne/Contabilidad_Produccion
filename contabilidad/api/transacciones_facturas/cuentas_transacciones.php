@@ -428,6 +428,9 @@ if ($data === null && json_last_error() !== JSON_ERROR_NONE) {
 
     public function listar_facturas_comercial_cobro($idcuenta,$empresa,$viv_mister_soft)
     {
+        // ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
         $idempresa = $this->getidempresa($empresa); 
         // $ide = $this->getidempresa($empresa);
         $lista = [];
@@ -446,7 +449,7 @@ if ($data === null && json_last_error() !== JSON_ERROR_NONE) {
                 }
                 $venta = $this->dbcm->query("SELECT * FROM venta WHERE id_venta='" . $qwe['id_documento'] . "'");
                 $asd = $this->dbcm->fetch($venta);
-                $res = array("id_venta" => $asd['id_venta'], "fecha" => $asd['fecha_venta'], "nfactura" => $asd['nfactura'], "montofactura" => $asd['monto_total'], "tipo" => $tipo);
+                $res = array("id_venta" => $asd['id_venta'], "fecha" => $asd['fecha_venta'], "nfactura" => $asd['nfactura'], "montototal" => $asd['monto_total'], "tipo" => $tipo);
      
                 array_push($lista, $res);
         }
@@ -458,42 +461,43 @@ if ($data === null && json_last_error() !== JSON_ERROR_NONE) {
         //     $url = "https://mistersofts.com/app/cmv1/api/listaVentas/".$empresa;
         // }
 
-        $data = $this->mejorar_data_factura_comercial($empresa, $viv_mister_soft);
+        // $data = $this->mejorar_data_factura_comercial($empresa, $viv_mister_soft);
         // $url = "https://mistersofts.com/app/cmv1/api/listaVentas/".$empresa;
         // $data = json_decode(file_get_contents($url), true);
         $lista_factura_venta = [];
 //en el data me devuelve null, entonces talves la decodificacion esta mal
 
-        $venta_vinculadas_sinFactura = $this->dbc->query("SELECT GROUP_CONCAT(id_documento) AS ids
-            FROM transaccion_documentos_comercial 
-            WHERE idempresa ='$idempresa'
-            AND registro_desde IN(
-                'contado_venta_sin_factura_comercial',
-                'credito_venta_sin_factura_comercial'
-            )
-        ");
+        // $venta_vinculadas_sinFactura = $this->dbc->query("SELECT GROUP_CONCAT(id_documento) AS ids
+        //     FROM transaccion_documentos_comercial 
+        //     WHERE idempresa ='$idempresa'
+        //     AND registro_desde IN(
+        //         'contado_venta_sin_factura_comercial',
+        //         'credito_venta_sin_factura_comercial'
+        //     )
+        // ");
 
-        $row_sin = $venta_vinculadas_sinFactura->fetch_assoc();
-        $cadena_ids_sin = $row_sin['ids'];
+        // $row_sin = $venta_vinculadas_sinFactura->fetch_assoc();
+        // $cadena_ids_sin = $row_sin['ids'];
 
-        $venta_vinculadas_conFactura = $this->dbc->query("SELECT GROUP_CONCAT(id_documento) AS ids
-            FROM transaccion_documentos_comercial 
-            WHERE idempresa ='$idempresa'
-            AND registro_desde IN(
-                'contado_venta_con_factura_comercial',
-                'credito_venta_con_factura_comercial'
-            )
-        ");
+        // $venta_vinculadas_conFactura = $this->dbc->query("SELECT GROUP_CONCAT(id_documento) AS ids
+        //     FROM transaccion_documentos_comercial 
+        //     WHERE idempresa ='$idempresa'
+        //     AND registro_desde IN(
+        //         'contado_venta_con_factura_comercial',
+        //         'credito_venta_con_factura_comercial'
+        //     )
+        // ");
 
-        $row_con = $venta_vinculadas_conFactura->fetch_assoc();
-        $cadena_ids_con = $row_con['ids'];
+        // $row_con = $venta_vinculadas_conFactura->fetch_assoc();
+        // $cadena_ids_con = $row_con['ids'];
 
-        $lista_ventas = $this->dbc->query("SELECT 
+        $lista_ventas = $this->dbcm->query("SELECT 
                 v.id_venta          AS id,
                 v.fecha_venta       AS fechaventa,
                 c.nombre            AS cliente,
                 v.tipo_pago,
                 v.nfactura,
+                v.monto_total     AS montototal,
                 'FAC'             AS tipo
             FROM venta v
             LEFT JOIN cliente              c   ON v.cliente_id_cliente1                      = c.id_cliente
@@ -514,19 +518,20 @@ if ($data === null && json_last_error() !== JSON_ERROR_NONE) {
                     AND estc.tipo_cobro = 'COT') > 0, 
                     'credito', 'contado')   AS tipopago,
                 ctz.num                 AS nfactura,
+                ctz.monto_total         AS montototal,
                 IF(ctz.estado = 1, 'PREF', 'NOR') AS tipo
             FROM cotizacion ctz
             LEFT JOIN cliente              c    ON ctz.cliente_id_cliente                      = c.id_cliente
             WHERE c.idempresa = '$idempresa'
             AND ctz.condicion = 1
             AND ctz.estado = 1
-            AND ctz.id_cotizacion NOT IN($cadena_ids_sin)
+			AND ctz.estadoVinculacionC != '1'
             GROUP BY ctz.id_cotizacion
 
             ORDER BY fechaventa DESC, id DESC
 
         ");
-        foreach($data as $plantilla){
+        foreach($lista_ventas as $plantilla){
             $trans_fact = $this->dbc->query("SELECT id_documento
                                             FROM transaccion_documentos_comercial 
                                             WHERE id_documento = '{$plantilla['id']}'");
@@ -548,7 +553,8 @@ if ($data === null && json_last_error() !== JSON_ERROR_NONE) {
     $lista = [];
 
     // VENTAS COMERCIALES CON FACTURA
-    $registro = $this->dbc->query("SELECT * FROM transaccion_documentos_comercial WHERE cuenta = '$idcuenta' AND registro_desde ='contado_venta_con_factura_comercial'");
+    $registro = $this->dbc->query("SELECT * FROM transaccion_documentos_comercial WHERE cuenta = '$idcuenta' 
+    AND registro_desde IN('contado_venta_con_factura_comercial','credito_venta_con_factura_comercial')");
     while ($qwe = $this->dbc->fetch($registro)) {
         $venta = $this->dbcm->query("SELECT * FROM venta WHERE id_venta= '$qwe[id_documento]'");
         $asd = $this->dbcm->fetch($venta);
@@ -571,7 +577,8 @@ if ($data === null && json_last_error() !== JSON_ERROR_NONE) {
         $lista[] = $res;
     }
     // VENTAS COMERCIAL SIN FACTURA
-    $registro = $this->dbc->query("SELECT * FROM transaccion_documentos_comercial WHERE cuenta = '$idcuenta' AND registro_desde ='contado_venta_sin_factura_comercial'");
+    $registro = $this->dbc->query("SELECT * FROM transaccion_documentos_comercial WHERE cuenta = '$idcuenta' 
+    AND registro_desde IN('contado_venta_sin_factura_comercial','credito_venta_sin_factura_comercial')");
     while ($qwe = $this->dbc->fetch($registro)) {
         $venta = $this->dbcm->query("SELECT * FROM cotizacion WHERE id_cotizacion= '$qwe[id_documento]'");
         $asd = $this->dbcm->fetch($venta);
