@@ -1042,5 +1042,5 @@ if($data['ver'] == "asignar_asiento_A_factura") {
 //  guardar  asignar_facturas_comercial_A_cuentas cambio asignar_facturas_comercial_A_cuentas
 // asignar registrar_configuracion_reporte registrar_factura_recibo_pago_cajaBancos registrar_recibo_pago_cajaBancos_en_facturas reporte_actualizacion_patrimonio
 // asignar vincular_rubro_plandecuentas desvincular
-//asignar_facturas_comercial_A_cuentas desvincular_documentos_de_cuenta
+//asignar_facturas_comercial_A_cuentas asignacion
 ?> 
