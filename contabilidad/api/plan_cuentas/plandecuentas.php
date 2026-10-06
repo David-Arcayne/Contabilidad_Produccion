@@ -280,7 +280,7 @@ class Plandecuentas extends DB{
         echo json_encode($lista);
     }
 
-    public function registrar_agrupacion_rubro_plandecuenta($tipo_plandecuenta,$numero,$empresa){
+    public function registrar_agrupacion_rubro_plandecuenta($tipo_plandecuenta,$numero,$nombre_defecto,$empresa){
         // $idempresa = Empresa::getidempresa($empresa);
         $idempresa = $this->getidempresa($empresa);
         $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM agrupacion_rubro_plandecuenta WHERE numero = '$numero' AND idempresa = '$idempresa'");
@@ -291,7 +291,8 @@ class Plandecuentas extends DB{
             $res = array("danger", "El registro ya existe","Error");
         } else {
             // Insertar el nuevo registro
-            $registrar_agrupacion = $this->dbc->query("INSERT INTO agrupacion_rubro_plandecuenta(tipo_plandecuenta,numero,idempresa) VALUES ('$tipo_plandecuenta','$numero','$idempresa')");
+            $registrar_agrupacion = $this->dbc->query("INSERT INTO agrupacion_rubro_plandecuenta(tipo_plandecuenta,numero,nombre_por_defecto,idempresa) 
+            VALUES ('$tipo_plandecuenta','$numero','$nombre_defecto','$idempresa')");
             if ($registrar_agrupacion === TRUE) {                                                                                                                                                                
                 $res = array("success", "Registro exitoso","registroCaracteristicas");
             } else {
@@ -302,7 +303,7 @@ class Plandecuentas extends DB{
         
     }
 
-    public function editar_agrupacion_rubro_plandecuenta($id,$tipo_plandecuenta,$numero,$empresa) {
+    public function editar_agrupacion_rubro_plandecuenta($id,$tipo_plandecuenta,$numero,$nombre_defecto,$empresa) {
         $idempresa = $this->getidempresa($empresa);
 
         $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM agrupacion_rubro_plandecuenta WHERE numero = '$numero' AND idempresa = '$idempresa' AND idagrupacion_rubro_plandecuenta != '$id'");
@@ -315,7 +316,7 @@ class Plandecuentas extends DB{
             // Insertar el nuevo registro
             $registroListaCompra = $this->dbc->query("UPDATE agrupacion_rubro_plandecuenta
                                     SET tipo_plandecuenta = '$tipo_plandecuenta',
-                                    numero = '$numero'
+                                    numero = '$numero', nombre_por_defecto = '$nombre_defecto'
                                     WHERE idagrupacion_rubro_plandecuenta = '$id';");
             if ($registroListaCompra === TRUE) {                                                                                                                                                                
                 $res = array("success", "Edición exitosa","editarCaracteristicas");

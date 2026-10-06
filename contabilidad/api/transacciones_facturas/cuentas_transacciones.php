@@ -434,62 +434,28 @@ if ($data === null && json_last_error() !== JSON_ERROR_NONE) {
         $idempresa = $this->getidempresa($empresa); 
         // $ide = $this->getidempresa($empresa);
         $lista = [];
-        $registro = $this->dbc->query("SELECT * FROM factura WHERE cuenta = '$idcuenta' LIMIT 1");
         $detalle_trans = $this->dbc->query("SELECT * FROM detalletransaccion WHERE iddetalletransaccion ='$idcuenta'");
         $dt = $this->dbc->fetch($detalle_trans);
 
-        $factu_clase = $this->dbc->query("SELECT * FROM transaccion_documentos_comercial WHERE idempresa ='$idempresa' AND cuenta ='0' AND idtransaccion IN(0,$dt[transacciones_idtransacciones]) AND registro_desde ='contado_venta_con_factura_comercial'");
+        // $factu_clase = $this->dbc->query("SELECT * FROM transaccion_documentos_comercial WHERE idempresa ='$idempresa' AND cuenta ='0' AND idtransaccion IN(0,$dt[transacciones_idtransacciones]) AND registro_desde ='contado_venta_con_factura_comercial'");
 
-        while ($qwe = $this->dbc->fetch($factu_clase)) {
+        // while ($qwe = $this->dbc->fetch($factu_clase)) {
 
-                if($qwe['registro_desde'] == 'contado_venta_sin_factura_comercial'){
-                    $tipo = "PREF";
-                }elseif($qwe['registro_desde'] == 'contado_venta_con_factura_comercial'){
-                    $tipo = "FAC";
-                }
-                $venta = $this->dbcm->query("SELECT * FROM venta WHERE id_venta='" . $qwe['id_documento'] . "'");
-                $asd = $this->dbcm->fetch($venta);
-                $res = array("id_venta" => $asd['id_venta'], "fecha" => $asd['fecha_venta'], "nfactura" => $asd['nfactura'], "montototal" => $asd['monto_total'], "tipo" => $tipo);
+        //         if($qwe['registro_desde'] == 'contado_venta_sin_factura_comercial' || $qwe['registro_desde'] == 'credito_venta_sin_factura_comercial'){
+        //             $tipo = "PREF";
+        //         }elseif($qwe['registro_desde'] == 'contado_venta_con_factura_comercial' || $qwe['registro_desde'] == 'credito_venta_con_factura_comercial'){
+        //             $tipo = "FAC";
+        //         }
+        //         $venta = $this->dbcm->query("SELECT * FROM venta WHERE id_venta='" . $qwe['id_documento'] . "'");
+        //         $asd = $this->dbcm->fetch($venta);
+        //         $res = array("id_venta" => $asd['id_venta'], "fecha" => $asd['fecha_venta'], "nfactura" => $asd['nfactura'], "montototal" => $asd['monto_total'], "tipo" => $tipo);
      
-                array_push($lista, $res);
-        }
-//´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´
-        // $url = "https://vivasoft.link/app/cmv1/api/listaVentas/".$empresa;
-        // if($viv_mister_soft == "vivasoft"){
-        //     $url = "https://vivasoft.link/app/cmv1/api/listaVentas/".$empresa;
-        // }else{ // mistersofts
-        //     $url = "https://mistersofts.com/app/cmv1/api/listaVentas/".$empresa;
+        //         array_push($lista, $res);
         // }
+//´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´
 
-        // $data = $this->mejorar_data_factura_comercial($empresa, $viv_mister_soft);
-        // $url = "https://mistersofts.com/app/cmv1/api/listaVentas/".$empresa;
-        // $data = json_decode(file_get_contents($url), true);
         $lista_factura_venta = [];
 //en el data me devuelve null, entonces talves la decodificacion esta mal
-
-        // $venta_vinculadas_sinFactura = $this->dbc->query("SELECT GROUP_CONCAT(id_documento) AS ids
-        //     FROM transaccion_documentos_comercial 
-        //     WHERE idempresa ='$idempresa'
-        //     AND registro_desde IN(
-        //         'contado_venta_sin_factura_comercial',
-        //         'credito_venta_sin_factura_comercial'
-        //     )
-        // ");
-
-        // $row_sin = $venta_vinculadas_sinFactura->fetch_assoc();
-        // $cadena_ids_sin = $row_sin['ids'];
-
-        // $venta_vinculadas_conFactura = $this->dbc->query("SELECT GROUP_CONCAT(id_documento) AS ids
-        //     FROM transaccion_documentos_comercial 
-        //     WHERE idempresa ='$idempresa'
-        //     AND registro_desde IN(
-        //         'contado_venta_con_factura_comercial',
-        //         'credito_venta_con_factura_comercial'
-        //     )
-        // ");
-
-        // $row_con = $venta_vinculadas_conFactura->fetch_assoc();
-        // $cadena_ids_con = $row_con['ids'];
 
         $lista_ventas = $this->dbcm->query("SELECT 
                 v.id_venta          AS id,
@@ -502,7 +468,7 @@ if ($data === null && json_last_error() !== JSON_ERROR_NONE) {
             FROM venta v
             LEFT JOIN cliente              c   ON v.cliente_id_cliente1                      = c.id_cliente
             WHERE c.idempresa = '$idempresa' and v.estado = 1
-            AND v.estadoVinculacionC != '1' 
+            AND v.estadoVinculacionC = '3' 
 #             and v.fecha_venta > '2025-01-01'
 #             AND tipo_pago ='credito'
             GROUP BY v.id_venta
@@ -525,24 +491,24 @@ if ($data === null && json_last_error() !== JSON_ERROR_NONE) {
             WHERE c.idempresa = '$idempresa'
             AND ctz.condicion = 1
             AND ctz.estado = 1
-			AND ctz.estadoVinculacionC != '1'
+			AND ctz.estadoVinculacionC = '3'
             GROUP BY ctz.id_cotizacion
 
             ORDER BY fechaventa DESC, id DESC
 
         ");
         foreach($lista_ventas as $plantilla){
-            $trans_fact = $this->dbc->query("SELECT id_documento
-                                            FROM transaccion_documentos_comercial 
-                                            WHERE id_documento = '{$plantilla['id']}'");
-            if($trans_fact->num_rows > 0){
-                // Ya existe, no lo agregamos
-            } else {
+            // $trans_fact = $this->dbc->query("SELECT id_documento
+            //                                 FROM transaccion_documentos_comercial 
+            //                                 WHERE id_documento = '{$plantilla['id']}'");
+            // if($trans_fact->num_rows > 0){
+            //     // Ya existe, no lo agregamos
+            // } else {
                 // Guardamos todo el registro, no solo el id
                 $lista_factura_venta[] = $plantilla;
-            }
+            // }
         }
-
+        
         $lista_final = array_merge($lista, $lista_factura_venta);
         
         echo json_encode($lista_final);

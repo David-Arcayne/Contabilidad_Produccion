@@ -3332,9 +3332,9 @@ public function reporte_balance_general_por_niveles_consolidados(
     $maxProfundidad,
     $gestion
 ) {
-    ini_set('display_errors', 1);
-      ini_set('display_startup_errors', 1);
-      error_reporting(E_ALL);
+    // ini_set('display_errors', 1);
+    //   ini_set('display_startup_errors', 1);
+    //   error_reporting(E_ALL);
     $array = $this->reporte_balance_general_consolidado(
         $idplantilla_reporte,
         $fecha_ini,

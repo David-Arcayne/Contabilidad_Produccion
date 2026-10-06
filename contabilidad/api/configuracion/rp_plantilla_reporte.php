@@ -2539,10 +2539,7 @@ class PlantillaReporte extends DB{
         $agru = $this->dbc->query("SELECT * from agrupacion_rubro_plandecuenta where idagrupacion_rubro_plandecuenta = '$id_agru_rubro'");// HIJOS DE LAS PLANTILLAS AGRUPADORAS 
         $agru_aux = $agru->fetch_assoc();
 
-        $tipo_pl = $this->dbc->query("SELECT * from tipo_plandecuenta where nombre = '$agru_aux[tipo_plandecuenta]'");// HIJOS DE LAS PLANTILLAS AGRUPADORAS
-        $pl_aux = $tipo_pl->fetch_assoc();
-
-        if($pl_aux['nombre'] == 'Ingreso' || $pl_aux['nombre'] == 'Pasivo' || $pl_aux['nombre'] == 'Patrimonio'){ // INGRESOS 4.0.0.00.00 - pasivo, patrimonio
+        if($agru_aux['nombre_por_defecto'] == 'Ingreso' || $agru_aux['nombre_por_defecto'] == 'Pasivo' || $agru_aux['nombre_por_defecto'] == 'Patrimonio'){ // INGRESOS 4.0.0.00.00 - pasivo, patrimonio
             $calcu = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(haber) - SUM(debe) AS total FROM transacciones t
                 INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
                 INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
@@ -2553,7 +2550,7 @@ class PlantillaReporte extends DB{
             $valor_auxi = $calcu->fetch_assoc();
             $valor_total = $valor_auxi['total'];
 
-        }elseif($pl_aux['nombre'] == 'Gasto' || $pl_aux['nombre'] == 'Costo' || $pl_aux['nombre'] == 'Activo'){ // EGRESOS_GASTOS 5.0.0.00.00   activo
+        }elseif($agru_aux['nombre_por_defecto'] == 'Egreso' || $agru_aux['nombre_por_defecto'] == 'Activo'){ // EGRESOS_GASTOS 5.0.0.00.00   activo
             $calcu = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total FROM transacciones t
                 INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
                 INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
@@ -2564,7 +2561,7 @@ class PlantillaReporte extends DB{
             $valor_auxi = $calcu->fetch_assoc();
             $valor_total = $valor_auxi['total'];
 
-        }elseif($pl_aux['nombre'] == 'Cuentas de Orden'){ // las cuentas de 6.0.0.00.00 ORDEN
+        }elseif($agru_aux['nombre_por_defecto'] == 'Cuentas de Orden'){ // las cuentas de 6.0.0.00.00 ORDEN
             $plantilla = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla = '$idplantilla'");// HIJOS DE LAS PLANTILLAS AGRUPADORAS
             $pl_tipo = $plantilla->fetch_assoc();
            
@@ -3218,7 +3215,7 @@ class PlantillaReporte extends DB{
         $tipo_pl = $this->dbc->query("SELECT * from tipo_plandecuenta where nombre = '$agru_aux[tipo_plandecuenta]'");// HIJOS DE LAS PLANTILLAS AGRUPADORAS
         $pl_aux = $tipo_pl->fetch_assoc();
 
-        if($pl_aux['nombre'] == 'Ingreso' || $pl_aux['nombre'] == 'Pasivo' || $pl_aux['nombre'] == 'Patrimonio'){ // INGRESOS 4.0.0.00.00 - pasivo, patrimonio
+        if($agru_aux['nombre_por_defecto'] == 'Ingreso' || $agru_aux['nombre_por_defecto'] == 'Pasivo' || $agru_aux['nombre_por_defecto'] == 'Patrimonio'){ // INGRESOS 4.0.0.00.00 - pasivo, patrimonio
             $calcu = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(haber) - SUM(debe) AS total FROM transacciones t
                 INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
                 INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
@@ -3228,7 +3225,7 @@ class PlantillaReporte extends DB{
             $valor_auxi = $calcu->fetch_assoc();
             $valor_total = $valor_auxi['total'];
 
-        }elseif($pl_aux['nombre'] == 'Gasto' || $pl_aux['nombre'] == 'Costo' || $pl_aux['nombre'] == 'Activo'){ // EGRESOS_GASTOS 5.0.0.00.00   activo
+        }elseif($agru_aux['nombre_por_defecto'] == 'Egreso' || $agru_aux['nombre_por_defecto'] == 'Activo'){ // EGRESOS_GASTOS 5.0.0.00.00   activo
             $calcu = $this->dbc->query("SELECT sum(dt.debe) AS deb,sum(dt.haber) AS hab,SUM(debe) - SUM(haber) AS total FROM transacciones t
                 INNER JOIN detalletransaccion dt on dt.transacciones_idtransacciones = t.idtransacciones
                 INNER JOIN plandecuenta p on p.idplandecuenta=dt.idplandecuenta
@@ -3238,7 +3235,7 @@ class PlantillaReporte extends DB{
             $valor_auxi = $calcu->fetch_assoc();
             $valor_total = $valor_auxi['total'];
 
-        }elseif($pl_aux['nombre'] == 'Cuentas de Orden'){ // las cuentas de 6.0.0.00.00 ORDEN
+        }elseif($agru_aux['nombre_por_defecto'] == 'Cuentas de Orden'){ // las cuentas de 6.0.0.00.00 ORDEN
             $plantilla = $this->dbc->query("SELECT * FROM pr_plantilla WHERE idplantilla = '$idplantilla'");// HIJOS DE LAS PLANTILLAS AGRUPADORAS
             $pl_tipo = $plantilla->fetch_assoc();
            

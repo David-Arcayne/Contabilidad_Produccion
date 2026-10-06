@@ -2292,7 +2292,7 @@ public function asignar_facturas_A_cuentas($data) {
                 $updatetranscodigo = $this->dbc->query("DELETE FROM transaccion_documentos_comercial WHERE id_documento = '{$docu['id']}' AND registro_desde ='contado_venta_sin_factura_comercial'");
                 if (!$updatetranscodigo) throw new Exception("Error al eliminar documento comercial (contado sin factura)");
 
-                $update = $this->dbcm->query("UPDATE cotizacion SET estadoVinculacionC = '2' WHERE id_cotizacion = '{$docu['id']}'");
+                $update = $this->dbcm->query("UPDATE cotizacion SET estadoVinculacionC = '3' WHERE id_cotizacion = '{$docu['id']}'");
                 if (!$update) throw new Exception("Error al actualizar cotizacion en dbcm");
 
             } elseif ($docu['tipo'] == 'credito_venta_sin_factura_comercial') {
@@ -2301,7 +2301,7 @@ public function asignar_facturas_A_cuentas($data) {
                 $updatetranscodigo = $this->dbc->query("DELETE FROM transaccion_documentos_comercial WHERE id_documento = '{$docu['id']}' AND registro_desde ='credito_venta_sin_factura_comercial'");
                 if (!$updatetranscodigo) throw new Exception("Error al eliminar documento comercial (credito sin factura)");
 
-                $update = $this->dbcm->query("UPDATE cotizacion SET estadoVinculacionC = '2' WHERE id_cotizacion = '{$docu['id']}'");
+                $update = $this->dbcm->query("UPDATE cotizacion SET estadoVinculacionC = '3' WHERE id_cotizacion = '{$docu['id']}'");
                 if (!$update) throw new Exception("Error al actualizar cotizacion en dbcm");
 
             } elseif ($docu['tipo'] == 'contado_venta_con_factura_comercial') {
@@ -2310,7 +2310,7 @@ public function asignar_facturas_A_cuentas($data) {
                 $updatetranscodigo = $this->dbc->query("DELETE FROM transaccion_documentos_comercial WHERE id_documento = '{$docu['id']}' AND registro_desde ='contado_venta_con_factura_comercial'");
                 if (!$updatetranscodigo) throw new Exception("Error al eliminar documento comercial (contado con factura)");
 
-                $update = $this->dbcm->query("UPDATE venta SET estadoVinculacionC = '2' WHERE id_venta = '{$docu['id']}'");
+                $update = $this->dbcm->query("UPDATE venta SET estadoVinculacionC = '3' WHERE id_venta = '{$docu['id']}'");
                 if (!$update) throw new Exception("Error al actualizar venta en dbcm");
 
             } elseif ($docu['tipo'] == 'credito_venta_con_factura_comercial') {
@@ -2319,7 +2319,7 @@ public function asignar_facturas_A_cuentas($data) {
                 $updatetranscodigo = $this->dbc->query("DELETE FROM transaccion_documentos_comercial WHERE id_documento = '{$docu['id']}' AND registro_desde ='credito_venta_con_factura_comercial'");
                 if (!$updatetranscodigo) throw new Exception("Error al eliminar documento comercial (credito con factura)");
 
-                $update = $this->dbcm->query("UPDATE venta SET estadoVinculacionC = '2' WHERE id_venta = '{$docu['id']}'");
+                $update = $this->dbcm->query("UPDATE venta SET estadoVinculacionC = '3' WHERE id_venta = '{$docu['id']}'");
                 if (!$update) throw new Exception("Error al actualizar venta en dbcm");
 
             } elseif ($docu['tipo'] == 'cobro_venta_comercial') {

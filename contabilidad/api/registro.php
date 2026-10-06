@@ -400,12 +400,12 @@ if($data['ver'] == "asignar_asiento_A_factura") {
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['iddivisa']));
         }
     }elseif($ver=="registrar_asignacion_asiento_operacion"){
-        if(isset($_POST['fecha_registro'],$_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['bandera'],$_POST['frecuencia_registro'],$_POST['idgestion'],$_POST['idempresa'])){
+        if(isset($_POST['fecha_registro'],$_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['bandera'],$_POST['frecuencia_registro'],$_POST['idcuenta'],$_POST['idgestion'],$_POST['idempresa'])){
             $cont=new Asiento();
-            $cont->registrar_asignacion_asiento_operacion($_POST['fecha_registro'],$_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['bandera'],$_POST['frecuencia_registro'],$_POST['idgestion'],$_POST['idempresa']);
+            $cont->registrar_asignacion_asiento_operacion($_POST['fecha_registro'],$_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['bandera'],$_POST['frecuencia_registro'],$_POST['idcuenta'],$_POST['idgestion'],$_POST['idempresa']);
         }
         else{
-            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['fecha_registro'],$_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['bandera'],$_POST['frecuencia_registro'],$_POST['idgestion'],$_POST['idempresa']));
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['fecha_registro'],$_POST['idoperacion_modulos'],$_POST['idasientotipo'],$_POST['bandera'],$_POST['frecuencia_registro'],$_POST['idcuenta'],$_POST['idgestion'],$_POST['idempresa']));
         }
     }elseif($ver=="registro_transaccion_comercial"){
         if(isset($_POST['fecha'],$_POST['idasignacion_asiento'],$_POST['monto'],$_POST['empresa'],$_POST['sucursal'],$_POST['idgestion'])){
@@ -689,16 +689,16 @@ if($data['ver'] == "asignar_asiento_A_factura") {
             echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['idplandecuenta'],$_POST['idplantilla_reporte'],$_POST['reporte'],$_POST['nombre_cuenta_superior'],$_POST['nivel_registrado'],$_POST['orden'],$_POST['grupo'],$_POST['es_calculable'],$_POST['es_activo_fijo'],$_POST['negrilla_cursiva'],$_POST['empresa']));
         }
     }elseif($ver=="registrar_agrupacion_rubro_plandecuenta"){
-        if(isset($_POST['tipo_plandecuenta'],$_POST['numero'],$_POST['empresa'])){
+        if(isset($_POST['tipo_plandecuenta'],$_POST['numero'],$_POST['nombre_por_defecto'],$_POST['empresa'])){
             $cont=new Plandecuentas();
-            $cont->registrar_agrupacion_rubro_plandecuenta($_POST['tipo_plandecuenta'],$_POST['numero'],$_POST['empresa']);
+            $cont->registrar_agrupacion_rubro_plandecuenta($_POST['tipo_plandecuenta'],$_POST['numero'],$_POST['nombre_por_defecto'],$_POST['empresa']);
         }
         else{
-            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['tipo_plandecuenta'],$_POST['numero'],$_POST['empresa']));
+            echo json_encode(array("danger", "Faltan parámetros en la solicitud",$_POST['tipo_plandecuenta'],$_POST['numero'],$_POST['nombre_por_defecto'],$_POST['empresa']));
         }
     }elseif($ver=="editar_agrupacion_rubro_plandecuenta"){
     $cont=new Plandecuentas();
-    $cont->editar_agrupacion_rubro_plandecuenta($_POST['idagrupacion_rubro_plandecuenta'],$_POST['tipo_plandecuenta'],$_POST['numero'],$_POST['empresa']);
+    $cont->editar_agrupacion_rubro_plandecuenta($_POST['idagrupacion_rubro_plandecuenta'],$_POST['tipo_plandecuenta'],$_POST['numero'],$_POST['nombre_por_defecto'],$_POST['empresa']);
     }
     elseif($ver=="registrar_balance_general_admin"){
         if(isset($_POST['idplantilla_reporte'],$_POST['idtn'],$_POST['empresa'],$_POST['idgestion'])){
@@ -1040,7 +1040,7 @@ if($data['ver'] == "asignar_asiento_A_factura") {
 //asignar_facturas_comercial_A_cuentas desvincular
 } 
 //  guardar  asignar_facturas_comercial_A_cuentas cambio asignar_facturas_comercial_A_cuentas
-// asignar registrar_configuracion_reporte registrar_factura_recibo_pago_cajaBancos registrar_recibo_pago_cajaBancos_en_facturas reporte_actualizacion_patrimonio
+// asignar registrar_asignacion_asiento_operacion registrar_comprobantes_caja_bancos_comercial registrar_recibo_pago_cajaBancos_en_facturas reporte_actualizacion_patrimonio
 // asignar vincular_rubro_plandecuentas desvincular
 //asignar_facturas_comercial_A_cuentas desvincular_documentos_de_cuenta
 ?> 
