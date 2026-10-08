@@ -1613,6 +1613,9 @@ public function codigo_correlativo_plandecuenta($codigo,$empresa)
 
     public function importar_tipodecambio() {
 //Formato no soportado
+ ini_set('display_errors', 1); 
+            ini_set('display_startup_errors', 1);
+            error_reporting(E_ALL);
         try {
 
             if (!isset($_FILES['archivo'])) {
@@ -1730,37 +1733,101 @@ public function codigo_correlativo_plandecuenta($codigo,$empresa)
     }
     
     private function procesarFilasExcel($encabezados, $filas) {
+        // Función auxiliar interna para quitar tildes y pasar a minúsculas
+        $normalizar = function($texto) {
+            $texto = mb_strtolower(trim($texto), 'UTF-8');
+            $search = ['á', 'é', 'í', 'ó', 'ú', 'ä', 'ë', 'ï', 'ö', 'ü', 'ñ'];
+            $replace = ['a', 'e', 'i', 'o', 'u', 'a', 'e', 'i', 'o', 'u', 'n'];
+            return str_replace($search, $replace, $texto);
+        };
+
         // Mapear índices de columnas
         $mapa = [];
-        foreach ($encabezados as $indice => $nombre) {
-            $mapa[strtolower(trim((string)$nombre))] = $indice;
-        }
-
-        // // Validar columnas obligatorias
-        // $requeridos = [
-        //     'idproducto',
-        //     'productos_almacen_id_productos_almacen',
-        //     'costo_unitario',
-        //     'cantidad',
-        //     'sku'
-        // ];
-
-        // foreach ($requeridos as $req) {
-        //     if (!isset($mapa[$req])) {
-        //         throw new Exception("Falta la columna requerida: $req");
-        //     }
+        // foreach ($encabezados as $indice => $nombre) {
+        //     $mapa[strtolower(trim((string)$nombre))] = $indice;
         // }
+        foreach ($encabezados as $indice => $nombre) {
+            $mapa[$normalizar((string)$nombre)] = $indice;
+        }
 
         $items = [];
 
         foreach ($filas as $fila) {
-            $item = [
-                'fecha' => $fila[$mapa['fecha']] ?? null,
-                'dolar' => $fila[$mapa['dolar']] ?? null,
-                'ufv' => $fila[$mapa['ufv']] ?? null
-            ];
+           
+        // === NUEVO: Ignorar filas vacías o que no tengan datos en las columnas principales ===
+        if (empty(implode('', $fila))) {
+            continue; 
+        }
+            // $items[] = $item;
+            // 1. Transformar el Dólar (cambiar coma por punto y asegurar formato numérico)
+        $dolarCrudo = $fila[$mapa['dolar']] ?? null;
+        $dolarLimpio = null;
+        if ($dolarCrudo !== null && $dolarCrudo !== '') {
+            // Reemplaza la coma por punto (ej: "6,96" -> "6.96")
+            $dolarLimpio = str_replace(',', '.', $dolarCrudo);
+            $dolarLimpio = filter_var($dolarLimpio, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+        }
 
-            $items[] = $item;
+        // 2. Transformar la UFV por si acaso también viniera con coma
+        $ufvCrudo = $fila[$mapa['ufv']] ?? null;
+        $ufvLimpio = null;
+        if ($ufvCrudo !== null && $ufvCrudo !== '') {
+            $ufvLimpio = str_replace(',', '.', $ufvCrudo);
+            $ufvLimpio = filter_var($ufvLimpio, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+        }
+
+        // 3. Transformar la Fecha (invirtiendo mes y día si vienen como M/D/Y)
+        $fechaCruda = $fila[$mapa['fecha']] ?? null;
+        $fechaLimpia = null;
+
+        if ($fechaCruda !== null && $fechaCruda !== '') {
+            // Limpiamos espacios y estandarizamos separadores a barra diagonal
+            $fechaCruda = trim(str_replace(['-', '.'], '/', $fechaCruda));
+
+            // Dividimos la fecha por las barras
+            $partes = explode('/', $fechaCruda);
+
+            if (count($partes) === 3) {
+                // AJUSTE: Si tu Excel manda MES / DÍA / AÑO, intercambiamos los índices:
+                // $partes[0] = Mes, $partes[1] = Día, $partes[2] = Año
+                $mes = str_pad($partes[0], 2, '0', STR_PAD_LEFT);
+                $dia = str_pad($partes[1], 2, '0', STR_PAD_LEFT);
+                $anio = $partes[2];
+
+                // Si el año viene en formato de 2 dígitos (ej: "26"), lo convertimos a "2026"
+                if (strlen($anio) === 2) {
+                    $anio = '20' . $anio;
+                }
+
+                // Validamos que sea una fecha real y armamos el formato YYYY-MM-DD
+                if (checkdate((int)$mes, (int)$dia, (int)$anio)) {
+                    $fechaLimpia = "$anio-$mes-$dia";
+                }
+            }
+
+            // Como respaldo si el formato viniera al revés (Día / Mes / Año) y el anterior falló
+            if (!$fechaLimpia) {
+                $partes = explode('/', $fechaCruda);
+                if (count($partes) === 3) {
+                    $diaAlt = str_pad($partes[0], 2, '0', STR_PAD_LEFT);
+                    $mesAlt = str_pad($partes[1], 2, '0', STR_PAD_LEFT);
+                    $anioAlt = strlen($partes[2]) === 2 ? '20' . $partes[2] : $partes[2];
+
+                    if (checkdate((int)$mesAlt, (int)$diaAlt, (int)$anioAlt)) {
+                        $fechaLimpia = "$anioAlt-$mesAlt-$diaAlt";
+                    }
+                }
+            }
+        }
+
+        $item = [
+            'fecha' => $fechaLimpia,
+            'dolar' => $dolarLimpio,
+            'ufv' => $ufvLimpio
+        ];
+
+        $items[] = $item;
+
         }
 
         return $items;
@@ -1773,16 +1840,6 @@ public function codigo_correlativo_plandecuenta($codigo,$empresa)
             error_reporting(E_ALL);
         $res = "";
         $ide = $this->getidempresa($empresa);
-
-        // $filePath = $tipoCambio_excel['tmp_name'];
-
-        // // Usa PhpSpreadsheet para leer el archivo
-        
-
-        // $spreadsheet = IOFactory::load($filePath);
-        // $sheet = $spreadsheet->getActiveSheet();
-        // $rows = $sheet->toArray();
-        // $registro = $this->dbc->query("INSERT INTO tipodecambio(idtipodecambio,dolar,ufv,fecha,idorganizacion)VALUES(NULL,'$dolar','$ufv','$fecha','$ide')");
 
         $existe_vinculacion_act = $this->dbc->query("SELECT * FROM vinculacion_empresas WHERE idempresa_actual = '$ide'");
 
@@ -1836,13 +1893,6 @@ public function codigo_correlativo_plandecuenta($codigo,$empresa)
                 }
             
         }
-
-        // if ($registro_empr_act === TRUE) {
-        //     $res = array("success", "Se registro Correctamente", "registrotipocambio");
-        // } else {
-        //     $res = array("danger", "No se pudo realizar el registro");
-        // }
-
         return $registro_empr_act;
         // echo json_encode($res);
     }

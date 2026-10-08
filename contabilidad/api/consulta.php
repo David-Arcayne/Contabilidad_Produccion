@@ -913,7 +913,7 @@ elseif($ver[0]=="listar_cobros_comercial_sin_cuenta"){
 //     $cont->obtenerGestionAnterior($ver[1],$ver[2]); eliminar_gestion_contable   
 // }
 
-// obtener_operacion_despacho_diario  rp listadegestion listar_todos_documentos_asignado_cuenta listar_otras_cuentas_cobrar
+// listar_factura_comercial_con_transaccion  rp listar_factura_comercial_sin_cajaBancos listar_todos_documentos_asignado_cuenta listar_otras_cuentas_cobrar
 // listar_cobros_comercial_sin_cuenta listar_todos_documentos_asignado_cuenta listar_recibo_por_caja_bancos listar_facturas_comercial_cobro
 // listar_facturas_comercial_cobro listar_reportes_referencia_select eliminar_otras_operaciones listadegestion listar_factura_comercial_con_transaccion
 
@@ -926,13 +926,13 @@ elseif($ver[0]=="listar_cobros_comercial_sin_cuenta"){
 //
 
 // 
-//  listar_configuracion_reporte reportedetallefpt  listatipodecambio reporte_balance_general_por_niveles_consolidados activar_desactivar_gestiones listar_comprobantes_cobro_pago
+//  listar_configuracion_reporte reportedetallefpt  listar_cobros_comercial_con_transaccion reporte_balance_general_por_niveles_consolidados activar_desactivar_gestiones listar_comprobantes_cobro_pago
 //  listar_agrupacion_rubro_plandecuenta listar_factura_comercial listatransacciones reporte_balance_general_prueba listar_agrupacion_plantilla facturas_perteneciente_a_cuenta
 // 
 //  obtener
 //  reporte_balance_general_por_niveles_consolidados reporte_estado_resultados_actualizado_consolidado_por_niveles
 //  reporte_estado_resultados_actualizado_consolidado_por_niveles  reportebalancedesumasysaldos  listar_solo_usuarios listar_todos_documentos_asignado_cuenta  
-
+//listar_factura_comercial_con_transaccion  
 //   listar_factura_comercial_sin_cajaBancos.php    reporte_balance_general_hasta reportecomprobantecontable reporteactivodiaponibledos eliminar_registro_flujo_efectivo eliminar_configuracion_reporte
 
 
