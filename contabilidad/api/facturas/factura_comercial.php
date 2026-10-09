@@ -29,27 +29,66 @@ class Factura_comercial extends DB{
         // ini_set('display_errors', 1);
         // ini_set('display_startup_errors', 1);
         // error_reporting(E_ALL);
-   
-        if($viv_mister_soft == "vivasoft"){
-            $url = "https://vivasoft.link/app/cmv1/api/listaVentas/".$idmd5;
-        }else{ // mistersofts
-            $url = "https://mistersofts.com/app/cmv1/api/listaVentas/".$idmd5;
-        }
-        
-        $data = json_decode(file_get_contents($url), true);
-
-        //  $data = mejorar_data_factura_comercial($idmd5, $viv_mister_soft);
-        // $url = "https://mistersofts.com/app/ct/api/mejorar_data_factura_comercial/".$idmd5."/".$viv_mister_soft;
-        // $data = json_decode(file_get_contents($url), true);
-
+        $idempresa = $this->getidempresa($idmd5); 
         $lista_factura_venta = [];
 
-        foreach($data as $plantilla){
+        $lista_ventas = $this->dbcm->query("SELECT 
+                v.id_venta          AS id,
+                v.fecha_venta       AS fechaventa,
+                c.id_cliente            AS idcliente,
+                c.nombre            AS cliente,
+                a.nombre                AS almacen,
+                v.tipo_pago,
+                v.nfactura,
+                v.monto_total     AS montototal,
+                'FAC'             AS tipo
+            FROM venta v
+            LEFT JOIN cliente              c   ON v.cliente_id_cliente1                      = c.id_cliente
+            LEFT JOIN detalle_venta        dv  ON v.id_venta                                 = dv.venta_id_venta
+            LEFT JOIN productos_almacen    pa  ON dv.productos_almacen_id_productos_almacen  = pa.id_productos_almacen
+            LEFT JOIN almacen              a   ON pa.almacen_id_almacen                      = a.id_almacen
+            WHERE c.idempresa = '$idempresa' and v.estado = 1
+            AND v.estadoVinculacionC = '3' 
+#             and v.fecha_venta > '2025-01-01'
+#             AND tipo_pago ='credito'
+            GROUP BY v.id_venta
+
+            UNION ALL
+
+            SELECT
+                ctz.id_cotizacion       AS id,
+                ctz.fecha_cotizacion    AS fechaventa,
+                c.id_cliente            AS idcliente,
+                c.nombre                AS cliente,
+                a.nombre                AS almacen,
+                IF((SELECT COUNT(*) FROM estado_cobro estc 
+                    WHERE estc.venta_id_venta = ctz.id_cotizacion 
+                    AND estc.tipo_cobro = 'COT') > 0, 
+                    'credito', 'contado')   AS tipopago,
+                ctz.num                 AS nfactura,
+                ctz.monto_total         AS montototal,
+                IF(ctz.estado = 1, 'PREF', 'NOR') AS tipo
+            FROM cotizacion ctz
+            LEFT JOIN cliente              c    ON ctz.cliente_id_cliente                      = c.id_cliente
+            LEFT JOIN detalle_cotizacion   dctz ON ctz.id_cotizacion                           = dctz.cotizacion_id_cotizacion
+            LEFT JOIN productos_almacen    pa   ON dctz.productos_almacen_id_productos_almacen = pa.id_productos_almacen
+            LEFT JOIN almacen              a    ON pa.almacen_id_almacen                        = a.id_almacen
+            WHERE c.idempresa = '$idempresa'
+            AND ctz.condicion = 1
+            AND ctz.estado = 1
+			AND ctz.estadoVinculacionC = '3'
+            GROUP BY ctz.id_cotizacion
+
+            ORDER BY fechaventa DESC, id DESC
+
+        ");
+
+        foreach($lista_ventas as $plantilla){
 // PREGUNTAMOS SI ESA FACTURA TIENE CAJA BANCOS -- SOLO TOMA EN CUENTA FACT AL CONTADO, LAS DE CREDITO NUNCA TENDRAN CAJA BANCOS, SOLO SUS COBROS
 
             $fact_caja_banco = $this->dbc->query("SELECT * 
                                             FROM comprobantes_comercial_caja_bancos 
-                                            WHERE id_documento = '{$plantilla['id']}' AND registro_desde ='contado_venta_comercial'");
+                                            WHERE id_documento = '{$plantilla['id']}' AND registro_desde IN('contado_venta_con_factura_comercial','contado_venta_sin_factura_comercial')");
             
             if($fact_caja_banco->num_rows > 0){
                 $cb_comprob = $fact_caja_banco->fetch_assoc();
@@ -64,40 +103,77 @@ class Factura_comercial extends DB{
             }            
 
             //PREGUNTAMOS SI ESA FACTURA TIENE TRANSACCION
-            $trans_fact = $this->dbc->query("SELECT id_documento 
-                                            FROM transaccion_documentos_comercial 
-                                            WHERE id_documento = '{$plantilla['id']}' AND registro_desde ='contado_venta_comercial'");
-            if($trans_fact->num_rows > 0){
-                // Ya existe, no lo agregamos
-            }else {
+            // $trans_fact = $this->dbc->query("SELECT id_documento 
+            //                                 FROM transaccion_documentos_comercial 
+            //                                 WHERE id_documento = '{$plantilla['id']}'");
+            
+            // if($trans_fact->num_rows > 0){
+            //     // Ya existe, no lo agregamos
+            // }else {
                 // Guardamos todo el registro, no solo el id
                 $plantilla['nombre_caja_banco'] = $nombre_caja_banco; 
+
+                if($plantilla['tipo'] == 'PREF' &&  $plantilla['tipo_pago'] == 'contado'){
+                    $registro_desde = "contado_venta_sin_factura_comercial";
+                }elseif($plantilla['tipo'] == 'PREF' &&  $plantilla['tipo_pago'] == 'credito'){
+                    $registro_desde = "credito_venta_sin_factura_comercial";
+                }elseif($plantilla['tipo'] == 'FAC' &&  $plantilla['tipo_pago'] == 'contado'){
+                    $registro_desde = "contado_venta_con_factura_comercial";
+                }elseif($plantilla['tipo'] == 'FAC' &&  $plantilla['tipo_pago'] == 'credito'){
+                    $registro_desde = "credito_venta_con_factura_comercial";
+                }else{
+                    $registro_desde ='';
+                }
+                $plantilla['registro_desde'] = $registro_desde; 
                 $lista_factura_venta[] = $plantilla;
-            }
+            // }
         }
         echo json_encode($lista_factura_venta);
     }
     
     public function listar_factura_comercial_sin_cajaBancos($idmd5,$viv_mister_soft){ // FACTURAS VENTA DE COMERCIAL QUE NO TIENE CAJA BANCOS    
-        // ini_set('display_errors', 1);
-        // ini_set('display_startup_errors', 1);
-        // error_reporting(E_ALL);
-   
-        if($viv_mister_soft == "vivasoft"){
-            $url = "https://vivasoft.link/app/cmv1/api/listadoventasContabilidad/".$idmd5;
-        }else{ // mistersofts
-            $url = "https://mistersofts.com/app/cmv1/api/listadoventasContabilidad/".$idmd5;
-        }
-        
-        $data = json_decode(file_get_contents($url), true);
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+
+        $idempresa = $this->getidempresa($idmd5); 
         $lista_factura_venta = [];
 
-        foreach($data as $plantilla){
+        $ventas_cotizacion = $this->dbcm->query("SELECT ctz.id_cotizacion AS id,
+        ctz.fecha_cotizacion    AS fechaventa,
+                cl.nombre                AS cliente,
+            
+                ctz.num                     AS nro_documento,
+                ctz.monto_total         AS montototal,
+                IF(ctz.estado = 1, 'PREF', 'NOR') AS tipo,
+                ctz.tipo_pago
+        FROM cotizacion ctz
+        INNER JOIN cliente cl ON cl.id_cliente =ctz.cliente_id_cliente
+        WHERE ctz.idcajabancos IS NULL AND cl.idempresa='$idempresa'
+        AND ctz.condicion = 1
+        AND ctz.estado = 1
+        AND ctz.tipo_pago ='contado'
+        UNION ALL
+
+        SELECT v.id_venta AS id,
+        v.fecha_venta       AS fechaventa,
+                cl.nombre            AS cliente,
+                v.nfactura   AS nro_documento,
+                v.monto_total     AS montototal,
+                'FAC'             AS tipo,
+                v.tipo_pago
+        FROM venta v
+        INNER JOIN cliente cl ON cl.id_cliente =v.cliente_id_cliente1
+        WHERE v.cajabanco IS NULL AND cl.idempresa='$idempresa' AND v.fecha_venta >= '2026-01-01'
+        ");
+                                    
+        foreach($ventas_cotizacion as $plantilla){
 
         //PREGUNTAMOS SI ESA FACTURA TIENE TRANSACCION
+        //SOLO TOMAMOS EN CUENTA LAS VENTAS QUE SON AL CONTADO, LAS Q SON A CREDITO NO DEBERIAN TENER CAJA BANCO
             $trans_fact = $this->dbc->query("SELECT idtransaccion 
                                             FROM transaccion_documentos_comercial 
-                                            WHERE id_documento = '{$plantilla['id']}' AND registro_desde ='contado_venta_comercial'");
+                                            WHERE id_documento = '{$plantilla['id']}' AND registro_desde IN('contado_venta_con_factura_comercial','contado_venta_sin_factura_comercial')");
             if($trans_fact->num_rows > 0){
                 // AGREGAMOS EL CODIGO DE LA TRANSACCION
                 $trans_codig = $trans_fact->fetch_assoc();
@@ -113,17 +189,17 @@ class Factura_comercial extends DB{
 
             // PREGUNTAMOS SI ESA FACTURA TIENE CAJA BANCOS -- SOLO TOMA EN CUENTA FACT AL CONTADO, LAS DE CREDITO NUNCA TENDRAN CAJA BANCOS, SOLO SUS COBROS
 
-            $fact_caja_banco = $this->dbc->query("SELECT * 
-                                            FROM comprobantes_comercial_caja_bancos 
-                                            WHERE id_documento = '{$plantilla['id']}' AND registro_desde ='contado_venta_comercial'");
+            // $fact_caja_banco = $this->dbc->query("SELECT * 
+            //                                 FROM comprobantes_comercial_caja_bancos 
+            //                                 WHERE id_documento = '{$plantilla['id']}' AND registro_desde ='contado_venta_comercial'");
             
-            if($fact_caja_banco->num_rows > 0){
-                //YA EXISTE, NO LO AGREGAMOS
-            } else {
+            // if($fact_caja_banco->num_rows > 0){
+            //     //YA EXISTE, NO LO AGREGAMOS
+            // } else {
                 // Guardamos todo el registro, no solo el id
                 $plantilla['codigotransaccion'] = $codigo_trans; 
                 $lista_factura_venta[] = $plantilla;
-            }            
+            // }            
         }
         echo json_encode($lista_factura_venta);
     }
@@ -433,7 +509,7 @@ class Factura_comercial extends DB{
                     'CONTABILIDAD',
                     '{$factura['fecha']}',
                     '{$factura['almacen']}',
-                    '{$factura['cliente_proveedor']}',
+                    '{$factura['cliente_proveedor']}', 
                     '{$factura['idfactura']}',
                     '{$factura['nro_documento']}',
                     '$nuevo_correlativo',
@@ -472,7 +548,7 @@ class Factura_comercial extends DB{
         echo json_encode($res);
     }
 
-      public function listar_factura_comercial_con_transaccion($idmd5) // ESTA API TAMBIEN SERA PARA LISTAR DENTRO DE TRANSACCIONES LA 3ERA OPCION DE FACTURAS COMERCIAL
+      public function listar_factura_comercial_con_transaccion($idmd5) // ESTA API SE USARA EN INTEGRACION, VENTAS QUE YA ESTAN VINCULADAS A TRANSACCION
         { 
         // ini_set('display_errors', 1);
         // ini_set('display_startup_errors', 1);
@@ -482,92 +558,48 @@ class Factura_comercial extends DB{
         $lista = [];
 
         $listaFactura = [];
-        $trans_fact = $this->dbc->query("SELECT id_documento FROM transaccion_documentos_comercial WHERE idempresa = '$idempresa' AND registro_desde ='contado_venta_comercial'");
-        while ($zxc = $this->dbc->fetch($trans_fact)) {
-            // $listaFactura = $zxc['idfactura_comercial'];
-            array_push($listaFactura,$zxc['id_documento']);
-        }
+        // $trans_venta_con_fact = $this->dbc->query("SELECT id_documento FROM transaccion_documentos_comercial WHERE idempresa = '$idempresa' 
+        // AND registro_desde IN('contado_venta_con_factura_comercial','credito_venta_con_factura_comercial')");
 
-        $facturas = implode(", ", $listaFactura);
+        // $trans_venta_sin_fact = $this->dbc->query("SELECT id_documento FROM transaccion_documentos_comercial WHERE idempresa = '$idempresa' 
+        // AND registro_desde IN('contado_venta_sin_factura_comercial','credito_venta_sin_factura_comercial')");
 
-        if (!empty($facturas)) {
-            $clien = $this->dbcm->query("SELECT 
-            v.id_venta, 
-            MAX(a.nombre) AS nombre_almacen, 
-            v.fecha_venta, 
-            MAX(c.nombre) AS nombre_cliente, 
-            MAX(c.nombrecomercial) AS nombre_comercial, 
-            MAX(c.ciudad) AS ciudad, 
-            v.tipo_venta, 
-            v.tipo_pago, 
-            v.monto_total, 
-            v.nfactura, 
-            v.descuento, 
-            MAX(pa.almacen_id_almacen) AS almacen_id, 
-            v.cliente_id_cliente1, 
-            MAX(s.nombre) AS nombre_sucursal, 
-            v.estado, 
-            MAX(ca.canal) AS canal_venta, 
-            MAX(vf.cuf) AS cuf, 
-            MAX(vf.fechaEmission) AS fecha_emision, 
-            MAX(vf.shortLink) AS enlace_corto, 
-            MAX(vf.urlSin) AS url_sin, 
-            MAX(ec.estado) AS estado_cobro, 
-            MAX(ec.saldo) AS saldo
-        FROM venta v  
-            LEFT JOIN cliente c ON v.cliente_id_cliente1 = c.id_cliente 
-            LEFT JOIN detalle_venta dv ON v.id_venta = dv.venta_id_venta 
-            LEFT JOIN sucursal s ON v.idsucursal = s.id_sucursal 
-            LEFT JOIN productos_almacen pa ON dv.productos_almacen_id_productos_almacen = pa.id_productos_almacen 
-            LEFT JOIN almacen a ON pa.almacen_id_almacen = a.id_almacen 
-            LEFT JOIN canalventa ca ON v.idcanal = ca.idcanalventa 
-            LEFT JOIN ventas_facturadas vf ON v.id_venta = vf.venta_id_venta 
-            LEFT JOIN estado_cobro ec ON ec.venta_id_venta = v.id_venta 
-        WHERE v.id_venta IN ($facturas) 
-        GROUP BY v.id_venta 
-        ORDER BY v.fecha_venta DESC, v.id_venta DESC;
-        ");
-                }else{
-                    $clien = $this->dbcm->query("SELECT 
-            v.id_venta, 
-            MAX(a.nombre) AS nombre_almacen, 
-            v.fecha_venta, 
-            MAX(c.nombre) AS nombre_cliente, 
-            MAX(c.nombrecomercial) AS nombre_comercial, 
-            MAX(c.ciudad) AS ciudad, 
-            v.tipo_venta, 
-            v.tipo_pago, 
-            v.monto_total, 
-            v.nfactura, 
-            v.descuento, 
-            MAX(pa.almacen_id_almacen) AS almacen_id, 
-            v.cliente_id_cliente1, 
-            MAX(s.nombre) AS nombre_sucursal, 
-            v.estado, 
-            MAX(ca.canal) AS canal_venta, 
-            MAX(vf.cuf) AS cuf, 
-            MAX(vf.fechaEmission) AS fecha_emision, 
-            MAX(vf.shortLink) AS enlace_corto, 
-            MAX(vf.urlSin) AS url_sin, 
-            MAX(ec.estado) AS estado_cobro, 
-            MAX(ec.saldo) AS saldo
-        FROM venta v  
-            LEFT JOIN cliente c ON v.cliente_id_cliente1 = c.id_cliente 
-            LEFT JOIN detalle_venta dv ON v.id_venta = dv.venta_id_venta 
-            LEFT JOIN sucursal s ON v.idsucursal = s.id_sucursal 
-            LEFT JOIN productos_almacen pa ON dv.productos_almacen_id_productos_almacen = pa.id_productos_almacen 
-            LEFT JOIN almacen a ON pa.almacen_id_almacen = a.id_almacen 
-            LEFT JOIN canalventa ca ON v.idcanal = ca.idcanalventa 
-            LEFT JOIN ventas_facturadas vf ON v.id_venta = vf.venta_id_venta 
-            LEFT JOIN estado_cobro ec ON ec.venta_id_venta = v.id_venta 
-        WHERE v.id_venta IN (NULL)
-        GROUP BY v.id_venta 
-        ORDER BY v.fecha_venta DESC, v.id_venta DESC;
-        ");
-                }
+        $trans_venta_cotizacion = $this->dbcm->query("SELECT ctz.id_cotizacion AS id,
+        ctz.fecha_cotizacion    AS fechaventa,
+                cl.nombre                AS cliente,
+            
+                ctz.num                     AS nro_documento,
+                ctz.monto_total         AS montototal,
+                IF(ctz.estado = 1, 'PREF', 'NOR') AS tipo,
+                ctz.tipo_pago
+        FROM cotizacion ctz
+        INNER JOIN cliente cl ON cl.id_cliente =ctz.cliente_id_cliente
+        WHERE ctz.estadoVinculacionC ='1' AND cl.idempresa='$idempresa' 
+        AND ctz.condicion = 1
+            AND ctz.estado = 1
+        
+        UNION ALL
 
-        $i = 0;
-                while ($qwe = $this->dbcm->fetch($clien)) {
+        SELECT v.id_venta AS id,
+        v.fecha_venta       AS fechaventa,
+                cl.nombre            AS cliente,
+                v.nfactura   AS nro_documento,
+                v.monto_total     AS montototal,
+                'FAC'             AS tipo,
+                v.tipo_pago
+        FROM venta v
+        INNER JOIN cliente cl ON cl.id_cliente =v.cliente_id_cliente1
+        WHERE v.estadoVinculacionC ='1' AND cl.idempresa='$idempresa' AND v.fecha_venta >= '2024-01-01'");
+
+        // while ($zxc = $this->dbc->fetch($trans_venta_cotizacion)) {
+        //     // $listaFactura = $zxc['idfactura_comercial'];
+        //     array_push($listaFactura,$zxc['id_documento']);
+        // }
+
+        // $facturas = implode(", ", $listaFactura);
+
+        // $i = 0;
+                while ($qwe = $this->dbcm->fetch($trans_venta_cotizacion)) {
         
                     $trans_fact_aux = $this->dbc->query("SELECT * FROM transaccion_documentos_comercial WHERE id_documento = '$qwe[0]' AND registro_desde ='contado_venta_comercial'");
 
@@ -1268,9 +1300,9 @@ class Factura_comercial extends DB{
 
     public function listar_cobros_comercial($empresa,$viv_mister_soft)
     {
-         ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+        //  ini_set('display_errors', 1);
+        // ini_set('display_startup_errors', 1);
+        // error_reporting(E_ALL);
 
         $idempresa = $this->getidempresa($empresa); 
         // $ide = $this->getidempresa($empresa);
@@ -1319,7 +1351,7 @@ class Factura_comercial extends DB{
                 $sql = "SELECT MAX(nro_comprobante) as ultimo 
                         FROM comprobantes_comercial_caja_bancos 
                         WHERE idempresa = '$idempresa' 
-                        AND registro_desde = '$factura[registro_desde]'";
+                        AND registro_desde = '$factura[registro_desde]'"; //yo pasare registro_desde en listado
                 $result = $this->dbc->query($sql);
                 $row = $result->fetch_assoc();
 
@@ -1330,17 +1362,17 @@ class Factura_comercial extends DB{
         ) VALUES (
             'CONTABILIDAD',
             '{$factura['fecha']}',
-            '{$factura['lugar']}',
-            '{$factura['cliente_proveedor']}',
+            '{$factura['lugar']}', 
+            '{$factura['cliente_proveedor']}', 
             '{$factura['id_documento']}',
             '{$factura['nro_documento']}',
             '$nuevo_correlativo',
-            '{$data['registro_desde']}', 
-            '{$data['concepto']}',    
+            '{$factura['registro_desde']}', 
+            '{$factura['registro_desde']}',    
             '{$data['idcaja_bancos']}', 
             '{$factura['monto']}',
-            '{$data['ingreso_egreso']}', 
-            '{$factura['estado']}',
+            'ingreso', 
+            '{$factura['estado']}', 
             '$idempresa'
         )");
             }
@@ -1561,8 +1593,8 @@ class Factura_comercial extends DB{
 
         if (!empty($cobros)) { // TIENE DATOS LOS COBROS
             $clien = $this->dbcm->query("SELECT * FROM detalle_cobro WHERE iddetalle_cobro IN($cobros)
-        ");
-                }else{
+            ");
+        }else{
                     $clien = $this->dbcm->query("SELECT * FROM detalle_cobro WHERE iddetalle_cobro IN(NULL)
         ");
                 }

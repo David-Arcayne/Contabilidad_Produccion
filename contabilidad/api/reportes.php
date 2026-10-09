@@ -563,24 +563,25 @@ public function getidgestion($md5){
       $ide = $this->getidempresa($empresa);
       // $gestion = $this->getidgestion($empresa);
       $reporte = $this->dbc->query("SELECT 
-    p.numero, 
-    p.nombreplan, 
-    SUM(d.debe) AS debe, 
-    SUM(d.haber) AS haber, 
-    SUM(d.debe) - SUM(d.haber) AS deudor, 
-    SUM(d.haber) - SUM(d.debe) AS acreedor
-FROM plandecuenta AS p
-INNER JOIN detalletransaccion AS d 
-       ON d.idplandecuenta = p.idplandecuenta
-INNER JOIN transacciones AS t 
-       ON t.idtransacciones = d.transacciones_idtransacciones
-WHERE p.organizacion_idorganizacion = '$ide'
-  AND t.organizacion_idorganizacion = '$ide'
-  AND t.estado NOT IN (4, 5, 6)
-  AND t.fechatransaccion BETWEEN '$fechai' AND '$fechaf'
-  AND t.idgestion = '$gestion'
-GROUP BY p.numero, p.nombreplan
-ORDER BY p.numero ASC;");
+          p.numero, 
+          p.nombreplan, 
+          SUM(d.debe) AS debe, 
+          SUM(d.haber) AS haber, 
+          SUM(d.debe) - SUM(d.haber) AS deudor, 
+          SUM(d.haber) - SUM(d.debe) AS acreedor
+        FROM plandecuenta AS p
+        INNER JOIN detalletransaccion AS d 
+              ON d.idplandecuenta = p.idplandecuenta
+        INNER JOIN transacciones AS t 
+              ON t.idtransacciones = d.transacciones_idtransacciones
+        WHERE p.organizacion_idorganizacion = '$ide'
+          AND t.organizacion_idorganizacion = '$ide'
+          AND t.estado NOT IN (4, 5, 6)
+          -- AND t.consolidar = '2'
+          AND t.fechatransaccion BETWEEN '$fechai' AND '$fechaf'
+          AND t.idgestion = '$gestion'
+        GROUP BY p.numero, p.nombreplan
+        ORDER BY p.numero ASC;");
   
       $totalDebe = 0;
       $totalHaber = 0;

@@ -1,7 +1,7 @@
 <?php
 require_once "../../db/db.php";
 class Asiento extends DB{
-    public function registrar_asignacion_asiento_operacion($fecha_registro,$idoperacion_modulos,$idasientotipo,$bandera,$frecuencia_registro,$idgestion,$empresa){
+    public function registrar_asignacion_asiento_operacion($fecha_registro,$idoperacion_modulos,$idasientotipo,$bandera,$frecuencia_registro,$idcuenta,$idgestion,$empresa){
         $idempresa = $this->getidempresa($empresa);
         // $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM divisa WHERE nombre = '$nombre' AND idempresa = '$idempresa'");
         // $resultado = $consulta->fetch_assoc();
@@ -11,8 +11,8 @@ class Asiento extends DB{
             $res = array("danger", "El registro ya existe","Error");
         } else {
             // Insertar el nuevo registro
-            $registroProveedor = $this->dbc->query("INSERT INTO asignacion_asiento_operacion_modulos(fecha_registro,idoperacion_modulos,idasientotipo,bandera,frecuencia_registro,idgestion,idempresa) 
-            VALUES ('$fecha_registro','$idoperacion_modulos','$idasientotipo','$bandera','$frecuencia_registro','$idgestion','$idempresa')");
+            $registroProveedor = $this->dbc->query("INSERT INTO asignacion_asiento_operacion_modulos(fecha_registro,idoperacion_modulos,idasientotipo,bandera,frecuencia_registro,idcuenta,idgestion,idempresa) 
+            VALUES ('$fecha_registro','$idoperacion_modulos','$idasientotipo','$bandera','$frecuencia_registro','$idcuenta','$idgestion','$idempresa')");
             if ($registroProveedor === TRUE) {                                                                                                                                                                
                 $res = array("success", "Registro exitoso","registroCaracteristicas");
             } else {
@@ -25,7 +25,6 @@ class Asiento extends DB{
 
     public function editar_asignacion_asiento_operacion($id,$idoperacion_modulos,$idasientotipo,$bandera,$idgestion,$frecuencia_registro) {
         // $idempresa = $this->getidempresa($empresa);
-
         // $consulta = $this->dbc->query("SELECT COUNT(*) AS total FROM divisa WHERE nombre = '$nombre' AND idempresa = '$idempresa' AND iddivisa != '$id'");
         // $resultado = $consulta->fetch_assoc();
         // $totalRegistros = $resultado['total'];
@@ -217,6 +216,27 @@ class Asiento extends DB{
                 "nombre" => $qwe['nombre'],
                 "tipo" => $qwe['tipo'],
                 "tipo_modulo" => $qwe['tipo_modulo']
+            );
+            array_push($lista, $res);
+        }
+    
+        echo json_encode($lista, JSON_NUMERIC_CHECK);
+    }
+
+    public function listar_confi_conta_integracion($empresa) {
+        $lista = [];
+        $idempresa = $this->getidempresa($empresa);
+    
+        // Preparar la consulta
+        $asig_op_mod = $this->dbc->query("SELECT asom.frecuencia_registro,om.nombre_operacion FROM asignacion_asiento_operacion_modulos asom
+        INNER JOIN operacion_modulos om ON om.idoperacion_modulos = asom.idoperacion_modulos
+        WHERE asom.idempresa = '$idempresa'");
+    
+        while ($qwe = $this->dbc->fetch($asig_op_mod)) {
+            $res = array(
+                // "iddivisa" => $qwe['iddivisa'],
+                "frecuencia_registro" => $qwe['frecuencia_registro'],
+                "nombre_operacion" => $qwe['nombre_operacion']
             );
             array_push($lista, $res);
         }

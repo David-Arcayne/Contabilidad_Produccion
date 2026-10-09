@@ -1162,9 +1162,9 @@ class Filtrado_facturas extends DB{
     }
 
     public function recibos_perteneciente_a_cuenta($idtransaccion,$idcuenta,$fecha_ini,$fecha_fin,$empresa){
-     ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
+    //  ini_set('display_errors', 1);
+    //     ini_set('display_startup_errors', 1);
+    //     error_reporting(E_ALL);
     $idempresa = $this->getidempresa($empresa);    
     $lista = [];
     
